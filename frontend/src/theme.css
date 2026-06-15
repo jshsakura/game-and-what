@@ -1516,7 +1516,7 @@ body::before {
 .dp, .dp-hub {
   background: #26262b; border: none; box-shadow: none;
 }
-.dp { font-size: 12px; color: #75757d; }
+.dp { font-size: 12px; color: #75757d; font-variant-emoji: text; }
 .dp.on { transform: none; box-shadow: none; filter: brightness(1.5); }   /* press a single arm, cross stays put */
 .dp-up { grid-area: 1 / 2; border-radius: 6px 6px 0 0; }
 .dp-left { grid-area: 2 / 1; border-radius: 6px 0 0 6px; }

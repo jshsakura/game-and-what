@@ -403,11 +403,13 @@ function VirtualPad({ onDown, onUp }) {
   return (
     <div className="emu-pad">
       <div className="pad-dpad">
-        <PadButton btn="up" glyph="▲" label={t("위")} className="dp dp-up" {...p} />
-        <PadButton btn="left" glyph="◀" label={t("왼쪽")} className="dp dp-left" {...p} />
+        {/* trailing U+FE0E forces text (not colour-emoji) presentation — ◀ ▶ render
+            as emoji on many platforms otherwise */}
+        <PadButton btn="up" glyph="▲︎" label={t("위")} className="dp dp-up" {...p} />
+        <PadButton btn="left" glyph="◀︎" label={t("왼쪽")} className="dp dp-left" {...p} />
         <span className="dp-hub" aria-hidden />
-        <PadButton btn="right" glyph="▶" label={t("오른쪽")} className="dp dp-right" {...p} />
-        <PadButton btn="down" glyph="▼" label={t("아래")} className="dp dp-down" {...p} />
+        <PadButton btn="right" glyph="▶︎" label={t("오른쪽")} className="dp dp-right" {...p} />
+        <PadButton btn="down" glyph="▼︎" label={t("아래")} className="dp dp-down" {...p} />
       </div>
       <img className="pad-logo" src="/gamewatch-logo.png" alt="" aria-hidden />
       <div className="pad-right">
