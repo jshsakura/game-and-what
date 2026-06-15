@@ -85,18 +85,18 @@
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-2); }
 
-/* Root carries the theme colour so mobile rubber-band overscroll never flashes
-   white outside the body; overscroll-behavior also tames the bounce. */
+/* Paint the whole-page background on the ROOT only (body stays transparent), so
+   there's exactly one background layer — no html/body colour seam showing as a
+   dark line at the top (margin-collapse) and no white flash on mobile overscroll. */
 html {
-  background: var(--shell);
+  background-color: var(--shell);
+  background-image: radial-gradient(circle at 50% 0%, var(--shell-2), var(--shell));
+  background-attachment: fixed;
   overscroll-behavior: none;
 }
 body {
   margin: 0;
-  min-height: 100%;
   font-family: var(--body-font);
-  background:
-    radial-gradient(circle at 50% 0%, var(--shell-2), var(--shell)) fixed;
   color: #f4f1e6;
   overscroll-behavior: none;
 }
