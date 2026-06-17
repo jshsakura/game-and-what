@@ -16,6 +16,10 @@ frontend/dist/
 .env
 .env.local
 
+# Scratch artifacts — test runner output + one-off screenshots (root only)
+.playwright-mcp/
+/miyoo-ui.png
+
 # scratch reference uploads
 _refs/*
 !_refs/README.md
