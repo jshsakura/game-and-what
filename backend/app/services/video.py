@@ -3,16 +3,20 @@ Video encoding for the device's /media MJPEG player.
 
 Hard hardware fact (docs/MEDIA_BROWSER.md): the chip has NO H.264/HEVC
 decoder, only a hardware JPEG decoder. So the ONLY playable video is
-MJPEG inside an .avi container. This is the firmware's exact ffmpeg recipe:
+MJPEG inside an .avi container. Device-verified recipe (bench-tested):
 
   ffmpeg -i input -c:v mjpeg -q:v 5 \
-    -vf scale=w=320:h=240:force_original_aspect_ratio=decrease:\
-        force_divisible_by=16,format=yuv420p,scale=src_range=1:dst_range=1 \
-    -r 30 -c:a pcm_s16le -ac 1 -ar 24000 output.avi
+    -vf scale=320:240:force_original_aspect_ratio=decrease,\
+        pad=320:240:-1:-1:color=black,fps=24 \
+    -c:a libmp3lame -ac 1 -b:a 96k -ar 44100 output.avi
 
-Mapping: force_divisible_by=16 -> JPEG MCU, yuv420p -> HW decoder native
-output, pcm_s16le -ac 1 -ar 24000 -> the SAI 16-bit mono audio path.
-Screen is 320x240.
+Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck, and PCM mono
+(~88 KB/s) would 5-7x the audio SD load on top of the ~226 KB/s video. MP3
+mono 96k is ~12 KB/s, decodes in ~3ms/frame (well inside the 24fps budget),
+and reuses the device's existing minimp3 decoder (shared with the music app)
+— no new audio path. The device downmixes/resamples to its 48kHz mono output
+internally, so source channels/rate don't matter. pad -> always exactly the
+320x240 screen (letterbox); fps 24 trims SD/CPU further. Screen is 320x240.
 """
 from __future__ import annotations
 
@@ -20,18 +24,23 @@ import asyncio
 import shutil
 from pathlib import Path
 
-# Device-fixed encode parameters — change only against the firmware docs.
+# Device-verified encode parameters (bench-tested on hardware).
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
-VIDEO_QSCALE = 5          # -q:v 5
-FRAME_RATE = 30           # -r 30
-AUDIO_RATE = 24000        # -ar 24000
+VIDEO_QSCALE = 8          # -q:v 8 (smaller frames -> less SD load; offsets 30fps)
+FRAME_RATE = 30           # fps=30 — the device decodes via the HW JPEG codec now
+                          # (~few ms/frame), so 30fps is smooth; q8 keeps SD load flat
+AUDIO_BITRATE = "96k"     # MP3 mono — minimal SD load, reuses minimp3 on device
+AUDIO_RATE = 44100        # -ar 44100 (device resamples to 48k mono internally)
 OUTPUT_SUFFIX = ".avi"
 
+# Fit within the screen preserving aspect, then PAD to an exact 320x240 with
+# black bars (letterbox) so output is always exactly the device screen size, and
+# resample to the target frame rate.
 _VIDEO_FILTER = (
-    f"scale=w={SCREEN_WIDTH}:h={SCREEN_HEIGHT}"
-    ":force_original_aspect_ratio=decrease:force_divisible_by=16"
-    ",format=yuv420p,scale=src_range=1:dst_range=1"
+    f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease"
+    f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black"
+    f",fps={FRAME_RATE}"
 )
 
 
@@ -50,8 +59,7 @@ def build_command(input_path: Path, output_path: Path) -> list[str]:
         "-i", str(input_path),
         "-c:v", "mjpeg", "-q:v", str(VIDEO_QSCALE),
         "-vf", _VIDEO_FILTER,
-        "-r", str(FRAME_RATE),
-        "-c:a", "pcm_s16le", "-ac", "1", "-ar", str(AUDIO_RATE),
+        "-c:a", "libmp3lame", "-ac", "1", "-b:a", AUDIO_BITRATE, "-ar", str(AUDIO_RATE),
         str(output_path),
     ]
 
