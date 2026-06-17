@@ -29,6 +29,7 @@ container env (compose auto-loads a sibling `.env`). See `.env.example`.
 |---|---|---|
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | — | IGDB cover search + auto-fill (Twitch dev app) |
 | `TGDB_API_KEY` | — | TheGamesDB cover search + auto-fill (free key, **monthly quota**) |
+| `STEAMGRIDDB_API_KEY` | — | SteamGridDB cover search (free Bearer token from steamgriddb.com) |
 | `GNW_KOREAN_MODE` | `false` | Korea-only features (한글패치/한글명/커버 ko). Public image: off |
 | `GNW_CORS_ORIGINS` | `*` | Comma-separated CORS origins (no auth — front with Zero Trust) |
 | `GNW_DATA_DIR` | `…/backend/data` | Persistent data root (set to `/app/backend/data` in the image) |
@@ -58,6 +59,7 @@ any of three ways:
 # 1) docker run -e
 docker run -d -p 38472:8080 -v "$PWD/data:/app/backend/data" \
   -e IGDB_CLIENT_ID=xxx -e IGDB_CLIENT_SECRET=yyy -e TGDB_API_KEY=zzz \
+  -e STEAMGRIDDB_API_KEY=sgdb \
   ghcr.io/<owner>/game-and-what:latest
 ```
 

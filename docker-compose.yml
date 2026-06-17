@@ -29,6 +29,7 @@ services:
       IGDB_CLIENT_ID: ${IGDB_CLIENT_ID:-}
       IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET:-}
       TGDB_API_KEY: ${TGDB_API_KEY:-}
+      STEAMGRIDDB_API_KEY: ${STEAMGRIDDB_API_KEY:-}
       # Korea-specific features — public image keeps this off.
       GNW_KOREAN_MODE: ${GNW_KOREAN_MODE:-false}
     restart: unless-stopped
