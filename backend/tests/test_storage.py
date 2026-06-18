@@ -2,6 +2,8 @@
 """safe_name() filename sanitization for the SD card's FAT/exFAT filesystem."""
 import unicodedata
 
+from app import config
+from app.services import storage
 from app.services.storage import safe_name
 
 
@@ -35,3 +37,23 @@ def test_empty_falls_back_to_untitled():
 def test_result_is_nfc_normalized():
     decomposed = unicodedata.normalize("NFD", "한글")
     assert safe_name(decomposed) == unicodedata.normalize("NFC", "한글")
+
+
+def test_sweep_temp_uploads_removes_orphans_keeps_real(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "LIBRARY_DIR", tmp_path)
+    media = tmp_path / "public" / config.MEDIA_DIR_NAME
+    media.mkdir(parents=True)
+    (media / ".src_abc").write_bytes(b"x")
+    (media / ".src_def").write_bytes(b"y")
+    (media / "keep.avi").write_bytes(b"z")
+
+    removed = storage.sweep_temp_uploads()
+
+    assert removed == 2
+    assert not list(media.glob(".src_*"))
+    assert (media / "keep.avi").exists()
+
+
+def test_sweep_temp_uploads_no_library_dir(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "LIBRARY_DIR", tmp_path / "missing")
+    assert storage.sweep_temp_uploads() == 0

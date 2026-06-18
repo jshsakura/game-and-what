@@ -47,6 +47,12 @@ app.include_router(lang.router)
 @app.on_event("startup")
 def _startup() -> None:
     db.init_db()
+    # Reclaim disk from orphaned upload temps (.src_*) left by an encode that was
+    # killed mid-run (crash/OOM/stop) before its finally-cleanup could fire.
+    from .services import storage
+    swept = storage.sweep_temp_uploads()
+    if swept:
+        print(f"[startup] swept {swept} orphaned upload temp file(s)")
     # Backfill language/한글패치 for legacy roms (lang_source IS NULL) once — new
     # uploads already auto-detect, so this converges immediately and is a no-op
     # thereafter. Metadata-only: never touches filenames, covers or files.

@@ -53,6 +53,29 @@ def media_dir(session_id: str) -> Path:
     return session_root(session_id) / config.MEDIA_DIR_NAME
 
 
+# Transient upload name: `.src_<id>` in a session's media dir, written before an
+# encode and removed in the encoder's `finally`. See video/upload routers.
+TEMP_UPLOAD_GLOB = ".src_*"
+
+
+def sweep_temp_uploads() -> int:
+    """Delete orphaned `.src_*` upload temp files left by an encode that never
+    finished (hard crash / OOM / container stop → the normal `finally` cleanup
+    didn't run). Safe at startup: a `.src_*` exists only DURING an encode, so any
+    present after a restart is guaranteed an orphan. Returns the count removed."""
+    removed = 0
+    if not config.LIBRARY_DIR.exists():
+        return 0
+    for media in config.LIBRARY_DIR.glob(f"*/{config.MEDIA_DIR_NAME}"):
+        for f in media.glob(TEMP_UPLOAD_GLOB):
+            try:
+                f.unlink()
+                removed += 1
+            except OSError:
+                pass
+    return removed
+
+
 def music_dir(session_id: str) -> Path:
     return session_root(session_id) / config.MUSIC_DIR_NAME
 

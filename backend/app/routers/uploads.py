@@ -222,6 +222,7 @@ async def _run_encode(
     try:
         await video.encode_to_mjpeg_avi(src, dst)
     except video.VideoEncodeError as exc:
+        dst.unlink(missing_ok=True)  # drop any partial/zero-byte .avi ffmpeg left
         await jobs.update(job_id, status="failed", message=str(exc))
         with db.connect() as conn:
             conn.execute("UPDATE videos SET status='failed' WHERE id=?", (video_id,))
