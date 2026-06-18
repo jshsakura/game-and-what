@@ -27,6 +27,13 @@ function DemoBanner() {
         <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub ★</a>
         <a href={`${REPO_URL}#quick-start-docker`} target="_blank" rel="noreferrer">🐳 Docker</a>
       </span>
+      <span className="demo-banner-tip">
+        💡 {t("Self-host")}:&nbsp;
+        <code
+          title={t("Click to copy")}
+          onClick={(e) => navigator.clipboard?.writeText(e.currentTarget.textContent)}
+        >docker run -p 38472:8080 ghcr.io/jshsakura/game-and-what</code>
+      </span>
     </div>
   );
 }

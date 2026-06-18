@@ -813,7 +813,9 @@ body::before {
 }
 /* the ORIGINAL side shows the WHOLE image at its natural shape — never cropped */
 .cover-compare .cmp-web {
-  width: auto; height: auto; max-width: 150px; max-height: 210px;
+  width: auto; height: auto;
+  min-width: 110px; min-height: 150px;   /* keep a box when the image is empty/sizeless */
+  max-width: 150px; max-height: 210px;
   aspect-ratio: auto; object-fit: contain;
 }
 /* the device image shown with crisp pixels (honest about hardware output) */
@@ -1981,3 +1983,12 @@ body::before {
   text-decoration: underline; white-space: nowrap;
 }
 .demo-banner a:hover { opacity: .75; }
+
+/* Demo banner tip — copyable Docker one-liner */
+.demo-banner-tip { display: inline-flex; align-items: center; flex-wrap: wrap; }
+.demo-banner-tip code {
+  background: #00000033; color: var(--accent-ink);
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 10px; cursor: pointer; user-select: all;
+}
+.demo-banner-tip code:hover { background: #00000055; }

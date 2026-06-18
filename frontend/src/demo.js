@@ -91,8 +91,8 @@ export function installDemoFetch() {
       status: 200, headers: { "Content-Type": "application/json" },
     }));
   };
-  // Default the UI to Korean for the demo unless the visitor already chose one.
+  // Default the UI to English for the demo unless the visitor already chose one.
   try {
-    if (!localStorage.getItem("gnw_lang")) localStorage.setItem("gnw_lang", "ko");
+    if (!localStorage.getItem("gnw_lang")) localStorage.setItem("gnw_lang", "en");
   } catch (_) { /* ignore */ }
 }
