@@ -1,5 +1,7 @@
 // API client. Single SHARED library — every visitor uses the same workspace,
 // so what anyone uploads is visible to everyone (no per-browser isolation).
+import { DEMO, PLACEHOLDER_COVER } from "./demo.js";
+
 const SESSION_ID = "public";
 
 export function getSessionId() {
@@ -14,6 +16,7 @@ async function withSession(makeRequest) {
 // POST a FormData via XHR so we get real UPLOAD progress (fetch can't report it).
 // onProgress(loaded, total) fires as bytes go up. Resolves the parsed JSON body.
 function xhrUpload(url, form, onProgress) {
+  if (DEMO) return Promise.reject(new Error("데모 모드입니다 — 업로드는 Docker로 설치 후 사용하세요."));
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url);
@@ -155,6 +158,7 @@ export async function uploadCover(romId, file, crop) {
 }
 
 export function coverUrl(romId) {
+  if (DEMO) return PLACEHOLDER_COVER;
   const sid = getSessionId();
   // cache-bust so a freshly uploaded cover shows immediately
   return sid ? `/api/sessions/${sid}/roms/${romId}/cover` : null;

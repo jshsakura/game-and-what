@@ -275,6 +275,7 @@ export default {
   // ── MediaTab / VideoTab / MusicTab ──
   "음악": "Música",
   "영상 → MJPEG .avi (320×240·30fps·mono)로 인코딩해서 /media에 보관": "Vídeo → codificado para MJPEG .avi (320×240·30fps·mono) e guardado em /media",
+  "데모 미리보기 — 샘플 데이터입니다. Game & Watch 휴대기기용 레트로 SD 카드 매니저.": "Pré-visualização demo — apenas dados de exemplo. Gestor de cartões SD retro para o Game & Watch.",
   "화면 채우기": "Ajuste de tela",
   "맞춤 (레터박스)": "Ajustar (letterbox)",
   "꽉 채우기 (잘라냄)": "Preencher (cortar)",

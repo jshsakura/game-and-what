@@ -11,7 +11,11 @@ import { ToastProvider } from "./toast.jsx";
 import { DownloadProvider } from "./download.jsx";
 import { ConfigProvider } from "./config.jsx";
 import { I18nProvider } from "./i18n.jsx";
+import { DEMO, installDemoFetch } from "./demo.js";
 import "./theme.css";
+
+// Static GitHub Pages preview: no backend — serve canned fixtures from fetch.
+if (DEMO) installDemoFetch();
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -79,7 +79,7 @@ export function SystemIcon({ dirname, size = 16 }) {
       <img
         ref={imgRef}
         className="sys-ico"
-        src={`/system-icons/${dirname}.${ICON_EXTS[extIdx]}`}
+        src={`${import.meta.env.BASE_URL}system-icons/${dirname}.${ICON_EXTS[extIdx]}`}
         width={size}
         height={size}
         alt=""
@@ -632,7 +632,7 @@ export function langCC(code) {
 }
 export function langFlagUrl(code) {
   const cc = langCC(code);
-  return cc ? `/flags/${cc}.png` : "";   // bundled locally — no external CDN
+  return cc ? `${import.meta.env.BASE_URL}flags/${cc}.png` : "";   // bundled locally — no external CDN
 }
 
 // Cover-flag (corner country icon) options for the rom edit modal. "" = no flag.

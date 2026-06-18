@@ -9,6 +9,11 @@ retro-go SD card layout. Ready to extract onto your card.
 > firmware. The name "Game & What" is a play on words — this project ships **no
 > ROMs, BIOS or copyrighted assets** (see [Disclaimer](#disclaimer)).
 
+**▶︎ [Live demo](https://jshsakura.github.io/game-and-what/)** — a static preview
+with sample data (no backend; uploads/edits are disabled).
+
+![Game & What preview](docs/preview-ko.png)
+
 ---
 
 ## What it does

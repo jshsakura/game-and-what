@@ -10,6 +10,26 @@ import { getLibrary, packageUrl, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
 import { LOCALES } from "./i18n.locales.js";
+import { DEMO } from "./demo.js";
+
+const REPO_URL = "https://github.com/jshsakura/game-and-what";
+
+// Intro/demo bar for the static GitHub Pages preview: explains what the site is
+// and that the data is sample-only, with links to the real thing.
+function DemoBanner() {
+  const t = useT();
+  return (
+    <div className="demo-banner">
+      <span>
+        🎮 {t("데모 미리보기 — 샘플 데이터입니다. Game & Watch 휴대기기용 레트로 SD 카드 매니저.")}
+      </span>
+      <span className="demo-banner-links">
+        <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub ★</a>
+        <a href={`${REPO_URL}#quick-start-docker`} target="_blank" rel="noreferrer">🐳 Docker</a>
+      </span>
+    </div>
+  );
+}
 
 const THEME_KEY = "gnw_theme";
 
@@ -89,7 +109,7 @@ function LangFlag({ locale }) {
   if (broken) return <span className="lang-code">{locale.code.toUpperCase()}</span>;
   return (
     <img
-      src={`/flags/${locale.flag}.png`}
+      src={`${import.meta.env.BASE_URL}flags/${locale.flag}.png`}
       alt={locale.label}
       onError={() => setBroken(true)}
     />
@@ -206,6 +226,7 @@ export default function App() {
 
   return (
     <div className="app">
+      {DEMO && <DemoBanner />}
       <header className="topbar">
         <div
           className="brand-id"
