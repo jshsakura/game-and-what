@@ -39,6 +39,18 @@ with sample data (no backend; uploads/edits are disabled).
   "Korean-patched" flag, and related filters. **Off by default** (international image).
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
 
+## Screenshots
+
+*(from the [live demo](https://jshsakura.github.io/game-and-what/) — sample data)*
+
+| Library — per-system grid, covers, one-click SD ZIP | Built-in guide & SD spec reference |
+|---|---|
+| ![Library](docs/preview.png) | ![Info & spec](docs/screen-info.png) |
+
+**Pick your edition** — the whole UI reskins between a Zelda (green) and Mario (red) theme:
+
+![Mario edition](docs/screen-mario.png)
+
 ## Quick start (Docker)
 
 ```bash
