@@ -4,7 +4,7 @@
 export default {
   "Works": "정상",
   "Library": "라이브러리",
-  "Extra": "엑스트라",
+  "Extra": "추가파일",
   "Media": "미디어",
   "Data": "데이터",
   "Info": "정보",
