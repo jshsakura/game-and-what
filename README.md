@@ -12,7 +12,7 @@ retro-go SD card layout. Ready to extract onto your card.
 **▶︎ [Live demo](https://jshsakura.github.io/game-and-what/)** — a static preview
 with sample data (no backend; uploads/edits are disabled).
 
-![Game & What preview](docs/preview-ko.png)
+![Game & What preview](docs/preview.png)
 
 ---
 

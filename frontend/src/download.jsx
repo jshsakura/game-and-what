@@ -33,7 +33,7 @@ export function DownloadProvider({ children }) {
     setJob({ label: fallbackName, received: 0, total: knownTotal, building: true });
     try {
       const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
-      if (!res.ok) throw new Error(t("다운로드 실패 ({status})", { status: res.status }));
+      if (!res.ok) throw new Error(t("Download failed ({status})", { status: res.status }));
       const total = Number(res.headers.get("Content-Length")) || knownTotal || 0;
       const name = filenameFromHeader(res.headers.get("Content-Disposition"), fallbackName);
       const reader = res.body.getReader();
@@ -61,7 +61,7 @@ export function DownloadProvider({ children }) {
       if (e.name === "AbortError") {
         setJob(null);
       } else {
-        setJob((j) => (j ? { ...j, error: e.message || t("다운로드 실패") } : null));
+        setJob((j) => (j ? { ...j, error: e.message || t("Download failed") } : null));
         setTimeout(() => setJob(null), 2600);
       }
     } finally {
@@ -81,10 +81,10 @@ export function DownloadProvider({ children }) {
     <DownloadCtx.Provider value={{ download, busy: !!job }}>
       {children}
       {job && (
-        <div className="dl-overlay" role="dialog" aria-label={t("다운로드 진행")}>
+        <div className="dl-overlay" role="dialog" aria-label={t("Download progress")}>
           <div className="dl-panel">
             <div className="dl-title">
-              {job.error ? t("● 실패") : job.building ? t("준비 중…") : t("다운로드 중…")}
+              {job.error ? t("● Failed") : job.building ? t("Preparing…") : t("Downloading…")}
             </div>
             <div className={`dl-bar ${indeterminate && !job.error ? "indet" : ""} ${job.error ? "err" : ""}`}>
               <div className="dl-fill" style={indeterminate ? undefined : { width: `${pct}%` }} />
@@ -94,10 +94,10 @@ export function DownloadProvider({ children }) {
                 ? job.error
                 : job.total
                   ? `${pct}%  ·  ${formatBytes(job.received)} / ${formatBytes(job.total)}`
-                  : t("{size} 받는 중…", { size: formatBytes(job.received) })}
+                  : t("Receiving {size}…", { size: formatBytes(job.received) })}
             </div>
             {!job.error && (
-              <button type="button" className="dl-cancel" onClick={cancel}>{t("취소")}</button>
+              <button type="button" className="dl-cancel" onClick={cancel}>{t("Cancel")}</button>
             )}
           </div>
         </div>

@@ -21,7 +21,7 @@ function DemoBanner() {
   return (
     <div className="demo-banner">
       <span>
-        🎮 {t("데모 미리보기 — 샘플 데이터입니다. Game & Watch 휴대기기용 레트로 SD 카드 매니저.")}
+        🎮 {t("Demo preview — sample data only. A retro SD-card manager for the Game & Watch handheld.")}
       </span>
       <span className="demo-banner-links">
         <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub ★</a>
@@ -44,13 +44,13 @@ const THEME_KEY = "gnw_theme";
 const TABS = [
   // Primary: LIBRARY (default landing) + UPLOAD. Secondary (gray): MEDIA + DATA + HELP.
   // MEDIA merges the old VIDEO + MUSIC converters into one tab.
-  // label is a Korean i18n key — rendered via t(tab.label) in JSX.
-  { key: "library", label: "라이브러리", Icon: Library },
-  { key: "rom", label: "업로드", Icon: Upload },
-  { key: "extra", label: "엑스트라", Icon: HardDrive },
-  { key: "media", label: "미디어", Icon: Clapperboard, secondary: true, media: true },
-  { key: "data", label: "데이터", Icon: Database, secondary: true, data: true },
-  { key: "help", label: "정보", Icon: Info, secondary: true, help: true },
+  // label is an English i18n key — rendered via t(tab.label) in JSX.
+  { key: "library", label: "Library", Icon: Library },
+  { key: "rom", label: "Upload", Icon: Upload },
+  { key: "extra", label: "Extra", Icon: HardDrive },
+  { key: "media", label: "Media", Icon: Clapperboard, secondary: true, media: true },
+  { key: "data", label: "Data", Icon: Database, secondary: true, data: true },
+  { key: "help", label: "Info", Icon: Info, secondary: true, help: true },
 ];
 
 // 8-bit pixel heart (Zelda life heart) — used as the toggle knob.
@@ -102,7 +102,7 @@ function ThemeToggle({ theme, onToggle }) {
       aria-checked={isMario}
       className={`theme-switch ${isMario ? "mario" : "zelda"}`}
       onClick={onToggle}
-      title={t("에디션: {ed} · 클릭해 전환", { ed: isMario ? "Mario" : "Zelda" })}
+      title={t("Edition: {ed} · click to switch", { ed: isMario ? "Mario" : "Zelda" })}
     >
       <span className="theme-switch-knob"><PixelHeart size={14} /></span>
     </button>
@@ -151,7 +151,7 @@ function LangToggle() {
         type="button"
         className="lang-switch-trigger"
         onClick={() => setOpen((o) => !o)}
-        title={t("언어 선택")}
+        title={t("Language")}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="language"
@@ -239,7 +239,7 @@ export default function App() {
           className="brand-id"
           role="button"
           tabIndex={0}
-          title={t("메인으로")}
+          title={t("Home")}
           onClick={() => setTab("library")}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setTab("library"); } }}
         >
@@ -289,11 +289,11 @@ export default function App() {
                 className={`btn tab-selall ${allSelected ? "on" : ""}`}
                 onClick={toggleAll}
                 disabled={libKeys.length === 0}
-                title={t("모든 플랫폼 선택 / 해제")}
+                title={t("Select / clear all platforms")}
               >
                 {allSelected
-                  ? <><X size={14} strokeWidth={3} aria-hidden /> {t("전체")}</>
-                  : <><Check size={14} strokeWidth={3} aria-hidden /> {t("전체")}</>}
+                  ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All")}</>
+                  : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
               </button>
             )}
             <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
@@ -302,7 +302,7 @@ export default function App() {
                 allSelected ? "gnw-sd.zip" : "gnw-sd-selected.zip",
                 (allSelected ? sdSize : selSize) || 0,
               )}
-              title={hasSel ? (allSelected ? t("전체 SD(펌웨어·바이오스 포함) ZIP으로 받기") : t("체크한 플랫폼을 SD ZIP으로 받기")) : t("플랫폼을 체크(또는 전체 선택)하면 받을 수 있어요")}>
+              title={hasSel ? (allSelected ? t("Download the full SD (incl. firmware & BIOS) as ZIP") : t("Download the checked platforms as an SD ZIP")) : t("Check a platform (or select all) to download")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> SD ZIP
               {hasSel && (
                 <span className="size-tag">{(allSelected ? sdSize : selSize) != null ? formatBytes(allSelected ? sdSize : selSize) : "…"}</span>

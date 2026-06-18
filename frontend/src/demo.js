@@ -72,7 +72,7 @@ function route(path) {
   return {};                                                       // safe empty default
 }
 
-const DEMO_NOTICE = "데모 모드입니다 — 실제 업로드/편집은 Docker로 설치 후 사용하세요.";
+const DEMO_NOTICE = "Demo mode — install via Docker to use uploads and edits.";
 
 // Install once, before the app renders. GET → fixture JSON; any write → a clear
 // "demo mode" rejection so mutating actions don't silently appear to work.

@@ -21,7 +21,7 @@ export default function DataTab({ onChanged }) {
   const [error, setError] = useState("");
   const [ext, setExt] = useState("all");   // extension filter
 
-  const extOf = (name) => { const i = name.lastIndexOf("."); return i > 0 ? name.slice(i + 1).toLowerCase() : t("(없음)"); };
+  const extOf = (name) => { const i = name.lastIndexOf("."); return i > 0 ? name.slice(i + 1).toLowerCase() : t("(none)"); };
   const exts = [...new Set(files.map((f) => extOf(f.name)))].sort();
   const shown = ext === "all" ? files : files.filter((f) => extOf(f.name) === ext);
 
@@ -41,7 +41,7 @@ export default function DataTab({ onChanged }) {
     finally { setBusy(false); }
   }
   async function remove(name) {
-    if (!(await toast.confirm(t("'{name}' 파일을 삭제할까요?", { name }), { confirmText: t("삭제") }))) return;
+    if (!(await toast.confirm(t("Delete the file '{name}'?", { name }), { confirmText: t("Delete") }))) return;
     setBusy(true);
     try { await deleteData(name); reload(); }
     catch (e) { setError(e.message); }
@@ -51,15 +51,15 @@ export default function DataTab({ onChanged }) {
   return (
     <div className="stack data-tab">
       <div className="muted">
-        <Database size={13} aria-hidden /> {t("임시 참고자료 보관소 —")} <b>{t("SD ZIP 다운로드에서 제외")}</b>{t("됩니다.")}
+        <Database size={13} aria-hidden /> {t("Temporary reference storage —")} <b>{t("excluded from the SD ZIP download")}</b>{t(".")}
       </div>
 
       <Dropzone
         multiple
         label={
           busy
-            ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("업로드 중…")}</span>
-            : <span className="dz-label"><Upload size={16} aria-hidden /> {t("참고자료를 끌어다 놓거나 클릭 (아무 파일)")}</span>
+            ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("Uploading…")}</span>
+            : <span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag & drop reference files or click (any file)")}</span>
         }
         onFiles={handleFiles}
       />
@@ -69,7 +69,7 @@ export default function DataTab({ onChanged }) {
       {!loading && files.length > 0 && exts.length > 1 && (
         <div className="data-filter">
           <button className={`scope-btn ${ext === "all" ? "on" : ""}`} onClick={() => setExt("all")}>
-            {t("전체")} ({files.length})
+            {t("All")} ({files.length})
           </button>
           {exts.map((e) => (
             <button key={e} className={`scope-btn ${ext === e ? "on" : ""}`} onClick={() => setExt(e)}>
@@ -91,17 +91,17 @@ export default function DataTab({ onChanged }) {
           ))}
         </div>
       ) : files.length === 0 ? (
-        <div className="muted">{t("보관된 자료가 없습니다.")}</div>
+        <div className="muted">{t("No files stored.")}</div>
       ) : (
         <div className="data-list">
           {shown.map((f) => (
             <div className="data-row" key={f.name}>
               <span className="data-name">{f.name}</span>
               <span className="data-size">{fmtSize(f.size)}</span>
-              <a className="icon-btn" href={dataDownloadUrl(f.name)} download title={t("다운로드")}>
+              <a className="icon-btn" href={dataDownloadUrl(f.name)} download title={t("Download")}>
                 <Download size={13} strokeWidth={2.5} />
               </a>
-              <button className="icon-btn danger" disabled={busy} onClick={() => remove(f.name)} title={t("삭제")}>
+              <button className="icon-btn danger" disabled={busy} onClick={() => remove(f.name)} title={t("Delete")}>
                 <Trash2 size={13} strokeWidth={2.5} />
               </button>
             </div>

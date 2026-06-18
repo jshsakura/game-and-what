@@ -31,7 +31,7 @@ const SORTS = {
   oldest: (a, b) => favFirst(a, b) || byDateAsc(a, b) || byName(a, b),
 };
 const SORT_ORDER = ["recent", "name", "oldest"];
-const SORT_LABELS = { recent: "최신순", name: "이름순", oldest: "오래된순" };
+const SORT_LABELS = { recent: "Newest", name: "Name", oldest: "Oldest" };
 
 const HANGUL_RE = /[가-힣]/;
 // Homebrew / Pico-8 are indie carts with no Korean release → never "missing".
@@ -116,9 +116,9 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       const res = await uploadRoms(current, files, onProgress);
       const dups = (res.results || []).filter((r) => r.error === "duplicate");
       if (dups.length) {
-        toast.warn(`${t("이미 있는 롬이라 건너뜀 (중복) {n}개", { n: dups.length })}: ${dups.map((d) => d.name).join(", ")}`);
+        toast.warn(`${t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}: ${dups.map((d) => d.name).join(", ")}`);
       }
-      toast.success(t("업로드 완료"));
+      toast.success(t("Upload complete"));
       refresh();
     } catch (e) { setError(e.message); toast.error(e.message); }
     finally { setBusy(false); }
@@ -205,7 +205,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   return (
     <div className="stack">
       <div className="muted">
-        <Library size={13} aria-hidden /> {t("보관 중")}: {lib.roms.length} ROM · {lib.videos.length} VIDEO · {lib.music?.length || 0} MUSIC{(items.length > 0 || searching || missingOnly || nonKoOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("조회 {n}개", { n: items.length })}` : ""}
+        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} ROM · {lib.videos.length} VIDEO · {lib.music?.length || 0} MUSIC{(items.length > 0 || searching || missingOnly || nonKoOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
       </div>
 
       {error && <div className="badge failed">{error}</div>}
@@ -233,7 +233,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
         </>
       )}
       {!loading && empty && (
-        <div className="muted"><Inbox size={13} aria-hidden /> {t("아직 보관된 파일이 없습니다. 플랫폼을 고르고 아래에 롬을 올리세요.")}</div>
+        <div className="muted"><Inbox size={13} aria-hidden /> {t("No files stored yet. Pick a platform and upload ROMs below.")}</div>
       )}
 
       {/* Search by name, scoped to the selected system or everything */}
@@ -241,13 +241,13 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
         <div className="lib-searchbar">
           <div className="lib-search">
             {selected.size > 0 && (
-              <span className="sel-count-badge">{t("{n}플랫폼", { n: selected.size })} · {t("{n}파일 선택됨", { n: selectedFileCount.toLocaleString() })}</span>
+              <span className="sel-count-badge">{t("{n} platforms", { n: selected.size })} · {t("{n} files selected", { n: selectedFileCount.toLocaleString() })}</span>
             )}
             <Search size={14} strokeWidth={2.5} aria-hidden />
             <input
               className="text-input"
               value={query}
-              placeholder={searchAll ? t("게임 이름 검색 (전체)") : t("게임 이름 검색 ({sys})", { sys: activeGroup?.system.name ?? t("현재 플랫폼") })}
+              placeholder={searchAll ? t("Search game name (all)") : t("Search game name ({sys})", { sys: activeGroup?.system.name ?? t("current platform") })}
               spellCheck={false}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -258,19 +258,19 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
             options={SORT_ORDER.map((m) => ({ key: m, label: SORT_LABELS[m] }))}
           />
           <div className="lib-filters">
-            <span className="search-scope" role="group" aria-label={t("검색 범위")}>
-              <button className={`scope-btn ${!searchAll ? "on" : ""}`} onClick={() => setSearchAll(false)}>{t("현재")}</button>
-              <button className={`scope-btn ${searchAll ? "on" : ""}`} onClick={() => setSearchAll(true)}>{t("전체")}</button>
+            <span className="search-scope" role="group" aria-label={t("Search scope")}>
+              <button className={`scope-btn ${!searchAll ? "on" : ""}`} onClick={() => setSearchAll(false)}>{t("This")}</button>
+              <button className={`scope-btn ${searchAll ? "on" : ""}`} onClick={() => setSearchAll(true)}>{t("All")}</button>
             </span>
-            <span className="search-scope" role="group" aria-label={t("필터")}>
+            <span className="search-scope" role="group" aria-label={t("Filter")}>
               <button className={`scope-btn ${missingOnly ? "on" : ""}`} onClick={() => setMissingOnly((m) => !m)}
-                title={t("커버 없는 롬만 보기")} aria-pressed={missingOnly}>
-                <ImageOff size={13} strokeWidth={2.5} /> {t("커버 없음")}
+                title={t("Show only ROMs without covers")} aria-pressed={missingOnly}>
+                <ImageOff size={13} strokeWidth={2.5} /> {t("No cover")}
               </button>
               {koFeature && (
                 <button className={`scope-btn ${nonKoOnly ? "on" : ""}`} onClick={() => setNonKoOnly((m) => !m)}
-                  title={t("한글명 아닌 롬만 보기 (영문·일본어 이름)")} aria-pressed={nonKoOnly}>
-                  <Languages size={13} strokeWidth={2.5} /> {t("한글")}
+                  title={t("Show only non-Korean-named ROMs (English/Japanese names)")} aria-pressed={nonKoOnly}>
+                  <Languages size={13} strokeWidth={2.5} /> {t("Korean")}
                 </button>
               )}
             </span>
@@ -305,13 +305,13 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               <span className="lib-chip-badges">
                 <span className="lib-chip-count">{g.roms.length}</span>
                 {miss > 0
-                  ? <span className="lib-chip-miss" title={t("커버 누락 {n}개", { n: miss })}>{miss}</span>
-                  : koFeature && koMiss > 0 && <span className="lib-chip-komiss" title={t("한글 제목 없음 {n}개", { n: koMiss })}>{koMiss}</span>}
+                  ? <span className="lib-chip-miss" title={t("{n} missing covers", { n: miss })}>{miss}</span>
+                  : koFeature && koMiss > 0 && <span className="lib-chip-komiss" title={t("{n} without Korean titles", { n: koMiss })}>{koMiss}</span>}
               </span>
               {g.roms.length > 0 && (
                 <span
                   className={`lib-chip-check ${selected.has(g.key) ? "on" : ""}`}
-                  role="checkbox" aria-checked={selected.has(g.key)} title={t("다운로드 선택")}
+                  role="checkbox" aria-checked={selected.has(g.key)} title={t("Select for download")}
                   onClick={(e) => { e.stopPropagation(); onToggleSel(g.key); }}
                 >
                   {selected.has(g.key) && <Check size={16} strokeWidth={4} aria-hidden />}
@@ -332,8 +332,8 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
             accept={activeGroup.system.exts.map((e) => "." + e).join(",")}
             label={
               busy
-                ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("업로드 중…")}</span>
-                : <span className="dz-label"><Upload size={16} aria-hidden /> {t("여기로 {sys} 롬을 끌어다 놓거나 클릭", { sys: activeGroup.system.name })}</span>
+                ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("Uploading…")}</span>
+                : <span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag {sys} ROMs here or click", { sys: activeGroup.system.name })}</span>
             }
             onFiles={uploadHere}
           />
@@ -362,8 +362,8 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
         <div className="lib-empty">
           <Inbox size={18} aria-hidden />{" "}
           {missingOnly && !searching && !nonKoOnly
-            ? t("이 플랫폼은 커버 누락이 없습니다 ✓")
-            : t("조회된 게임이 없습니다")}
+            ? t("No missing covers on this platform ✓")
+            : t("No games found")}
         </div>
       )}
 

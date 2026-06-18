@@ -31,7 +31,7 @@ export default function MusicTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Music size={13} aria-hidden /> {t("MP3는 그대로,")} <b>{t("영상은 MP3로 추출")}</b>{t("해서 /music에 보관 (기기 Music 앱이 ID3 태그·앨범아트를 직접 읽음)")}
+        <Music size={13} aria-hidden /> {t("Keep MP3 as-is,")} <b>{t("extract MP3 from video")}</b>{t(" and store in /music (the device's Music app reads ID3 tags and album art directly)")}
       </div>
 
       <Dropzone
@@ -39,7 +39,7 @@ export default function MusicTab({ onChanged }) {
         multiple
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {t("여기로 MP3나 영상을 끌어다 놓거나 클릭 (영상은 mp3로 추출)")}
+            <Upload size={16} aria-hidden /> {t("Drag an MP3 or video here or click (video is extracted to mp3)")}
           </span>
         }
         onFiles={handleFiles}
@@ -52,11 +52,11 @@ export default function MusicTab({ onChanged }) {
               <span className="muted">{it.name}</span>
               <span className="muted">
                 {it.status === "ok" ? (
-                  <><CheckCircle2 size={13} strokeWidth={2.5} aria-hidden /> {t("완료")}</>
+                  <><CheckCircle2 size={13} strokeWidth={2.5} aria-hidden /> {t("Done")}</>
                 ) : it.status === "err" ? (
-                  <><XCircle size={13} strokeWidth={2.5} aria-hidden /> {it.error || t("실패")}</>
+                  <><XCircle size={13} strokeWidth={2.5} aria-hidden /> {it.error || t("Failed")}</>
                 ) : (
-                  <><Loader size={13} strokeWidth={2.5} className="spin" aria-hidden /> {t("올리는 중…")}</>
+                  <><Loader size={13} strokeWidth={2.5} className="spin" aria-hidden /> {t("Uploading…")}</>
                 )}
               </span>
             </div>

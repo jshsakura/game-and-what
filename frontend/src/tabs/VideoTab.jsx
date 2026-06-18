@@ -49,11 +49,11 @@ export default function VideoTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Clapperboard size={13} aria-hidden /> {t("영상 → MJPEG .avi (320×240·30fps·mono)로 인코딩해서 /media에 보관")}
+        <Clapperboard size={13} aria-hidden /> {t("Video → encoded to MJPEG .avi (320×240·30fps·mono) and stored in /media")}
       </div>
       {!ffmpeg && (
         <div className="badge failed">
-          <AlertTriangle size={11} strokeWidth={2.5} aria-hidden /> {t("서버에 ffmpeg가 없습니다")}
+          <AlertTriangle size={11} strokeWidth={2.5} aria-hidden /> {t("ffmpeg is not available on the server")}
         </div>
       )}
 
@@ -61,18 +61,18 @@ export default function VideoTab({ onChanged }) {
         accept="video/*"
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {t("여기로 영상을 끌어다 놓거나 클릭 (mp4/mov/mkv…)")}
+            <Upload size={16} aria-hidden /> {t("Drag a video here or click (mp4/mov/mkv…)")}
           </span>
         }
         onFiles={handleFiles}
       />
 
       <label className="row" style={{ gap: 6 }}>
-        <span className="muted">{t("화면 채우기")}</span>
+        <span className="muted">{t("Screen fit")}</span>
         <select value={mode} onChange={(e) => setMode(e.target.value)}>
-          <option value="fit">{t("맞춤 (레터박스)")}</option>
-          <option value="fill">{t("꽉 채우기 (잘라냄)")}</option>
-          <option value="stretch">{t("늘이기 (비율 무시)")}</option>
+          <option value="fit">{t("Fit (letterbox)")}</option>
+          <option value="fill">{t("Fill (crop)")}</option>
+          <option value="stretch">{t("Stretch (distort)")}</option>
         </select>
       </label>
 
@@ -82,11 +82,11 @@ export default function VideoTab({ onChanged }) {
             <span className="muted">{name}</span>
             <span className="muted">
               {job.status === "done" ? (
-                <><CheckCircle2 size={13} strokeWidth={2.5} aria-hidden /> {t("완료")}</>
+                <><CheckCircle2 size={13} strokeWidth={2.5} aria-hidden /> {t("Done")}</>
               ) : job.status === "failed" ? (
-                <><XCircle size={13} strokeWidth={2.5} aria-hidden /> {t("실패")}</>
+                <><XCircle size={13} strokeWidth={2.5} aria-hidden /> {t("Failed")}</>
               ) : (
-                <><Loader size={13} strokeWidth={2.5} className="spin" aria-hidden /> {t("인코딩 중…")}</>
+                <><Loader size={13} strokeWidth={2.5} className="spin" aria-hidden /> {t("Encoding…")}</>
               )}
             </span>
           </div>

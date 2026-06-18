@@ -28,11 +28,11 @@ export default function MediaTab({ onChanged }) {
     <div className="stack media-tab">
       <div className="media-subtabs">
         <button className={`media-subtab ${sub === "video" ? "on" : ""}`} onClick={() => setSub("video")}>
-          <Clapperboard size={14} strokeWidth={2.5} aria-hidden /> {t("영상")}
+          <Clapperboard size={14} strokeWidth={2.5} aria-hidden /> {t("Video")}
           {media.videos.length > 0 && <span className="media-count">{media.videos.length}</span>}
         </button>
         <button className={`media-subtab ${sub === "music" ? "on" : ""}`} onClick={() => setSub("music")}>
-          <Music size={14} strokeWidth={2.5} aria-hidden /> {t("음악")}
+          <Music size={14} strokeWidth={2.5} aria-hidden /> {t("Music")}
           {media.music.length > 0 && <span className="media-count">{media.music.length}</span>}
         </button>
       </div>

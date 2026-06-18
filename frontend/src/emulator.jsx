@@ -87,7 +87,7 @@ const SCREEN_ASPECT = {
 // Per-system keyboard cheatsheet. The keys are libretro's DEFAULT keyboard map
 // (RetroPad → keyboard) that Nostalgist drives the core with; the labels are each
 // system's real button names so it reads like retro-go's per-console control hint.
-const DPAD = { keys: ["↑", "↓", "←", "→"], b: "방향" };
+const DPAD = { keys: ["↑", "↓", "←", "→"], b: "D-pad" };
 const AB = [{ k: "Z", b: "B" }, { k: "X", b: "A" }];
 const KEY_HINTS = {
   nes:   [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
@@ -98,13 +98,13 @@ const KEY_HINTS = {
   sg:    [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }],
   md:    [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
-  col:   [DPAD, { k: "Z", b: "왼쪽 발사" }, { k: "X", b: "오른쪽 발사" }, { k: "1~9 0 * #", b: "키패드" }],
+  col:   [DPAD, { k: "Z", b: "Left fire" }, { k: "X", b: "Right fire" }, { k: "1~9 0 * #", b: "Keypad" }],
   gw:    [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "Enter", b: "START" }],
   tama:  [{ k: "Z", b: "A" }, { k: "X", b: "B" }, { k: "A", b: "C" }],
   pico8: [DPAD, { k: "Z", b: "O (○)" }, { k: "X", b: "X (✕)" }],
   wsv:   [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
-  amstrad: [DPAD, { k: "Space", b: "발사" }, { k: "Shift", b: "발사 2" }, { k: "Enter", b: "RETURN" }],
-  msx:    [DPAD, { k: "Space", b: "발사 (스페이스)" }, { k: "Ctrl", b: "발사 2" }, { k: "Enter", b: "RETURN" }],
+  amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
+  msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],
 };
 const DEFAULT_HINTS = [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }];
@@ -215,10 +215,10 @@ export function EmulatorOverlay({ rom, onClose }) {
     (async () => {
       try {
         const core = coreFor(rom.system_key);
-        if (!core) throw new Error(t("이 플랫폼은 브라우저에서 실행할 수 없습니다."));
+        if (!core) throw new Error(t("This platform can't run in the browser."));
 
         const res = await fetch(romFileUrl(rom.id));
-        if (!res.ok) throw new Error(t("롬 파일을 불러오지 못했습니다."));
+        if (!res.ok) throw new Error(t("Failed to load the ROM file."));
         const fileContent = await res.blob();
         const bios = await loadBios(rom);
         if (cancelled) return;
@@ -297,7 +297,7 @@ export function EmulatorOverlay({ rom, onClose }) {
   }
 
   return (
-    <div className={`emu-overlay mode-${mode}`} role="dialog" aria-modal="true" aria-label={t("{title} 실행", { title })}>
+    <div className={`emu-overlay mode-${mode}`} role="dialog" aria-modal="true" aria-label={t("Run {title}", { title })}>
       <div className="emu-window" ref={windowRef}
         style={mode === "window" ? { transform: `translate(${pos.x}px, ${pos.y}px)` } : undefined}>
         <div className={`emu-bar ${mode === "window" ? "draggable" : ""}`} onPointerDown={onBarPointerDown}>
@@ -305,22 +305,22 @@ export function EmulatorOverlay({ rom, onClose }) {
           <span className="emu-title">{title}</span>
           <span className="emu-bar-right">
             <button className="icon-btn" onClick={copyName}
-              title={copied ? t("파일명 복사됨") : t("파일명 복사")}>
+              title={copied ? t("Filename copied") : t("Copy filename")}>
               {copied ? <Check size={15} strokeWidth={2.5} /> : <Copy size={15} strokeWidth={2.5} />}
             </button>
             {mode === "window" ? (
-              <button className="icon-btn" onClick={() => setMode("max")} title={t("브라우저 가득")}>
+              <button className="icon-btn" onClick={() => setMode("max")} title={t("Fill browser")}>
                 <Maximize2 size={15} strokeWidth={2.5} />
               </button>
             ) : (
-              <button className="icon-btn" onClick={() => setMode("window")} title={t("창 모드")}>
+              <button className="icon-btn" onClick={() => setMode("window")} title={t("Window mode")}>
                 <Minimize2 size={15} strokeWidth={2.5} />
               </button>
             )}
-            <button className="icon-btn" onClick={goFullscreen} title={t("전체화면")}>
+            <button className="icon-btn" onClick={goFullscreen} title={t("Fullscreen")}>
               <Monitor size={15} strokeWidth={2.5} />
             </button>
-            <button className="icon-btn" onClick={onClose} title={t("닫기 (ESC)")}>
+            <button className="icon-btn" onClick={onClose} title={t("Close (ESC)")}>
               <X size={17} strokeWidth={2.5} />
             </button>
           </span>
@@ -331,7 +331,7 @@ export function EmulatorOverlay({ rom, onClose }) {
             <iframe
               ref={iframeRef}
               className="emu-canvas"
-              title={t("{title} 실행", { title })}
+              title={t("Run {title}", { title })}
               src={`/${jsEngineFor(rom.system_key).html}?rom=${encodeURIComponent(rom.id)}&ext=${encodeURIComponent((rom.stored_name || "").split(".").pop().toLowerCase())}`}
               allow="autoplay; fullscreen; gamepad"
               onLoad={() => { try { iframeRef.current?.contentWindow?.focus(); } catch (_) {} }}
@@ -344,15 +344,15 @@ export function EmulatorOverlay({ rom, onClose }) {
           {status === "loading" && (
             <div className="emu-status">
               <div className="emu-spinner" aria-hidden />
-              {t("코어 불러오는 중…")}
+              {t("Loading core…")}
               {isExperimental(rom.system_key) && (
-                <div className="emu-note">{t("이 플랫폼은 실험적 지원이라 정상 구동되지 않을 수 있어요.")}</div>
+                <div className="emu-note">{t("This platform has experimental support and may not run correctly.")}</div>
               )}
             </div>
           )}
           {status === "error" && (
             <div className="emu-status emu-error">
-              <div>{t("실행할 수 없습니다.")}</div>
+              <div>{t("Can't run.")}</div>
               <div className="emu-note">{err}</div>
             </div>
           )}
@@ -364,14 +364,14 @@ export function EmulatorOverlay({ rom, onClose }) {
             Hidden for JS-engine (Javatari) systems: their keyboard map differs and
             the on-screen pad is the control, so the libretro key hints would mislead. */}
         {status === "running" && !jsEngineFor(rom.system_key) && (
-          <div className="emu-keys" aria-label={t("키보드 조작 안내")}>
+          <div className="emu-keys" aria-label={t("Keyboard controls")}>
             {(KEY_HINTS[rom.system_key] || DEFAULT_HINTS).map((h, i) => (
               <span className="emu-key-grp" key={i}>
                 {(h.keys || [h.k]).map((kk, j) => <kbd key={j}>{kk}</kbd>)}
                 <em>{t(h.b)}</em>
               </span>
             ))}
-            <span className="emu-key-grp"><kbd>Esc</kbd><em>{t("닫기")}</em></span>
+            <span className="emu-key-grp"><kbd>Esc</kbd><em>{t("Close")}</em></span>
           </div>
         )}
       </div>
@@ -420,11 +420,11 @@ function VirtualPad({ onDown, onUp }) {
       <div className="pad-dpad">
         {/* trailing U+FE0E forces text (not colour-emoji) presentation — ◀ ▶ render
             as emoji on many platforms otherwise */}
-        <PadButton btn="up" glyph="▲︎" label={t("위")} className="dp dp-up" {...p} />
-        <PadButton btn="left" glyph="◀︎" label={t("왼쪽")} className="dp dp-left" {...p} />
+        <PadButton btn="up" glyph="▲︎" label={t("Up")} className="dp dp-up" {...p} />
+        <PadButton btn="left" glyph="◀︎" label={t("Left")} className="dp dp-left" {...p} />
         <span className="dp-hub" aria-hidden />
-        <PadButton btn="right" glyph="▶︎" label={t("오른쪽")} className="dp dp-right" {...p} />
-        <PadButton btn="down" glyph="▼︎" label={t("아래")} className="dp dp-down" {...p} />
+        <PadButton btn="right" glyph="▶︎" label={t("Right")} className="dp dp-right" {...p} />
+        <PadButton btn="down" glyph="▼︎" label={t("Down")} className="dp dp-down" {...p} />
       </div>
       <div className="pad-right">
         <div className="pad-ss">

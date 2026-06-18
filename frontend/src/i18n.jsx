@@ -7,22 +7,22 @@ import {
   resolveBrowserLocale,
 } from "./i18n.locales.js";
 
-// UI language. Korean is the SOURCE language: in-code strings are Korean and used
-// directly as the lookup key. English is the fallback UI language and ships in the
-// main bundle (no flash, always available). The remaining locales are lazily
-// imported as separate chunks so the initial download stays small on mobile.
+// UI language. English is the SOURCE language: in-code strings are English and used
+// directly as the lookup key. A missing key falls back to the English key itself.
+// Korean and all other locales lazily import their translation dicts on first use.
 const LANG_KEY = "gnw_lang";
 
-// Loaded dictionaries by locale. Korean carries no dictionary (it IS the source);
-// English is preloaded. Others populate on first use.
-const dictCache = { [SOURCE_LOCALE]: {}, en: EN };
+// Loaded dictionaries by locale. English is the source: by default a key resolves
+// to itself, but en.js may carry a few disambiguation overrides (e.g. two distinct
+// keys that should render the same English word). Other locales populate on first use.
+const dictCache = { [SOURCE_LOCALE]: EN };
 
 function loadDict(code) {
-  if (dictCache[code]) return Promise.resolve(dictCache[code]);
+  if (dictCache[code] !== undefined) return Promise.resolve(dictCache[code]);
   // Vite bundles each ./locales/*.js as its own chunk for this dynamic import.
   return import(`./locales/${code}.js`)
     .then((m) => (dictCache[code] = m.default || {}))
-    .catch(() => (dictCache[code] = {})); // missing/broken dict → full Korean fallback
+    .catch(() => (dictCache[code] = {})); // missing/broken dict → full English fallback
 }
 
 // CJK / Cyrillic web font lazy loader. Only runs for locales that need extra
@@ -55,7 +55,7 @@ const I18nContext = createContext({
 
 export function I18nProvider({ children }) {
   const [lang, setLangState] = useState(initialLang);
-  // Active locale's dictionary; the cache hit (ko/en) avoids a first-paint flash.
+  // Active locale's dictionary; English has no dict (it IS the source).
   const [dict, setDict] = useState(() => dictCache[lang] || null);
 
   useEffect(() => {
@@ -75,16 +75,11 @@ export function I18nProvider({ children }) {
     if (isLocale(code)) setLangState(code);
   };
 
-  // t(ko[, vars]): the Korean source string is the key. Resolution order for a
-  // non-Korean locale: that locale's translation → English → Korean source.
-  // English is the universal fallback (always bundled), so an untranslated or
-  // still-loading locale shows English rather than Korean. Supports {name}-style
-  // placeholders: t("총 {n}개", {n: 5}).
-  const t = (ko, vars) => {
-    let s = ko; // source locale (ko) and ultimate fallback
-    if (lang !== SOURCE_LOCALE) {
-      s = (dict && dict[ko]) || EN[ko] || ko; // "" = untranslated → English
-    }
+  // t(en[, vars]): the English source string is the key. Resolution order for a
+  // non-English locale: that locale's translation → English source (key itself).
+  // Supports {name}-style placeholders: t("Total {n} items", {n: 5}).
+  const t = (en, vars) => {
+    let s = (dict && dict[en]) || en; // locale translation (or en.js override) → English key
     if (vars) for (const k in vars) s = s.replaceAll(`{${k}}`, vars[k]);
     return s;
   };
@@ -96,7 +91,7 @@ export function useI18n() {
   return useContext(I18nContext);
 }
 
-// Convenience hook: const t = useT();  →  t("문자열")
+// Convenience hook: const t = useT();  →  t("string")
 export function useT() {
   return useContext(I18nContext).t;
 }

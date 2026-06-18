@@ -44,7 +44,7 @@ export default function RomTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Gamepad2 size={13} aria-hidden /> {t("플랫폼 선택 → 롬 올리면 한글명·커버 자동. 폴더째 올리면 동봉 이미지(.png)를 커버로 쓰고 alt덤프([a1])는 건너뜀")}
+        <Gamepad2 size={13} aria-hidden /> {t("Pick a platform → upload ROMs for automatic Korean names & covers. Upload a whole folder to use bundled images (.png) as covers; alt dumps ([a1]) are skipped")}
       </div>
 
       {systems.length === 0 && !error ? (
@@ -63,7 +63,7 @@ export default function RomTab({ onChanged }) {
         multiple
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {t("여기로 {name} 롬을 끌어다 놓거나 클릭", { name: current?.name ?? "" })}
+            <Upload size={16} aria-hidden /> {t("Drag & drop {name} ROMs here or click", { name: current?.name ?? "" })}
           </span>
         }
         onFiles={handleFiles}
@@ -73,21 +73,21 @@ export default function RomTab({ onChanged }) {
 
       {results.length > 0 && (
         <div className="muted">
-          ✓ {t("{n}개 저장", { n: okResults.length })}
-          {extra?.covers > 0 ? ` · ${t("🖼 동봉 커버 {n}개", { n: extra.covers })}` : ""}
-          {extra?.skippedAlt > 0 ? ` · ${t("alt덤프 {n}개 건너뜀", { n: extra.skippedAlt })}` : ""}
-          {failed.length > 0 ? ` · ${t("{n}개 건너뜀", { n: failed.length })}` : ""}
+          ✓ {t("{n} saved", { n: okResults.length })}
+          {extra?.covers > 0 ? ` · ${t("🖼 {n} bundled covers", { n: extra.covers })}` : ""}
+          {extra?.skippedAlt > 0 ? ` · ${t("{n} alt dumps skipped", { n: extra.skippedAlt })}` : ""}
+          {failed.length > 0 ? ` · ${t("{n} skipped", { n: failed.length })}` : ""}
         </div>
       )}
 
       {dups.length > 0 && (
         <div className="badge failed">
-          ⚠ {t("이미 있는 롬이라 건너뜀 (중복) {n}개", { n: dups.length })}: {dups.map((f) => f.name).join(", ")}
+          ⚠ {t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}: {dups.map((f) => f.name).join(", ")}
         </div>
       )}
 
       {badExt.length > 0 && (
-        <div className="muted">{t("건너뜀:")} {badExt.map((f) => f.name).join(", ")} {t("(지원 안 하는 확장자)")}</div>
+        <div className="muted">{t("Skipped:")} {badExt.map((f) => f.name).join(", ")} {t("(unsupported extension)")}</div>
       )}
 
       {okResults.length > 0 && (

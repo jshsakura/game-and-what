@@ -1,9 +1,8 @@
 // Single source of truth for UI languages. The set mirrors the retro-go-sd
 // firmware locales (sd_content/lang/*.bin) so the web manager and the device
-// menu speak the same languages. Korean is the SOURCE language: in-code strings
-// are Korean and used directly as lookup keys, so `ko` carries no dictionary.
-// English already ships a full dictionary; the remaining locales are scaffolded
-// (empty values that fall back to Korean) and filled in over time.
+// menu speak the same languages. English is the SOURCE language: in-code strings
+// are English and used directly as lookup keys, so `en` carries no dictionary.
+// Korean and all remaining locales lazily load their dictionaries on first use.
 //
 // `flag` is the basename under /public/flags/<flag>.png. Some flags are not yet
 // bundled (tw, pt, ru, no) — the switcher falls back to a text code badge, so a
@@ -24,7 +23,7 @@ export const LOCALES = [
 ];
 
 export const DEFAULT_LOCALE = "en";
-export const SOURCE_LOCALE = "ko";
+export const SOURCE_LOCALE = "en";
 
 const CODES = LOCALES.map((l) => l.code);
 

@@ -41,7 +41,7 @@ export default function ExtraTab({ onChanged }) {
   }
 
   async function remove(path) {
-    if (!(await toast.confirm(t("'/{path}' 파일을 삭제할까요?", { path }), { confirmText: t("삭제") }))) return;
+    if (!(await toast.confirm(t("Delete the file '/{path}'?", { path }), { confirmText: t("Delete") }))) return;
     try { await deleteExtra(path); await reload(); onChanged?.(); }
     catch (e) { toast.error(e.message); }
   }
@@ -49,10 +49,10 @@ export default function ExtraTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <FolderPlus size={13} aria-hidden /> {t("아무 파일이나")} <b>{t("SD 경로")}</b>{t("를 정해서 올리면 SD ZIP에 그대로 들어갑니다. (FDS:")} <b>bios/nes</b> {t("에")} <b>disksys.rom</b>)
+        <FolderPlus size={13} aria-hidden /> {t("Upload any file by")} <b>{t("setting an SD path")}</b>{t("and it goes into the SD ZIP as-is. (FDS:")} <b>bios/nes</b> {t("in")} <b>disksys.rom</b>)
       </div>
 
-      <label className="field-label">{t("대상 폴더 (SD 경로)")}</label>
+      <label className="field-label">{t("Target folder (SD path)")}</label>
       <div className="path-group">
         <span className="path-group-tag"><FolderPlus size={13} strokeWidth={2.5} aria-hidden /> SD</span>
         <span className="path-slash">/</span>
@@ -70,7 +70,7 @@ export default function ExtraTab({ onChanged }) {
         multiple
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {t("파일을 끌어다 놓거나 클릭 →")} <b>/{(folder.replace(/^\/+|\/+$/g, "") || "")}/</b> {t("에 저장")}
+            <Upload size={16} aria-hidden /> {t("Drag & drop files or click →")} <b>/{(folder.replace(/^\/+|\/+$/g, "") || "")}/</b> {t("to save")}
           </span>
         }
         onFiles={handleFiles}
@@ -88,17 +88,17 @@ export default function ExtraTab({ onChanged }) {
           ))}
         </div>
       ) : files.length === 0 ? (
-        <div className="muted">{t("올려둔 파일이 없습니다 (SD에 포함 안 됨).")}</div>
+        <div className="muted">{t("No files uploaded (not included in SD).")}</div>
       ) : (
         <div className="data-list">
           {files.map((f) => (
             <div className="data-row" key={f.path}>
               <span className="data-name">/{f.path}</span>
               <span className="data-size">{formatBytes(f.size_bytes)}</span>
-              <a className="icon-btn" href={extraDownloadUrl(f.path)} download title={t("다운로드")}>
+              <a className="icon-btn" href={extraDownloadUrl(f.path)} download title={t("Download")}>
                 <Download size={13} strokeWidth={2.5} />
               </a>
-              <button className="icon-btn danger" onClick={() => remove(f.path)} title={t("삭제")}>
+              <button className="icon-btn danger" onClick={() => remove(f.path)} title={t("Delete")}>
                 <Trash2 size={13} strokeWidth={2.5} />
               </button>
             </div>

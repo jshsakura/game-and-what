@@ -16,7 +16,7 @@ async function withSession(makeRequest) {
 // POST a FormData via XHR so we get real UPLOAD progress (fetch can't report it).
 // onProgress(loaded, total) fires as bytes go up. Resolves the parsed JSON body.
 function xhrUpload(url, form, onProgress) {
-  if (DEMO) return Promise.reject(new Error("데모 모드입니다 — 업로드는 Docker로 설치 후 사용하세요."));
+  if (DEMO) return Promise.reject(new Error("Demo mode — install via Docker to enable uploads."));
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url);
@@ -29,16 +29,16 @@ function xhrUpload(url, form, onProgress) {
       let body = {};
       try { body = JSON.parse(xhr.responseText || "{}"); } catch (_) { /* keep {} */ }
       if (xhr.status >= 200 && xhr.status < 300) resolve(body);
-      else reject(new Error(body.detail || `업로드 실패 (${xhr.status})`));
+      else reject(new Error(body.detail || `Upload failed (${xhr.status})`));
     };
-    xhr.onerror = () => reject(new Error("네트워크 오류로 업로드 실패"));
+    xhr.onerror = () => reject(new Error("Upload failed due to a network error"));
     xhr.send(form);
   });
 }
 
 export async function getSystems() {
   const res = await fetch("/api/systems");
-  if (!res.ok) throw new Error("플랫폼 목록 로드 실패");
+  if (!res.ok) throw new Error("Failed to load platform list");
   return (await res.json()).systems;
 }
 
@@ -153,7 +153,7 @@ export async function uploadCover(romId, file, crop) {
     if (crop) form.append("crop", JSON.stringify(crop));
     return fetch(`/api/sessions/${sid}/roms/${romId}/cover`, { method: "POST", body: form });
   });
-  if (!res.ok) throw new Error((await res.json()).detail || "커버 업로드 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Cover upload failed");
   return res.json();
 }
 
@@ -184,13 +184,13 @@ export function coverDownloadUrl(romId, variant = "device") {
 
 export async function getJob(jobId) {
   const res = await fetch(`/api/jobs/${jobId}`);
-  if (!res.ok) throw new Error("잡 상태 조회 실패");
+  if (!res.ok) throw new Error("Failed to get job status");
   return res.json();
 }
 
 export async function getLibrary() {
   const res = await withSession((sid) => fetch(`/api/sessions/${sid}/library`));
-  if (!res.ok) throw new Error("라이브러리 로드 실패");
+  if (!res.ok) throw new Error("Failed to load library");
   return res.json();
 }
 
@@ -239,7 +239,7 @@ export async function igdbSearch(query, system) {
   const params = new URLSearchParams({ q: query });
   if (system) params.set("system", system);
   const res = await fetch(`/api/igdb/search?${params}`);
-  if (!res.ok) throw new Error("IGDB 검색 실패");
+  if (!res.ok) throw new Error("IGDB search failed");
   return res.json();
 }
 
@@ -247,7 +247,7 @@ export async function tgdbSearch(query, system) {
   const params = new URLSearchParams({ q: query });
   if (system) params.set("system", system);
   const res = await fetch(`/api/tgdb/search?${params}`);
-  if (!res.ok) throw new Error("TheGamesDB 검색 실패");
+  if (!res.ok) throw new Error("TheGamesDB search failed");
   return res.json();
 }
 
@@ -255,7 +255,7 @@ export async function sgdbSearch(query, system) {
   const params = new URLSearchParams({ q: query });
   if (system) params.set("system", system);
   const res = await fetch(`/api/sgdb/search?${params}`);
-  if (!res.ok) throw new Error("SteamGridDB 검색 실패");
+  if (!res.ok) throw new Error("SteamGridDB search failed");
   return res.json();
 }
 
@@ -266,7 +266,7 @@ export async function setCoverFromUrl(romId, url, crop) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(crop ? { url, crop } : { url }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "커버 설정 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set cover");
   return res.json();
 }
 
@@ -278,14 +278,14 @@ export async function recropCover(romId, crop) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(crop ? { crop } : {}),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "커버 위치 조정 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to adjust cover position");
   return res.json();
 }
 
 export async function deleteCover(romId) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}/cover`, { method: "DELETE" }));
-  if (!res.ok) throw new Error("커버 제거 실패");
+  if (!res.ok) throw new Error("Failed to remove cover");
   return res.json();
 }
 
@@ -296,21 +296,21 @@ export async function renameRom(romId, name) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "이름 변경 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Rename failed");
   return res.json();
 }
 
 export async function deleteRom(romId) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}`, { method: "DELETE" }));
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 
 // Firmware update file (single retro-go_update.bin → SD root).
 export async function getFirmware() {
   const res = await fetch(`/api/sessions/${SESSION_ID}/firmware`);
-  if (!res.ok) throw new Error("펌웨어 정보 로드 실패");
+  if (!res.ok) throw new Error("Failed to load firmware info");
   return res.json();
 }
 
@@ -327,7 +327,7 @@ export function downloadFirmwareUrl() {
 // Extra passthrough files → SD root at the given path (e.g. bios/nes/disksys.rom).
 export async function getExtra() {
   const res = await fetch(`/api/sessions/${SESSION_ID}/extra`);
-  if (!res.ok) throw new Error("Extra 목록 로드 실패");
+  if (!res.ok) throw new Error("Failed to load extra file list");
   return res.json();
 }
 export async function uploadExtra(file, path, onProgress) {
@@ -338,7 +338,7 @@ export async function uploadExtra(file, path, onProgress) {
 }
 export async function deleteExtra(path) {
   const res = await fetch(`/api/sessions/${SESSION_ID}/extra?path=${encodeURIComponent(path)}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 export function extraDownloadUrl(path) {
@@ -347,7 +347,7 @@ export function extraDownloadUrl(path) {
 
 export async function deleteFirmware() {
   const res = await fetch(`/api/sessions/${SESSION_ID}/firmware`, { method: "DELETE" });
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 
@@ -358,28 +358,28 @@ export async function replaceRomFile(romId, file) {
     form.append("file", file);
     return fetch(`/api/sessions/${sid}/roms/${romId}/replace`, { method: "POST", body: form });
   });
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "파일 교체 실패");
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "File replace failed");
   return res.json();
 }
 
 export async function deleteMusic(musicId) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/music/${musicId}`, { method: "DELETE" }));
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 
 export async function deleteVideo(videoId) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/videos/${videoId}`, { method: "DELETE" }));
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 
 // DATA — scratch/reference files (excluded from the SD zip).
 export async function getData() {
   const res = await withSession((sid) => fetch(`/api/sessions/${sid}/data`));
-  if (!res.ok) throw new Error("DATA 로드 실패");
+  if (!res.ok) throw new Error("Failed to load data files");
   return res.json();
 }
 
@@ -389,14 +389,14 @@ export async function uploadData(files) {
     for (const f of files) form.append("files", f);
     return fetch(`/api/sessions/${sid}/data`, { method: "POST", body: form });
   });
-  if (!res.ok) throw new Error("DATA 업로드 실패");
+  if (!res.ok) throw new Error("Data upload failed");
   return res.json();
 }
 
 export async function deleteData(name) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/data/${encodeURIComponent(name)}`, { method: "DELETE" }));
-  if (!res.ok) throw new Error("삭제 실패");
+  if (!res.ok) throw new Error("Failed to delete");
   return res.json();
 }
 
@@ -412,7 +412,7 @@ export async function gamelistPreview(filename) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ filename }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "미리보기 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Preview failed");
   return res.json();
 }
 
@@ -422,7 +422,7 @@ export async function gamelistApply(filename) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ filename }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "적용 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Apply failed");
   return res.json();
 }
 
@@ -434,11 +434,11 @@ export async function setRomLang(romId, isKoreanPatched) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_korean_patched: isKoreanPatched }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "패치 표시 변경 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to change patch mark");
   return res.json();
 }
 
-// Set the cover's corner flag/country EXPLICITLY (independent of 한글패치).
+// Set the cover's corner flag/country EXPLICITLY (independent of Korean patch).
 // coverFlag = "ko"|"ja"|"en"|... or "" / null to clear. Re-bakes the device .img.
 export async function setCoverFlag(romId, coverFlag) {
   const res = await withSession((sid) =>
@@ -446,7 +446,7 @@ export async function setCoverFlag(romId, coverFlag) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cover_flag: coverFlag || null }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "국기 변경 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to change flag");
   return res.json();
 }
 
@@ -457,7 +457,7 @@ export async function addRomFile(romId, file) {
   form.append("file", file);
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}/files`, { method: "POST", body: form }));
-  if (!res.ok) throw new Error((await res.json()).detail || "파일 추가 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to add file");
   return res.json();
 }
 
@@ -465,7 +465,7 @@ export async function addRomFile(romId, file) {
 export async function deleteRomFile(romId, name) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}/files/${encodeURIComponent(name)}`, { method: "DELETE" }));
-  if (!res.ok) throw new Error((await res.json()).detail || "파일 삭제 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to delete file");
   return res.json();
 }
 
@@ -476,7 +476,7 @@ export async function setSdInclude(romId, include) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ include: !!include }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "SD 포함 설정 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set SD include");
   return res.json();
 }
 
@@ -487,7 +487,7 @@ export async function setFavorite(romId, favorite) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ favorite: !!favorite }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "즐겨찾기 설정 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set favorite");
   return res.json();
 }
 
@@ -499,7 +499,7 @@ export async function setPico8Compat(romId, status) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: status || null }),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "호환 상태 설정 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set compatibility status");
   return res.json();
 }
 
@@ -514,7 +514,7 @@ export async function autocover(system, force = false) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "자동 커버 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Auto-cover failed");
   return res.json();
 }
 
@@ -526,7 +526,7 @@ export async function autoresolve(system) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(system ? { system } : {}),
     }));
-  if (!res.ok) throw new Error((await res.json()).detail || "자동 해결 실패");
+  if (!res.ok) throw new Error((await res.json()).detail || "Auto-resolve failed");
   return res.json();
 }
 

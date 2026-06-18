@@ -71,9 +71,9 @@ export function ToastProvider({ children }) {
             <div className="confirm-msg">{confirmState.message}</div>
             {c.detail && <div className="confirm-detail">{c.detail}</div>}
             <div className="confirm-actions">
-              <button className="btn ghost" onClick={() => settle(false)}>{c.cancelText ?? t("취소")}</button>
+              <button className="btn ghost" onClick={() => settle(false)}>{c.cancelText ?? t("Cancel")}</button>
               <button className={`btn ${c.danger ? "danger" : ""}`} onClick={() => settle(true)}>
-                {c.confirmText ?? t("확인")}
+                {c.confirmText ?? t("OK")}
               </button>
             </div>
           </div>
