@@ -275,6 +275,10 @@ export default {
   // ── MediaTab / VideoTab / MusicTab ──
   "음악": "Musica",
   "영상 → MJPEG .avi (320×240·30fps·mono)로 인코딩해서 /media에 보관": "Video → codificato in MJPEG .avi (320×240·30fps·mono) e salvato in /media",
+  "화면 채우기": "Adatta schermo",
+  "맞춤 (레터박스)": "Adatta (letterbox)",
+  "꽉 채우기 (잘라냄)": "Riempi (ritaglia)",
+  "늘이기 (비율 무시)": "Allunga (distorce)",
   "서버에 ffmpeg가 없습니다": "ffmpeg non è disponibile sul server",
   "여기로 영상을 끌어다 놓거나 클릭 (mp4/mov/mkv…)": "Trascina un video qui o fai clic (mp4/mov/mkv…)",
   "인코딩 중…": "Codifica in corso…",

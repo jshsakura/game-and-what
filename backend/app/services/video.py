@@ -34,14 +34,32 @@ AUDIO_BITRATE = "96k"     # MP3 mono — minimal SD load, reuses minimp3 on devi
 AUDIO_RATE = 44100        # -ar 44100 (device resamples to 48k mono internally)
 OUTPUT_SUFFIX = ".avi"
 
-# Fit within the screen preserving aspect, then PAD to an exact 320x240 with
-# black bars (letterbox) so output is always exactly the device screen size, and
-# resample to the target frame rate.
-_VIDEO_FILTER = (
-    f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease"
-    f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black"
-    f",fps={FRAME_RATE}"
-)
+# Three ways to map an arbitrary source onto the exact 320x240 screen:
+#   fit     (default) — scale DOWN to fit, then PAD with black bars (letterbox).
+#                       Whole frame kept, correct aspect, no cropping.
+#   fill    (cover)   — scale UP to cover, then CROP the overflow. Fills the
+#                       screen edge-to-edge, correct aspect, crops the long side.
+#   stretch           — scale to EXACTLY 320x240 ignoring aspect. Fills the
+#                       screen with no bars and no cropping, but DISTORTS.
+# All end at exactly 320x240 and resample to the target frame rate.
+_VIDEO_FILTERS = {
+    "fit": (
+        f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease"
+        f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black"
+        f",fps={FRAME_RATE}"
+    ),
+    "fill": (
+        f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=increase"
+        f",crop={SCREEN_WIDTH}:{SCREEN_HEIGHT}"
+        f",fps={FRAME_RATE}"
+    ),
+    "stretch": (
+        f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}"
+        f",fps={FRAME_RATE}"
+    ),
+}
+DEFAULT_FIT_MODE = "fit"
+FIT_MODES = tuple(_VIDEO_FILTERS)  # ("fit", "fill", "stretch")
 
 
 class VideoEncodeError(RuntimeError):
@@ -52,21 +70,26 @@ def ffmpeg_available() -> bool:
     return shutil.which("ffmpeg") is not None
 
 
-def build_command(input_path: Path, output_path: Path) -> list[str]:
-    """The exact MJPEG/.avi command, as an argv list (no shell)."""
+def build_command(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE) -> list[str]:
+    """The exact MJPEG/.avi command, as an argv list (no shell). `mode` is one of
+    FIT_MODES — 'fit' (letterbox), 'fill' (crop to cover), 'stretch' (distort).
+    Unknown values fall back to the default fit."""
     return [
         "ffmpeg", "-hide_banner", "-y",
         "-i", str(input_path),
         "-c:v", "mjpeg", "-q:v", str(VIDEO_QSCALE),
-        "-vf", _VIDEO_FILTER,
+        "-vf", _VIDEO_FILTERS.get(mode, _VIDEO_FILTERS[DEFAULT_FIT_MODE]),
         "-c:a", "libmp3lame", "-ac", "1", "-b:a", AUDIO_BITRATE, "-ar", str(AUDIO_RATE),
         str(output_path),
     ]
 
 
-async def encode_to_mjpeg_avi(input_path: Path, output_path: Path) -> Path:
+async def encode_to_mjpeg_avi(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE) -> Path:
     """
     Encode `input_path` to a device-playable MJPEG .avi at `output_path`.
+
+    `mode` controls screen mapping: 'fit' letterboxes (keeps whole frame),
+    'fill' scales up + crops to cover, 'stretch' distorts to exactly 320x240.
 
     Runs ffmpeg in a subprocess so the event loop stays free. Raises
     VideoEncodeError on any failure (caller marks the job failed).
@@ -77,7 +100,7 @@ async def encode_to_mjpeg_avi(input_path: Path, output_path: Path) -> Path:
         raise VideoEncodeError(f"Input not found: {input_path}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = build_command(input_path, output_path)
+    cmd = build_command(input_path, output_path, mode=mode)
 
     proc = await asyncio.create_subprocess_exec(
         *cmd,

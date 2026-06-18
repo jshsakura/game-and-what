@@ -10,6 +10,7 @@ export default function VideoTab({ onChanged }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [ffmpeg, setFfmpeg] = useState(true);
+  const [mode, setMode] = useState("fit");  // fit | fill | stretch
   const timer = useRef(null);
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export default function VideoTab({ onChanged }) {
     if (!file) return;
     setError(""); setName(file.name); setJob({ status: "encoding", progress: 0.05 });
     try {
-      const res = await uploadVideo(file, onProgress);
+      const res = await uploadVideo(file, onProgress, { mode });
       poll(res.job_id);
     } catch (e) {
       setError(e.message); setJob(null);
@@ -65,6 +66,15 @@ export default function VideoTab({ onChanged }) {
         }
         onFiles={handleFiles}
       />
+
+      <label className="row" style={{ gap: 6 }}>
+        <span className="muted">{t("화면 채우기")}</span>
+        <select value={mode} onChange={(e) => setMode(e.target.value)}>
+          <option value="fit">{t("맞춤 (레터박스)")}</option>
+          <option value="fill">{t("꽉 채우기 (잘라냄)")}</option>
+          <option value="stretch">{t("늘이기 (비율 무시)")}</option>
+        </select>
+      </label>
 
       {job && (
         <div className="stack">
