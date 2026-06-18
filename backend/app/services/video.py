@@ -1,22 +1,25 @@
 """
 Video encoding for the device's /media MJPEG player.
 
-Hard hardware fact (docs/MEDIA_BROWSER.md): the chip has NO H.264/HEVC
-decoder, only a hardware JPEG decoder. So the ONLY playable video is
-MJPEG inside an .avi container. Device-verified recipe (bench-tested):
+Hard hardware fact: the chip has NO H.264/HEVC decoder, only a hardware JPEG
+decoder. So the ONLY playable video is MJPEG inside an .avi container. This
+is the EXACT command build_command() emits (default 'fit' mode shown):
 
-  ffmpeg -i input -c:v mjpeg -q:v 5 \
-    -vf scale=320:240:force_original_aspect_ratio=decrease,\
-        pad=320:240:-1:-1:color=black,fps=24 \
+  ffmpeg -hide_banner -y -i input -c:v mjpeg -q:v 8 \
+    -vf scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=30 \
     -c:a libmp3lame -ac 1 -b:a 96k -ar 44100 output.avi
 
-Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck, and PCM mono
-(~88 KB/s) would 5-7x the audio SD load on top of the ~226 KB/s video. MP3
-mono 96k is ~12 KB/s, decodes in ~3ms/frame (well inside the 24fps budget),
-and reuses the device's existing minimp3 decoder (shared with the music app)
-— no new audio path. The device downmixes/resamples to its 48kHz mono output
-internally, so source channels/rate don't matter. pad -> always exactly the
-320x240 screen (letterbox); fps 24 trims SD/CPU further. Screen is 320x240.
+Only the -vf filter changes with the screen-fit mode (see _VIDEO_FILTERS):
+  fit     scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=30
+  fill    scale=320:240:force_original_aspect_ratio=increase,crop=320:240,fps=30
+  stretch scale=320:240,fps=30
+
+Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck. MP3 mono 96k is
+~12 KB/s and reuses the device's existing minimp3 decoder (shared with the
+music app) — no new audio path. The device downmixes/resamples to its 48kHz
+mono output internally, so source channels/rate don't matter. Video is
+320x240 MJPEG q8 @ 30fps (~250 KB/s); the on-device player drops video frames
+when the SD can't keep up so audio stays locked in sync. Screen is 320x240.
 """
 from __future__ import annotations
 
