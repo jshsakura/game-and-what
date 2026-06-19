@@ -69,7 +69,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   // 한글명-누락 filter/badge: Korean deploy AND Korean UI only (hidden in English).
   const koFeature = koreanMode && lang === "ko";
   const [lib, setLib] = useState({ roms: [], videos: [], music: [] });
-  const [systems, setSystems] = useState([]);
+  // Seed from the last-known systems (cached) so the loading skeleton renders the
+  // RIGHT number of platform chips on first paint — otherwise it starts at the
+  // fallback count and visibly jumps when /api/systems resolves mid-skeleton.
+  const [systems, setSystems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("gnw_systems") || "[]"); } catch { return []; }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [active, setActive] = useState(null); // selected system key (or MEDIA_KEY)
@@ -96,7 +101,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   }, []);
 
   useEffect(() => { reload(); }, [reload, reloadKey]);
-  useEffect(() => { getSystems().then(setSystems).catch(() => {}); }, []);
+  useEffect(() => {
+    getSystems().then((s) => {
+      setSystems(s);
+      try { localStorage.setItem("gnw_systems", JSON.stringify(s)); } catch { /* ignore */ }
+    }).catch(() => {});
+  }, []);
 
   // While any cover is still being fetched (status 'pending'), poll so spinners
   // turn into covers live without a manual refresh. Stops once none are pending.
@@ -214,7 +224,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
           {/* Platform list is a fixed lineup → skeleton chips while loading
               (use the known system count, falling back to the full lineup). */}
           <div className="lib-chips">
-            {Array.from({ length: systems.length || 18 }).map((_, i) => (
+            {Array.from({ length: systems.length || 21 }).map((_, i) => (
               <div className="lib-chip skel-chip" key={i}>
                 <div className="skel-ico" />
                 <div className="skel-line" />
