@@ -29,6 +29,10 @@ _FOLDER_TO_SYSTEM = {
     "pokemonmini": "mini", "tamagotchi": "tama", "tama": "tama", "pico8": "pico8",
     "homebrew": "homebrew",
     "famicom": "nes", "fc": "nes",
+    # Neo Geo Pocket + WonderSwan are combined folders: mono+Color share one
+    # system, so ngpc→ngp and wsc→ws (a 'gamelist-ngpc.xml' feeds the ngp tab).
+    "ngp": "ngp", "ngc": "ngp", "ngpc": "ngp", "neogeopocket": "ngp",
+    "ws": "ws", "wsc": "ws", "wonderswan": "ws", "swancrystal": "ws",
     # identity keys so 'gamelist-a2600.xml' etc infer directly
     "nes": "nes", "gbc": "gbc", "a2600": "a2600", "a7800": "a7800", "mini": "mini",
 }

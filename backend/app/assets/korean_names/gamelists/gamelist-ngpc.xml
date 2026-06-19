@@ -1,0 +1,1064 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gameList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<game>
+		<path>./(K) SNK vs. Capcom - The Match of the Millennium.zip</path>
+		<name>(K) 정상결전 최강 파이터즈 - SNK VS CAPCOM</name>
+		<desc>SNK vs 캡콤 - 밀레니엄 매치는 1999년 12월 22일, SNK가 네오지오 포켓 컬러(NGPC) 전용으로 출시한 캡콤과의 크로스오버 2D 격투 게임이다. 유저한글화는 '팀 무풍'에 의해 진행되었다. 이 게임은 네오지오 포켓 컬러만의 전용 타이틀로, 흑백 모델에서는 구동되지 않으며, 당시 휴대용 게임기의 한계를 극복하려는 시도의 일환으로 제작되었다.
+SNK와 캡콤은 1997년 이후 대전 격투 게임 장르가 하향세에 접어들면서, 서로의 게임 캐릭터를 활용한 격투 게임을 두 편씩 만들기로 합의하였다. 그리하여 이 게임은 SNK가 만든 첫 번째 크로스오버 격투 게임으로, 두 번째로 발매된 작품이다. 캡콤이 먼저 시도한 후, SNK는 네오지오 포켓 컬러라는 플랫폼을 활용해 자신의 캐릭터들과 캡콤의 캐릭터들을 대전 시킨 이 게임을 선보였다.
+게임은 13명의 SNK 캐릭터와 13명의 캡콤 캐릭터로 구성되며, 그 중 일부 캐릭터는 토너먼트 모드를 클리어하거나 미니게임을 통해 해금할 수 있다. 각 캐릭터는 고유의 필살기와 특수 기술을 보유하고 있으며, 포인트 시스템을 통해 게임 내에서 얻은 포인트를 사용하여 이들을 강화하거나 해금하는 방식이 특징이다.
+SNK vs 캡콤 - 밀레니엄 매치는 기본적인 격투 요소 외에도 미니게임과 올림픽 모드를 통해 1인 플레이 중심으로 설계되었다. 다양한 미니게임을 통해 플레이어는 포인트를 획득하고, 이를 캐릭터의 능력 강화와 필살기 해금에 사용할 수 있다. 예를 들어, 펠리시아와 함께하는 음악 게임, 주베이와 함께하는 몰래 툭 치기 게임 등 다양한 미니게임들이 제공되어, 단순한 격투뿐만 아니라 다양한 방식으로 게임을 즐길 수 있었다.
+게임은 네오지오 포켓 컬러의 한계에 맞춰 그래픽, 사운드, 그리고 플레이 방식이 모두 최적화되었지만, 대전 격투 게임으로서의 핵심적인 재미는 제한적이었다. 네오지오 포켓 컬러는 당시 휴대용 게임기 시장에서 큰 인기를 끌지 못한 기기였기 때문에, SNK vs 캡콤 또한 상업적 실패를 겪을 수밖에 없었다. 휴대용 격투 게임의 한계를 잘 알고 제작된 이 게임은 그럼에도 불구하고 퀄리티 면에서 뛰어난 평가를 받았고, 후속작인 SVC CHAOS나 NEOGEO BATTLE COLISEUM과 비교할 때, 그 내용의 풍부함과 퀄리티에서 두각을 나타냈다.
+이 게임은 네오지오 포켓 컬러라는 제한된 플랫폼에서 캡콤과 SNK의 아이코닉한 캐릭터들을 한데 모은 중요한 타이틀이었으며, 대전 게임의 본격적인 재미를 그대로 옮길 수는 없었지만, 당시의 게임기 한계 속에서 두 회사의 대전 격투 게임의 매력을 잘 살렸다. 그럼에도 불구하고 대전 게임으로서의 특성보다는 1인 플레이 콘텐츠에 좀 더 집중되었고, 대전보다는 미니게임과 캐릭터 해금 시스템이 더 큰 비중을 차지하였다.
+네오지오 포켓 컬러의 상업적 실패와 겹치면서 이 게임은 잘 알려지지 않았지만, 좋은 평가를 받았다. 비록 대전 게임으로서의 본래 목적을 다하지 못했지만, 게임의 콘텐츠와 깊이에서 좋은 평가를 받았고, 그 후 Nintendo Switch와 Steam에 이식되어, 이제는 비교적 더 넓은 사용자들이 접근할 수 있게 되었다.</desc>
+		<rating>0.9</rating>
+		<releasedate>19991222T000000</releasedate>
+		<developer>Capcom</developer>
+		<publisher>Capcom</publisher>
+		<genre>Action-Fighting</genre>
+		<players>1-2</players>
+		<hash>B173030A</hash>
+		<image>./media/images/SNK vs. Capcom - The Match of the Millennium.png</image>
+		<genreid>262</genreid>
+	</game>
+	
+	<game id="47057" source="ScreenScraper.fr">
+		<path>./(K) King Of Fighters R-1.zip</path>
+		<name>(K) 킹 오브 파이터즈 R-1 - 포켓 파이팅 시리즈</name>
+		<desc>킹 오브 파이터즈 R-1은 SNK가 네오지오 포켓을 위한 첫 번째 킹 오브 파이터즈 타이틀로, 유저한글화는 '팀 무풍'에 의해 진행되었다. 휴대용 게임기로서 킹 오브 파이터즈의 전통적인 격투 게임 플레이를 충실히 재현한 작품이다. 이 게임은 킹 오브 파이터즈 '97의 특징적인 요소들을 반영하며, 14명의 유명 캐릭터들이 등장한다. 플레이어는 엑스트라와 어드밴스 두 가지 모드 중 하나를 선택할 수 있는데, 이는 원작 킹 오브 파이터즈 '97의 시스템을 바탕으로 하여, 각각의 플레이 스타일에 맞는 방식으로 게임을 즐길 수 있다.
+게임에서 플레이할 수 있는 캐릭터는 쿄 쿠사나기, 마이 시라누이, 테리 보가드, 이오리 야가미 등 킹 오브 파이터즈 시리즈에서 인기 있는 전투 캐릭터들로 구성되어 있으며, 각 캐릭터는 원작에서 보여주던 특수 기술과 움직임을 충실히 재현한다. 예를 들어, 쿄 쿠사나기의 '쿄 쿄카쿠'나, 이오리 야가미의 '야가미 스톰' 등 각 캐릭터의 필살기와 움직임은 게임 내에서 그대로 발현되어, 팬들에게 익숙한 전투의 재미를 제공한다.
+배경과 스테이지는 킹 오브 파이터즈 '97에서 차용된 다양한 요소들로 구성되어 있으며, 게임의 전반적인 그래픽은 SD(슈퍼 디포르메) 스타일로 귀엽게 변형된 캐릭터들과 배경으로 구성되어 있어, 작은 화면에서도 시각적으로 즐길 수 있게 된다.
+특히, 킹 오브 파이터즈 R-1은 네오지오 포켓의 하드웨어 특성에 맞춰, 세밀한 조작과 빠른 전투 속도를 제공한다. 기본적인 전투 방식 외에도 플레이어는 다양한 전략적 요소를 고려하여, 각 캐릭터의 강점과 약점을 파악하고, 적절한 기술과 타이밍을 활용해야 한다. 휴대용 게임기에서 구현된 격투 게임으로서는 뛰어난 완성도를 자랑하며, 킹 오브 파이터즈 팬들에게는 휴대성을 갖춘 멋진 전투 게임이 될 수 있다.</desc>
+		<rating>0.85</rating>
+		<releasedate>19981028T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Fighting-Fighting / Versus</genre>
+		<players>1-2</players>
+		<hash>DCEB7E11</hash>
+		<genreid>262</genreid>
+		<image>./media/image/King Of Fighters R-1.png</image>
+		<thumbnail>./media/thumbnail/King Of Fighters R-1.png</thumbnail>
+		<video>./media/video/King Of Fighters R-1.mp4</video>
+		<marquee>./media/marquee/King Of Fighters R-1.png</marquee>
+	</game>
+    <game id="47055" source="ScreenScraper.fr">
+        <path>./Baseball Stars.zip</path>
+        <name>베이스볼 스타즈 - 포켓 스포츠 시리즈</name>
+        <desc>베이스볼 스타즈 - 포켓 스포츠 시리즈는 야구 스포츠 게임으로, NES 버전의 베이스볼 스타즈와 유사한 게임플레이를 제공하지만, 캐릭터와 게임 스타일이 보다 단순하고 덜 사실적인 방식으로 표현되어 있다. 플레이어는 자신의 야구 팀을 관리하며 다양한 경기 시리즈를 진행하게 된다. 게임은 전형적인 야구 규칙을 따르고 있으며, 한 명은 공을 던지고, 다른 한 명은 이를 치며, 그 공을 다른 누군가가 잡는 방식으로 진행된다. 각 캐릭터는 고유한 스탯을 가지며, 스태미나와 같은 요소가 포함되어 있어 팀 구성 및 전략적인 플레이가 가능하다. 베이스볼 스타즈는 Neo Geo Pocket Color 플랫폼에서 경쾌하고 단순한 야구 게임 경험을 원하는 팬들에게 적합한 타이틀이다.</desc>
+        <rating>0.75</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>Saurus</developer>
+        <publisher>SNK</publisher>
+        <genre>Sports-Sports / Baseball</genre>
+        <players>1-2</players>
+        <hash>4781AE84</hash>
+        <genreid>1538</genreid>
+        <image>./media/image/Baseball Stars.png</image>
+        <thumbnail>./media/thumbnail/Baseball Stars.png</thumbnail>
+        <video>./media/video/Baseball Stars.mp4</video>
+        <marquee>./media/marquee/Baseball Stars.png</marquee>
+    </game>
+    <game id="47057" source="ScreenScraper.fr">
+        <path>./King Of Fighters R-1.zip</path>
+        <name>킹 오브 파이터즈 R-1 - 포켓 파이팅 시리즈</name>
+        <desc>킹 오브 파이터즈 R-1은 SNK가 네오지오 포켓을 위한 첫 번째 킹 오브 파이터즈 타이틀로, 휴대용 게임기로서 킹 오브 파이터즈의 전통적인 격투 게임 플레이를 충실히 재현한 작품이다. 이 게임은 킹 오브 파이터즈 '97의 특징적인 요소들을 반영하며, 14명의 유명 캐릭터들이 등장한다. 플레이어는 엑스트라와 어드밴스 두 가지 모드 중 하나를 선택할 수 있는데, 이는 원작 킹 오브 파이터즈 '97의 시스템을 바탕으로 하여, 각각의 플레이 스타일에 맞는 방식으로 게임을 즐길 수 있다.
+게임에서 플레이할 수 있는 캐릭터는 쿄 쿠사나기, 마이 시라누이, 테리 보가드, 이오리 야가미 등 킹 오브 파이터즈 시리즈에서 인기 있는 전투 캐릭터들로 구성되어 있으며, 각 캐릭터는 원작에서 보여주던 특수 기술과 움직임을 충실히 재현한다. 예를 들어, 쿄 쿠사나기의 '쿄 쿄카쿠'나, 이오리 야가미의 '야가미 스톰' 등 각 캐릭터의 필살기와 움직임은 게임 내에서 그대로 발현되어, 팬들에게 익숙한 전투의 재미를 제공한다.
+배경과 스테이지는 킹 오브 파이터즈 '97에서 차용된 다양한 요소들로 구성되어 있으며, 게임의 전반적인 그래픽은 SD(슈퍼 디포르메) 스타일로 귀엽게 변형된 캐릭터들과 배경으로 구성되어 있어, 작은 화면에서도 시각적으로 즐길 수 있게 된다.
+특히, 킹 오브 파이터즈 R-1은 네오지오 포켓의 하드웨어 특성에 맞춰, 세밀한 조작과 빠른 전투 속도를 제공한다. 기본적인 전투 방식 외에도 플레이어는 다양한 전략적 요소를 고려하여, 각 캐릭터의 강점과 약점을 파악하고, 적절한 기술과 타이밍을 활용해야 한다. 휴대용 게임기에서 구현된 격투 게임으로서는 뛰어난 완성도를 자랑하며, 킹 오브 파이터즈 팬들에게는 휴대성을 갖춘 멋진 전투 게임이 될 수 있다.</desc>
+        <rating>0.85</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>SNK</developer>
+        <publisher>SNK</publisher>
+        <genre>Fighting-Fighting / Versus</genre>
+        <players>1-2</players>
+        <hash>DCEB7E11</hash>
+        <genreid>262</genreid>
+        <image>./media/image/King Of Fighters R-1.png</image>
+        <thumbnail>./media/thumbnail/King Of Fighters R-1.png</thumbnail>
+        <video>./media/video/King Of Fighters R-1.mp4</video>
+        <marquee>./media/marquee/King Of Fighters R-1.png</marquee>
+    </game>
+    <game id="47058" source="ScreenScraper.fr">
+        <path>./Melon-chan no Seichouki.zip</path>
+        <name>메론짱의 성장일기</name>
+        <desc>메론짱의 성장일기는 라이프 시뮬레이션 게임으로, 다마고치와 같은 가상 생명체 양육 시뮬레이션 게임과 유사하다. 플레이어는 작은 소녀 메론짱을 키우고 그녀를 돌보며 성장시키는 역할을 하게 된다. 게임은 1990년대 말 일본에서만 출시되었으며, Neo Geo Pocket의 초기 타이틀 중 하나로 많은 주목을 받았다. 흑백 그래픽으로 제작되었으며, 당시의 제한된 기술력을 기반으로 간단하면서도 중독성 있는 게임 플레이를 제공하였다. 게임 내에서 메론짱은 플레이어의 선택에 따라 점진적으로 성장하고 다양한 반응을 보여주는 특징을 가지고 있어, 당시의 플레이어들에게 새로운 경험을 선사하였다. Neo Geo Pocket Color와도 호환이 가능하여 더 넓은 사용자층이 게임을 즐길 수 있었다.</desc>
+        <rating>0.5</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>ADK</developer>
+        <publisher>SNK</publisher>
+        <genre>Simulation-Simulation / Life</genre>
+        <players>1</players>
+        <hash>CB42CFA4</hash>
+        <genreid>1024</genreid>
+        <image>./media/image/Melon-chan no Seichouki.png</image>
+        <thumbnail>./media/thumbnail/Melon-chan no Seichouki.png</thumbnail>
+        <video>./media/video/Melon-chan no Seichouki.mp4</video>
+        <marquee>./media/marquee/Melon-chan no Seichouki.png</marquee>
+    </game>
+    <game id="47059" source="ScreenScraper.fr">
+        <path>./Neo Cherry Master - Real Casino Series.zip</path>
+        <name>네오 체리 마스터 - 리얼 카지노 시리즈</name>
+        <desc>네오 체리 마스터 - 리얼 카지노 시리즈는 고전적인 슬롯 머신을 재현한 슬롯 머신 시뮬레이터 게임이다. 게임은 현실적인 슬롯 머신 경험을 추구하며, 과일을 매칭하여 점수를 획득하는 고전적인 한 팔 도둑 스타일의 슬롯을 기반으로 하고 있다. 플레이어는 간단히 레버를 당겨 결과를 확인하며 게임을 진행하지만, 운과 전략이 혼합된 재미를 느낄 수 있다. 게임은 심플 모드와 오리지널 모드라는 두 가지 모드를 제공하며, 심플 모드는 기본적인 슬롯 머신 게임 플레이를 제공하고, 오리지널 모드는 플레이어가 이름을 입력하고 하이스코어를 저장할 수 있는 기능을 추가로 제공한다. 당시의 휴대용 콘솔의 특성을 잘 활용하여 간단하면서도 몰입감 있는 카지노 경험을 선사하였으며, 도박 요소와 고전적인 슬롯 머신의 매력을 결합하여 다양한 사용자층에게 어필하였다.</desc>
+        <rating>0.5</rating>
+        <releasedate>19981225T000000</releasedate>
+        <developer>Dyna</developer>
+        <publisher>SNK</publisher>
+        <genre>Casino-Casino / Slot machine</genre>
+        <players>1</players>
+        <hash>5C067579</hash>
+        <genreid>3584</genreid>
+        <image>./media/image/Neo Cherry Master.png</image>
+        <thumbnail>./media/thumbnail/Neo Cherry Master.png</thumbnail>
+        <video>./media/video/Neo Cherry Master.mp4</video>
+        <marquee>./media/marquee/Neo Cherry Master.png</marquee>
+    </game>
+    <game id="47060" source="ScreenScraper.fr">
+        <path>./NeoGeo Cup '98.zip</path>
+        <name>네오지오 컵 98</name>
+        <desc>네오지오 컵 98은 세계 최고의 팀 중 하나를 선택해 네오지오 컵 우승을 목표로 도전하는 축구 게임이다. 스토리 모드에서는 각 경기에서 승리하며 점수를 획득할 수 있고, 이 점수는 게임 내 상점에서 사용되어 팀의 능력을 강화하는 데 사용된다. 이러한 점수 시스템은 게임에 RPG 요소를 더하며, 플레이어는 상점에서 유니폼, 축구화, 운동복 등 다양한 아이템을 구입하여 팀원들의 능력을 특정 기준에 따라 향상시킬 수 있다. 예를 들어, 아이템을 통해 선수들의 속도를 높이거나 골 결정력을 강화하는 등 전략적인 플레이가 가능하다. 하지만 우승을 달성하기 위해서는 긴 시간 동안의 치열한 경기가 필요하며, 게임의 난이도는 도전 욕구를 자극한다.</desc>
+        <rating>0.6</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>SNK</developer>
+        <publisher>SNK</publisher>
+        <genre>Sports-Sports / Football (Soccer)</genre>
+        <players>1-2</players>
+        <hash>33ADD5BD</hash>
+        <genreid>1538</genreid>
+        <image>./media/image/NeoGeo Cup '98.png</image>
+        <thumbnail>./media/thumbnail/NeoGeo Cup '98.png</thumbnail>
+        <video>./media/video/NeoGeo Cup '98.mp4</video>
+        <marquee>./media/marquee/NeoGeo Cup '98.png</marquee>
+    </game>
+    <game id="47066" source="ScreenScraper.fr">
+        <path>./Pocket Tennis.zip</path>
+        <name>포켓 테니스 - 포켓 스포츠 시리즈</name>
+        <desc>포켓 테니스 - 포켓 스포츠 시리즈는 간단하면서도 몰입감 있는 테니스 게임으로, 전시 경기(Exhibition)와 토너먼트라는 두 가지 모드를 제공한다. 전시 경기 모드에서는 사용자가 컴퓨터나 링크 케이블을 이용한 2인 대전 중 하나를 선택할 수 있다. 플레이어는 여덟 명의 다양한 능력을 가진 캐릭터 중 하나를 선택하여 게임을 진행하며, 총 네 종류(컬러 버전은 다섯 종류)의 코트에서 경기를 치를 수 있다. 또한 한 경기에서의 세트 수(1, 3, 또는 5세트)를 조정할 수 있다.
+토너먼트 모드는 컴퓨터와의 대결에 집중된 모드로, 플레이어는 캐릭터는 선택할 수 있지만 상대 팀이나 경기 환경은 고정되어 있다. 경기 진행 방식은 8강전, 준결승, 그리고 결승전으로 이루어지며, 각 경기에서 승리하여 최종 우승에 도전하게 된다. 간단한 조작감과 전략적인 경기 흐름으로 휴대용 게임기에서 테니스의 재미를 충분히 느낄 수 있다.</desc>
+        <rating>0.85</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>Yumekobo</developer>
+        <publisher>SNK</publisher>
+        <genre>Sports / Tennis-Sports</genre>
+        <players>1-2</players>
+        <hash>89410850</hash>
+        <genreid>1538</genreid>
+        <image>./media/image/Pocket Tennis.png</image>
+        <thumbnail>./media/thumbnail/Pocket Tennis.png</thumbnail>
+        <video>./media/video/Pocket Tennis.mp4</video>
+        <marquee>./media/marquee/Pocket Tennis.png</marquee>
+    </game>
+    <game id="47061" source="ScreenScraper.fr">
+        <path>./Renketsu Puzzle Tsunagete Pon!.zip</path>
+        <name>연결 퍼즐 연결해서 퐁!</name>
+        <desc>연결 퍼즐: 연결해서 퐁!은 블록을 제거하며 진행하는 퍼즐 게임이다. 화면 상단에서 끊임없이 새로운 블록이 내려오며, 플레이어는 이 블록들을 적절히 배치해 같은 색깔이나 모양을 연결해 사라지게 해야 한다. 블록이 화면 하단에 도달하면 게임이 종료된다.
+게임은 단순하지만 긴장감 넘치는 진행으로 플레이어의 순발력과 전략적 사고를 요구한다. 빠르게 내려오는 블록 속도를 따라잡으며 최적의 조합을 만들어야 한다. 추가로, 콤보를 만들어 블록을 연속적으로 제거하면 높은 점수를 얻을 수 있다.
+연결 퍼즐: 연결해서 퐁!은 초보자도 쉽게 접근할 수 있는 직관적인 조작법을 제공하지만, 고득점을 노리는 숙련자에게는 도전 과제를 선사한다. 네오지오 포켓의 제한된 화면 속에서 구현된 깔끔한 그래픽과 빠른 템포의 게임 플레이는 플레이어에게 끊임없는 몰입감을 선사한다.
+짧게 즐길 수 있는 퍼즐 게임을 찾는 이들에게 추천하며, 경쟁적인 고득점 플레이와 여유로운 퍼즐 풀이 모두를 즐길 수 있는 타이틀이다.</desc>
+        <rating>0.75</rating>
+        <releasedate>19981028T000000</releasedate>
+        <developer>Yumekobo</developer>
+        <publisher>SNK</publisher>
+        <genre>Puzzle</genre>
+        <players>1-2</players>
+        <hash>CE09F534</hash>
+        <genreid>2816</genreid>
+        <image>./media/image/Renketsu Puzzle Tsunagete Pon!.png</image>
+        <thumbnail>./media/thumbnail/Renketsu Puzzle Tsunagete Pon!.png</thumbnail>
+        <video>./media/video/Renketsu Puzzle Tsunagete Pon!.mp4</video>
+        <marquee>./media/marquee/Renketsu Puzzle Tsunagete Pon!.png</marquee>
+    </game>
+    <game id="47067" source="ScreenScraper.fr">
+        <path>./Samurai Spirits!.zip</path>
+        <name>사무라이 쇼다운! - 포켓 파이팅 시리즈</name>
+        <desc>사무라이 쇼다운! 포켓은 본래 사무라이 쇼다운 4의 휴대용 버전으로, 네오지오 포켓에서 제공하는 격투 게임 중 하나이다. 이 게임은 네오지오 포켓의 초창기 타이틀 중 하나로, 초기에는 흑백 화면으로 제공되었으며, 캐릭터는 슈퍼디포메드 스타일로 디자인되어, 머리가 크고 몸이 작은 귀여운 형태로 그려졌다. 이 스타일은 다른 네오지오 포켓의 격투 게임들과 유사하다. 
+게임의 기본적인 시스템은 아케이드 버전의 사무라이 쇼다운을 잘 반영하고 있지만, 휴대용 기기 특성상 원작보다 단순화된 조작과 시스템을 제공한다. 등장하는 캐릭터들은 대부분의 특수 기술과 일반 공격을 그대로 유지하고 있지만, 아케이드 버전에서 보여주던 깊이 있는 전략 요소는 사라졌다. 이로 인해, 게임은 원작의 매력을 완벽하게 재현하기는 어렵지만, 그럼에도 불구하고 간단하고 직관적인 게임 플레이 덕분에 여전히 즐길 만한 요소를 제공한다. 
+게임의 그래픽과 시스템은 당시 휴대용 콘솔의 한계를 고려한 결과물로, 그만큼 게임 플레이 자체는 단순하지만 여전히 그 재미는 느낄 수 있다. 사무라이 쇼다운! 포켓은 비록 뛰어난 그래픽이나 복잡한 전략을 제공하지 않지만, 휴대용 격투 게임으로서의 특성을 잘 살려낸 타이틀이다.</desc>
+        <rating>0.8</rating>
+        <releasedate>19981225T000000</releasedate>
+        <developer>Saurus</developer>
+        <publisher>SNK</publisher>
+        <genre>Fighting-Fighting / Versus</genre>
+        <players>1-2</players>
+        <hash>32E4696A</hash>
+        <genreid>262</genreid>
+        <image>./media/image/Samurai Spirits!.png</image>
+        <thumbnail>./media/thumbnail/Samurai Spirits!.png</thumbnail>
+        <video>./media/video/Samurai Spirits!.mp4</video>
+        <marquee>./media/marquee/Samurai Spirits!.png</marquee>
+    </game>
+	<game>	
+        <path>./Shougi no Tatsujin.zip</path>
+        <name>장기의 달인</name>
+        <desc>장기의 달인은 일본의 전통적인 보드 게임인 장기를 디지털화한 작품으로, 일본식 체스라 불리는 장기를 배울 수 있는 좋은 기회를 제공한다. 이 게임의 목표는 상대방의 왕을 제압하는 것으로, 체스와 유사한 전략적 사고가 요구된다.
+장기는 체스와 비슷한 구조를 가졌지만, 말의 종류와 배치, 이동 규칙에서 차이를 보인다. 특히, 잡은 말을 자신의 말로 다시 사용할 수 있는 투입 규칙은 장기의 가장 독특한 특징 중 하나로, 플레이어에게 다양한 전략을 구상할 기회를 제공한다.
+게임은 초보자를 위한 기본 규칙 설명과 연습 모드, 실력을 시험할 수 있는 다양한 난이도의 AI 대전 모드를 제공한다. 정교하게 설계된 네오지오 포켓의 화면에서 장기판과 말이 깔끔하게 표시되며, 조작은 직관적이고 반응성이 뛰어나다.
+장기의 달인은 장기를 처음 접하는 사람부터 고수까지 모두 즐길 수 있는 게임으로, 장기의 매력을 깊이 이해하고 싶거나 손쉽게 장기를 연습하고 싶은 플레이어에게 강력히 추천된다. 일본 전통 게임의 매력을 디지털로 경험해보자.</desc>
+        <rating>0.5</rating>
+        <releasedate>19981120T000000</releasedate>
+        <developer>ADK</developer>
+        <publisher>SNK</publisher>
+        <genre>Strategy-Shougi-Asiatic board game</genre>
+        <players>1-2</players>
+        <hash>F34D0C9B</hash>
+        <genreid>1280</genreid>
+        <image>./media/image/Shougi no Tatsujin.png</image>
+        <thumbnail>./media/thumbnail/Shougi no Tatsujin.png</thumbnail>
+        <video>./media/video/Shougi no Tatsujin.mp4</video>
+        <marquee>./media/marquee/Shougi no Tatsujin.png</marquee>
+    </game>	
+	<game>
+		<path>./(K) SNK Gals Fighters.zip</path>
+		<name>(K) SNK 걸즈 파이터 (부분한글화)</name>
+		<desc>SNK 걸즈 파이터는 SNK의 인기 격투 게임 캐릭터들이 등장하는 여성 전용 대회 "퀸 오브 파이터즈 토너먼트"를 배경으로 한 격투 게임이다. 마이의 대사만 유저한글화 된 버전이 있다. 이 게임은 SNK의 다양한 게임 시리즈에서 여성 캐릭터들을 한데 모아 싸움을 벌이는 독특한 설정을 가지고 있다. 대회의 주최자는 "미스 X"라는 이름의 신비로운 인물로, 그녀는 여성들만을 참가시켜 대회를 개최하고, 그 우승자에게는 "K 탈리스만"이라는 신비한 유물을 주겠다고 발표한다. 이 유물은 소원을 이룰 수 있는 능력을 지니고 있어, 참가자들은 각자의 개인적인 꿈과 야망을 이루기 위해 싸운다.
+게임에 등장하는 캐릭터들은 더 킹 오브 파이터즈 시리즈의 마이 시라누이, 유리 사카자키, 아테나 아사미야, 레오나 하이덴, 셔미 등과, 삼국지 영웅전의 아카리 이치죠, 사무라이 쇼다운의 시키와 나코루루 등 다양한 게임에서 온 여성 캐릭터들이다. 이들은 모두 원작에서 보여준 기술과 공격 방식들을 그대로 구현하면서도, 게임의 독특한 스타일에 맞게 적절히 변형되어 있다. 각 캐릭터는 자신만의 고유한 필살기와 기술을 사용하며, 일부는 원작 게임에서의 특징을 패러디한 기술들을 선보이기도 한다.
+게임의 전투 시스템은 더 킹 오브 파이터즈 시리즈의 "어드밴스드 모드"와 유사한 방식으로 구성되어 있다. 기본적인 공격과 방어, 회피 명령 외에도 "MAX 게이지"와 같은 특수 시스템을 통해 캐릭터의 능력을 강화시킬 수 있다. 그러나, 킹 오브 파이터즈와 달리 SD 캐릭터들이 등장하며, 귀엽고 작은 스타일로 캐릭터들이 표현된다. SD 스타일은 게임의 전반적인 분위기를 더욱 유쾌하고 친숙하게 만들어주며, 팬들에게는 새로운 형태의 격투 경험을 제공한다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000120T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Fighting</genre>
+		<players>1-2</players>
+		<hash>B02C2BE7</hash>
+		<image>./media/images/SNK Gals Fighters.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./(K) SNK vs. Capcom - Card Fighters 2 Expand Edition.zip</path>
+		<name>(K) SNK vs 캡콤 - 카드 파이터 2 - 익스펜드 에디션</name>
+		<desc>SNK vs. 캡콤 - 카드 파이터 2 - 익스펜드 에디션은 2001년 9월 13일 일본에서 출시된 네오지오 포켓 컬러 전용 카드 배틀 게임이다. 유저한글화는 '코코낫'에 의해 진행되었다. 본작은 전작의 시스템을 계승하면서, 새로운 카드와 캐릭터가 추가되어 전략적인 덱 구성이 가능하다. 게임은 SNK와 캡콤 진영 중 하나를 선택하여 시작하며, 플레이어는 스토리 모드와 배틀 모드에서 진행할 수 있다. 스토리 모드는 리쿠토와 하루나의 모험을 그린 비주얼 노블 스타일로 전개된다. 배틀 모드에서는 다양한 카드 덱을 활용해 상대와 대결한다.
+본 게임은 240개의 캐릭터 카드와 60개의 액션 카드를 포함하여 124개의 새로운 카드가 추가되었으며, 특히 리액션 카드와 특수 카드가 새롭게 도입되어 전략적인 깊이를 더한다. 리액션 카드는 반격 단계에서 사용할 수 있는 카드로, 게임의 전술적 요소를 강화한다. 또한, 카드 덱 구성은 매우 자유롭고, 플레이어는 자신만의 전략을 세워 승리를 목표로 한다.
+이 게임은 카드 배틀의 기본적인 재미 외에도 카드 교환과 상점 이용 등 다양한 요소를 제공하며, 카드 수집과 배틀을 좋아하는 팬들에게 도전적인 즐거움을 선사한다. 스토리 모드에서는 네오맨틀과의 대결을 중심으로 이야기가 전개되며, 다양한 카드 파이터들이 등장해 풍성한 캐릭터들을 경험할 수 있다.</desc>
+		<rating>0.7</rating>
+		<releasedate>20010913T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Playing cards</genre>
+		<players>1-2</players>
+		<hash>CCBCFDA7</hash>
+		<image>./media/images/SNK vs. Capcom - Card Fighters 2 Expand Edition.png</image>
+		<genreid>2560</genreid>
+	</game>
+	<game>
+		<path>./Baseball Stars Color.zip</path>
+		<name>빅 뱅 프로 레슬링</name>
+		<desc>빅 뱅 프로 레슬링은 300년의 역사를 자랑하는 I.E.W(International Elite Wrestling) 리그에서 펼쳐지는 격렬한 레슬링 대회에 참가하는 게임이다. 이 게임의 이야기는 I.E.W의 왕인 조셉 스틸이 왕좌를 지키기 위해 경쟁자들과 맞붙는 과정을 그린다. 8명의 최정상 레슬러들이 링 위에서 싸우며, 그들 간의 대결은 단순히 승리를 넘어 최고의 레슬링 챔피언 벨트를 쥐기 위한 치열한 경쟁이 펼쳐진다.
+각 레슬러는 독특한 능력과 스타일을 가지고 있으며, 플레이어는 자신이 선택한 레슬러를 조작하여 상대를 쓰러뜨리고 챔피언이 되는 목표를 추구한다. 게임 내에서 등장하는 다양한 기술과 파워를 활용해 상대를 물리치고, 링 위에서 펼쳐지는 액션은 빠르고 역동적이다. 플레이어는 레슬링의 치열한 경쟁과 전략적 요소를 즐기며, 궁극적으로 I.E.W 챔피언 벨트를 차지하는 것이 목표이다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Saurus</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports-Sports / Baseball</genre>
+		<players>1-2</players>
+		<hash>FFA7E88D</hash>
+		<image>./media/images/Baseball Stars Color.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Big Bang Pro Wrestling.zip</path>
+		<name>바이오모터 유니트론</name>
+		<desc>바이오모터 유니트론은 네오지오 포켓 컬러를 위한 롤플레잉 게임(RPG)으로, 새로운 에너지원이 세계에 도입되면서 시작되는 이야기를 중심으로 전개된다. 이 에너지원은 거대한 로봇을 건설하게 만들었으며, 이 로봇들은 ‘마스터 오브 마스터’를 목표로 서로 싸우는 격투 게임의 주인공이 된다.
+플레이어는 주인공 캐릭터와 그들의 유니트론 로봇을 조종하며, 이 로봇들을 업그레이드하고 싸움을 통해 점점 더 강력한 로봇을 만들어 나가야 한다. 게임에서의 목표는 전투를 통해 돈을 벌고, 아이템을 얻어 유니트론을 강화하는 것이다. 도시는 상점과 다양한 주민들로 가득하며, 대화와 상점을 통해 필요한 아이템을 구매할 수 있다.
+유니트론은 업그레이드를 통해 외형과 성능이 변화하며, 무려 200개 이상의 다양한 무기 구성 옵션이 존재한다. 각 무기와 부품은 고유한 재료와 속성을 가지고 있어, 예를 들어 불속성 무기는 나무 타입 로봇에 더 효과적이다. 이와 같은 특성은 전투에서 전략적인 요소를 추가한다. 또한, 도시에 위치한 대형 던전은 대부분의 퀘스트와 아이템이 위치한 장소로, 탐험과 해결을 요구한다.
+전투 시스템은 포켓몬처럼 메뉴 기반이며, 플레이어는 다양한 능력 중에서 전투에 맞는 기술을 선택하여 싸운다. 전략적 사고와 아이템 관리가 중요한 게임이다.</desc>
+		<rating>0.6</rating>
+		<releasedate>20001123T000000</releasedate>
+		<developer>S-Neo</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports-Sports / Wrestling</genre>
+		<players>2</players>
+		<hash>B783C372</hash>
+		<image>./media/images/Big Bang Pro Wrestling.png</image>
+		<genreid>1536</genreid>
+	</game>
+	<game>
+		<path>./Bikkuriman 2000 Viva!.zip</path>
+		<name>비쿠리맨 2000 - 비바! 포켓 페스티벌</name>
+		<desc>"비쿠리맨 2000 - 비바! 포켓 페스티벌"은 다양한 미니게임을 즐길 수 있는 컬렉션 게임으로, 밝고 활기찬 분위기 속에서 즐거운 시간을 보낼 수 있다. 플레이어는 네오지오 포켓 컬러 버전에서 "세이 텐시 타케루"를 선택해 놀이공원을 탐험하며 다양한 어트랙션에 참여한다.
+미니게임 중 일부는 무료로 즐길 수 있으며, 이를 통해 게임 내 코인을 획득할 수 있다. 이 코인은 다른 어트랙션에 참여하거나 슬롯머신을 돌리는 데 사용된다. 슬롯머신에서는 "버그 아쿠마 vs. 기가 텐시" 시리즈의 희귀 스티커를 얻을 수 있으며, 이렇게 수집한 스티커는 게임 내 박물관에서 감상할 수 있다.
+처음에는 제한된 수의 미니게임만 제공되지만, 특정 목표를 달성하면 더 많은 게임이 잠금 해제되어 점점 더 다양한 콘텐츠를 즐길 수 있다. 미니게임의 성적에 따라 추가 코인을 획득하거나, 특정 어트랙션에서는 희귀한 스티커를 보상으로 받을 수도 있어 도전 욕구를 자극한다.
+"비쿠리맨 2000 - 비바! 포켓 페스티벌"은 독특한 수집 요소와 다양한 미니게임을 통해 플레이어에게 재미와 성취감을 동시에 제공한다. 밝고 귀여운 그래픽과 직관적인 조작은 누구나 쉽게 즐길 수 있게 하며, 비쿠리맨 시리즈 팬들에게는 더욱 특별한 경험을 선사한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20000316T000000</releasedate>
+		<developer>SEGA</developer>
+		<publisher>SEGA</publisher>
+		<genre>Action-Adventure</genre>
+		<players>1</players>
+		<hash>7A2D7635</hash>
+		<image>./media/images/Bikkuriman 2000 Viva!.png</image>
+		<genreid>512</genreid>
+	</game>
+	<game>
+		<path>./Biomotor Unitron.zip</path>
+		<name>바이오모터 유니트론</name>
+		<desc>바이오모터 유니트론은 네오지오 포켓 컬러를 위한 롤플레잉 게임(RPG)으로, 새로운 에너지원이 세계에 도입되면서 시작되는 이야기를 중심으로 전개된다. 이 에너지원은 거대한 로봇을 건설하게 만들었으며, 이 로봇들은 ‘마스터 오브 마스터’를 목표로 서로 싸우는 격투 게임의 주인공이 된다.
+플레이어는 주인공 캐릭터와 그들의 유니트론 로봇을 조종하며, 이 로봇들을 업그레이드하고 싸움을 통해 점점 더 강력한 로봇을 만들어 나가야 한다. 게임에서의 목표는 전투를 통해 돈을 벌고, 아이템을 얻어 유니트론을 강화하는 것이다. 도시는 상점과 다양한 주민들로 가득하며, 대화와 상점을 통해 필요한 아이템을 구매할 수 있다.
+유니트론은 업그레이드를 통해 외형과 성능이 변화하며, 무려 200개 이상의 다양한 무기 구성 옵션이 존재한다. 각 무기와 부품은 고유한 재료와 속성을 가지고 있어, 예를 들어 불속성 무기는 나무 타입 로봇에 더 효과적이다. 이와 같은 특성은 전투에서 전략적인 요소를 추가한다. 또한, 도시에 위치한 대형 던전은 대부분의 퀘스트와 아이템이 위치한 장소로, 탐험과 해결을 요구한다.
+전투 시스템은 포켓몬처럼 메뉴 기반이며, 플레이어는 다양한 능력 중에서 전투에 맞는 기술을 선택하여 싸운다. 전략적 사고와 아이템 관리가 중요한 게임이다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19990731T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>3807DF4F</hash>
+		<image>./media/images/Biomotor Unitron.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Bust-A-Move Pocket.zip</path>
+		<name>버스트 어 무브 포켓</name>
+		<desc>버스트 어 무브 포켓은 클래식한 퍼즐 게임으로, 버블 보블의 후속작인 퍼즐 보블의 핵심 개념을 기반으로 한다. 게임의 목표는 각 스테이지에서 색이 같은 3개 이상의 버블을 맞춰 깨는 것이다. 이를 통해 각 레벨을 클리어하고 점수를 쌓아나간다.
+게임은 주로 2인용 모드에서 경쟁하며, 두 플레이어가 번갈아 가며 버블을 맞추어 먼저 모든 버블을 깨는 사람이 승리하게 된다. 간단한 규칙과 직관적인 조작 방식으로 빠르게 적응할 수 있는 게임이지만, 각 스테이지가 진행될수록 점점 더 많은 전략을 요구하게 된다. 기본적인 퍼즐 게임의 매력을 그대로 살리며, 멀티플레이어 기능을 통해 친구와의 대결에서도 큰 재미를 제공한다.</desc>
+		<rating>0.8</rating>
+		<releasedate>19990326T000000</releasedate>
+		<developer>Taito</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle / Throw-Puzzle</genre>
+		<players>1-2</players>
+		<hash>85FE6AE3</hash>
+		<image>./media/images/Bust-A-Move Pocket.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Cool Boarders Pocket.zip</path>
+		<name>쿨 보더스 포켓</name>
+		<desc>쿨 보더스 포켓은 일반적인 쿨 보더스 시리즈의 다른 게임들과는 다른 점이 많다. 게임은 아이소메트릭(위에서 내려다보는 시점) 뷰를 사용하며, 이는 전통적인 3인칭 시점과는 차별화된다.
+게임은 두 가지 모드를 제공한다:
+1. 프리라이드 모드: 제한 없이 장애물 코스를 탐험하며 목표에 도달할 때까지 진행한다.
+2. 서바이벌 모드: 장애물 코스를 탈출하는 동안 플레이어의 건강이 다할 때까지 생존을 도전하는 모드.
+이 게임에서 플레이어는 남성 또는 여성 스노보더 중에서 하나를 선택할 수 있다. 스노보드의 움직임과 스타일이 고유하고, 각각의 캐릭터가 가진 특징에 맞는 동작들이 제공되어 개성 있는 게임을 즐길 수 있다. 스노보드 타기와 장애물 회피를 통한 스릴을 체험할 수 있는 게임이다.</desc>
+		<rating>0.45</rating>
+		<releasedate>20000224T000000</releasedate>
+		<developer>UEP Systems</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports-Sports / Skiing</genre>
+		<players>1</players>
+		<hash>833F9C22</hash>
+		<image>./media/images/Cool Boarders Pocket.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Cool Cool Jam.zip</path>
+		<name>쿨쿨 잼</name>
+		<desc>"쿨쿨 잼"은 2000년에 네오지오 포켓 컬러로 출시된 리듬 게임으로, 음악과 어드벤처 요소가 결합된 독특한 경험을 제공한다. 이 게임은 "파라파 더 래퍼", "동키 콩가", "비트매니아"와 같은 리듬 게임과 유사한 게임플레이를 선보이며, 음악적 감각과 타이밍을 테스트한다.
+게임의 스토리는 1000년 후의 미래로 이동한 소년과 소녀가 집으로 돌아가기 위해 성공적인 음악 밴드를 결성해야 한다는 내용을 중심으로 진행된다. 싱글 플레이어 모드에서는 리듬 게임 외에도 어드벤처 게임 요소가 포함되어 있어 흥미로운 스토리와 미션을 즐길 수 있다.
+플레이어는 다양한 악기를 연주하며 각 악기는 고유한 연주 스타일을 갖추고 있다. 악기의 예는 다음과 같다:
+박수: 화면의 막대가 이동하며 빨간 점이 나타날 때 버튼을 눌러 타이밍을 맞춘다. 성공하면 점이 빛난다.
+바이올린: 빨간 불(A 버튼)이나 초록 불(B 버튼)이 나타날 때 해당 버튼을 눌러 연주하며, 조이스틱으로 음량을 조절한다.
+블루스 하모니카: 불빛의 위치에 따라 조이스틱을 움직이고, A 또는 B 버튼을 눌러야 한다.
+기타: 줄 연주는 A 또는 B 버튼으로, 피크 조작은 조이스틱으로 진행한다.
+색소폰: 조이스틱과 버튼으로 음정을 조작하며 화면에 표시된 기호에 맞춘다.
+트럼펫: 조이스틱으로 음정을, A 또는 B 버튼으로 리듬을 맞추며 공기압 표시를 주의해야 한다.
+이외에도 악기의 조작 방식은 다양하며, 악기를 뒤집어 연주하는 색다른 기타 모드도 제공된다.
+"쿨쿨 잼"은 1인 플레이뿐만 아니라 2인 협동 모드를 지원하며, 협동 플레이에서는 두 플레이어가 번갈아가며 연주하고 메시지를 주고받는 듀엣 형식으로 진행된다. 음악적 도전과 함께 어드벤처의 재미를 느낄 수 있는 이 작품은 리듬 게임 팬들에게 특별한 경험을 선사한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20000810T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Rhythm-Music and Dancing</genre>
+		<players>2</players>
+		<hash>4FDA5D8A</hash>
+		<image>./media/images/Cool Cool Jam.png</image>
+		<genreid>266</genreid>
+	</game>
+	<game>
+		<path>./Crush Roller.zip</path>
+		<name>크러쉬 롤러</name>
+		<desc>크러쉬 롤러는 1981년 아케이드 게임인 Make Trax를 기반으로 한 게임으로, 유럽과 아시아에서는 크러쉬 롤러라는 이름으로 출시되었다. 게임의 목표는 페인트 브러시를 사용해 미로처럼 구성된 전체 필드를 색칠하는 것이다. 하지만 색칠하는 동안 두 명의 적이 미로 안을 돌아다니며, 적에게 부딪히면 목숨이 하나 줄어든다.
+특정 레벨에는 롤러가 있으며, 이 롤러를 페인트 브러시로 밀어 적을 죽일 수 있다. 적이 롤러의 경로를 지나면 잠시 게임에서 제외되며 추가 점수를 얻는다. 또한, 롤러에 지나가는 적이 많을수록 점수가 점점 더 올라간다.
+가끔씩 다른 괴물이 등장하여 페인트 위에 발자국을 남기는데, 이 괴물을 색칠하여 제거하면 추가 점수를 얻을 수 있다. 이 괴물이 남긴 자국을 다시 칠하는 과정이 필요하다.
+전체 미로를 색칠하면 레벨이 클리어된다. 이 게임은 원래 아케이드 버전과 달리 여러 레벨을 제공하며, 다양한 난이도에서 점점 더 도전적인 플레이가 펼쳐진다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>ADK</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Action / Labyrinth</genre>
+		<players>1-2</players>
+		<hash>F20FF9F2</hash>
+		<image>./media/images/Crush Roller.png</image>
+		<genreid>258</genreid>
+	</game>
+	<game>
+		<path>./Dark Arms - Beast Buster 1999.zip</path>
+		<name>다크 암즈 - 비스느 버스터 1999</name>
+		<desc>다크 암즈 - 비스트 버스터 1999는 Neo Geo Pocket Color용 RPG로, 아케이드 게임 Beast Busters의 스핀오프 게임이다.
+게임의 배경은 우리 세계와 평행한 "다크 영역"이다. 플레이어는 다크 영역의 지배자와 계약을 맺고 이 차원에 접근하게 된다. 이곳에서는 괴물을 잡고 이를 생물학적 무기인 다크 암즈에 먹여서 능력을 강화하고, 더 강력한 무기로 진화시킬 수 있다.
+다크 영역에는 다양한 퍼즐이 존재하며, 플레이어는 이를 해결해야 한다. 또한, 수많은 언데드 괴물들이 등장하며, 이 괴물들을 다크 암즈에 먹여 능력을 키운다. 게임의 주요 목표는 괴물들을 잡아 다크 암즈를 강화하고, 강력한 적들을 처치하는 것이다.
+게임 내에서의 무기 진화와 괴물 사육 요소가 독특한 특징으로, 플레이어는 각기 다른 괴물들을 먹여 다크 암즈의 능력을 끊임없이 발전시키고 진화시킬 수 있다. 다양한 던전과 몬스터 사냥이 결합된 RPG 스타일의 게임으로, 흥미로운 전개가 돋보인다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Noise Factory</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>6F353F34</hash>
+		<image>./media/images/Dark Arms - Beast Buster 1999.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Delta Warp.zip</path>
+		<name>델타 워프</name>
+		<desc>델타 워프는 2000년에 Neo Geo Pocket Color용으로 출시된 퍼즐 게임이다. 이 게임의 핵심은 삼각형 모양의 타일을 보드 위에서 움직이며 얼음과 같은 위험 요소들을 피하는 것이다. 타일을 올바르게 배치하고 위험을 피하는 간단하면서도 도전적인 플레이가 특징이다.
+델타 워프는 일본에서만 출시되었지만, 영어 텍스트 메뉴가 제공되며, 게임의 간단한 게임 방식 덕분에 일본어를 읽지 못하는 사람도 쉽게 플레이할 수 있다. 이 게임은 퍼즐을 풀면서 전략적인 사고를 요구하며, 점점 더 어려워지는 보드와 장애물을 피하면서 목표를 향해 나아가야 한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20000810T000000</releasedate>
+		<developer>Iosys</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle</genre>
+		<players>1-2</players>
+		<hash>ADD4FDFF</hash>
+		<image>./media/images/Delta Warp.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Densetsu no Ogre Battle Gaiden - Zenobia no Ouji.zip</path>
+		<name>전설의 오우거 배틀 외전 - 제노비아의 왕자</name>
+		<desc>전설의 오우거 배틀 외전 - 제노비아의 왕자는 SNES용 원작 게임인 오우거 배틀의 외전으로, "밀라노의 수도"라는 14번째 장(Chapter)에서 일어나는 사건을 다룬다. 이 게임은 전통적인 RPG와 전략적인 전투가 결합된 독특한 게임 플레이를 특징으로 한다.
+플레이어는 게임의 주인공이 되어, 성장하는 군대를 이끌고 여러 중요한 전투를 치르게 된다. 각 전투 전에 플레이어는 군대를 다양한 그룹으로 편성할 수 있으며, 지도에서 주어진 미션을 수행하기 위해 군대를 이동시킨다. 군대가 목표를 향해 이동하는 도중, 적군의 유닛 그룹과 마주치면, 게임은 등각 투영(isometric) 뷰로 전환되어 자동화된 턴제 전투가 벌어진다.
+게임 내에서의 전투는 유닛 그룹 간의 전투로, 각 유닛의 능력과 전략적 배치가 중요하며, 승리 시 다음 전투로 진행된다. 전투가 끝날 때마다 플레이어는 새로운 유닛을 영입하거나 자원을 얻고, 이야기를 이어가게 된다. 게임은 복잡한 전략적 사고와 전투 계획이 필요한 RPG로, 팬들에게는 오우거 배틀 시리즈의 매력을 잘 살린 작품으로 평가된다.</desc>
+		<rating>0.7</rating>
+		<releasedate>20000622T000000</releasedate>
+		<developer>Quest</developer>
+		<publisher>Quest</publisher>
+		<genre>Role Playing Game-Strategy</genre>
+		<players>1-2</players>
+		<hash>EEEEFD6A</hash>
+		<image>./media/images/Densetsu no Ogre Battle Gaiden - Zenobia no Ouji.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Densha de GO! 2.zip</path>
+		<name>전차로 고! 2 네오지오 포켓</name>
+		<desc>"전차로 고! 2 네오지오 포켓"은 일본의 인기 기차 운전 게임 시리즈의 두 번째 작품으로, 타이토에서 개발하여 다양한 홈 시스템으로 이식된 게임이다. 이 게임은 아케이드 스타일의 게임플레이로, 현실적인 기차 운전 시뮬레이션보다는 재미와 긴장감을 강조한다.
+플레이어는 기차를 운전하며 역에 완벽한 순간과 위치에서 정차하고, 시간표를 준수하며, 신호와 속도 제한을 지켜야 한다. 또한 승객들의 안전과 편안함을 보장하는 것이 중요한 목표이다. 실수 시 점수가 차감되며, 점수가 0에 도달하면 게임이 종료된다.
+게임에서 제공되는 주요 노선은 다음과 같다:
+호쿠호쿠선: 나에오에츠 ~ 우라가와라
+도호쿠 신칸센: 모리오카 ~ 신하나마키
+아키타 신칸센: 아키타 ~ 오마가리
+케이힌도호쿠선: 시나가와 ~ 우에노
+오사카 순환선: 오사카 ~ 텐노지 (아케이드 원작에 없는 노선)
+가고시마 본선: 하카타 ~ 고쿠라 (플레이스테이션 및 윈도우 버전에서만 제공)
+각 노선은 기차 운전의 난이도와 기차 유형에 따라 다양한 도전과 재미를 선사하며, 시간과 정확성을 요구하는 요소가 강하다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19991021T000000</releasedate>
+		<developer>Taito</developer>
+		<publisher>SNK</publisher>
+		<genre>Simulation-Simulation / Vehicle</genre>
+		<players>1-2</players>
+		<hash>D5CED9E9</hash>
+		<image>./media/images/Densha de GO! 2.png</image>
+		<genreid>1024</genreid>
+	</game>
+	<game>
+		<path>./Dive Alert - Burn Hen.zip</path>
+		<name>다이브 얼러트 - 번 편</name>
+		<desc>"다이브 얼러트 - 번 편"은 미래의 수중 세계를 배경으로 하는 액션 RPG로, 플레이어는 '맷'이라는 캐릭터를 조작한다. 이 게임은 지구의 대부분이 물로 둘러싸인 미래의 세상을 그리고 있으며, 유일한 육지인 '테라'에 입성하기 위해 잠수함 함장으로서의 능력을 증명해야 한다.
+게임은 다양한 전투와 함께, 적의 선박을 격파하는 것이 주요 목표이다. 또한 게임 내에서 사용할 수 있는 다양한 아이템과 보트들이 등장하며, 이를 모아가면서 전투를 유리하게 이끌어갈 수 있다. 레이더 화면을 통해 적의 위치를 파악하고, 토르페도를 발사하여 적을 공격하는 방식이다.
+게임은 텍스트 기반의 이야기 전개와 애니메이션 컷신을 제공하며, 두 명의 플레이어는 케이블을 통해 연결해 1:1 전투를 벌이거나, 배를 교환하고 데이터를 축적할 수 있다. 이 게임은 또 다른 버전인 '레베카 편'과 동일한 기본 구조를 가지고 있지만, 등장하는 캐릭터, 아이템, 보트 등이 다르다.</desc>
+		<rating>0.5</rating>
+		<releasedate>19990819T000000</releasedate>
+		<developer>Sacnoth</developer>
+		<publisher>SNK</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>C213941D</hash>
+		<image>./media/images/Dive Alert - Burn Hen.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Dive Alert - Rebecca Hen.zip</path>
+		<name>다이브 얼러트 - 레베카 편</name>
+		<desc>"다이브 얼러트 - 레베카 편"은 "다이브 얼러트 - 번 편"의 또 다른 버전으로, 게임의 기본 구조는 같지만, 플레이어가 조작하는 캐릭터가 '레베카'로 변경된다. 이 버전에서도 전반적인 스토리와 목표는 동일하지만, 등장하는 캐릭터와 아이템, 보트가 다르며, 이를 '포켓덱스'와 비슷한 장치에 기록하여 수집할 수 있다.
+적의 선박을 상대로 한 전투에서는 레이더 화면을 활용해 적의 위치를 추적하고, 토르페도를 발사하여 공격을 퍼붓는 방식으로 진행된다. 텍스트와 애니메이션 컷신을 통한 이야기 전개는 몰입감을 높이며, 두 플레이어가 서로 연결해 배를 교환하거나 1:1 전투를 벌이는 기능도 제공된다. 이 외에도 배터리 백업 기능과 훈련 모드가 있어 플레이어가 스킬을 익히거나 데이터를 축적할 수 있다.
+'번 편'과 '레베카 편'은 서로 다른 특성과 내용을 가진 버전으로, 두 게임을 모두 플레이하여 더 다양한 경험을 할 수 있다.</desc>
+		<rating>0.55</rating>
+		<releasedate>19990819T000000</releasedate>
+		<developer>Sacnoth</developer>
+		<publisher>SNK</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>3C4AF4F5</hash>
+		<image>./media/images/Dive Alert - Rebecca Hen.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Dynamite Slugger.zip</path>
+		<name>다이너마이트 슬러거</name>
+		<desc>다이너마이트 슬러거는 2000년에 Neo Geo Pocket Color용으로 출시된 야구 게임이다. 이 게임은 Baseball Stars와 Baseball Stars Color와 같은 다른 Neo Geo Pocket Color의 야구 게임들과 유사한 방식으로 플레이된다. 그러나 다이너마이트 슬러거는 Neo Geo Pocket Color에서 출시된 최신 야구 게임으로, 그만큼 향상된 그래픽과 개선된 게임 플레이를 제공한다.
+게임은 전통적인 야구 규칙을 따르며, 야구 선수들을 조작해 경기를 진행하는 스포츠 게임이다. 각 선수는 고유의 능력치를 가지고 있으며, 이를 활용해 상대 팀과 경쟁을 벌인다. 다이너마이트 슬러거는 Neo Geo Pocket Color의 성능을 최대한 활용하여 보다 선명한 그래픽과 정교한 애니메이션을 특징으로 한다.</desc>
+		<rating>0.45</rating>
+		<releasedate>20000525T000000</releasedate>
+		<developer>ADK</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports-Sports / Baseball</genre>
+		<players>1-2</players>
+		<hash>7F1779CD</hash>
+		<image>./media/images/Dynamite Slugger.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Evolution - Eternal Dungeon.zip</path>
+		<name>신기세기 에볼루션 - 끝이 없는 던전</name>
+		<desc>신기세기 에볼루션 - 끝이 없는 던전은 Evolution: The World of Sacred Device의 휴대용 버전으로, Dreamcast에서 원래 출시된 게임의 다운그레이드된 포터블 버전이다. 게임은 주인공 Mag Launcher가 에볼루티아라는 신비한 아이템을 찾기 위한 탐험을 중심으로 전개된다. 이 아이템은 엄청난 힘을 지닌 것으로 전설로 전해진다.
+게임의 핵심은 마을에서 퀘스트를 받고, 이를 수행하기 위해 파티를 구성하여 던전을 탐험하는 것이다. 던전 탐험 중에는 경험치와 아이템을 얻으며 캐릭터를 강화할 수 있다. 플레이어는 전투에서 최대 3명의 파티원을 조작하며, 턴제 전투에서 각 캐릭터의 행동을 선택해 실행한다. 파티 구성과 던전 클리어를 통해 이야기의 진행을 이끌어간다.
+이 게임은 원작 Dreamcast 버전에 비해 그래픽과 게임 플레이가 단순화되어 있으며, 상향식 2D 스프라이트로 던전 탐험이 이루어지고, 메뉴 시스템을 통해 전투를 진행한다. 던전은 랜덤 생성이 아닌 미리 디자인된 맵으로 구성되어 있다. 게임은 그라인딩을 통해 캐릭터를 성장시키며, 아이템과 장비를 구입하여 Cy-frame을 강화하는 등 다양한 요소를 포함하고 있다.</desc>
+		<rating>0.7</rating>
+		<releasedate>20000101T000000</releasedate>
+		<developer>Sting</developer>
+		<publisher>SEGA</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>BE47E531</hash>
+		<image>./media/images/Evolution- Eternal Dungeon.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Fantastic Night Dreams - Cotton.zip</path>
+		<name>판타스틱 나이트 드림 - 코튼</name>
+		<desc>판타스틱 나이트 드림 - 코튼(Cotton: Fantastic Night Dreams)은 2D 횡스크롤 슈팅 게임으로, 마법사 소녀 코튼이 주인공이다. 코튼은 자신의 좋아하는 사탕을 얻기 위해 마법의 빗자루를 타고 모험을 떠난다. 하지만 그녀의 사탕에 대한 집착이 결국 세계를 위협하는 여러 가지 위협들과 얽히게 되어, 이를 물리쳐야 하는 미션이 주어진다.
+게임은 경험치 시스템을 도입하여, 적을 처치할수록 경험치를 얻고 이를 통해 무기를 업그레이드할 수 있다. 업그레이드를 위해 얻는 파워 크리스탈을 통해 무기의 성능이 향상된다. 또한, 무기를 충전하여 강력한 특수 공격을 사용할 수 있고, 코튼의 마법 친구 실크의 도움을 받아 옵션 형성을 통해 보조 공격을 할 수 있다. 실크는 여러 가지 형태로 등장하며, 코튼의 공격을 강화하는 데 중요한 역할을 한다.
+이 게임은 전통적인 슈팅 게임의 매력을 그대로 갖추고 있으며, 코튼과 실크의 유쾌하고 귀여운 상호작용이 게임의 분위기를 밝고 재미있게 만들어준다. 다양한 적들과 보스 전투, 그리고 독특한 스테이지 디자인이 특징적인 요소로, 오랜 시간 동안 플레이할 수 있는 흥미로운 게임이다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20000323T000000</releasedate>
+		<developer>Success</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Shoot'em Up / Horizontal-Shoot'em Up</genre>
+		<players>1</players>
+		<hash>B8A12409</hash>
+		<image>./media/images/Fantastic Night Dreams- Cotton.png</image>
+		<genreid>260</genreid>
+	</game>
+	<game>
+		<path>./Faselei!.zip</path>
+		<name>파셀레이</name>
+		<desc>Faselei!는 Neo Geo Pocket Color용으로 출시된 전략 RPG 게임으로, 이 게임은 스토리 중심의 플레이와 전투 및 기계(TS) 커스터마이징을 중심으로 한 독특한 게임성을 자랑합니다. 게임은 기계 전쟁이 벌어지는 시대를 배경으로, 플레이어는 TS라는 거대한 로봇을 조종해 전투를 벌이며 스토리를 진행합니다.
+게임의 전투 시스템은 턴제와 실시간 전투가 결합된 방식입니다. 매 턴마다 액션 입력을 통해 전투를 시작하고, 이후 실시간으로 모든 전투가 전개됩니다. 전투 전에 액션을 설정하는 동안, 플레이어는 상대와 아군의 행동을 예측하고 전략을 세워야 하며, 이를 통해 전투의 승패가 결정됩니다.
+또한, 게임은 스토리와 캐릭터에 깊이가 있어, 스토리라인의 진행에 따라 다양한 TS의 커스터마이징이 가능하고, 그에 따라 전투 전략이 달라지기 때문에 전략적인 사고와 기계 조정이 중요합니다. 특히 디지털화된 게임의 주제곡 가사가 포함되어 있어, 분위기를 더욱 고조시킵니다.</desc>
+		<rating>0.85</rating>
+		<releasedate>19991222T000000</releasedate>
+		<developer>Sacnoth</developer>
+		<publisher>SNK</publisher>
+		<genre>Strategy</genre>
+		<players>1</players>
+		<hash>8F585838</hash>
+		<image>./media/images/Faselei!.png</image>
+		<genreid>1280</genreid>
+	</game>
+	<game>
+		<path>./Fatal Fury - F-Contact.zip</path>
+		<name>아랑전설 F-콘택트 - 포켓 파이팅 시리즈</name>
+		<desc>아랑전설 F-콘택트 (Fatal Fury - First Contact)는 Neo Geo Pocket Color 용으로 개발된 파이팅 게임이다. "SD" (Super-Deformed) 아트 스타일을 채택하여 기존 Fatal Fury 시리즈의 고유한 특징을 유지하면서도, 손쉬운 접근과 귀여운 캐릭터 디자인을 선보인다. 이 게임은 Real Bout Fatal Fury 2: The Newcomers의 모바일 버전으로, 원작의 클래식한 전투 시스템과 캐릭터들을 그대로 재현하면서도, Neo Geo Pocket Color의 한계를 고려하여 다소 간소화된 형태로 제공된다. 게임은 전통적인 Super Deformed(SD) 스타일로 캐릭터들을 표현하며, 각 캐릭터들이 과장된 귀여운 형태로 나타나고, 일반적인 아케이드 파이팅 게임의 캐릭터들보다 더 작은 몸집과 더 큰 머리를 가진 모습이다. 이로 인해 게임은 시각적으로 더 친근하고 귀여운 느낌을 준다. 원작 Real Bout Fatal Fury 2에서 제공되었던 2D 전투 시스템을 그대로 계승하고 있으며, 이 게임에서는 상단과 하단의 두 전투 평면을 통해 공격과 회피를 조작할 수 있다. 또한, 특수 기술, 초강력 공격(S.Power, P.Power) 및 특수 방어 기술(Breakshots)도 유지되며, 타격감과 전략적 요소가 잘 결합되어 있다. 링크 케이블을 이용한 2인 대전이 가능하여 친구와 함께 대결을 즐길 수 있다. 게임에는 Andy Bogard, Terry Bogard, Joe Higashi, Mai Shiranui, Kim Kaphwan, Ryuji Yamazaki, Rick Strowd, Li Xiangfei, Billy Kane, Wolfgang Krauser, Geese Howard 등 총 11명의 주요 캐릭터가 등장한다. 이 중 리 시앙페이와 릭 스트로우드는 새로운 캐릭터로, 각 캐릭터마다 고유한 특수 기술과 전략이 있다. 게임은 Neo Geo Pocket Color의 하드웨어 제한으로 인해 배경/전투 평면 시스템과 일부 캐릭터들이 축소되었지만, 원작의 특징적인 전투 시스템과 캐릭터들을 충실히 반영하였다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Fighting-Fighting / Versus</genre>
+		<players>1-2</players>
+		<hash>A9119B5A</hash>
+		<image>./media/images/Fatal Fury - F-Contact.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./Ganbare Neo Poke Kun.zip</path>
+		<name>힘내라 네오 포케군</name>
+		<desc>"힘내라 네오 포케군"은 독특한 게임으로, 플레이어는 주인공인 네오 포케군의 소소한 일상과 반응을 관찰하며 간접적으로 상호작용한다. 네오 포케군은 작은 도쿄 아파트에 갇힌 만화 같은 프로그래머로, 직접적으로 그의 행동을 조종할 수는 없지만, 아파트 내의 다양한 물건을 켜거나 끄는 방식으로 그의 반응을 유도할 수 있다. 또한, 특정 시간대나 방문자의 종류에 따라 포케군의 반응이 달라지며, 그의 기분이 좋아지면 자신만의 미니게임을 만들어 주기도 한다.
+게임의 주요 콘텐츠는 30개의 미니게임으로 구성되어 있으며, 각각은 다른 게임들의 클론, 슈팅 게임, 짧은 플랫폼 게임, 퍼즐 챌린지 등으로 다양하다. 이 게임들은 와리오 웨어(Wario Ware)와 비슷한 방식으로 짧고 빠른 게임플레이를 제공하며, 네오 포케군의 다양한 반응과 함께 웃음을 자아낸다. 게임은 기이한 유머와 재미있는 애니메이션을 통해 플레이어에게 끊임없는 즐거움을 준다. 일부 게임은 기본적인 벡터 그래픽을 사용하며, 대부분은 2D 스프라이트로 표현된다.</desc>
+		<rating>0.7</rating>
+		<releasedate>20000606T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Simulation</genre>
+		<players>1-2</players>
+		<hash>6DF986A3</hash>
+		<image>./media/images/Ganbare Neo Poke Kun.png</image>
+		<genreid>1024</genreid>
+	</game>
+	<game>
+		<path>./Infinity Cure.zip</path>
+		<name>인피니티 큐어</name>
+		<desc>"인피니티 큐어"는 네오지오 포켓 컬러로 이식된 비주얼 노벨 게임 "인피니티"의 포트 버전으로, 주로 스토리와 캐릭터 간의 상호작용을 중심으로 전개된다. 게임은 플레이어가 여러 인물들과 대화를 나누고, 중요한 선택들을 하면서 이야기를 풀어 나가는 방식이다. 이 게임은 여러 가지 선택지가 존재하며, 각 선택에 따라 스토리가 다르게 흘러가므로 여러 번 반복해서 플레이할 수 있는 요소를 제공한다.
+게임의 배경은 가까운 미래로, 복잡한 인간 관계와 도덕적 갈등이 주요 테마가 된다. 플레이어는 주인공이 되어, 여러 캐릭터들과의 관계를 형성하고 그들과의 상호작용을 통해 이야기를 풀어가게 된다. 다양한 선택지를 통해 스토리의 결말을 바꿀 수 있기 때문에, 각 플레이마다 다른 결말을 경험할 수 있다. 또한, 게임은 감정적으로 깊이 있는 스토리라인과 몰입감 있는 캐릭터들로 구성되어 있으며, 비주얼과 음악이 그 분위기를 더욱 고조시킨다.
+"인피니티 큐어"는 원작 게임의 매력적인 스토리와 세계관을 그대로 담고 있어, 비주얼 노벨 장르의 팬들에게 큰 인기를 끌었다. 비주얼 노벨 특유의 감동적인 전개와 몰입감 넘치는 대화 시스템을 제공하며, 스토리를 따라가다 보면 플레이어는 각 캐릭터와 깊은 정서적 연결을 느낄 수 있다. 이식된 버전에서도 원작의 감동을 그대로 느낄 수 있으며, 휴대용으로 게임을 즐기기에 적합한 버전이 되어 있다.
+게임은 텍스트 기반의 이야기 전개와 함께 풍부한 캐릭터들의 감정선, 그리고 그들의 선택에 따라 변화하는 결말을 제공하여, 반복 플레이를 통해 다양한 이야기를 체험할 수 있다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20001123T000000</releasedate>
+		<developer>Kindle Imagine Develop</developer>
+		<publisher>Kindle Imagine Develop</publisher>
+		<genre>Adventure</genre>
+		<players>1</players>
+		<hash>32DC2AA2</hash>
+		<image>./media/images/Infinity Cure.png</image>
+		<genreid>512</genreid>
+	</game>
+	<game>
+		<path>./Kikou Seiki Unitron.zip</path>
+		<name>기갑세기 유니트론 - 빛나는 땅에서</name>
+		<desc>"기갑세기 유니트론 - 빛나는 땅에서"는 바이오모터 유니트론의 후속작으로, 400년 후의 세계를 배경으로 한다. 이 게임은 일본에서만 출시되었으며, 바이오모터 유니트론과 유사한 방식으로 진행된다. 상단에서 내려다보는 던전 탐험과 메뉴 기반의 전투 시스템을 채택하고 있으며, 플레이어는 자신만의 유니트론 로봇을 업그레이드해 다양한 무기와 장비를 장착하여 던전 내의 적들과 싸워야 한다.
+게임에서는 로봇을 강화하고, 다양한 던전에서 펼쳐지는 전투를 통해 적을 물리쳐야 한다. 또한, 링크 케이블을 통해 두 명의 플레이어가 서로의 유니트론을 대결시킬 수 있는 대전 모드도 제공된다. 이를 통해 친구와 함께 로봇 전투를 즐길 수 있다. "기갑세기 유니트론 - 빛나는 땅에서"는 전작의 요소를 계승하면서도 더욱 진화된 전투와 커스터마이징 시스템을 제공하며, 로봇 전투의 매력을 한층 강화한 작품이다.</desc>
+		<rating>0.85</rating>
+		<releasedate>20000120T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1-2</players>
+		<hash>84580D66</hash>
+		<image>./media/images/Kikou Seiki Unitron.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./King of Fighters R-2.zip</path>
+		<name>킹 오브 파이터즈 R-2 - 포켓 파이팅 시리즈</name>
+		<desc>킹 오브 파이터즈 R-2는 킹 오브 파이터즈 시리즈가 네오지오 포켓 컬러로 발매된 두 번째 타이틀로, 이번에는 킹 오브 파이터즈 '98을 바탕으로 한 게임이다. 이전 작품과 마찬가지로, 일본 "SD" 스타일의 슈퍼 디포르메 캐릭터 디자인이 사용되었으며, 캐릭터들의 모습을 귀엽게 변형한 그래픽이 특징이다.
+게임은 두 가지 모드인 "어드밴스"와 "엑스트라"를 제공하며, 이는 킹 오브 파이터즈 '98에서의 게임 플레이를 그대로 옮겨왔다. 새로운 특징으로는 '어드밴티지 시스템'이 추가되어, 파워 게이지를 통해 각 캐릭터의 능력을 더욱 강화시킬 수 있다. 또한, '프랜차이즈 보스'인 루갈 번슈타인이 등장하며, 더욱 강력해진 루갈과의 대결은 게임의 중요한 도전 과제가 된다.
+팀 구성은 약간 변경되었으며, 이전 팀에 포함되지 않았던 레오나 하이던과 이오리 야가미가 각각 독립된 캐릭터로 등장한다. 주요 팀은 '쿠사나기 팀' (쿄 쿠사나기, 사이슈 쿠사나기, 싱고 야부키), '슈퍼 베이브 팀' (아테나 아사미야, 유리 사카자키, 카스미 토도), '뉴 사우스타운 팀' (료 사카자키, 마이 시라누이, 테리 보가드), '오로치 팀' (야시로 나나카세, 셔미, 크리스) 등이 있으며, 각 팀은 원작의 느낌을 살리면서도 휴대용 기기에서 즐기기 좋은 형태로 재구성되었다. 이 게임은 격투 게임의 전략적 요소와 캐릭터의 다양한 움직임을 즐길 수 있게 해, 킹 오브 파이터즈 팬들에게 또 다른 즐거움을 선사한다.</desc>
+		<rating>0.8</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Fighting-Fighting / Versus</genre>
+		<players>1-2</players>
+		<hash>47E490A2</hash>
+		<image>./media/images/King of Fighters R-2.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./Last Blade - Beyond The Destiny.zip</path>
+		<name>월하의 검사 - 운명 너머</name>
+		<desc>월하의 검사 - 운명 너머는 일본의 “바쿠마츠”(Bakumatsu) 시대인 1863년을 배경으로 한 전투 액션 게임으로, 역사적인 혼란과 혼전 속에서 펼쳐지는 격투를 그린다. 이 게임은 전통적인 일본 검술을 기반으로 한 전투 시스템과, 각기 다른 특성을 가진 무기들을 사용하여 플레이어에게 새로운 전투의 재미를 선사한다. Power(힘)와 Speed(속도) 무기를 비롯한 다양한 반격 기술(Repel move)을 활용해 전투에서 우위를 점할 수 있다.
+게임은 전형적인 무기 전투 게임의 규칙을 따르면서도, 각기 다른 스타일의 무기 사용법을 제공하여 플레이어에게 더 많은 선택권을 준다. 각 무기마다 장단점이 뚜렷하며, 플레이어는 적절한 무기와 전략을 선택해야 한다. 또한, 게임의 전투는 속도와 힘을 적절히 조절하는 기술적인 측면이 강조되며, 플레이어는 검술의 묘미를 느끼며 게임을 진행할 수 있다.
+이 게임은 기존의 전투 액션 게임들과 차별화되는 독특한 전투 시스템과 일본의 역사적 배경을 결합하여, 게임 속에서 새로운 형태의 격투와 액션을 경험할 수 있게 한다. 전투의 세밀한 조작과 전략적 사고를 요구하는 이 게임은, 단순한 액션 게임을 넘어서는 깊이 있는 플레이를 제공한다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000316T000000</releasedate>
+		<developer>Saurus</developer>
+		<publisher>SNK</publisher>
+		<genre>Fighting-Action</genre>
+		<players>1-2</players>
+		<hash>12AFACB0</hash>
+		<image>./media/images/Last Blade - Beyond The Destiny.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./Magical Drop Pocket.zip</path>
+		<name>매지컬 드롭 포켓</name>
+		<desc>매지컬 드롭 포켓은 매지컬 드롭 III의 기본적인 게임 메커니즘을 따르며, 휴대용 기기용으로 최적화된 퍼즐 게임이다. 이 게임은 화면을 구성하는 6개의 열(세로)에서 공을 쌓아 올리며, 같은 색의 공들을 묶어 제거하는 방식으로 진행된다. 기존의 7개 열을 가진 매지컬 드롭 시리즈와는 달리, 이 게임은 6개의 열을 활용하여 퍼즐을 풀어나간다. 이 차이는 게임의 전략적 요소를 다소 변화시켜, 플레이어가 새로운 방식으로 게임을 접근해야 함을 의미한다.
+게임 모드는 크게 '스토리', '셀프 챌린지', '프렌드 챌린지'로 나뉘어 있으며, 각 모드는 기본적으로 1P vs 컴퓨터, 솔로 플레이, 2P vs 모드 등을 지원한다. 스토리 모드는 5개의 난이도 모드를 제공하며, 셀프 챌린지는 3개의 난이도에서 플레이할 수 있다. 각 모드에서는 플레이어가 공을 일정 조건에 맞게 배열해 연결하고, 그 연결을 통해 점수를 얻는 방식으로 진행된다. 특히, 스토리 모드에서는 AI가 일정 시간마다 랜덤으로 공격을 시도해 플레이어의 퍼즐 진행을 방해한다. 이를 통해 긴장감과 도전감을 더하고, 퍼즐을 풀어가는 재미를 배가시킨다.
+또한, 게임은 '체인' 시스템을 채택하여, 일정 수의 공을 연결시켜 제거하는 방식으로 점수를 쌓아가는 특징이 있다. 이 체인 시스템은 연결한 공의 수에 비례하여 큰 점수를 얻을 수 있게 해, 전략적으로 많은 공을 연결시킬 수 있는 기회를 만들어 준다. AI가 랜덤으로 공격하는 요소 덕분에 매번 새로운 전략을 구사해야 하므로 반복 플레이가 매우 흥미롭다.
+매지컬 드롭 포켓은 간단한 조작법과 직관적인 게임 플레이로 누구나 쉽게 접근할 수 있으면서도, 전략적 사고와 빠른 반응 속도가 중요한 게임이다. 휴대용 기기에서 즐기기에 최적화된 퍼즐 게임으로, 언제 어디서나 짧은 시간 동안 집중해서 플레이할 수 있는 특징이 있다.</desc>
+		<rating>0.8</rating>
+		<releasedate>19990624T000000</releasedate>
+		<developer>SAS Sakata</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle</genre>
+		<players>1-2</players>
+		<hash>694CE2DC</hash>
+		<image>./media/images/Magical Drop Pocket.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Memories Off - Pure.zip</path>
+		<name>메모리즈 오프 - 퓨어</name>
+		<desc>"메모리즈 오프 - 퓨어"는 1999년 플레이스테이션에서 출시된 비주얼 노벨 게임 "메모리즈 오프"의 이전 이야기를 다룬 작품으로, 주로 감성적인 스토리와 캐릭터 간의 관계를 중심으로 전개된다. 게임은 토모야와 아야카, 그리고 유에라는 세 명의 주요 인물이 중심이 된다. 이들은 같은 중학교에 다니며, 서로 가까운 이웃으로 창문을 통해 소통하는 특별한 관계를 맺고 있다.
+이 게임은 약 3~4시간 정도의 플레이 시간이 소요되며, 기본적인 스토리는 한 번의 플레이로 끝난다. 그러나 게임은 두 가지 엔딩을 제공하며, 이를 통해 다양한 선택지를 경험할 수 있다. 특히, 아야카와 유에의 관점에서 이야기를 다시 경험할 수 있는 두 번째 반전이 있어 재플레이 가치를 높인다. 두 번의 플레이를 통해 각 캐릭터가 가진 감정선과 사건에 대한 이해도를 높일 수 있다.
+"메모리즈 오프 - 퓨어"는 감성적이고 서정적인 스토리 전개와, 캐릭터들의 미묘한 감정선이 중요한 요소로, 이들의 관계 변화가 주는 감동을 중점적으로 다룬다. 게임 내에서 선택지는 각기 다른 결과를 낳으며, 플레이어는 주인공의 선택에 따라 이야기의 흐름을 바꿀 수 있다. 게임의 이야기 진행은 텍스트 기반으로 이루어지며, 그 속에서 발생하는 감정의 교차와 갈등을 플레이어는 깊이 있게 체험할 수 있다.
+게임은 플레이어에게 감정적이고 몰입감 있는 경험을 제공하며, 비주얼 노벨 장르를 좋아하는 이들에게는 충분한 만족감을 주는 작품이다.</desc>
+		<rating>0.6</rating>
+		<releasedate>20000427T000000</releasedate>
+		<developer>Kindle Imagine Develop</developer>
+		<publisher>Kindle Imagine Develop</publisher>
+		<genre>Adventure-Adventure / Visual Novel</genre>
+		<players>1</players>
+		<hash>A7926E90</hash>
+		<image>./media/images/Memories Off - Pure.png</image>
+		<genreid>515</genreid>
+	</game>
+	<game>
+		<path>./Metal Slug - 1st Mission.zip</path>
+		<name>메탈 슬러그 - 첫 번째 미션</name>
+		<desc>메탈 슬러그 - 첫 번째 미션은 유명한 액션 게임 시리즈인 메탈 슬러그의 네오지오 포켓 컬러용 첫 번째 타이틀이다. 이 게임에서는 '페레그린 팔콘'이라는 정예 군대의 일원으로 플레이하며, 악명 높은 대령 빌데가른을 처치하는 미션을 수행한다. 다양한 전투 기계인 메탈 슬러그 탱크와 슬러그 플라이어를 사용하며, 핸드건과 전략적인 사고로 총 17개의 미션을 클리어해야 한다.
+게임의 특징 중 하나는 여러 단계 진행 방식과 게임 내에서 플레이어의 성적을 평가하는 랭킹 시스템이다. 이 시스템은 반복적인 플레이를 유도하며, 각 미션에서 더 나은 성적을 달성하고 싶게 만든다. 또한, 게임 내 세이브 기능을 통해 이동 중에도 언제든지 진행 상황을 저장하고, 게임을 종료했다가 다시 시작할 수 있어 편리하다. 이 게임은 메탈 슬러그의 전통적인 사이드 스크롤 액션을 잘 재현하면서도 휴대용 기기에서 즐길 수 있도록 최적화된 형태로, 액션 팬들에게 큰 매력을 발산한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Ukiyotei</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Shooter / Run and Gun-Shooter</genre>
+		<players>1</players>
+		<hash>4FF91807</hash>
+		<image>./media/images/Metal Slug - 1st Mission.png</image>
+		<genreid>256</genreid>
+	</game>
+	<game>
+		<path>./Metal Slug - 2nd Mission.zip</path>
+		<name>메탈 슬러그 - 두 번째 미션</name>
+		<desc>메탈 슬러그 - 두 번째 미션은 메탈 슬러그 - 첫 번째 미션의 후속작으로, 이번에는 반군 '팬텀'을 물리치는 임무를 맡게 된다. 이 게임은 총 38개의 스테이지로 구성되며, 비선형적인 전투 경로를 따라 적군을 처치하고 인질을 구출하는 임무를 수행한다. 또한, 메탈 슬러그 탱크, 슬러그 플라이어 전투기, 슬러그 서브 잠수함 등 다양한 전투 기계를 조종할 수 있으며, 각 전투 기기에는 중기관총, 로켓 발사기, 화염방사기 등 다양한 무기가 장착되어 있다.
+게임의 두 번째 미션에서는 새로운 캐릭터가 등장하고, 구출한 인질 목록과 타임 어택 모드가 추가되어 게임의 깊이가 더해졌다. 이로 인해 플레이어는 더 많은 도전과 목표를 설정할 수 있으며, 각 스테이지에서 더 빠르고 효율적으로 플레이하려는 욕구를 자극한다. 또한, 전작보다 더 많은 스테이지와 다양한 전투 기계가 추가되어, 메탈 슬러그 특유의 폭발적인 액션과 재미를 더욱 강화한 작품이다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000101T000000</releasedate>
+		<developer>Ukiyotei</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Shooter / Run and Gun-Shooter</genre>
+		<players>1</players>
+		<hash>AC549144</hash>
+		<image>./media/images/Metal Slug - 2nd Mission.png</image>
+		<genreid>256</genreid>
+	</game>
+	<game>
+		<path>./Mizuki Shigeru no Youkai Shashinkan.zip</path>
+		<name>미즈키 시게루의 요괴사진관</name>
+		<desc>"미즈키 시게루의 요괴사진관"은 일본의 유명한 만화가 미즈키 시게루의 작품을 기반으로 한 RPG 게임이다. 미즈키 시게루는 일본의 전통적인 요괴(초자연적인 유령이나 괴물)에 대한 깊은 지식으로 유명하며, 이 게임은 그가 창조한 요괴들을 중심으로 진행된다.
+게임의 주요 목표는 일본 각지를 탐험하며 요괴들을 찾아내고, 이를 카메라로 촬영하여 수집하는 것이다. 이렇게 촬영한 요괴들의 사진은 카드 형태로 변환되어, 다양한 카드 배틀에서 중요한 역할을 한다. 요괴들의 특성과 능력에 맞는 카드를 이용해 전략적으로 배틀을 진행하며, 플레이어는 점차 더 강력한 요괴들을 수집하고 성장시킬 수 있다.
+게임은 요괴들을 찾기 위한 탐험과 사진 촬영, 그리고 카드를 이용한 배틀 시스템이 결합되어 있어, 단순한 RPG의 틀을 넘어서는 독특한 게임플레이를 제공한다. 일본의 요괴 문화에 대한 깊은 이해와 미즈키 시게루의 독특한 예술적 감각이 담긴 이 게임은, 일본 내에서 NGPC 팬들 사이에서 매우 인기 있는 타이틀로 자리잡았다.
+"미즈키 시게루의 요괴사진관"은 요괴라는 전통적인 주제를 현대적인 RPG와 결합시킨 작품으로, 일본의 민속적 요소와 신비로운 분위기를 잘 표현한 게임이다.</desc>
+		<rating>0.6</rating>
+		<releasedate>19991229T000000</releasedate>
+		<developer>Ukiyotei</developer>
+		<publisher>SNK</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1</players>
+		<hash>DDE08335</hash>
+		<image>./media/images/Mizuki Shigeru no Youkai Shashinkan.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Neo Poke Pro Yakyuu.zip</path>
+		<name>네오 포케 프로 야구</name>
+		<desc>"네오 포케 프로 야구"는 SNK에서 개발하고 발매한 스포츠 게임으로, 1999년에 일본에서 출시되었다. 이 게임은 프로 야구를 테마로 한 타이틀로, 실감 나는 야구 경기를 플레이어가 조작하는 방식으로 즐길 수 있다.
+게임은 기본적으로 야구의 모든 규칙과 상황을 충실히 재현하고 있으며, 플레이어는 자신만의 팀을 만들거나, 실제 프로 팀을 선택하여 경기를 진행할 수 있다. 게임은 다양한 모드와 상황을 제공하며, 실제 야구와 비슷한 규칙에 따라 플레이어가 야구 선수로서 팀을 이끌어 나가야 한다.
+"네오 포케 프로 야구"는 야구의 규칙을 그대로 구현하며, 플레이어는 타격, 투구, 수비 등 다양한 역할을 맡을 수 있다. 이 게임은 네오지오 포켓 컬러의 휴대성을 살려 언제 어디서나 손쉽게 야구를 즐길 수 있는 장점을 제공한다.
+이 게임은 야구 팬들뿐만 아니라, 스포츠 게임을 좋아하는 모든 사람들에게 흥미로운 경험을 선사하는 작품으로, 당시 일본에서 큰 인기를 끌었다.</desc>
+		<rating>0.5</rating>
+		<releasedate>19990527T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports / Baseball-Sports</genre>
+		<players>1-2</players>
+		<hash>F4D78F12</hash>
+		<image>./media/images/Neo Poke Pro Yakyuu.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Neo Turf Masters.zip</path>
+		<name>네오 터프 마스터즈</name>
+		<desc>네오 터프 마스터즈는 다양한 국가에서 진행되는 골프 게임으로, 플레이어는 미국, 독일, 일본의 세 국가에서 각기 다른 18홀 코스를 플레이할 수 있다. 총 54홀의 코스를 거쳐 골프의 묘미를 경험할 수 있으며, 이 게임은 사실적인 골프 플레이를 지향한다. 각 코스는 실제 골프와 유사하게 설계되어 있으며, 다양한 장애물과 환경을 넘기 위해 전략적으로 공을 조준해야 한다.
+게임 모드는 싱글 플레이와 2인 대전 모드로 나뉜다. 싱글 플레이에서는 여러 난이도와 챌린지를 제공하며, 대전 모드에서는 친구와 실력을 겨룰 수 있다. 또한, 플레이어는 6명의 다양한 캐릭터 중에서 선택할 수 있으며, 각 캐릭터는 고유한 강점과 약점을 지니고 있어, 플레이 스타일에 따라 캐릭터를 선택하는 전략적 요소가 중요하다.
+네오 터프 마스터즈의 핵심은 정확한 클릭 방식을 통한 타격이다. 화면 상에서 목표 지점을 클릭하여 골프공을 칠 위치를 설정하고, 그 후 훅, 슬라이스, 파워 등을 조정하여 공의 경로를 결정한다. 이 방식은 실시간으로 조정하는 재미를 더하며, 골프의 세밀한 컨트롤을 요구한다. 또한, 대전 모드에서는 '슈퍼 클럽'이라는 아이템을 사용할 수 있으며, 이 클럽은 한 번만 사용할 수 있는 강력한 아이템으로, 친구들과 교환하거나 전략적으로 활용할 수 있다.
+이 게임은 그 단순함 속에서도 깊은 전략적 사고와 정확한 타격 기술이 필요한 골프 게임으로, 손쉽게 접근할 수 있으면서도 다양한 플레이 스타일을 제공한다. 휴대용 기기에서 골프를 즐길 수 있는 최적의 선택지로, 언제 어디서든 골프의 재미를 느낄 수 있다.</desc>
+		<rating>0.85</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Saurus</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports-Sports / Golf</genre>
+		<players>1-2</players>
+		<hash>317A66D2</hash>
+		<image>./media/images/Neo Turf Masters.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./NeoGeo Cup '98 Plus.zip</path>
+		<name>네오지오컵 98 플러스 컬러 - 포켓 스포츠 시리즈</name>
+		<desc>"네오지오컵 98 플러스 컬러"는 네오지오 포켓을 위한 축구 게임으로, 다채로운 게임 모드를 제공하며, 축구 팬들에게 매력적인 스포츠 경험을 선사한다. 게임에는 싱글 매치, 헤드 투 헤드 플레이 (링크 케이블을 이용한 대전 모드), 그리고 스토리 모드가 포함되어 있다. 플레이어는 16개의 국제 축구팀 중 하나를 선택하여 경기를 펼칠 수 있으며, 각 팀은 고유의 통계치를 가지고 있어 전략적인 선택이 중요하다.
+게임의 기본적인 조작은 패스, 슈팅, 드리블, 슬라이딩 태클, 충돌 등을 포함하며, 이를 통해 실제 축구의 다양한 상황을 재현한다. 스토리 모드에서는 여러 차례의 토너먼트에 참가하여 가능한 많은 경기를 승리해야 하며, 각 승리 후 얻은 상금을 팀에 필요한 아이템을 구매하는 데 사용할 수 있다. 이 아이템들은 보통 한 가지 능력치를 향상시키지만, 다른 능력치에는 부정적인 영향을 미칠 수 있어 신중한 선택이 필요하다.
+경기 중에는 필드 포메이션을 변경하거나 선수 교체를 할 수 있는 기능도 제공되어, 전략적인 플레이가 가능하다. 각 팀의 고유한 전술과 능력치를 잘 활용하여 경기를 이끌어가는 것이 핵심이다. "네오지오컵 98 플러스 컬러"는 게임의 직관적인 조작과 빠른 템포의 경기 진행으로, 짧은 시간 안에 흥미진진한 축구 경기를 즐길 수 있는 요소가 돋보인다.
+이 게임은 축구를 좋아하는 사람들에게는 물론, 스포츠 게임을 즐기는 모든 이들에게 만족감을 주는 작품으로, 네오지오 포켓의 한정된 기능을 활용하여 충분히 몰입감 있는 축구 게임을 제공한다.</desc>
+		<rating>0.6</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports / Football (Soccer)-Sports</genre>
+		<players>1</players>
+		<hash>C0DA4FE9</hash>
+		<image>./media/images/NeoGeo Cup '98 Plus.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Nige-ron-pa.zip</path>
+		<name>니게론파</name>
+		<desc>니게론파는 간단한 휴대용 RPG로, 주로 사이드 퀘스트와 아이템 수집, 친구 모집을 중심으로 진행된다. 이 게임은 비교적 간단한 스토리라인과 구조로 구성되어 있으며, 플레이어는 다양한 퀘스트를 수행하며 성장해 나간다. 퀘스트의 대부분은 아이템을 모으거나 특정 인물과 대화하는 방식으로 진행되며, 이를 통해 점차 캐릭터를 강화할 수 있다.
+게임의 특징은 '라이센스' 시스템으로, 이 라이센스는 마치 직업처럼 다양한 능력을 제공한다. 각 라이센스는 강력한 기술과 마법을 사용할 수 있게 해주며, 이는 게임을 진행하면서 점차 강화되고 변화한다. 플레이어는 라이센스를 통해 자신만의 전투 스타일을 만들 수 있으며, 다양한 마법과 스킬을 활용해 적을 처치하거나 도전을 극복할 수 있다.
+게임의 전투는 실시간 턴제 방식으로 진행되며, 각 캐릭터는 자신만의 특성을 가지고 있어 전투 전략이 중요하다. 친구를 모집하고 그들과 함께 모험을 떠나며, 점점 더 강력한 적들과 싸우게 된다. 퀘스트를 클리어하고, 점차 레벨업을 해 나가며 게임의 스토리가 진행된다.
+니게론파는 복잡하지 않지만 플레이어에게 다양한 선택을 제공하며, 꾸준히 새로운 능력을 배우고 강화해 나가는 재미가 있다. 휴대용 기기에서 쉽게 즐길 수 있는 RPG로, 짧은 시간 동안 몰입할 수 있는 퀘스트와 성장 시스템을 제공한다.</desc>
+		<rating>0.3</rating>
+		<releasedate>20001123T000000</releasedate>
+		<developer>Dennou Eizou</developer>
+		<publisher>Dennou Eizou</publisher>
+		<genre>Role Playing Game</genre>
+		<players>1</players>
+		<hash>3CC3E269</hash>
+		<image>./media/images/Nige-ron-pa.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./Oekaki Pazuru.zip</path>
+		<name>픽쳐 퍼즐</name>
+		<desc>픽쳐 퍼즐은 일본에서 "오에카키 퍼즐"로 알려진, 숫자와 색깔로 그림을 완성하는 퍼즐 게임이다. 이 게임은 닌텐도의 '픽로스' 시리즈와 유사한 방식으로 진행된다. 총 200개의 퍼즐을 제공하며, 그 중 20개는 5x5 크기, 105개는 10x10, 75개는 15x15 크기로 되어 있다. 이 중에서 더 작은 퍼즐들이 많아서, 작은 퍼즐은 짧은 시간에 풀 수 있지만, 더 큰 퍼즐은 NGPC 화면 크기에 비해 매우 작은 그리드로 풀기가 어려워 시간을 많이 소모한다.
+각 퍼즐을 해결하면, 게임은 그 퍼즐을 색칠한 버전으로 교체하고 제목을 붙여준다. 특히 작은 퍼즐의 경우 완성된 그림이 무엇인지를 정확히 알기 어려운 경우가 있는데, 색칠된 그림을 통해 이를 쉽게 알아볼 수 있다. 이는 게임이 네오지오 포켓 컬러에서만 실행 가능하다는 점에서 중요한 요소로, 컬러 화면을 활용해 더 명확한 이미지 확인이 가능하다.
+픽쳐 퍼즐은 짧은 시간 동안 퍼즐을 풀 수 있기 때문에 휴대용 기기에서 간편하게 즐기기에 적합한 게임이다. 이 게임은 수많은 퍼즐을 통해 퍼즐의 재미와 색칠된 그림을 완성하는 성취감을 느낄 수 있다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000427T000000</releasedate>
+		<developer>Success</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle</genre>
+		<players>1</players>
+		<hash>59AB1E0F</hash>
+		<image>./media/images/Oekaki Pazuru.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Pac-Man.zip</path>
+		<name>팩맨</name>
+		<desc>팩맨은 1980년대 가장 인기 있고 영향력 있는 게임 중 하나로, 작은 노란 점인 팩맨이 미로를 돌아다니며 여러 점과 과일을 먹고 클리어하는 방식의 게임이다. 게임의 목표는 미로에 있는 모든 점을 먹는 것이다. 하지만 팩맨의 길은 네 명의 유령에게 위협을 받는다. 이 유령들은 수줍은 파란 유령 '배시풀' (Inky), 뒤쫓아오는 빨간 유령 '섀도우' (Blinky), 빠른 분홍색 유령 '스피디' (Pinky), 그리고 잊어버리는 오렌지색 유령 '포키' (Clyde)이다. 이 유령들에게 닿으면 팩맨은 생명을 잃게 된다.
+팩맨은 미로 속에 배치된 네 개의 에너자이저를 먹음으로써 상황을 반전시킬 수 있다. 에너자이저를 먹은 팩맨은 잠시 동안 유령을 먹을 수 있게 되며, 유령들은 파란색으로 변한다. 이때 유령을 먹으면 보너스 점수를 얻을 수 있지만, 제한된 시간 동안만 지속되며, 유령들은 다시 원래의 위치로 돌아가서 팩맨을 쫓기 시작한다.
+몇 라운드를 클리어하면, 팩맨과 유령들 간의 유머러스한 인터미션이 펼쳐지며, 게임의 재미를 더한다. 간단하면서도 중독성 있는 게임 플레이로, 팩맨은 시간이 지나도 여전히 많은 사람들에게 사랑받는 클래식 게임이다.</desc>
+		<rating>0.8</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Namco</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Action / Labyrinth</genre>
+		<players>1</players>
+		<hash>21E8CC15</hash>
+		<image>./media/images/Pac-Man.png</image>
+		<genreid>258</genreid>
+	</game>
+	<game>
+		<path>./Party Mail.zip</path>
+		<name>파티 메일</name>
+		<desc>"파티 메일"은 여러 사람들과 함께 미니게임을 즐기고, 이메일을 주고받을 수 있는 소프트웨어로, 네오지오 포켓 컬러의 무선 기능을 활용한 독특한 게임이다. 이 게임은 여러 사용자가 무선 장치를 통해 서로 연결되어 이메일을 주고받고, 다양한 미니게임을 함께 즐길 수 있다.
+게임에서 이메일의 발신자는 다섯 가지의 서로 다른 애완동물 중 하나로 설정할 수 있으며, 이 애완동물은 이메일이 도착할 때마다 독특한 말을 하며, 그로 인해 게임에 재미와 변화를 더한다. 이러한 상호작용은 사용자가 이메일을 주고받는 과정에서 반복적으로 발생하며, 이메일을 보내는 행위와 미니게임을 진행하는 것이 결합되어 매우 사회적인 경험을 제공한다.
+"파티 메일"은 네오지오 포켓 컬러의 제한된 기능을 최대한 활용하면서, 여러 사람이 함께 즐길 수 있는 커뮤니케이션 및 게임 요소를 제공하는 점에서 특별한 매력을 지닌 타이틀이다. 이메일을 주고받으며 자연스럽게 연결된 사용자들 사이에서 소셜한 분위기를 형성하고, 간단하면서도 재밌는 미니게임들로 많은 사람들과 함께 즐거운 시간을 보낼 수 있다.</desc>
+		<rating>0.5</rating>
+		<releasedate>19991222T000000</releasedate>
+		<developer>ADK</developer>
+		<publisher>SNK</publisher>
+		<genre>Action / Adventure-Action</genre>
+		<players>1</players>
+		<hash>4DA8A1C0</hash>
+		<image>./media/images/Party Mail.png</image>
+		<genreid>256</genreid>
+	</game>
+	<game>
+		<path>./Pocket Love - If.zip</path>
+		<name>포켓 러브 - if</name>
+		<desc>"포켓 러브 - if"는 게임보이 시리즈에서 두 번째로 출시된 후, 네오지오 포켓 컬러로 이식된 포켓 러브 시리즈의 세 번째 작품이다. 이 게임의 목표는 고등학생으로서 자신을 훈련하고, 화이트 데이에 한 소녀로부터 고백을 받는 것이다. 이 게임은 캐릭터들과의 관계를 발전시키고, 그들이 주는 힌트와 사건을 통해 최종적으로 사랑의 고백을 받는 것이 핵심이다.
+"포켓 러브 - if"는 이전 시리즈에서 제공한 시스템을 한층 업그레이드하고, 새로운 캐릭터들을 추가하여 게임의 다양성을 더욱 풍부하게 만들었다. 플레이어는 주인공을 조종하여 일상적인 고등학교 생활을 보내며, 다양한 사람들과의 상호작용을 통해 친밀감을 쌓고, 이로 인해 발생하는 이벤트들이 이야기를 이끌어간다.
+게임의 시스템과 제작 또한 향상되어, 더욱 직관적인 인터페이스와 더 많은 선택지로 플레이어가 다양한 상황을 경험할 수 있다. 캐릭터들의 감정선과 상황 변화가 섬세하게 묘사되어, 각기 다른 결말을 도출할 수 있다. "포켓 러브 - if"는 연애 시뮬레이션 장르를 좋아하는 팬들에게 많은 흥미를 끌었으며, 네오지오 포켓 컬러의 특성을 잘 살려 소셜한 경험과 감정적 몰입감을 제공하는 게임이다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19991021T000000</releasedate>
+		<developer>Kindle Imagine Develop</developer>
+		<publisher>Kindle Imagine Develop</publisher>
+		<genre>Simulation</genre>
+		<players>1</players>
+		<hash>C2EE1EE5</hash>
+		<image>./media/images/Pocket Love - If.png</image>
+		<genreid>1024</genreid>
+	</game>
+	<game>
+		<path>./Pocket Tennis Color - Pocket Sports Series.zip</path>
+		<name>포켓 테니스 컬러 - 포켓 스포츠 시리즈</name>
+		<desc>포켓 테니스 컬러는 테니스 스포츠를 즐길 수 있는 게임으로, 8명의 플레이어블 캐릭터와 다양한 테니스 액션을 제공하여 테니스 팬들에게 만족을 준다. 게임은 사실적인 플레이 방식으로, 로브, 고속 스매시 등 다양한 샷을 구현하여 실제 테니스 경기를 방불케 한다.
+전시 모드에서는 컴퓨터와의 단식 경기를 즐길 수 있고, 별도로 판매되는 네오지오 케이블 링크를 통해 친구와 함께 경기를 할 수 있다. 토너먼트 모드에서는 강력한 경쟁자들과 겨루며, 이기면 우승 타이틀을 차지할 수 있다. 게임은 자신의 경기 결과를 저장할 수 있어 나중에 결과를 자랑하며 즐길 수 있다. 기록 모드는 플레이어가 자신의 기록과 트로피를 확인하면서 게임을 더 여유롭게 즐길 수 있는 기능을 제공한다.
+포켓 테니스 컬러는 간편하고 직관적인 테니스 게임으로, 짧은 시간에 플레이하면서도 진지한 경기를 즐기고 싶은 이들에게 최적의 선택이 될 수 있는 게임이다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Sports / Tennis-Sports</genre>
+		<players>1</players>
+		<hash>D8590B96</hash>
+		<image>./media/images/Pocket Tennis Color - Pocket Sports Series.png</image>
+		<genreid>1538</genreid>
+	</game>
+	<game>
+		<path>./Puyo Puyo 2.zip</path>
+		<name>뿌요 팝</name>
+		<desc>"뿌요 팝"은 두 명이 대결을 벌이는 퍼즐 게임으로, 뿌요라는 이름의 색깔이 다른 블록을 쌓아가며 경쟁하는 형식의 게임이다. 이 게임의 목표는 자신의 그리드를 뿌요로 채우고, 4개 이상의 같은 색의 뿌요를 일직선으로 연결하거나 몇 가지 기하학적인 패턴을 이용해 제거하는 것이다. 게임의 특이한 점은 체인을 만들어 뿌요를 제거할 때마다 상대방의 그리드에 무작위로 추가되는 뿌요가 있다는 점이다. 이 덕분에 상대방은 점점 더 많은 뿌요로 그리드가 가득 차게 되어, 게임을 진행하면서 더욱 긴장감 넘치는 대결이 펼쳐진다.
+이 게임에서 중요한 전략은 체인 연속 제거이다. 뿌요를 여러 번 연결해 지우면, 상대방의 그리드에 더 많은 필러가 쌓이게 되어 결국 그리드가 가득 차면 상대가 패배하게 된다. 반대로, 자신의 그리드를 비우는 동시에 상대의 그리드를 채워나가는 전략이 중요하다. 두 명의 플레이어가 경쟁하는 과정에서 빠르고 정확한 판단력이 요구되며, 특히 빠른 속도와 정확한 타이밍이 승패를 가를 수 있다.
+"뿌요 팝"은 단순하면서도 중독성 강한 퍼즐 게임으로, 친구나 다른 플레이어와의 대전에서 흥미진진한 대결을 제공한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Compile</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle-Puzzle / Fall</genre>
+		<players>1</players>
+		<hash>5C649D1E</hash>
+		<image>./media/images/Puyo Puyo 2.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Renketsu Puzzle Tsunagete Pon!.zip</path>
+		<name>연결 퍼즐 연결해서 퐁! 컬러</name>
+		<desc>"연결 퍼즐 연결해서 퐁! 컬러"는 블록을 연결하여 색을 맞추고, 새로운 블록을 쏘아 맞추는 방식으로 진행되는 퍼즐 게임이다. 이 게임의 목표는 화면 상단에서 떨어지는 다양한 색상의 블록을 연결하여 없애는 것이다. 새로운 블록이 끊임없이 화면에 떨어지며, 화면 하단에 첫 번째 블록들이 닿으면 게임이 끝난다. 플레이어는 블록을 쏘아서 그 블록이 연결되면 색이 같은 블록들이 연결되어 사라지게 된다.
+게임 모드는 크게 세 가지로 나뉜다. 첫 번째 "Normal" 모드는 특정 시간이 지나면 특수 블록이 등장하며, 이 블록을 연결해야 다음 단계로 넘어갈 수 있다. 각 레벨을 시간 내에 마치면 50장의 수집 가능한 카드 중 하나를 잠금 해제할 수 있다. 두 번째 "Clear Mode"는 주어진 블록 모양을 제거하는 모드로, 목표는 주어진 패턴을 빠르게 해결하는 것이다. 세 번째 "Battle Mode"는 링크 케이블을 통해 두 명이 대결하는 모드로, 친구와 함께 실력을 겨룰 수 있다.
+이 게임은 빠른 템포의 퍼즐 게임으로, 타이밍과 전략적 사고가 중요한 요소로 작용한다. 더 많은 블록을 연결하고, 특수 블록을 잘 활용해 나가면서 높은 점수를 기록하거나 상대를 압도할 수 있다. 게임의 진행 속도는 매우 빠르며, 플레이어는 매번 빠르게 떠오르는 블록을 처리하고, 적절한 타이밍에 정확한 연결을 해야 한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>19990930T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle-Puzzle / Throw</genre>
+		<players>1</players>
+		<hash>8D0610AC</hash>
+		<image>./media/images/Renketsu Puzzle Tsunagete Pon!.png</image>
+		<genreid>2816</genreid>
+	</game>
+	<game>
+		<path>./Rockman - Battle &amp; Fighters.zip</path>
+		<name>록맨 - 배틀 엔 파이터즈</name>
+		<desc>록맨 - 배틀 엔 파이터즈는 아케이드 게임 Mega Man: The Power Battle와 Mega Man 2: The Power Fighters를 기반으로 한 격투 게임이다. 이 게임에서 플레이어는 총 4명의 캐릭터인 록맨, 프로토맨, 베이스, 듀오 중 하나를 선택해 다양한 로봇 마스터들과 전투를 벌인다. 게임은 세 가지 세트의 보스 배틀로 구성되어 있으며, 각 보스는 록맨 시리즈에서 유명한 로봇 마스터들이 등장한다.
+전투는 순차적으로 진행되며, 각 보스를 처치한 후에는 해당 보스의 특수 무기를 획득할 수 있다. 각 보스는 특정한 무기에 약점을 가지므로, 플레이어는 어느 순서로 보스를 처치할지를 전략적으로 고민해야 한다. 게임의 핵심은 보스들의 약점을 파악하고, 그에 맞는 무기를 활용하는 것이다.
+또한, 두 명의 플레이어가 링크 케이블을 이용해 데이터베이스 정보를 서로 전송할 수 있는 기능이 있지만, 협력 플레이나 대전 모드는 지원되지 않는다. 그럼에도 불구하고, 전작과 비슷한 방식의 전투와 다양한 특수 무기 사용이 주는 재미는 여전히 매력적인 요소로 다가온다. 이 게임은 록맨 팬들에게 익숙한 캐릭터와 특유의 전략적 전투 방식을 제공하며, 짧고 집중적인 배틀을 즐길 수 있는 타이틀이다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000706T000000</releasedate>
+		<developer>Capcom</developer>
+		<publisher>Capcom</publisher>
+		<genre>Fighting</genre>
+		<players>1</players>
+		<hash>9C861E49</hash>
+		<image>./media/images/Rockman - Battle &amp; Fighters.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./Samurai Shodown! 2 - Pocket Fighting Series.zip</path>
+		<name>사무라이 쇼다운! 2 - 포켓 파이팅 시리즈</name>
+		<desc>사무라이 쇼다운! 2는 SNK의 전설적인 격투 게임 시리즈가 돌아온 작품이다. 이 게임에서는 15명의 전사 중 하나가 되어 악의 세력인 미즈키를 처치하기 위해 싸운다. 각 캐릭터는 고유의 무기와 기술을 이용해 적과의 전투를 벌이며, 일본의 전통적인 무사 정신을 느낄 수 있다. 플레이어는 검을 휘두르거나 발차기를 하며 상대를 처치하고, 때로는 무기를 이용해 적을 반으로 쪼갠다.
+게임의 주요 특징은 강렬한 액션과 함께 각 캐릭터들의 다양한 특수 기술을 활용할 수 있다는 점이다. 전투는 빠르고 직관적이며, 플레이어는 빠르게 적의 공격을 피하고 반격할 수 있는 기회를 찾아야 한다. 전투는 "검에 의해 살아가고, 검에 의해 죽는다"는 무사들의 철학을 바탕으로, 승리와 패배가 격렬하게 엇갈린다.
+사무라이 쇼다운! 2는 그 자체로 뛰어난 격투 게임이지만, 휴대용 기기인 네오지오 포켓에서 구현되었기에 그래픽과 조작 시스템은 한정된 성능을 고려한 간소화된 모습이다. 그럼에도 불구하고, 게임은 원작의 강렬한 전투와 전사들의 개성을 잘 담아내며, 흑백 화면에서도 충분히 매력적인 게임 플레이를 제공한다. 복잡하지 않으면서도 충분히 즐거운 경험을 제공하는 이 게임은 휴대용 격투 게임의 매력을 잘 살린 타이틀이다.</desc>
+		<rating>0.7</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Fighting-Fighting / Versus</genre>
+		<players>1-2</players>
+		<hash>4F7FB156</hash>
+		<image>./media/images/Samurai Shodown! 2 - Pocket Fighting Series.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./SNK Gals Fighters.zip</path>
+		<name>SNK 걸즈 파이터</name>
+		<desc>SNK 걸즈 파이터는 SNK의 인기 격투 게임 캐릭터들이 등장하는 여성 전용 대회 "퀸 오브 파이터즈 토너먼트"를 배경으로 한 격투 게임이다. 이 게임은 SNK의 다양한 게임 시리즈에서 여성 캐릭터들을 한데 모아 싸움을 벌이는 독특한 설정을 가지고 있다. 대회의 주최자는 "미스 X"라는 이름의 신비로운 인물로, 그녀는 여성들만을 참가시켜 대회를 개최하고, 그 우승자에게는 "K 탈리스만"이라는 신비한 유물을 주겠다고 발표한다. 이 유물은 소원을 이룰 수 있는 능력을 지니고 있어, 참가자들은 각자의 개인적인 꿈과 야망을 이루기 위해 싸운다.
+게임에 등장하는 캐릭터들은 더 킹 오브 파이터즈 시리즈의 마이 시라누이, 유리 사카자키, 아테나 아사미야, 레오나 하이덴, 셔미 등과, 삼국지 영웅전의 아카리 이치죠, 사무라이 쇼다운의 시키와 나코루루 등 다양한 게임에서 온 여성 캐릭터들이다. 이들은 모두 원작에서 보여준 기술과 공격 방식들을 그대로 구현하면서도, 게임의 독특한 스타일에 맞게 적절히 변형되어 있다. 각 캐릭터는 자신만의 고유한 필살기와 기술을 사용하며, 일부는 원작 게임에서의 특징을 패러디한 기술들을 선보이기도 한다.
+게임의 전투 시스템은 더 킹 오브 파이터즈 시리즈의 "어드밴스드 모드"와 유사한 방식으로 구성되어 있다. 기본적인 공격과 방어, 회피 명령 외에도 "MAX 게이지"와 같은 특수 시스템을 통해 캐릭터의 능력을 강화시킬 수 있다. 그러나, 킹 오브 파이터즈와 달리 SD 캐릭터들이 등장하며, 귀엽고 작은 스타일로 캐릭터들이 표현된다. SD 스타일은 게임의 전반적인 분위기를 더욱 유쾌하고 친숙하게 만들어주며, 팬들에게는 새로운 형태의 격투 경험을 제공한다.</desc>
+		<rating>0.8</rating>
+		<releasedate>20000120T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Action-Fighting</genre>
+		<players>1-2</players>
+		<hash>B02C2BE7</hash>
+		<image>./media/images/SNK Gals Fighters.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./SNK vs. Capcom - Card Fighters 2 Expand Edition.zip</path>
+		<name>SNK vs 캡콤 - 카드 파이터 2 - 익스펜드 에디션</name>
+		<desc>SNK vs. 캡콤 - 카드 파이터 2 - 익스펜드 에디션은 2001년 9월 13일 일본에서 출시된 네오지오 포켓 컬러 전용 카드 배틀 게임이다. 본작은 전작의 시스템을 계승하면서, 새로운 카드와 캐릭터가 추가되어 전략적인 덱 구성이 가능하다. 게임은 SNK와 캡콤 진영 중 하나를 선택하여 시작하며, 플레이어는 스토리 모드와 배틀 모드에서 진행할 수 있다. 스토리 모드는 리쿠토와 하루나의 모험을 그린 비주얼 노블 스타일로 전개된다. 배틀 모드에서는 다양한 카드 덱을 활용해 상대와 대결한다.
+본 게임은 240개의 캐릭터 카드와 60개의 액션 카드를 포함하여 124개의 새로운 카드가 추가되었으며, 특히 리액션 카드와 특수 카드가 새롭게 도입되어 전략적인 깊이를 더한다. 리액션 카드는 반격 단계에서 사용할 수 있는 카드로, 게임의 전술적 요소를 강화한다. 또한, 카드 덱 구성은 매우 자유롭고, 플레이어는 자신만의 전략을 세워 승리를 목표로 한다.
+이 게임은 카드 배틀의 기본적인 재미 외에도 카드 교환과 상점 이용 등 다양한 요소를 제공하며, 카드 수집과 배틀을 좋아하는 팬들에게 도전적인 즐거움을 선사한다. 스토리 모드에서는 네오맨틀과의 대결을 중심으로 이야기가 전개되며, 다양한 카드 파이터들이 등장해 풍성한 캐릭터들을 경험할 수 있다.</desc>
+		<rating>0.7</rating>
+		<releasedate>20010913T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Playing cards</genre>
+		<players>1-2</players>
+		<hash>CCBCFDA7</hash>
+		<image>./media/images/SNK vs. Capcom - Card Fighters 2 Expand Edition.png</image>
+		<genreid>2560</genreid>
+	</game>
+	<game>
+		<path>./SNK vs. Capcom - Card Fighters Clash - Capcom Version.zip</path>
+		<name>SNK vs 캡콤 - 격돌 카드 파이터 - 캡콤 서포터 버전</name>
+		<desc>SNK vs. 캡콤 - 격돌 카드 파이터 - 캡콤 서포터 버전은 카드를 활용한 전략적인 게임으로, 네오지오 포켓에서 즐길 수 있는 카드 배틀 게임이다. 이 게임은 캡콤의 카드 덱을 사용하여 SC 카드 파이터즈 대회에 참가하고, SNK와 캡콤의 두 세계에서 총 300장의 카드를 수집하며 친구들과 대결하고 카드 트레이드를 할 수 있다. 유희왕과 같은 인기 카드 게임처럼, 각 카드의 능력을 활용해 상대를 물리치는 것이 핵심이다.
+게임의 중요한 특징은 전략적 요소와 카드 수집의 재미가 결합되어 있다는 점이다. SNK와 캡콤의 캐릭터들이 등장하며, 그들의 능력을 카드로 표현해 상대와 대결하는 방식이다. 또한, SNK vs. 캡콤: 매치 오브 더 밀레니엄과 연결하여 수집 포인트를 주고받을 수 있는 기능도 제공되어, 더욱 깊은 게임 플레이를 즐길 수 있다. 카드 배틀 게임의 특성을 잘 살린 이 게임은 수집과 전략적 사고를 요구하는 동시에, 양사의 팬들에게 큰 재미를 선사한다.</desc>
+		<rating>0.9</rating>
+		<releasedate>19991021T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>Capcom</publisher>
+		<genre>Role Playing Game-Strategy</genre>
+		<players>1-2</players>
+		<hash>80CE137B</hash>
+		<image>./media/images/SNK vs. Capcom - Card Fighters Clash - Capcom Version.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./SNK vs. Capcom - Card Fighter's Clash - SNK Version.zip</path>
+		<name>SNK vs 캡콤 - 격돌 카드 파이터 - SNK 서포터 버전</name>
+		<desc>SNK vs. 캡콤 - 격돌 카드 파이터 - SNK 서포터 버전은 네오지오 포켓에서 즐길 수 있는 카드 배틀 게임으로, SNK의 카드 덱을 사용하여 'SC 카드 파이터즈 대회'에 참가하는 형식이다. 게임에서는 SNK와 캡콤의 양대 프랜차이즈에서 300장의 카드를 수집하고, 친구들과 대결하며 카드 트레이드를 할 수 있는 기능이 제공된다. 이 게임은 유희왕과 같은 CCG(콜렉터블 카드 게임)와 유사한 방식으로 진행되며, 각 카드에는 능력치와 효과가 있어 전략적으로 상대를 물리쳐야 한다.
+플레이어는 다양한 캐릭터들이 등장하는 카드 덱을 구성하여 전투를 벌이며, 카드를 어떻게 조합할지에 대한 깊은 전략적 사고가 요구된다. 또한, 게임은 링크 모드를 통해 다른 친구들과 카드를 주고받고 대결할 수 있는 기능을 제공하며, SNK vs. 캡콤: 매치 오브 더 밀레니엄과 연결하여 수집 포인트를 주고받는 등의 교류도 가능하다. 다양한 캐릭터와 전략적 카드 배틀의 재미를 즐길 수 있는 게임으로, 팬들에게 깊이 있는 경험을 선사한다.</desc>
+		<rating>0.9</rating>
+		<releasedate>19991021T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>Capcom</publisher>
+		<genre>Role Playing Game-Strategy</genre>
+		<players>1-2</players>
+		<hash>94B63A97</hash>
+		<image>./media/images/SNK vs. Capcom - Card Fighter's Clash - SNK Version.png</image>
+		<genreid>768</genreid>
+	</game>
+	<game>
+		<path>./SNK vs. Capcom - The Match of the Millennium.zip</path>
+		<name>SNK vs 캡콤 - 밀레니엄 매치</name>
+		<desc>SNK vs 캡콤 - 밀레니엄 매치는 1999년 12월 22일, SNK가 네오지오 포켓 컬러(NGPC) 전용으로 출시한 캡콤과의 크로스오버 2D 격투 게임이다. 이 게임은 네오지오 포켓 컬러만의 전용 타이틀로, 흑백 모델에서는 구동되지 않으며, 당시 휴대용 게임기의 한계를 극복하려는 시도의 일환으로 제작되었다.
+SNK와 캡콤은 1997년 이후 대전 격투 게임 장르가 하향세에 접어들면서, 서로의 게임 캐릭터를 활용한 격투 게임을 두 편씩 만들기로 합의하였다. 그리하여 이 게임은 SNK가 만든 첫 번째 크로스오버 격투 게임으로, 두 번째로 발매된 작품이다. 캡콤이 먼저 시도한 후, SNK는 네오지오 포켓 컬러라는 플랫폼을 활용해 자신의 캐릭터들과 캡콤의 캐릭터들을 대전 시킨 이 게임을 선보였다.
+게임은 13명의 SNK 캐릭터와 13명의 캡콤 캐릭터로 구성되며, 그 중 일부 캐릭터는 토너먼트 모드를 클리어하거나 미니게임을 통해 해금할 수 있다. 각 캐릭터는 고유의 필살기와 특수 기술을 보유하고 있으며, 포인트 시스템을 통해 게임 내에서 얻은 포인트를 사용하여 이들을 강화하거나 해금하는 방식이 특징이다.
+SNK vs 캡콤 - 밀레니엄 매치는 기본적인 격투 요소 외에도 미니게임과 올림픽 모드를 통해 1인 플레이 중심으로 설계되었다. 다양한 미니게임을 통해 플레이어는 포인트를 획득하고, 이를 캐릭터의 능력 강화와 필살기 해금에 사용할 수 있다. 예를 들어, 펠리시아와 함께하는 음악 게임, 주베이와 함께하는 몰래 툭 치기 게임 등 다양한 미니게임들이 제공되어, 단순한 격투뿐만 아니라 다양한 방식으로 게임을 즐길 수 있었다.
+게임은 네오지오 포켓 컬러의 한계에 맞춰 그래픽, 사운드, 그리고 플레이 방식이 모두 최적화되었지만, 대전 격투 게임으로서의 핵심적인 재미는 제한적이었다. 네오지오 포켓 컬러는 당시 휴대용 게임기 시장에서 큰 인기를 끌지 못한 기기였기 때문에, SNK vs 캡콤 또한 상업적 실패를 겪을 수밖에 없었다. 휴대용 격투 게임의 한계를 잘 알고 제작된 이 게임은 그럼에도 불구하고 퀄리티 면에서 뛰어난 평가를 받았고, 후속작인 SVC CHAOS나 NEOGEO BATTLE COLISEUM과 비교할 때, 그 내용의 풍부함과 퀄리티에서 두각을 나타냈다.
+이 게임은 네오지오 포켓 컬러라는 제한된 플랫폼에서 캡콤과 SNK의 아이코닉한 캐릭터들을 한데 모은 중요한 타이틀이었으며, 대전 게임의 본격적인 재미를 그대로 옮길 수는 없었지만, 당시의 게임기 한계 속에서 두 회사의 대전 격투 게임의 매력을 잘 살렸다. 그럼에도 불구하고 대전 게임으로서의 특성보다는 1인 플레이 콘텐츠에 좀 더 집중되었고, 대전보다는 미니게임과 캐릭터 해금 시스템이 더 큰 비중을 차지하였다.
+네오지오 포켓 컬러의 상업적 실패와 겹치면서 이 게임은 잘 알려지지 않았지만, 좋은 평가를 받았다. 비록 대전 게임으로서의 본래 목적을 다하지 못했지만, 게임의 콘텐츠와 깊이에서 좋은 평가를 받았고, 그 후 Nintendo Switch와 Steam에 이식되어, 이제는 비교적 더 넓은 사용자들이 접근할 수 있게 되었다.</desc>
+		<rating>0.9</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>Capcom</developer>
+		<publisher>Capcom</publisher>
+		<genre>Action-Fighting</genre>
+		<players>1-2</players>
+		<hash>B173030A</hash>
+		<image>./media/images/SNK vs. Capcom - The Match of the Millennium.png</image>
+		<genreid>262</genreid>
+	</game>
+	<game>
+		<path>./Sonic the Hedgehog - Pocket Adventure.zip</path>
+		<name>소닉 더 헤지혹 - 포켓 어드벤처</name>
+		<desc>소닉 더 헤지혹 - 포켓 어드벤처는 원래 세가의 인기 캐릭터 소닉을 주인공으로 한 플랫폼 게임으로, 네오지오 포켓 컬러(NGPC) 전용으로 출시되었다. 이는 세가의 소닉 시리즈가 세가 콘솔이 아닌 다른 플랫폼에서 출시된 두 번째 사례로, 중요한 의미를 지닌 작품이다. 소닉의 휴대용 게임기 시장 진출은 세가가 게임기어(Game Gear) 이후 철수한 뒤, 다시 한 번 휴대용 시장에 도전하는 중요한 신호탄이었다.
+게임은 2D 스크롤링 방식의 전형적인 소닉 게임을 채택하고 있으며, 소닉의 빠른 속도와 다양한 장애물을 피하는 방식이 핵심이 된다. 네오지오 포켓 컬러의 한계를 극복하며, 그래픽적으로도 놀라운 퀄리티를 자랑했으며, 소닉의 고유한 매력적인 디자인과 다채로운 색감을 잘 표현하였다. 그 당시 휴대용 게임기에서 이런 수준의 그래픽을 보여주는 것은 매우 혁신적이었다. 이로써 세가는 소닉의 전통적인 빠른 속도감을 휴대용 플랫폼에서 잘 살려낸 첫 사례로 평가받았다.
+게임의 기본적인 요소들인 스피드, 링 수집, 적들과의 전투 등은 여전히 소닉 시리즈의 핵심 요소로, 각 레벨마다 특색 있는 환경을 제공하며, 점프, 회전, 스핀 대시 등 다양한 기술을 사용해 장애물을 넘고 적들을 처치하는 재미를 선사한다. 또한 스테이지마다 숨겨진 비밀이나 다양한 콤보를 완성할 수 있는 요소가 있어 탐험의 재미도 더해준다.
+소닉 팬들에게는 그 특유의 빠른 속도감과 도전적인 스테이지들이 큰 매력으로 다가왔고, 세가가 네오지오 포켓 컬러라는 플랫폼을 통해 소닉의 전통적인 재미를 휴대용 게임기에서 완벽하게 구현한 작품으로 큰 인기를 끌었다. 세가와 캡콤이 각자의 방식으로 네오지오 포켓 컬러에서 경쟁을 벌였던 시기, 이 게임은 휴대용 게임기의 한계를 넘어서 소닉의 아이코닉한 매력을 보여준 중요한 작품이었다.</desc>
+		<rating>0.9</rating>
+		<releasedate>19990101T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Platform</genre>
+		<players>1-2</players>
+		<hash>356F0849</hash>
+		<image>./media/images/Sonic the Hedgehog - Pocket Adventure.png</image>
+		<genreid>257</genreid>
+	</game>
+	<game>
+		<path>./The King of Fighters - Battle de Paradise.zip</path>
+		<name>킹 오브 파이터즈 - 배틀로 파라다이스</name>
+		<desc>"킹 오브 파이터즈 - 배틀로 파라다이스"는 보드 게임 형식의 2인용 파티 게임으로, 수고로쿠(sugoroku)와 유사한 방식으로 진행된다. 플레이어는 다른 사용자와 연결하여 함께 플레이하거나, CPU와 대결할 수 있다. 각 플레이어는 4명의 오리지널 캐릭터 중 하나를 선택하여 보드 위에 놓고, 함께 스트라이커 캐릭터도 선택한다. 스트라이커는 '킹 오브 파이터즈 '99: 에볼루션에서 등장한 엑스트라 스트라이커들이다. 만약 캐릭터의 이름이 마음에 들지 않으면, 이름을 바꿀 수 있는 옵션도 제공된다.
+게임 진행은 주사위 굴리기로 시작되며, 주사위 결과에 따라 보드를 따라 이동한다. 보드에는 다양한 특수 칸들이 있으며, 이 칸에 도달하면 미니게임이 시작된다. 미니게임은 주로 기억력 게임, 회피 대전, 퀴즈 챌린지 등 다양한 장르로 구성되어 있다. 이 미니게임들은 SNK의 기존 게임들(예: T.A.N.K, 이전의 킹 오브 파이터즈 시리즈)에서 영감을 받은 것들이 많다. 미니게임에서 승리하면 코인을 얻을 수 있으며, 이 코인을 모아 별을 구매할 수 있다. 게임의 목표는 별을 가장 많이 모은 플레이어가 승리하는 것이다.
+킹 오브 파이터즈의 캐릭터와 스트라이커가 등장하는 점에서 팬들에게 친숙하며, 다양한 미니게임을 통해 운과 실력이 중요한 게임으로 즐길 수 있다.</desc>
+		<rating>0.6</rating>
+		<releasedate>20000706T000000</releasedate>
+		<developer>SNK</developer>
+		<publisher>SNK</publisher>
+		<genre>Board game</genre>
+		<players>1-2</players>
+		<hash>77E37BAC</hash>
+		<image>./media/images/The King of Fighters - Battle de Paradise.png</image>
+		<genreid>2048</genreid>
+	</game>
+	<game>
+		<path>./Tsunagete Pon! 2.zip</path>
+		<name>이어터져 퐁! 2</name>
+		<desc>"이어터져 퐁! 2"는 블록을 연결하여 색을 맞추고 사라지게 만드는 퍼즐 게임으로, 이전 게임인 Puzzle Link와 유사한 방식으로 진행된다. 게임의 목표는 화면 상단에서 떨어지는 다양한 색의 블록을 연결하여 없애는 것이다. 새로운 블록이 계속해서 떨어지며, 첫 번째 블록들이 화면 하단에 도달하면 게임이 끝난다. 플레이어는 블록을 쏘아 연결하며, 색상이 같은 블록들이 연결되면 해당 블록들이 사라진다.
+"이어터져 퐁! 2"에는 새로운 게임 모드가 추가되었다. 원래의 도전 모드와 퍼즐 모드 외에도, 마라톤 스타일의 게임 모드가 등장했다. 이 모드에서는 게임이 진행될수록 속도가 점차 빨라지며, 플레이어는 더 빠르게 블록을 제거해야 한다. 속도가 빨라질수록 파워업 아이템도 등장하며, 파워업 아이템 중 하나는 3번의 샷으로 동일 색의 블록을 제거할 수 있는 기능을 제공한다. 이 새로운 모드는 게임에 속도와 전략적 사고를 추가하여, 더욱 긴장감 넘치는 플레이를 제공한다. 또한 링크 케이블을 통해 두 명의 플레이어가 함께 대결할 수 있는 모드도 제공된다.
+이어터져 퐁! 2는 퍼즐 게임의 재미를 유지하면서, 빠른 속도와 전략적 사고를 요구하는 요소들을 더해 더욱 도전적인 플레이를 제공한다.</desc>
+		<rating>0.75</rating>
+		<releasedate>20000401T000000</releasedate>
+		<developer>Yumekobo</developer>
+		<publisher>SNK</publisher>
+		<genre>Puzzle</genre>
+		<players>1</players>
+		<hash>BA9CA21C</hash>
+		<image>./media/images/Tsunagete Pon! 2.png</image>
+		<genreid>2816</genreid>
+	</game>
+</gameList>
