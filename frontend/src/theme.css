@@ -1721,7 +1721,11 @@ body::before {
 .emu-overlay.mode-window { background: rgba(0, 0, 0, 0.62); padding: 22px; }
 .emu-overlay.mode-window .emu-window {
   position: relative;              /* anchors the control legend pinned below it */
-  width: min(620px, 94vw); height: min(86vh, 760px);
+  /* Open shaped to the game's aspect (--emu-asp = w/h): the stage gets ~55% of the
+     window height, so width ≈ stageH·aspect + face padding. Golden clamp keeps it
+     between 360px (never cramped) and min(620px,94vw) (4:3 never spreads too wide). */
+  height: min(86vh, 760px);
+  width: clamp(360px, calc(min(86vh, 760px) * 0.55 * var(--emu-asp, 1.333) + 30px), min(620px, 94vw));
   /* real Game & Watch look: the champagne-gold face is the SAME on both units —
      only the bezel + rim follow the theme (--accent green=zelda / red=mario,
      --shell = dark rim), exactly like the physical Zelda vs Mario devices. */

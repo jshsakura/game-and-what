@@ -86,7 +86,25 @@ const SCREEN_ASPECT = {
   amstrad: "4 / 3",
   msx: "4 / 3",
   mini: "4 / 3",
+  // Handhelds at their native framebuffer ratio (else the 4/3 fallback stretches
+  // them): Neo Geo Pocket 160×152, WonderSwan 224×144 (landscape default).
+  ngp: "20 / 19", ws: "14 / 9",
 };
+
+// Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
+// framebuffer ratio. We track it at runtime (WonderSwan rotates vertical games →
+// 144×224) and draw object-fit:contain so it fills the LCD without stretching,
+// capped to the stage (never blown up out of shape). SCREEN_ASPECT above is the
+// pre-boot fallback.
+const SQUARE_PIXEL = new Set(["ngp", "ws"]);
+
+// Numeric display aspect (w/h) for a system — drives the popup's natural width so
+// the window opens shaped to the game (4:3 wide, square handhelds narrower) instead
+// of one fixed box. Clamped to a golden min/max in CSS so it never gets silly.
+function aspectNumber(systemKey) {
+  const [w, h] = (SCREEN_ASPECT[systemKey] || "4 / 3").split("/").map((x) => parseFloat(x));
+  return w > 0 && h > 0 ? w / h : 4 / 3;
+}
 
 // Per-system keyboard cheatsheet. The keys are libretro's DEFAULT keyboard map
 // (RetroPad → keyboard) that Nostalgist drives the core with; the labels are each
@@ -303,7 +321,9 @@ export function EmulatorOverlay({ rom, onClose }) {
   return (
     <div className={`emu-overlay mode-${mode}`} role="dialog" aria-modal="true" aria-label={t("Run {title}", { title })}>
       <div className="emu-window" ref={windowRef}
-        style={mode === "window" ? { transform: `translate(${pos.x}px, ${pos.y}px)` } : undefined}>
+        style={mode === "window"
+          ? { transform: `translate(${pos.x}px, ${pos.y}px)`, "--emu-asp": aspectNumber(rom.system_key) }
+          : { "--emu-asp": aspectNumber(rom.system_key) }}>
         <div className={`emu-bar ${mode === "window" ? "draggable" : ""}`} onPointerDown={onBarPointerDown}>
           <span className="emu-led" aria-hidden />
           <span className="emu-title">{title}</span>
@@ -343,7 +363,11 @@ export function EmulatorOverlay({ rom, onClose }) {
             />
           ) : (
             <canvas ref={canvasRef} className="emu-canvas"
-              style={{ aspectRatio: SCREEN_ASPECT[rom.system_key] || "4 / 3" }} />
+              style={
+                SQUARE_PIXEL.has(rom.system_key)
+                  ? { aspectRatio: SCREEN_ASPECT[rom.system_key], objectFit: "contain" }
+                  : { aspectRatio: SCREEN_ASPECT[rom.system_key] || "4 / 3" }
+              } />
           )}
           {status === "loading" && (
             <div className="emu-status">
