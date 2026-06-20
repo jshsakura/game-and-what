@@ -1770,6 +1770,15 @@ body::before {
     inset 0 -3px 8px #00000033,
     0 26px 60px rgba(0, 0, 0, 0.7);
 }
+/* Desktop: don't let the window shrink to the mobile 360px floor. Near-square
+   handhelds (ngp ~1:1, ws) otherwise land ~470px and look cramped on a big
+   monitor — raise the floor to 500px while keeping the 620px cap (so 4:3 still
+   never over-spreads). Mobile keeps the 360px floor from the base rule. */
+@media (min-width: 720px) {
+  .emu-overlay.mode-window .emu-window {
+    width: clamp(500px, calc(min(86vh, 760px) * 0.55 * var(--emu-asp, 1.333) + 30px), min(620px, 94vw));
+  }
+}
 /* on the gold face the gold title text/LED rail must flip to dark ink */
 .mode-window .emu-bar { color: #23303a; text-shadow: none; }
 .mode-window .emu-title {
