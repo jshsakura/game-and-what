@@ -5,7 +5,7 @@ Hard hardware fact: the chip has NO H.264/HEVC decoder, only a hardware JPEG
 decoder. So the ONLY playable video is MJPEG inside an .avi container. This
 is the EXACT command build_command() emits (default 'fit' mode shown):
 
-  ffmpeg -hide_banner -y -i input -c:v mjpeg -q:v 10 \
+  ffmpeg -hide_banner -y -i input -c:v mjpeg -q:v 17 \
     -vf scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20 \
     -c:a libmp3lame -ac 1 -b:a 96k -ar 44100 output.avi
 
@@ -18,8 +18,9 @@ Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck. MP3 mono 96k is
 ~12 KB/s and reuses the device's existing minimp3 decoder (shared with the
 music app) — no new audio path. The device downmixes/resamples to its 48kHz
 mono output internally, so source channels/rate don't matter. Video is
-320x240 MJPEG q10 @ 20fps (~110 KB/s); the on-device player drops video frames
-when the SD can't keep up so audio stays locked in sync. Screen is 320x240.
+320x240 MJPEG q17 @ 20fps (peak <100 KB/s, scene-complexity-flattened); the
+on-device player drops video frames when the SD can't keep up so audio stays
+locked in sync. Screen is 320x240.
 """
 from __future__ import annotations
 
@@ -30,7 +31,16 @@ from pathlib import Path
 # Device-verified encode parameters (bench-tested on hardware).
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
-VIDEO_QSCALE = 10         # -q:v 10 (smaller frames -> fewer sectors per read)
+VIDEO_QSCALE = 17         # -q:v 17. MJPEG is intra-only, so per-frame bytes track
+                          # SCENE COMPLEXITY: at q10 a calm verse is ~110 KB/s but a
+                          # busy chorus (stage lights, fast motion) balloons to 150-170
+                          # KB/s — well over the SD read budget, so the player drops/
+                          # judders mid-clip ("fine until 1:30, then stutter"). NOTE a
+                          # bitrate cap (-b:v) does NOT help: intra MJPEG has no inter-
+                          # frame buffer, so ffmpeg only hits the AVERAGE and leaves the
+                          # peaks. Only a higher CONSTANT qscale flattens the peaks. q17
+                          # keeps the whole clip under ~100 KB/s peak (bench: YENA clip
+                          # peak 163->98 KB/s, 0 seconds over 110) at a modest quality cost.
 FRAME_RATE = 20           # fps=20 — fewer frames/s = fewer SD reads. per-read latency
                           # is the bottleneck, so fps↓ (read count) + q↑ (sectors/read)
                           # both cut SD load directly. 20fps (down from 24) trims ~17%
