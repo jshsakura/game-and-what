@@ -293,4 +293,11 @@ export default {
   "Flag shown at the cover's top-right — independent of the Korean-patch toggle": "顯示在封面右上角的國旗 — 與韓文修補無關",
   "Failed to set flag": "設定國旗失敗",
   "SteamGridDB key is not configured": "未設定 SteamGridDB 金鑰",
+  "Not on SD": "不含於SD",
+  "Exclude from SD": "從SD排除",
+  "Excluded from SD": "已從SD排除",
+  "Excluded from the SD download (kept in library)": "已從SD下載中排除（保留在庫中）",
+  "Keep this ROM in the library but exclude it from the SD download": "在庫中保留此ROM，但從SD下載中排除",
+  "{n} excluded from SD": "{n} 個已從SD排除",
+  "Kept in the library, not included in the SD download": "保留在庫中，不含於SD下載",
 };

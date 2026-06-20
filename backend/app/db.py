@@ -142,6 +142,12 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # The user can opt a specific homebrew ROM in: sd_include=1 → its ROM file
         # is included. Ignored for non-homebrew systems (those always ship).
         conn.execute("ALTER TABLE roms ADD COLUMN sd_include INTEGER NOT NULL DEFAULT 0")
+    if "sd_exclude" not in cols:
+        # The inverse of sd_include, for NON-homebrew ROMs (which ship by default):
+        # sd_exclude=1 drops this ROM's file + cover from the SD ZIP while KEEPING it
+        # in the library/DB — used to slim a bloated set (AKA-dups, protos) without
+        # deleting anything. Ignored for homebrew (those opt IN via sd_include).
+        conn.execute("ALTER TABLE roms ADD COLUMN sd_exclude INTEGER NOT NULL DEFAULT 0")
     if "extra_files" not in cols:
         # Homebrew cards can hold MULTIPLE files under one cover (e.g. the app .bin
         # PLUS its assets .dat). rom_path is the primary file; extra_files is a JSON

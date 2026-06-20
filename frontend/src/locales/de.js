@@ -294,4 +294,11 @@ export default {
   "Flag shown at the cover's top-right — independent of the Korean-patch toggle": "Flagge oben rechts auf dem Cover — unabhängig vom Korea-Patch",
   "Failed to set flag": "Flagge konnte nicht gesetzt werden",
   "SteamGridDB key is not configured": "SteamGridDB-Schlüssel ist nicht konfiguriert",
+  "Not on SD": "Nicht auf SD",
+  "Exclude from SD": "Von SD ausschließen",
+  "Excluded from SD": "Von SD ausgeschlossen",
+  "Excluded from the SD download (kept in library)": "Vom SD-Download ausgeschlossen (in Bibliothek behalten)",
+  "Keep this ROM in the library but exclude it from the SD download": "Dieses ROM in der Bibliothek behalten, aber vom SD-Download ausschließen",
+  "{n} excluded from SD": "{n} von SD ausgeschlossen",
+  "Kept in the library, not included in the SD download": "In der Bibliothek behalten, nicht im SD-Download enthalten",
 };

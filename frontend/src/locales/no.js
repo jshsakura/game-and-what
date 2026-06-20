@@ -295,4 +295,11 @@ export default {
   "Flag shown at the cover's top-right — independent of the Korean-patch toggle": "Flagg øverst til høyre på omslaget — uavhengig av koreansk patch",
   "Failed to set flag": "Kunne ikke angi flagg",
   "SteamGridDB key is not configured": "SteamGridDB-nøkkel er ikke konfigurert",
+  "Not on SD": "Ikke på SD",
+  "Exclude from SD": "Utelat fra SD",
+  "Excluded from SD": "Utelatt fra SD",
+  "Excluded from the SD download (kept in library)": "Utelatt fra SD-nedlasting (beholdt i biblioteket)",
+  "Keep this ROM in the library but exclude it from the SD download": "Behold denne ROM-en i biblioteket, men utelat den fra SD-nedlastingen",
+  "{n} excluded from SD": "{n} utelatt fra SD",
+  "Kept in the library, not included in the SD download": "Beholdt i biblioteket, ikke inkludert i SD-nedlastingen",
 };

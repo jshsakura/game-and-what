@@ -480,6 +480,17 @@ export async function setSdInclude(romId, include) {
   return res.json();
 }
 
+// Opt a (non-homebrew) ROM OUT of the SD ZIP without deleting it.
+export async function setSdExclude(romId, exclude) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/roms/${romId}/sd-exclude`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ exclude: !!exclude }),
+    }));
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set SD exclude");
+  return res.json();
+}
+
 // Mark/unmark a rom as favorite (★) — UI sort + cover star.
 export async function setFavorite(romId, favorite) {
   const res = await withSession((sid) =>

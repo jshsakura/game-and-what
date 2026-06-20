@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check } from "lucide-react";
+import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, HardDriveDownload } from "lucide-react";
 import { getLibrary, getSystems, coverUrl, uploadRoms } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
@@ -163,8 +163,10 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
 
   // Total rom files across the checked systems — shown in the selection badge
   // ("N플랫폼 · M파일 선택됨"). selected holds system keys; sum their rom counts.
+  // Count only ROMs that actually ship (sd_exclude=0) — excluded ones stay in the
+  // library but won't be in the SD ZIP, so they shouldn't inflate the selection.
   const selectedFileCount = useMemo(
-    () => [...selected].reduce((n, k) => n + (bySystem[k]?.length || 0), 0),
+    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter((r) => !r.sd_exclude).length || 0), 0),
     [selected, bySystem]
   );
 
@@ -301,8 +303,11 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       {!loading && !(searching && searchAll) && (
         <div className="lib-chips">
           {groups.map((g) => {
-            const miss = g.roms.filter((r) => r.cover_status !== "ok").length;
-            const koMiss = g.roms.filter(needsKorean).length;
+            // The count reflects what actually ships to the device: included
+            // (sd_exclude=0) ROMs. The excluded tally lives in the grid footer.
+            const incl = g.roms.filter((r) => !r.sd_exclude);
+            const miss = incl.filter((r) => r.cover_status !== "ok").length;
+            const koMiss = incl.filter(needsKorean).length;
             return (
             <button
               key={g.key}
@@ -313,7 +318,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               {/* One issue badge at most (avoid 3-up crowding): cover-missing has
                   priority; the 한글제목 badge only shows once covers are done. */}
               <span className="lib-chip-badges">
-                <span className="lib-chip-count">{g.roms.length}</span>
+                <span className="lib-chip-count">{incl.length}</span>
                 {miss > 0
                   ? <span className="lib-chip-miss" title={t("{n} missing covers", { n: miss })}>{miss}</span>
                   : koFeature && koMiss > 0 && <span className="lib-chip-komiss" title={t("{n} without Korean titles", { n: koMiss })}>{koMiss}</span>}
@@ -389,6 +394,17 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
           </button>
         </div>
       )}
+
+      {/* SD-excluded tally for the current platform — kept in the library but not
+          shipped. Sits at the card list's bottom-right; hidden when there are none. */}
+      {!searching && activeGroup && (() => {
+        const excl = activeGroup.roms.filter((r) => r.sd_exclude).length;
+        return excl > 0 ? (
+          <div className="lib-grid-foot" title={t("Kept in the library, not included in the SD download")}>
+            <HardDriveDownload size={11} strokeWidth={2.5} aria-hidden /> {t("{n} excluded from SD", { n: excl })}
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

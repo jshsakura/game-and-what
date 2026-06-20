@@ -3,13 +3,13 @@ import Cropper from "react-easy-crop";
 import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
-  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp,
+  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import {
   uploadCover, coverUrl, deviceCoverUrl, originalCoverUrl, coverDownloadUrl, downloadRomUrl, downloadVideoUrl, downloadMusicUrl,
   videoThumbUrl, videoPreviewUrl, musicCoverUrl, streamMusicUrl, deleteRom, deleteVideo, deleteMusic,
-  renameRom, igdbSearch, tgdbSearch, sgdbSearch, setCoverFromUrl, deleteCover, recropCover, replaceRomFile, formatBytes, setRomLang, setSdInclude,
+  renameRom, igdbSearch, tgdbSearch, sgdbSearch, setCoverFromUrl, deleteCover, recropCover, replaceRomFile, formatBytes, setRomLang, setSdInclude, setSdExclude,
   setFavorite, addRomFile, deleteRomFile, setPico8Compat, setCoverFlag,
 } from "./api.js";
 import { useToast } from "./toast.jsx";
@@ -999,6 +999,17 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
     finally { setBusy(false); }
   }
 
+  // Non-homebrew: keep the file in the library but drop it from the SD ZIP.
+  async function toggleSdExclude() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await setSdExclude(rom.id, !rom.sd_exclude);
+      onChanged?.();
+    } catch (e) { toast.error(e.message || t("Failed to change")); }
+    finally { setBusy(false); }
+  }
+
   // Add/replace a data file on the card (e.g. smw_assets.dat). Same name = replace.
   async function addFile(e) {
     const f = e.target.files?.[0];
@@ -1034,11 +1045,15 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
     ) : null;
 
   return (
-    <div className={`card ${rom.system_key === "pico8" && rom.pico8_compat === "broken" ? "card-broken" : ""}`}
+    <div className={`card ${rom.system_key === "pico8" && rom.pico8_compat === "broken" ? "card-broken" : ""} ${rom.sd_exclude ? "card-sd-out" : ""}`}
       style={{ borderTopColor: systemColor(rom.system_key) }}>
       <CoverSlot romId={rom.id} src={previewSrc} bust={coverV} alt={title}
         aspect={coverAspect(rom.system_key)} onActivate={openModal} badge={statusBadge}
-        cornerBL={rom.system_key === "pico8" ? <Pico8Compat status={rom.pico8_compat} /> : null}
+        cornerBL={rom.sd_exclude
+          ? <span className="sd-out" title={t("Excluded from the SD download (kept in library)")}>
+              <HardDriveDownload size={11} strokeWidth={2.5} aria-hidden /> {t("Not on SD")}
+            </span>
+          : rom.system_key === "pico8" ? <Pico8Compat status={rom.pico8_compat} /> : null}
         gauge={rom.system_key === "pico8" && rom.pico8_mem_hint != null ? {
           pct: rom.pico8_mem_hint, cls: p8memLevel(rom.pico8_mem_hint).cls,
           title: `${t("Code size")}: ${t(p8memLevel(rom.pico8_mem_hint).label)} (${rom.pico8_mem_hint}%)`,
@@ -1161,6 +1176,14 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   <Star size={14} strokeWidth={2.5} fill={rom.favorite ? "currentColor" : "none"} aria-hidden />
                   <span>{t("Favorite")}</span>
                 </button>
+                {rom.system_key !== "homebrew" && (
+                  <button type="button" className={`fav-toggle sd-toggle ${rom.sd_exclude ? "on" : ""}`} disabled={busy}
+                    onClick={toggleSdExclude}
+                    title={t("Keep this ROM in the library but exclude it from the SD download")}>
+                    <HardDriveDownload size={14} strokeWidth={2.5} aria-hidden />
+                    <span>{rom.sd_exclude ? t("Excluded from SD") : t("Exclude from SD")}</span>
+                  </button>
+                )}
               </div>
 
               {rom.system_key !== "homebrew" && (

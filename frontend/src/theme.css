@@ -454,6 +454,7 @@ body::before {
   background: #00000033; color: var(--card-dim); font-size: 11px;
 }
 .fav-toggle.on { color: var(--gold); border-color: var(--gold); }
+.fav-toggle.sd-toggle.on { color: #ffb454; border-color: #ffb45488; background: #ffb4541a; }
 .fav-toggle:hover { filter: brightness(1.12); }
 .fav-toggle:disabled { opacity: 0.6; cursor: default; }
 .flag-preview {
@@ -596,6 +597,24 @@ body::before {
 
 /* Broken PICO-8 carts stand out in the grid (won't run on the real device). */
 .card.card-broken { border-color: #e2503b66; background: #e2503b12; }
+
+/* SD-excluded: kept in the library but greyed out so it's obvious it won't ship
+   to the device. Grey ONLY the cover artwork + name — NOT the .card itself
+   (`filter`/`opacity` on the card would make its `position:fixed` detail modal
+   resolve against the card box → broken width) and NOT the corner SD badge (it
+   must stay sharp as the marker). The cover <img> carries an inline load-fade
+   opacity, so dim it via the `filter: opacity()` function, not the property. */
+.card.card-sd-out .cover-slot img,
+.card.card-sd-out .cover-slot .cover-add { filter: grayscale(0.85) opacity(0.55); transition: filter 0.12s; }
+.card.card-sd-out > .name { opacity: 0.55; transition: opacity 0.12s; }
+.card.card-sd-out:hover .cover-slot img,
+.card.card-sd-out:hover .cover-slot .cover-add { filter: none; }
+.card.card-sd-out:hover > .name { opacity: 1; }
+/* SD-excluded marker — sits in the cover's bottom-left corner badge (.cover-badge.bl). */
+.cover-badge.bl .sd-out {
+  display: inline-flex; align-items: center; gap: 3px;
+  color: #ffb454; font-size: 9px; font-weight: 700; line-height: 1; white-space: nowrap;
+}
 
 /* Static cart-complexity hint under the compat editor (rough, not device RAM). */
 .p8memhint { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
@@ -1251,6 +1270,12 @@ body::before {
   margin-top: 6px;
 }
 .lib-pager-info { font-family: var(--body-font); font-size: 12px; color: var(--lcd-ink); }
+/* SD-excluded tally — quiet note at the card list's bottom-right. */
+.lib-grid-foot {
+  display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+  margin-top: 8px; padding-right: 2px;
+  font-family: var(--body-font); font-size: 11px; color: var(--card-dim); opacity: 0.85;
+}
 
 /* Tab bar — a CARD that sits OUTSIDE the LCD (right-aligned ZIP download) */
 .tabbar {

@@ -295,4 +295,11 @@ export default {
   "Flag shown at the cover's top-right — independent of the Korean-patch toggle": "Флаг в правом верхнем углу обложки — независимо от корейского патча",
   "Failed to set flag": "Не удалось установить флаг",
   "SteamGridDB key is not configured": "Ключ SteamGridDB не настроен",
+  "Not on SD": "Не на SD",
+  "Exclude from SD": "Исключить из SD",
+  "Excluded from SD": "Исключено из SD",
+  "Excluded from the SD download (kept in library)": "Исключено из загрузки SD (остаётся в библиотеке)",
+  "Keep this ROM in the library but exclude it from the SD download": "Оставить этот ROM в библиотеке, но исключить из загрузки SD",
+  "{n} excluded from SD": "{n} исключено из SD",
+  "Kept in the library, not included in the SD download": "Остаётся в библиотеке, не входит в загрузку SD",
 };
