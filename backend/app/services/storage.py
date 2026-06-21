@@ -152,6 +152,47 @@ def move_to_trash(session_id: str, rel_path: str) -> None:
         pass
 
 
+def restore_from_trash(session_id: str, rel_path: str | None) -> bool:
+    """Inverse of move_to_trash: move the _trash copy back to its original
+    session-relative path. Returns True if restored, False if the trash copy is
+    gone (already purged / never existed)."""
+    if not rel_path:
+        return False
+    try:
+        src = trash_dir(session_id) / rel_path.replace("/", "__")
+        if not src.exists():
+            return False
+        dest = session_root(session_id) / rel_path
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        src.replace(dest)
+        return True
+    except OSError:
+        return False
+
+
+def purge_trash(session_id: str, older_than_days: int) -> int:
+    """Delete _trash files older than N days (by mtime). Returns count removed.
+    Caps how long deleted ROMs stay recoverable. Never raises."""
+    import time
+
+    removed = 0
+    try:
+        d = trash_dir(session_id)
+        if not d.exists():
+            return 0
+        cutoff = time.time() - older_than_days * 86400
+        for p in d.iterdir():
+            try:
+                if p.is_file() and p.stat().st_mtime < cutoff:
+                    p.unlink()
+                    removed += 1
+            except OSError:
+                pass
+    except OSError:
+        pass
+    return removed
+
+
 def write_bytes(path: Path, data: bytes) -> Path:
     """Persist bytes, creating parent dirs. Returns the path."""
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -194,6 +194,23 @@ export async function getLibrary() {
   return res.json();
 }
 
+// Activity feed — recent library changes (uploads, renames, PICO-8 compat…),
+// newest-first. Returns { events: [...] }.
+export async function getEvents(limit = 50) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/events?limit=${encodeURIComponent(limit)}`));
+  if (!res.ok) throw new Error("Failed to load activity");
+  return res.json();
+}
+
+// Undo a deletion from the feed: restore the ROM's files from _trash + DB row.
+export async function restoreEvent(eventId) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/events/${eventId}/restore`, { method: "POST" }));
+  if (!res.ok) throw new Error((await res.json()).detail || "Restore failed");
+  return res.json();
+}
+
 export function downloadRomUrl(romId) {
   const sid = getSessionId();
   return sid ? `/api/sessions/${sid}/roms/${romId}/download` : null;

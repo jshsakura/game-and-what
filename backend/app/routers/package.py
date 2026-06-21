@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 
 from .. import db
-from ..services import packaging
+from ..services import events, packaging
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["package"])
@@ -36,11 +36,14 @@ def set_sd_exclude(session_id: str, rom_id: str, payload: dict = Body(...)) -> d
     with db.connect() as conn:
         require_session(conn, session_id)
         row = conn.execute(
-            "SELECT id FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
+            "SELECT stored_name, system_key FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
         conn.execute("UPDATE roms SET sd_exclude = ? WHERE id = ?", (int(exclude), rom_id))
+        events.log(conn, session_id, "sd_exclude", rom_id=rom_id,
+                   rom_name=row["stored_name"], system_key=row["system_key"],
+                   meta={"exclude": exclude})
     return {"rom_id": rom_id, "sd_exclude": exclude}
 
 
@@ -94,13 +97,16 @@ def set_pico8_compat(session_id: str, rom_id: str, payload: dict = Body(...)) ->
     with db.connect() as conn:
         require_session(conn, session_id)
         row = conn.execute(
-            "SELECT system_key FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
+            "SELECT system_key, stored_name FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
         if row["system_key"] != "pico8":
             raise HTTPException(status_code=400, detail="PICO-8 롬에만 설정할 수 있습니다")
         conn.execute("UPDATE roms SET pico8_compat = ? WHERE id = ?", (status, rom_id))
+        events.log(conn, session_id, "pico8_compat", rom_id=rom_id,
+                   rom_name=row["stored_name"], system_key="pico8",
+                   meta={"status": status})
     return {"rom_id": rom_id, "pico8_compat": status}
 
 

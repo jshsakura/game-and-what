@@ -5,6 +5,7 @@ import MediaTab from "./tabs/MediaTab.jsx";
 import LibraryTab from "./tabs/LibraryTab.jsx";
 import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
+import ActivityFeed from "./ActivityFeed.jsx";
 import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive } from "lucide-react";
 import { getLibrary, packageUrl, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
@@ -251,11 +252,13 @@ export default function App() {
             <>
               <span className="is-skel tg-skel lang" aria-hidden />
               <span className="is-skel tg-skel theme" aria-hidden />
+              <span className="is-skel tg-skel bell" aria-hidden />
             </>
           ) : (
             <>
               <LangToggle />
               <ThemeToggle theme={theme} onToggle={toggleTheme} />
+              <ActivityFeed pulse={reloadKey} onChanged={bumpLibrary} />
             </>
           )}
         </div>

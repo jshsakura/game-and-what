@@ -9,7 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Body, HTTPException
 
 from .. import db
-from ..services import langtag
+from ..services import events, langtag
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["lang"])
@@ -26,7 +26,8 @@ def set_lang(session_id: str, rom_id: str, payload: dict = Body(...)) -> dict:
     with db.connect() as conn:
         require_session(conn, session_id)
         row = conn.execute(
-            "SELECT orig_lang, play_lang, is_korean_patched FROM roms WHERE id = ? AND session_id = ?",
+            "SELECT orig_lang, play_lang, is_korean_patched, stored_name, system_key "
+            "FROM roms WHERE id = ? AND session_id = ?",
             (rom_id, session_id),
         ).fetchone()
         if row is None:
@@ -41,6 +42,10 @@ def set_lang(session_id: str, rom_id: str, payload: dict = Body(...)) -> dict:
                WHERE id = ?""",
             (updated.play_lang, int(updated.is_korean_patched), rom_id),
         )
+        if bool(row["is_korean_patched"]) != updated.is_korean_patched:
+            events.log(conn, session_id, "lang_patch", rom_id=rom_id,
+                       rom_name=row["stored_name"], system_key=row["system_key"],
+                       meta={"patched": updated.is_korean_patched})
     return {
         "rom_id": rom_id, "orig_lang": updated.orig_lang, "play_lang": updated.play_lang,
         "is_korean_patched": updated.is_korean_patched, "lang_source": "manual",

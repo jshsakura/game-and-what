@@ -595,8 +595,15 @@ body::before {
 .p8opt.broken.on   { color: #d23f2c; }
 .p8opt.untested.on { color: #5f6873; }
 
-/* Broken PICO-8 carts stand out in the grid (won't run on the real device). */
-.card.card-broken { border-color: #e2503b66; background: #e2503b12; }
+/* Broken PICO-8 carts stand out in the grid (won't run on the real device):
+   a red wash composited over the card bg + a red top accent, so it reads as
+   "broken" at a glance — not just a faint border. */
+.card.card-broken {
+  border-color: #e2503b88;
+  border-top-color: #e2503b;
+  background: linear-gradient(180deg, #e2503b3d, #e2503b1f), var(--card-bg);
+}
+.card.card-broken:hover { box-shadow: 0 7px 16px #e2503b40, inset 0 1px 0 #ffffff14; }
 
 /* SD-excluded: kept in the library but greyed out so it's obvious it won't ship
    to the device. Grey ONLY the cover artwork + name — NOT the .card itself
@@ -716,6 +723,99 @@ body::before {
 /* Destructive icon button (delete) — red so it reads as dangerous, not neutral. */
 .icon-btn.danger { background: #8c2f24; color: #ffd9d2; }
 .icon-btn.danger:hover { background: #c0392b; color: #fff; }
+
+/* ── Activity feed: bell (far right of top bar) + right-side drawer ─────────── */
+/* The bell reuses the raised .icon-btn look; this only makes it the badge anchor
+   (overflow:visible so the badge can sit outside the button corner). */
+.actfeed-bell { position: relative; overflow: visible; }
+/* Subtle (은은한) unread badge — small, muted terracotta, soft halo instead of a
+   hard outline so it whispers rather than shouts. */
+.actfeed-badge {
+  position: absolute; top: -3px; right: -3px; z-index: 1;
+  min-width: 13px; height: 13px; padding: 0 3px; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--body-font); font-size: 8px; font-weight: 700; line-height: 1;
+  color: #fff; background: #cf6a55; border-radius: 8px;
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.actfeed-backdrop { position: fixed; inset: 0; z-index: 59; background: rgba(0, 0, 0, 0.5); }
+.actfeed-panel {
+  position: fixed; top: 0; right: 0; z-index: 60;
+  width: 360px; max-width: 88vw; height: 100vh; height: 100dvh;
+  background: var(--shell); border-left: 3px solid var(--gold);
+  box-shadow: -18px 0 50px rgba(0, 0, 0, 0.55);
+  display: flex; flex-direction: column;
+  animation: actfeed-slide 0.16s ease-out;
+}
+@keyframes actfeed-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.actfeed-head {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 13px 14px; background: linear-gradient(180deg, #ffffff14, #0000001f);
+  border-bottom: 1px solid #ffffff1f; text-shadow: 0 1px 0 #00000055;
+}
+.actfeed-title {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--gold);
+}
+/* Empty state — clearly "없음" in muted gray so it never reads as "still loading". */
+.actfeed-empty {
+  flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 9px; padding: 36px 16px; text-align: center;
+  color: var(--card-dim); font-family: var(--body-font); font-size: 12px;
+}
+.actfeed-empty svg { opacity: 0.55; }
+/* Skeleton rows while the first fetch is in flight (reuses the shimmer tokens). */
+.actfeed-skel { gap: 9px; }
+.actfeed-skel .skel-ico { width: 16px; height: 16px; border-radius: 5px; flex: 0 0 auto; }
+.actfeed-skel .skel-line { margin-top: 0; }
+.actfeed-skel .skel-line.fill { flex: 1 1 auto; }
+.actfeed-skel .skel-line.w-sm { width: 34px; flex: 0 0 auto; }
+.actfeed-list {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain; list-style: none; margin: 0; padding: 6px;
+  scrollbar-width: thin; scrollbar-color: #ffffff40 transparent;
+}
+.actfeed-list::-webkit-scrollbar { width: 7px; }
+.actfeed-list::-webkit-scrollbar-thumb { background: #ffffff33; border-radius: 4px; }
+.actfeed-item {
+  display: flex; align-items: center; gap: 9px; padding: 8px 8px;
+  border-radius: 7px; font-family: var(--body-font); font-size: 11.5px; color: var(--card-ink);
+  border-left: 2px solid transparent;
+}
+.actfeed-item + .actfeed-item { border-top: 1px solid #ffffff0f; }
+.actfeed-item .actfeed-ico {
+  flex: 0 0 auto; display: inline-flex; color: var(--accent-2);
+}
+.actfeed-item.up .actfeed-ico { color: #5bb86a; }
+.actfeed-item.del { border-left-color: #e2503b66; }
+.actfeed-item.del .actfeed-ico { color: #e2503b; }
+.actfeed-text {
+  flex: 1 1 auto; min-width: 0; line-height: 1.45;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.actfeed-meta { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; }
+.actfeed-time { font-size: 10px; color: var(--card-dim); white-space: nowrap; }
+/* Restore (undo delete) — small, quiet button on a deleted row. */
+.actfeed-restore {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 999px; cursor: pointer;
+  font-family: var(--body-font); font-size: 10px; font-weight: 700; line-height: 1.4;
+  color: #cfe8d2; background: #2f6b3a55; border: 1px solid #5bb86a66;
+  transition: background 0.12s, color 0.12s;
+}
+.actfeed-restore:hover:not(:disabled) { background: #2f6b3a; color: #fff; }
+.actfeed-restore:disabled { opacity: 0.6; cursor: default; }
+/* restored / expired status pills */
+.actfeed-tag {
+  font-family: var(--body-font); font-size: 9.5px; font-weight: 700;
+  padding: 1px 6px; border-radius: 999px; white-space: nowrap;
+  color: #cfe8d2; background: #2f6b3a40;
+}
+.actfeed-tag.muted { color: var(--card-dim); background: #ffffff14; }
+@media (max-width: 640px) {
+  .actfeed-panel { width: 88vw; }
+}
 
 /* Modal popup */
 .modal-backdrop {
@@ -1351,6 +1451,7 @@ body::before {
 .tg-skel { display: inline-block; }
 .tg-skel.theme { width: 52px; height: 28px; border-radius: 999px; }
 .tg-skel.lang  { width: 26px; height: 20px; border-radius: 5px; }
+.tg-skel.bell  { width: 22px; height: 22px; border-radius: 6px; }
 /* icon-only secondary tabs (VIDEO/MUSIC/DATA/HELP) — square, no label */
 .tabbar .tab.tab-icononly { padding: 9px 11px; }
 /* Secondary tabs (VIDEO, DATA) — a gray cluster, split from primary UPLOAD/LIBRARY */

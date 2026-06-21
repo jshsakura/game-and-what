@@ -63,10 +63,21 @@ CREATE TABLE IF NOT EXISTS rom_names (
     source       TEXT,                  -- which 꿀렁 list resolved it
     created_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS events (
+    id           TEXT PRIMARY KEY,
+    session_id   TEXT NOT NULL REFERENCES sessions(id),
+    event_type   TEXT NOT NULL,         -- rom_upload|rom_rename|rom_delete|pico8_compat|lang_patch|sd_exclude
+    rom_id       TEXT,                  -- null for roms since deleted (snapshot below)
+    rom_name     TEXT,                  -- stored_name snapshot at event time
+    system_key   TEXT,
+    meta         TEXT,                  -- small JSON, varies by type (e.g. {"status":"broken"})
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
 CREATE INDEX IF NOT EXISTS idx_roms_session ON roms(session_id);
 CREATE INDEX IF NOT EXISTS idx_videos_session ON videos(session_id);
 CREATE INDEX IF NOT EXISTS idx_music_session ON music(session_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_session ON uploads(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, created_at DESC);
 """
 
 

@@ -9,7 +9,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import artfetch, covers, covers_pico8, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romtag, storage
+from ..services import artfetch, covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romtag, storage
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["roms"])
@@ -153,6 +153,8 @@ async def upload_roms(
                  pico8_memhint.estimate(rom_path) if sys_obj.pico8 else None,
                  patchver.parse(original)),
             )
+            events.log(conn, session_id, "rom_upload", rom_id=rom_id,
+                       rom_name=stored_name, system_key=sys_obj.key)
         if cover_status != "ok" and not sys_obj.pico8:
             pending_cover.append({
                 "id": rom_id, "system_key": sys_obj.key, "stored_name": stored_name,

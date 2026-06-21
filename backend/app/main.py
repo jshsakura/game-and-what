@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db
-from .routers import covers, data, downloads, extra, firmware, gamelist, igdb, jobs, lang, manage, music, package, roms, scores, sessions, sgdb, tgdb, uploads, videos
+from .routers import covers, data, downloads, events, extra, firmware, gamelist, igdb, jobs, lang, manage, music, package, roms, scores, sessions, sgdb, tgdb, uploads, videos
 from .services.video import ffmpeg_available
 from .systems import SYSTEMS
 
@@ -55,6 +55,7 @@ app.include_router(sgdb.router)
 app.include_router(data.router)
 app.include_router(gamelist.router)
 app.include_router(lang.router)
+app.include_router(events.router)
 
 
 @app.on_event("startup")
@@ -69,10 +70,24 @@ def _startup() -> None:
     # Backfill language/한글패치 for legacy roms (lang_source IS NULL) once — new
     # uploads already auto-detect, so this converges immediately and is a no-op
     # thereafter. Metadata-only: never touches filenames, covers or files.
-    from .services import langfill
+    from .services import events, langfill
     with db.connect() as conn:
         langfill.backfill(conn)
         langfill.backfill_region(conn)
+        # Seed the activity feed from the existing library (one upload event per
+        # ROM that lacks one). Idempotent — no-ops once converged.
+        seeded = events.seed_uploads(conn, config.SHARED_SESSION_ID)
+        if seeded:
+            print(f"[startup] seeded {seeded} upload event(s) into the activity feed")
+    # Purge deleted files past the recovery window so _trash can't grow forever.
+    purged = storage.purge_trash(config.SHARED_SESSION_ID, events.RETENTION_DAYS)
+    if purged:
+        print(f"[startup] purged {purged} expired trash file(s)")
+    # Tidy the SD-zip build cache so it never lingers oversized.
+    from .services import packaging
+    pruned = packaging.prune_cache()
+    if pruned:
+        print(f"[startup] pruned {pruned} stale SD cache zip(s)")
 
 
 @app.get("/api/health")

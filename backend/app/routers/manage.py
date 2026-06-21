@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, Body, HTTPException
 
 from .. import db
-from ..services import renames, storage
+from ..services import events, renames, storage
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["manage"])
@@ -24,7 +24,7 @@ def delete_rom(session_id: str, rom_id: str) -> dict:
     with db.connect() as conn:
         require_session(conn, session_id)
         row = conn.execute(
-            "SELECT rom_path, cover_path FROM roms WHERE id = ? AND session_id = ?",
+            "SELECT * FROM roms WHERE id = ? AND session_id = ?",
             (rom_id, session_id),
         ).fetchone()
         if row is None:
@@ -32,6 +32,11 @@ def delete_rom(session_id: str, rom_id: str) -> dict:
         _remove(session_id, row["rom_path"])
         _remove(session_id, row["cover_path"])
         conn.execute("DELETE FROM roms WHERE id = ?", (rom_id,))
+        # Snapshot the whole row so the delete can be undone from the activity
+        # feed (files move to _trash; this re-inserts the DB row on restore).
+        events.log(conn, session_id, "rom_delete", rom_id=rom_id,
+                   rom_name=row["stored_name"], system_key=row["system_key"],
+                   meta={"snapshot": dict(row)})
     return {"deleted": rom_id}
 
 
@@ -58,6 +63,10 @@ def rename_rom(
             result = renames.rename_rom(conn, session_id, dict(row), raw)
         except ValueError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
+        if result.get("stored_name") and result["stored_name"] != row["stored_name"]:
+            events.log(conn, session_id, "rom_rename", rom_id=rom_id,
+                       rom_name=result["stored_name"], system_key=row["system_key"],
+                       meta={"from": row["stored_name"]})
     return {"id": rom_id, **result}
 
 
