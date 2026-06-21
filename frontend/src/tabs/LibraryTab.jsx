@@ -33,6 +33,12 @@ const SORTS = {
 const SORT_ORDER = ["recent", "name", "oldest"];
 const SORT_LABELS = { recent: "Newest", name: "Name", oldest: "Oldest" };
 
+// Does this ROM actually ship to the SD card? Mirrors backend _excluded_roms():
+// a ROM is dropped when the user opted it out (sd_exclude) OR it's a PICO-8 cart
+// that doesn't run on the real G&W (구동불가/broken). Excluded ROMs stay visible
+// in the library but are left out of per-system counts and the SD download.
+const shipsToSd = (rom) => !rom.sd_exclude && rom.pico8_compat !== "broken";
+
 const HANGUL_RE = /[가-힣]/;
 // Homebrew / Pico-8 are indie carts with no Korean release → never "missing".
 const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8"]);
@@ -100,6 +106,13 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       .finally(() => setLoading(false));
   }, []);
 
+  // Re-fetch WITHOUT the loading skeleton — for post-edit refreshes (toggle
+  // broken/exclude/favorite, rename…) so the chip counts update in place
+  // instead of flashing the whole library back to skeletons.
+  const reloadSilent = useCallback(() => {
+    getLibrary().then(setLib).catch(() => {});
+  }, []);
+
   useEffect(() => { reload(); }, [reload, reloadKey]);
   useEffect(() => {
     getSystems().then((s) => {
@@ -117,7 +130,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
     return () => clearInterval(t);
   }, [anyPending]);
 
-  const refresh = () => { reload(); onChanged?.(); };
+  const refresh = () => { reloadSilent(); onChanged?.(); };
 
   async function uploadHere(files, onProgress) {
     if (busy || !current) return;
@@ -163,10 +176,11 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
 
   // Total rom files across the checked systems — shown in the selection badge
   // ("N플랫폼 · M파일 선택됨"). selected holds system keys; sum their rom counts.
-  // Count only ROMs that actually ship (sd_exclude=0) — excluded ones stay in the
-  // library but won't be in the SD ZIP, so they shouldn't inflate the selection.
+  // Count only ROMs that actually ship — excluded ones (manual opt-out or PICO-8
+  // 구동불가) stay in the library but won't be in the SD ZIP, so they shouldn't
+  // inflate the selection.
   const selectedFileCount = useMemo(
-    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter((r) => !r.sd_exclude).length || 0), 0),
+    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter(shipsToSd).length || 0), 0),
     [selected, bySystem]
   );
 
@@ -303,9 +317,9 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       {!loading && !(searching && searchAll) && (
         <div className="lib-chips">
           {groups.map((g) => {
-            // The count reflects what actually ships to the device: included
-            // (sd_exclude=0) ROMs. The excluded tally lives in the grid footer.
-            const incl = g.roms.filter((r) => !r.sd_exclude);
+            // The count reflects what actually ships to the device. Excluded
+            // ROMs (manual opt-out or PICO-8 구동불가) are tallied in the footer.
+            const incl = g.roms.filter(shipsToSd);
             const miss = incl.filter((r) => r.cover_status !== "ok").length;
             const koMiss = incl.filter(needsKorean).length;
             return (
@@ -398,7 +412,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       {/* SD-excluded tally for the current platform — kept in the library but not
           shipped. Sits at the card list's bottom-right; hidden when there are none. */}
       {!searching && activeGroup && (() => {
-        const excl = activeGroup.roms.filter((r) => r.sd_exclude).length;
+        const excl = activeGroup.roms.filter((r) => !shipsToSd(r)).length;
         return excl > 0 ? (
           <div className="lib-grid-foot" title={t("Kept in the library, not included in the SD download")}>
             <HardDriveDownload size={11} strokeWidth={2.5} aria-hidden /> {t("{n} excluded from SD", { n: excl })}

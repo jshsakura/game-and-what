@@ -123,10 +123,14 @@ def _homebrew_roms(conn, session_id: str) -> "set[str]":
 
 
 def _excluded_roms(conn, session_id: str) -> "set[str]":
-    """Relative paths (ROM file + its cover) the user opted OUT of the SD
-    (sd_exclude=1). Kept in the library, dropped from the card."""
+    """Relative paths (ROM file + its cover) dropped from the SD card while kept
+    in the library. Two sources:
+      • sd_exclude=1 — the user opted this ROM out manually.
+      • pico8_compat='broken' — a PICO-8 cart that doesn't run on the real G&W
+        (구동불가); never worth shipping, so it's auto-excluded."""
     rows = conn.execute(
-        "SELECT rom_path, cover_path FROM roms WHERE session_id = ? AND sd_exclude = 1",
+        "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
+        "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
         (session_id,)).fetchall()
     out: set[str] = set()
     for r in rows:
