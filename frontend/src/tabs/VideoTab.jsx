@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Clapperboard, Upload, Loader, CheckCircle2, XCircle, AlertTriangle, Download, Server, ShieldCheck, Clock } from "lucide-react";
+import { Clapperboard, Upload, Loader, CheckCircle2, XCircle, AlertTriangle, Download, Server, ShieldCheck, Clock, Ban, Square } from "lucide-react";
 import { uploadVideo, getJob, getHealth } from "../api.js";
 import { Dropzone, ProgressBar } from "../components.jsx";
-import { convertToDeviceAvi, downloadBlob, aviName, preloadEncoder, isMultiThread } from "../localencode.js";
+import { convertToDeviceAvi, downloadBlob, aviName, preloadEncoder, isMultiThread, cancelEncode } from "../localencode.js";
 import { useT } from "../i18n.jsx";
 
 // Screen-fit selector — shared by both sections (it's about how the source maps
@@ -22,16 +22,24 @@ function FitSelect({ mode, setMode, t }) {
 
 // Browser-convert queue list — many files dropped at once convert one-by-one
 // (ffmpeg.wasm is a single instance) and each .avi downloads as it finishes.
-function QueueList({ queue, t }) {
+function QueueList({ queue, onCancel, t }) {
   if (!queue.length) return null;
   const done = queue.filter((i) => i.status === "done").length;
   const failed = queue.filter((i) => i.status === "failed").length;
-  const finished = done + failed === queue.length;
+  const cancelled = queue.filter((i) => i.status === "cancelled").length;
+  const active = queue.some((i) => i.status === "pending" || i.status === "converting");
   return (
     <div className="vtab-queue stack">
       <div className="row">
-        <span className="muted">{finished ? t("Done") : t("Converting…")}</span>
-        <span className="muted">{done}/{queue.length}{failed ? ` · ${failed} ${t("failed")}` : ""}</span>
+        <span className="muted">{active ? t("Converting…") : t("Done")}</span>
+        <span className="row" style={{ gap: 8 }}>
+          <span className="muted">{done}/{queue.length}{failed ? ` · ${failed} ${t("failed")}` : ""}{cancelled ? ` · ${cancelled} ${t("cancelled")}` : ""}</span>
+          {active && (
+            <button type="button" className="vtab-stop" onClick={onCancel} title={t("Stop")}>
+              <Square size={11} strokeWidth={3} fill="currentColor" aria-hidden /> {t("Stop")}
+            </button>
+          )}
+        </span>
       </div>
       <ul className="vtab-qlist">
         {queue.map((it, i) => (
@@ -39,12 +47,14 @@ function QueueList({ queue, t }) {
             <span className="vtab-qicon">
               {it.status === "done" ? <CheckCircle2 size={12} strokeWidth={2.5} aria-hidden />
                 : it.status === "failed" ? <XCircle size={12} strokeWidth={2.5} aria-hidden />
+                : it.status === "cancelled" ? <Ban size={12} strokeWidth={2.5} aria-hidden />
                 : it.status === "converting" ? <Loader size={12} strokeWidth={2.5} className="spin" aria-hidden />
                 : <Clock size={12} strokeWidth={2.5} aria-hidden />}
             </span>
             <span className="vtab-qname" title={it.name}>{it.name}</span>
             {it.status === "converting" && <span className="vtab-qpct">{Math.round((it.progress || 0) * 100)}%</span>}
             {it.status === "failed" && <span className="vtab-qpct err">{it.error || t("Failed")}</span>}
+            {it.status === "cancelled" && <span className="vtab-qpct">{t("cancelled")}</span>}
           </li>
         ))}
       </ul>
@@ -80,7 +90,8 @@ export default function VideoTab({ onChanged }) {
   const [ffmpeg, setFfmpeg] = useState(true);
   // Browser-convert section (local → download, no upload). queue = many files
   // dropped at once, converted sequentially.
-  const [queue, setQueue] = useState([]);  // [{name, status:'pending'|'converting'|'done'|'failed', progress, error}]
+  const [queue, setQueue] = useState([]);  // [{name, status:'pending'|'converting'|'done'|'failed'|'cancelled', progress, error}]
+  const cancelRef = useRef(false);
   // Shared-storage section (upload → server ffmpeg → /media)
   const [srvJob, setSrvJob] = useState(null);
   const [srvName, setSrvName] = useState("");
@@ -98,20 +109,29 @@ export default function VideoTab({ onChanged }) {
   async function handleLocal(files) {
     const list = Array.from(files);
     if (!list.length) return;
+    cancelRef.current = false;
     setQueue(list.map((f) => ({ name: f.name, status: "pending", progress: 0 })));
     const set = (i, patch) => setQueue((q) => q.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
     for (let i = 0; i < list.length; i++) {
+      if (cancelRef.current) { set(i, { status: "cancelled" }); continue; }
       set(i, { status: "converting", progress: 0.02 });
       try {
         const blob = await convertToDeviceAvi(list[i], mode, {
           onProgress: (p) => set(i, { progress: Math.max(0.02, p) }),
         });
+        if (cancelRef.current) { set(i, { status: "cancelled" }); continue; }
         downloadBlob(blob, aviName(list[i].name));
         set(i, { status: "done", progress: 1 });
       } catch (e) {
-        set(i, { status: "failed", error: e.message || String(e) });
+        set(i, cancelRef.current ? { status: "cancelled" } : { status: "failed", error: e.message || String(e) });
       }
     }
+  }
+
+  // Stop the queue: flag it, then terminate the in-flight ffmpeg.wasm exec.
+  function cancelLocal() {
+    cancelRef.current = true;
+    cancelEncode();
   }
 
   // Shared storage: upload the source, the server encodes it into /media (visible
@@ -174,7 +194,7 @@ export default function VideoTab({ onChanged }) {
           label={<span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag videos here or click — multiple at once (mp4/mov/mkv…)")}</span>}
           onFiles={handleLocal}
         />
-        <QueueList queue={queue} t={t} />
+        <QueueList queue={queue} onCancel={cancelLocal} t={t} />
       </section>
 
       {/* ── BOTTOM: upload to the shared library (server encodes into /media) ── */}

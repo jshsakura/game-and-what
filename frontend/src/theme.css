@@ -1141,6 +1141,13 @@ body::before {
 .vtab-qname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vtab-qpct { flex: none; font-variant-numeric: tabular-nums; color: var(--card-dim); }
 .vtab-qpct.err { color: #e2776b; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vtab-qitem.cancelled { opacity: 0.6; }
+.vtab-stop {
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
+  border: 1px solid #e2503b66; background: #e2503b22; color: #e8897e;
+}
+.vtab-stop:hover { background: #e2503b38; }
 /* reassurance / info line (privacy: no upload · MP3 needs no conversion). */
 .vtab-safe {
   display: flex; align-items: center; gap: 6px; font-size: 12px;

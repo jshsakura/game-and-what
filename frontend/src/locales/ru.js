@@ -325,4 +325,6 @@ export default {
   "Drag videos here or click — multiple at once (mp4/mov/mkv…)": "Перетащите видео сюда или нажмите — несколько сразу (mp4/mov/mkv…)",
   "For the device's /media player": "Для плеера /media устройства",
   "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)": "MJPEG · AVI · 320×240 · 20fps · mono MP3 (для устройства)",
+  "Stop": "Стоп",
+  "cancelled": "отменено",
 };

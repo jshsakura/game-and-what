@@ -363,4 +363,6 @@ export default {
   "Drag videos here or click — multiple at once (mp4/mov/mkv…)": "여기로 영상을 끌어다 놓거나 클릭 — 여러 개 한 번에 (mp4/mov/mkv…)",
   "For the device's /media player": "기기 /media 플레이어용",
   "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)": "MJPEG · AVI · 320×240 · 20fps · mono MP3 (기기용)",
+  "Stop": "중단",
+  "cancelled": "중단됨",
 };

@@ -40,13 +40,16 @@ async function getFFmpeg() {
     // Load the core as BLOB urls (toBlobURL fetches the static /public file and
     // wraps it in a blob:) — a plain path would be intercepted by Vite's module
     // transform (`?import`) and fail. Blob urls bypass that in dev AND prod.
+    // The `?v=` busts any stale-cached old core (v1.3.0 shipped a broken UMD core
+    // at the same path → browsers that cached it must refetch the ESM one).
     const base = MT ? "/ffmpeg-mt" : "/ffmpeg";
+    const v = "?v=esm1";
     const opts = {
-      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js${v}`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm${v}`, "application/wasm"),
     };
     if (MT) {  // emscripten pthread worker (MT core only)
-      opts.workerURL = await toBlobURL(`${base}/ffmpeg-core.worker.js`, "text/javascript");
+      opts.workerURL = await toBlobURL(`${base}/ffmpeg-core.worker.js${v}`, "text/javascript");
     }
     await ff.load(opts);
     _ff = ff;
@@ -63,6 +66,16 @@ export function encoderReady() { return !!_ff; }
 
 // true = the fast multi-thread core is in use (page is cross-origin isolated).
 export function isMultiThread() { return MT; }
+
+// Abort the in-flight conversion: terminating the worker rejects the running
+// exec() (caller catches it). The instance is dropped so the NEXT convert reloads
+// a fresh core (terminate() leaves it unusable).
+export function cancelEncode() {
+  const ff = _ff;
+  _ff = null;
+  _loading = null;
+  if (ff) { try { ff.terminate(); } catch { /* already gone */ } }
+}
 
 /**
  * Convert a video File to a device-playable MJPEG .avi entirely in the browser.

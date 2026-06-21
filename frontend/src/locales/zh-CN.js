@@ -323,4 +323,6 @@ export default {
   "Drag videos here or click — multiple at once (mp4/mov/mkv…)": "将视频拖到这里或点击 — 可一次多个 (mp4/mov/mkv…)",
   "For the device's /media player": "用于设备/media播放器",
   "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)": "MJPEG · AVI · 320×240 · 20fps · mono MP3（设备用）",
+  "Stop": "停止",
+  "cancelled": "已取消",
 };

@@ -35,4 +35,6 @@ export default {
   "Drag videos here or click — multiple at once (mp4/mov/mkv…)": "Drag videos here or click — multiple at once (mp4/mov/mkv…)",
   "For the device's /media player": "For the device's /media player",
   "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)": "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)",
+  "Stop": "Stop",
+  "cancelled": "cancelled",
 };

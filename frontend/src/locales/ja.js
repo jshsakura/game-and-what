@@ -323,4 +323,6 @@ export default {
   "Drag videos here or click — multiple at once (mp4/mov/mkv…)": "動画をここにドラッグまたはクリック — 複数同時OK (mp4/mov/mkv…)",
   "For the device's /media player": "端末の/mediaプレーヤー用",
   "MJPEG · AVI · 320×240 · 20fps · mono MP3 (for device)": "MJPEG · AVI · 320×240 · 20fps · mono MP3 (端末用)",
+  "Stop": "中止",
+  "cancelled": "中止",
 };
