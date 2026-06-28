@@ -53,7 +53,7 @@ const SYS_PALETTE = {
   md: "#e07a1a", sg: "#13a07a", pce: "#d61f6b", pcecd: "#a61e5d", col: "#d94f2b", msx: "#3b5bdb",
   a2600: "#9b59b6", a7800: "#b5651d", amstrad: "#0f9d58", wsv: "#d4a017",
   tama: "#1fc4a8", mini: "#e84393", gw: "#c9a227", homebrew: "#6b7280", pico8: "#ff77a8",
-  lynx: "#82c91e", videopac: "#c724b1", zxs: "#2f9e44", c64: "#1864ab",
+  lynx: "#82c91e", videopac: "#d921cc", zxs: "#d9d921", c64: "#1b27b2",
 };
 export function systemColor(key) {
   return SYS_PALETTE[key] || `hsl(${hueFor(key || "x")} 62% 52%)`;
