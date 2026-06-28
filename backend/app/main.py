@@ -119,6 +119,19 @@ def list_systems() -> dict:
     }
 
 
+# Never let the HTML document (index.html / SPA fallback) be cached: it names the
+# content-hashed JS/CSS bundle, so a stale cached copy pins the browser to an OLD
+# build (icons/features don't update). StaticFiles sets no Cache-Control, and
+# Cloudflare/browsers then cache it heuristically. Force revalidation on every
+# load — the hashed /assets stay cacheable, only the tiny HTML is rechecked.
+@app.middleware("http")
+async def _no_cache_html(request, call_next):
+    response = await call_next(request)
+    if response.headers.get("content-type", "").startswith("text/html"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return response
+
+
 # ── Production SPA static mount (Task D) ────────────────────────────────────
 # When the Docker image is built the Vite output is copied to one of these
 # candidate locations. We mount it ONLY when present so the dev workflow
