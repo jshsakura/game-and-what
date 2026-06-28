@@ -31,35 +31,47 @@ const AUDIO_ARGS = ["-c:a", "libmp3lame", "-ac", "1", "-b:a", "96k", "-ar", "441
 
 let _ff = null;          // single shared instance (the 32MB core loads once)
 let _loading = null;
+let _usedMT = MT;        // which core actually loaded (MT may fall back to single)
 let _onProgress = null;  // current run's progress cb (listeners registered once)
 let _onLog = null;
+
+// Load one core (mt=true → /ffmpeg-mt with pthread worker; false → single-thread).
+// Core files are loaded as BLOB urls (toBlobURL fetches the static /public file
+// and wraps it blob:) — a plain path would be intercepted by Vite's module
+// transform (`?import`) and fail. `?v=` busts any stale-cached old core.
+async function loadCore(mt) {
+  const ff = new FFmpeg();
+  ff.on("log", ({ message }) => { _onLog && _onLog(message); });
+  ff.on("progress", ({ progress }) => {
+    if (_onProgress) _onProgress(Math.max(0, Math.min(1, progress || 0)));
+  });
+  const base = mt ? "/ffmpeg-mt" : "/ffmpeg";
+  const v = "?v=esm1";
+  const opts = {
+    coreURL: await toBlobURL(`${base}/ffmpeg-core.js${v}`, "text/javascript"),
+    wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm${v}`, "application/wasm"),
+  };
+  if (mt) opts.workerURL = await toBlobURL(`${base}/ffmpeg-core.worker.js${v}`, "text/javascript");
+  await ff.load(opts);
+  _usedMT = mt;
+  return ff;
+}
 
 async function getFFmpeg() {
   if (_ff) return _ff;
   if (_loading) return _loading;
   _loading = (async () => {
-    const ff = new FFmpeg();
-    ff.on("log", ({ message }) => { _onLog && _onLog(message); });
-    ff.on("progress", ({ progress }) => {
-      if (_onProgress) _onProgress(Math.max(0, Math.min(1, progress || 0)));
-    });
-    // Load the core as BLOB urls (toBlobURL fetches the static /public file and
-    // wraps it in a blob:) — a plain path would be intercepted by Vite's module
-    // transform (`?import`) and fail. Blob urls bypass that in dev AND prod.
-    // The `?v=` busts any stale-cached old core (v1.3.0 shipped a broken UMD core
-    // at the same path → browsers that cached it must refetch the ESM one).
-    const base = MT ? "/ffmpeg-mt" : "/ffmpeg";
-    const v = "?v=esm1";
-    const opts = {
-      coreURL: await toBlobURL(`${base}/ffmpeg-core.js${v}`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm${v}`, "application/wasm"),
-    };
-    if (MT) {  // emscripten pthread worker (MT core only)
-      opts.workerURL = await toBlobURL(`${base}/ffmpeg-core.worker.js${v}`, "text/javascript");
+    // Prefer the fast MT core when the page is cross-origin isolated, but FALL BACK
+    // to single-thread if it fails to load — e.g. behind a proxy (Cloudflare
+    // Access) that drops the COEP header or blocks the pthread worker/SAB, where MT
+    // would otherwise die with no recovery and the convert just "doesn't work".
+    try {
+      _ff = await loadCore(MT);
+    } catch (e) {
+      if (!MT) throw e;
+      _ff = await loadCore(false);
     }
-    await ff.load(opts);
-    _ff = ff;
-    return ff;
+    return _ff;
   })().catch((e) => { _loading = null; throw e; });   // failed load → allow retry
   return _loading;
 }
@@ -71,7 +83,7 @@ export function preloadEncoder() { return getFFmpeg().catch(() => {}); }
 export function encoderReady() { return !!_ff; }
 
 // true = the fast multi-thread core is in use (page is cross-origin isolated).
-export function isMultiThread() { return MT; }
+export function isMultiThread() { return _ff ? _usedMT : MT; }
 
 // Abort the in-flight conversion: terminating the worker rejects the running
 // exec() (caller catches it). The instance is dropped so the NEXT convert reloads
