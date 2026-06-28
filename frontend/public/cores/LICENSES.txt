@@ -20,6 +20,7 @@ gw_libretro                   Game & Watch                       zlib           
 potator                       Watara Supervision                 Public Domain    https://github.com/libretro/potator
 retro8                        PICO-8                             GPLv3            https://github.com/libretro/retro8
 tamalibretro                  Tamagotchi                         GPLv2            https://github.com/celerizer/tamalibretro (based on jcrona/tamalib, GPLv2)
+handy                         Atari Lynx                         zlib             https://github.com/libretro/libretro-handy
 
 IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX core is released under a
 non-commercial license. Any distribution that bundles it (including this one)

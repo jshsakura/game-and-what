@@ -62,6 +62,10 @@ SYSTEMS: tuple[System, ...] = (
     # as ONE combined folder per family (NOT split like gb/gbc).
     System("ngp", "Neo Geo Pocket", "ngp", ("ngp", "ngc", "ngpc")),
     System("ws", "WonderSwan", "ws", ("ws", "wsc")),
+    # Atari Lynx. The SD build ships the handy-go core (external/handy-go), so a
+    # firmware that registers it can play these on-device; added here for library
+    # collection with original No-Intro names. Standard extension is ".lnx".
+    System("lynx", "Atari Lynx", "lynx", ("lnx",)),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
     # Firmware registers ext "gw"; many G&W rom packs ship as ".mgw" — accept both.

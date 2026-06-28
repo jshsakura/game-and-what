@@ -1,5 +1,5 @@
 import React from "react";
-import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive } from "lucide-react";
+import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive, Rocket } from "lucide-react";
 import { useT } from "../i18n.jsx";
 
 // Steps to prepare the SD with this tool
@@ -126,10 +126,18 @@ export default function HelpTab() {
       <div className="muted help-note">
         {t("MSX and Amstrad support virtual keyboard input from the PAUSE/SET menu, and Zelda 3 / Super Mario World have different button mappings depending on the Mario/Zelda device version. · Source:")}
       </div>
-      <a className="help-project" href="https://github.com/sylverb/game-and-watch-retro-go-sd" target="_blank" rel="noreferrer">
-        <GithubMark size={18} />
-        <span className="help-project-name">game-and-watch-retro-go-sd</span>
-      </a>
+      <div className="help-projects">
+        {/* Upstream firmware project (sylverb) */}
+        <a className="help-project" href="https://github.com/sylverb/game-and-watch-retro-go-sd" target="_blank" rel="noreferrer">
+          <GithubMark size={18} />
+          <span className="help-project-name">game-and-watch-retro-go-sd</span>
+        </a>
+        {/* This (experimental) build's release page */}
+        <a className="help-project help-project-alt" href="https://github.com/jshsakura/game-and-what/releases" target="_blank" rel="noreferrer">
+          <Rocket size={16} strokeWidth={2.5} aria-hidden />
+          <span className="help-project-name">game-and-what · {t("Releases (experimental)")}</span>
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, HardDriveDownload } from "lucide-react";
+import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, HardDriveDownload, StarOff } from "lucide-react";
 import { getLibrary, getSystems, coverUrl, uploadRoms } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
@@ -23,15 +23,30 @@ const byName = (a, b) =>
 const favFirst = (a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
 const byDateDesc = (a, b) => (b.created_at || "").localeCompare(a.created_at || "");
 const byDateAsc = (a, b) => (a.created_at || "").localeCompare(b.created_at || "");
+// IGDB score: 0-100 = rating, -1 = checked/none, NULL = not fetched. Only a real
+// >0 score counts as "rated"; unrated roms ALWAYS sink to the bottom in BOTH
+// directions (use the 무평점 filter to isolate them), so the rating sorts only
+// reorder games that actually carry a score.
+const hasScore = (r) => typeof r.igdb_score === "number" && r.igdb_score > 0;
+const byScore = (a, b, dir) => {
+  const sa = hasScore(a), sb = hasScore(b);
+  if (sa !== sb) return sa ? -1 : 1;   // rated always before unrated, both directions
+  if (!sa) return 0;                   // both unrated → let name break the tie
+  return dir * (a.igdb_score - b.igdb_score);
+};
+const byScoreDesc = (a, b) => byScore(a, b, -1);
+const byScoreAsc = (a, b) => byScore(a, b, 1);
 // Available sort modes (the segmented control in the toolbar). Default = recent
 // so a freshly-uploaded batch floats to the top, easy to find and organize.
 const SORTS = {
   recent: (a, b) => favFirst(a, b) || byDateDesc(a, b) || byName(a, b),
   name:   (a, b) => favFirst(a, b) || byName(a, b),
   oldest: (a, b) => favFirst(a, b) || byDateAsc(a, b) || byName(a, b),
+  rating: (a, b) => favFirst(a, b) || byScoreDesc(a, b) || byName(a, b),
+  rating_asc: (a, b) => favFirst(a, b) || byScoreAsc(a, b) || byName(a, b),
 };
-const SORT_ORDER = ["recent", "name", "oldest"];
-const SORT_LABELS = { recent: "Newest", name: "Name", oldest: "Oldest" };
+const SORT_ORDER = ["recent", "name", "oldest", "rating", "rating_asc"];
+const SORT_LABELS = { recent: "Newest", name: "Name", oldest: "Oldest", rating: "Rating", rating_asc: "Rating (low)" };
 
 // Does this ROM actually ship to the SD card? Mirrors backend _excluded_roms():
 // a ROM is dropped when the user opted it out (sd_exclude) OR it's a PICO-8 cart
@@ -41,7 +56,8 @@ const shipsToSd = (rom) => !rom.sd_exclude && rom.pico8_compat !== "broken";
 
 const HANGUL_RE = /[가-힣]/;
 // Homebrew / Pico-8 are indie carts with no Korean release → never "missing".
-const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8"]);
+// Atari Lynx is a US/EU handheld with no Korean releases either.
+const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx"]);
 // "Needs a Korean title" = no Hangul AND has a real translatable word: a run of
 // 2+ consecutive letters containing a lowercase one. This excludes titles that
 // are only digits/symbols ("1942"), all-caps acronyms ("NBA", "WWF"), and dotted
@@ -89,6 +105,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   const [searchAll, setSearchAll] = useState(false); // search scope: this system vs all
   const [missingOnly, setMissingOnly] = useState(false); // show only cover-missing roms
   const [nonKoOnly, setNonKoOnly] = useState(false); // show only NON-Korean-named roms
+  const [unratedOnly, setUnratedOnly] = useState(false); // show only roms with no IGDB score (obscure)
   const [sortMode, setSortMode] = useState("recent"); // recent | name | oldest
   const sortCmp = SORTS[sortMode] || SORTS.recent;
   const [compatFilter, setCompatFilter] = useState("all"); // PICO-8 호환 상태 필터
@@ -217,6 +234,8 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   // 한글명 아님 필터: 한글 없는 번역대상 롬만 (숫자전용 '1942'류 제외 — 칩 배지와 동일 기준)
   // Korea-specific → only active in Korean mode (others detect cover-missing only).
   if (nonKoOnly && koFeature) items = items.filter(needsKorean);
+  // 무평점 필터: IGDB 점수조차 없는 비주류 롬만 (score>0 아닌 것 = -1/미조회). 똥겜 솎아내기용.
+  if (unratedOnly) items = items.filter((r) => !(r.igdb_score > 0));
   // PICO-8 호환 상태 필터 (pico8 보기에서만 적용; 미설정 = untested)
   if (current === "pico8" && compatFilter !== "all") {
     items = items.filter((r) => (r.pico8_compat || "untested") === compatFilter);
@@ -226,12 +245,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   const pageItems = items.slice((safePage - 1) * pageSize, safePage * pageSize);
   useEffect(() => { setPage(1); }, [q]);
   useEffect(() => { setPage(1); }, [pageSize]);
-  useEffect(() => { setPage(1); }, [missingOnly, nonKoOnly, compatFilter]);
+  useEffect(() => { setPage(1); }, [missingOnly, nonKoOnly, unratedOnly, compatFilter]);
 
   return (
     <div className="stack">
       <div className="muted">
-        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} ROM · {lib.videos.length} VIDEO · {lib.music?.length || 0} MUSIC{(items.length > 0 || searching || missingOnly || nonKoOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} ROM · {lib.videos.length} VIDEO · {lib.music?.length || 0} MUSIC{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
       </div>
 
       {error && <div className="badge failed">{error}</div>}
@@ -299,6 +318,10 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
                   <Languages size={13} strokeWidth={2.5} /> {t("Korean")}
                 </button>
               )}
+              <button className={`scope-btn ${unratedOnly ? "on" : ""}`} onClick={() => setUnratedOnly((m) => !m)}
+                title={t("Show only ROMs with no IGDB score (obscure titles)")} aria-pressed={unratedOnly}>
+                <StarOff size={13} strokeWidth={2.5} /> {t("Unrated")}
+              </button>
             </span>
           </div>
         </div>

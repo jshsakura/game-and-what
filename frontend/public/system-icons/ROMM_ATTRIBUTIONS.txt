@@ -15,9 +15,9 @@ Files covered (the icons actually shipped in this folder):
   sg.png      sms.png     tama.svg      wsv.png
   ngp.svg     ws.svg
 
-ngp.svg (Neo Geo Pocket Color) and ws.svg (WonderSwan Color) are from the RomM
-project's platform icon set (rommapp/romm, frontend/assets/platforms), same
-Libretro/CC BY 4.0 lineage.
+ngp.svg (Neo Geo Pocket Color), ws.svg (WonderSwan Color) and lynx.svg (Atari
+Lynx) are from the RomM project's platform icon set (rommapp/romm,
+frontend/assets/platforms), same Libretro/CC BY 4.0 lineage.
   Source:  https://github.com/rommapp/romm
 
 See ../../../THIRD-PARTY-NOTICES.md for the project-wide third-party license list.

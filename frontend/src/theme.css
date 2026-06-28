@@ -1578,6 +1578,7 @@ body::before {
 .help-link { color: var(--accent-2); text-decoration: underline; }
 /* Emphasized retro-go SD project link (cat icon + name) at the bottom of INFO */
 .help-note { margin-bottom: 2px; }
+.help-projects { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
 .help-project {
   display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
   margin-top: 2px; padding: 8px 13px;
@@ -1586,6 +1587,7 @@ body::before {
   box-shadow: 0 2px 5px #00000047, inset 0 1px 0 #ffffff2e;
   transition: filter 0.12s, transform 0.05s;
 }
+.help-project-alt { background: var(--accent-2); color: var(--accent-ink); }
 .help-project:hover { filter: brightness(1.07); }
 .help-project:active { transform: translateY(1px); }
 .help-project svg { flex: 0 0 auto; }

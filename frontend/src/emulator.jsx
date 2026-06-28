@@ -40,6 +40,11 @@ const CORE_MAP = {
   // self-hosted from arianrhodsandlot/retroarch-emscripten-build (Nostalgist format).
   ngp: "mednafen_ngp",
   ws: "mednafen_wswan",
+  // Atari Lynx via the handy core, self-hosted from the same
+  // arianrhodsandlot/retroarch-emscripten-build (Nostalgist format, v1.22.2 —
+  // the version nostalgist@0.21 pins). .lnx files carry a header, so handy boots
+  // them HLE: no lynxboot.img BIOS required.
+  lynx: "handy",
   // NOTE: Atari 2600/7800, Amstrad CPC, MSX, Pokémon Mini have no Nostalgist-compatible
   // core, so they run via a self-hosted JS engine in an iframe instead (see JS_ENGINE —
   // Amstrad uses CPCEC, MSX uses WebMSX, Poké Mini uses the webRcade PokeMini core).
@@ -87,8 +92,9 @@ const SCREEN_ASPECT = {
   msx: "4 / 3",
   mini: "4 / 3",
   // Handhelds at their native framebuffer ratio (else the 4/3 fallback stretches
-  // them): Neo Geo Pocket 160×152, WonderSwan 224×144 (landscape default).
-  ngp: "20 / 19", ws: "14 / 9",
+  // them): Neo Geo Pocket 160×152, WonderSwan 224×144 (landscape default),
+  // Atari Lynx 160×102 (square pixels).
+  ngp: "20 / 19", ws: "14 / 9", lynx: "80 / 51",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -125,6 +131,8 @@ const KEY_HINTS = {
   tama:  [{ k: "Z", b: "A" }, { k: "X", b: "B" }, { k: "A", b: "C" }],
   pico8: [DPAD, { k: "Z", b: "O (○)" }, { k: "X", b: "X (✕)" }],
   wsv:   [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
+  // Atari Lynx: A/B + the two Option buttons (→ RetroPad L/R) and Pause (→ Start).
+  lynx:  [DPAD, ...AB, { k: "Q", b: "OPTION 1" }, { k: "W", b: "OPTION 2" }, { k: "Enter", b: "PAUSE" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],

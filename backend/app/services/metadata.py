@@ -36,6 +36,7 @@ _LIBRETRO_REPO = {
     "msx": "Microsoft - MSX",
     "a2600": "Atari - 2600",
     "a7800": "Atari - 7800",
+    "lynx": "Atari - Lynx",
     "amstrad": "Amstrad - CPC",
     "wsv": "Watara - Supervision",
     "mini": "Nintendo - Pokemon Mini",

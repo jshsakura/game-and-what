@@ -37,6 +37,7 @@ const SYS_ABBREV = {
   nes: "NES", gb: "GB", gbc: "GBC", gg: "GG", sms: "SMS", md: "MD", sg: "SG",
   pce: "PCE", col: "COL", msx: "MSX", a2600: "A26", a7800: "A78", amstrad: "CPC",
   wsv: "WSV", tama: "TAM", mini: "MIN", gw: "GW", homebrew: "HB", pico8: "P8",
+  lynx: "LNX",
 };
 
 function hueFor(key) {
@@ -51,6 +52,7 @@ const SYS_PALETTE = {
   md: "#e07a1a", sg: "#13a07a", pce: "#d61f6b", col: "#d94f2b", msx: "#3b5bdb",
   a2600: "#9b59b6", a7800: "#b5651d", amstrad: "#0f9d58", wsv: "#d4a017",
   tama: "#1fc4a8", mini: "#e84393", gw: "#c9a227", homebrew: "#6b7280", pico8: "#ff77a8",
+  lynx: "#82c91e",
 };
 export function systemColor(key) {
   return SYS_PALETTE[key] || `hsl(${hueFor(key || "x")} 62% 52%)`;
@@ -1077,7 +1079,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
       style={{ borderTopColor: systemColor(rom.system_key) }}>
       <CoverSlot romId={rom.id} src={previewSrc} bust={coverV} alt={title}
         aspect={coverAspect(rom.system_key)} onActivate={openModal}
-        badge={(scoreBadge || statusBadge) ? <>{scoreBadge}{statusBadge}</> : null}
+        badge={(scoreBadge || statusBadge) ? <>{statusBadge}{scoreBadge}</> : null}
         cornerBL={rom.sd_exclude
           ? <span className="sd-out" title={t("Excluded from the SD download (kept in library)")}>
               <HardDriveDownload size={11} strokeWidth={2.5} aria-hidden /> {t("Not on SD")}
