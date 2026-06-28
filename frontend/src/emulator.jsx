@@ -79,6 +79,14 @@ const CORE_MAP = {
 // Every core listed above is mirrored under /public/cores/<core>_libretro.{js,wasm}.
 const CORE_BASE = "/cores";
 
+// Per-system libretro core options (passed to Nostalgist as retroarchCoreConfig).
+// C64: real 1541 disk loading is authentically SLOW (minutes) — auto-warp speeds
+// the machine up during disk access then drops back, so games load fast while
+// true-drive emulation stays on for loader/protection compatibility.
+const CORE_CONFIG = {
+  c64: { vice_autoloadwarp: "enabled" },
+};
+
 // Systems with NO libretro WASM core, but a standalone JS emulator we self-host
 // and run in an isolated iframe. `pad` = how the on-screen pad reaches it:
 // 'jt' → postMessage to Javatari's control socket; null → engine's own input only.
@@ -327,6 +335,7 @@ export function EmulatorOverlay({ rom, onClose }) {
           resolveCoreWasm: (c) => `${CORE_BASE}/${c}_libretro.wasm`,
           rom: romArg,
           ...(bios.length ? { bios } : {}),
+          ...(CORE_CONFIG[rom.system_key] ? { retroarchCoreConfig: CORE_CONFIG[rom.system_key] } : {}),
           element: canvasRef.current,
           respondToGlobalEvents: true,
         });
