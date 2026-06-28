@@ -49,11 +49,12 @@ SYSTEMS: tuple[System, ...] = (
     System("md", "Genesis", "md", ("md", "gen", "bin")),
     System("sg", "SG-1000", "sg", ("sg",)),
     System("pce", "PC Engine", "pce", ("pce",)),
-    # PC Engine CD (a.k.a. TurboGrafx-CD). NOT in rg_emulators.c — added for the
-    # library collection only (No-Intro/Redump names). CD images live in the
-    # single /roms/pcecd/ folder as .chd (preferred) or .cue (+ .bin sidecars
-    # tracked as extra_files). On-device + browser play need the System Card
-    # (syscard) BIOS, so it's collection-only for now (no CORE_MAP entry).
+    # PC Engine CD (a.k.a. TurboGrafx-CD). NOT in rg_emulators.c — library system
+    # (No-Intro/Redump names). CD images live in the single /roms/pcecd/ folder as
+    # .chd (preferred) or .cue (+ .bin sidecars tracked as extra_files). Browser
+    # play uses the beetle-pce-fast core + a user-uploaded System Card BIOS
+    # (syscard3.pce in the Extra folder); single-file .chd boots, .cue/.bin sets
+    # need their track sidecars so they're not browser-playable (see emulator.jsx).
     System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue")),
     System("col", "ColecoVision", "col", ("col",)),
     System("msx", "MSX", "msx", ("dsk", "rom", "mx1", "mx2", "cdk")),

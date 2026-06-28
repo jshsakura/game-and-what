@@ -29,6 +29,12 @@ const CORE_MAP = {
   sg: "genesis_plus_gx",
   md: "genesis_plus_gx",
   pce: "mednafen_pce_fast",
+  // PC Engine CD shares the beetle-pce-fast core (it emulates CD-ROM² too).
+  // CD play needs the System Card BIOS (syscard3.pce) — user-uploaded to the
+  // Extra folder, see BIOS below. Single-file .chd boots directly; .cue+.bin
+  // sets need their track sidecars, which the bare /rom endpoint can't supply,
+  // so browser play is .chd-only (marked EXPERIMENTAL).
+  pcecd: "mednafen_pce_fast",
   col: "gearcoleco",
   gw: "gw",
   tama: "tamalibretro",
@@ -76,7 +82,7 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["gw", "pico8"]);
+const EXPERIMENTAL = new Set(["gw", "pico8", "pcecd"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -85,7 +91,7 @@ const MOBILE_QUERY = "(max-width: 640px)";
 // the rest are 4:3. Atari runs in an iframe and is intentionally left alone.
 const SCREEN_ASPECT = {
   nes: "4 / 3", sms: "4 / 3", sg: "4 / 3", md: "4 / 3", pce: "4 / 3",
-  col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
+  pcecd: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
   gb: "10 / 9", gbc: "10 / 9",
   pico8: "1 / 1", tama: "1 / 1", wsv: "1 / 1",
   amstrad: "4 / 3",
@@ -126,6 +132,7 @@ const KEY_HINTS = {
   sg:    [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }],
   md:    [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
+  pcecd: [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   col:   [DPAD, { k: "Z", b: "Left fire" }, { k: "X", b: "Right fire" }, { k: "1~9 0 * #", b: "Keypad" }],
   gw:    [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "Enter", b: "START" }],
   tama:  [{ k: "Z", b: "A" }, { k: "X", b: "B" }, { k: "A", b: "C" }],
@@ -145,6 +152,10 @@ const DEFAULT_HINTS = [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b
 // "colecovision.rom", not the SD's "coleco.bin" (same bytes).
 const BIOS = {
   col: [{ fileName: "colecovision.rom", path: "bios/coleco/coleco.bin" }],
+  // PC Engine CD: beetle-pce-fast needs the System Card 3.0 ROM to boot CD games.
+  // syscard3.pce runs essentially the whole library; upload it to the Extra
+  // folder at bios/pce/syscard3.pce. Absent BIOS → the core errors out.
+  pcecd: [{ fileName: "syscard3.pce", path: "bios/pce/syscard3.pce" }],
 };
 const FDS_BIOS = { fileName: "disksys.rom", path: "bios/nes/disksys.rom" };
 
