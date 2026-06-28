@@ -132,10 +132,10 @@ export default function HelpTab() {
           <GithubMark size={18} />
           <span className="help-project-name">game-and-watch-retro-go-sd</span>
         </a>
-        {/* This (experimental) build's release page */}
-        <a className="help-project help-project-alt" href="https://github.com/jshsakura/game-and-what/releases" target="_blank" rel="noreferrer">
+        {/* My experimental firmware fork — release/download page */}
+        <a className="help-project help-project-alt" href="https://github.com/jshsakura/game-and-watch-retro-go-sd/releases" target="_blank" rel="noreferrer">
           <Rocket size={16} strokeWidth={2.5} aria-hidden />
-          <span className="help-project-name">game-and-what · {t("Releases (experimental)")}</span>
+          <span className="help-project-name">{t("Releases (experimental)")}</span>
         </a>
       </div>
     </div>
