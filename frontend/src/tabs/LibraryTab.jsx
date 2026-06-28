@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, HardDriveDownload, StarOff } from "lucide-react";
-import { getLibrary, getSystems, coverUrl, uploadRoms } from "../api.js";
+import { getLibrary, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useKoreanMode } from "../config.jsx";
@@ -154,7 +154,11 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
     if (busy || !current) return;
     setBusy(true); setError("");
     try {
-      const res = await uploadRoms(current, files, onProgress);
+      // CD systems (PC Engine CD) are folder-per-game — use the same uploader the
+      // Upload tab does, so dropping a game folder works identically here.
+      const res = FOLDER_SYSTEMS.has(current)
+        ? await uploadCdFolder(current, files, onProgress)
+        : await uploadRoms(current, files, onProgress);
       const dups = (res.results || []).filter((r) => r.error === "duplicate");
       if (dups.length) {
         toast.warn(`${t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}: ${dups.map((d) => d.name).join(", ")}`);
@@ -382,11 +386,14 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
         <div className="lib-upload-area">
           <Dropzone
             multiple
-            accept={activeGroup.system.exts.map((e) => "." + e).join(",")}
+            folder={FOLDER_SYSTEMS.has(current)}
+            accept={FOLDER_SYSTEMS.has(current) ? "" : activeGroup.system.exts.map((e) => "." + e).join(",")}
             label={
               busy
                 ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("Uploading…")}</span>
-                : <span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag {sys} ROMs here or click", { sys: activeGroup.system.name })}</span>
+                : FOLDER_SYSTEMS.has(current)
+                  ? <span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag & drop a {name} game folder (.cue + tracks) or use 'Whole folder'", { name: activeGroup.system.name })}</span>
+                  : <span className="dz-label"><Upload size={16} aria-hidden /> {t("Drag {sys} ROMs here or click", { sys: activeGroup.system.name })}</span>
             }
             onFiles={uploadHere}
           />
