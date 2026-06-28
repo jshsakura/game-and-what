@@ -23,6 +23,9 @@ platform icon set (rommapp/romm, frontend/assets/platforms), same Libretro/CC BY
 4.0 lineage.
   Source:  https://github.com/rommapp/romm
 
+zxs.png (Sinclair ZX Spectrum) and c64.png (Commodore 64) are converted from the
+RomM platform icons (zxs.ico / c64.ico), same Libretro/CC BY 4.0 lineage.
+
 chip8.svg (CHIP-8) is an original icon made for this project (no attribution
 required).
 

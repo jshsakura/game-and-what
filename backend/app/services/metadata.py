@@ -39,6 +39,8 @@ _LIBRETRO_REPO = {
     "a7800": "Atari - 7800",
     "lynx": "Atari - Lynx",
     "videopac": "Magnavox - Odyssey2",
+    "zxs": "Sinclair - ZX Spectrum",
+    "c64": "Commodore - 64",
     "amstrad": "Amstrad - CPC",
     "wsv": "Watara - Supervision",
     "mini": "Nintendo - Pokemon Mini",

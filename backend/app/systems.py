@@ -78,6 +78,10 @@ SYSTEMS: tuple[System, ...] = (
     # it's library-collection only for now (TOSEC .bin names). dirname "videopac"
     # matches the firmware folder so it lines up if that core is ever enabled.
     System("videopac", "Odyssey²", "videopac", ("bin",)),
+    # ZX Spectrum & Commodore 64 — library-collection only (no firmware/web core
+    # yet). Z80/6502 home computers with huge libraries; common emulator formats.
+    System("zxs", "ZX Spectrum", "zxs", ("z80", "tap", "tzx", "sna", "szx")),
+    System("c64", "Commodore 64", "c64", ("d64", "t64", "prg", "crt", "g64", "tap")),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
     # Firmware registers ext "gw"; many G&W rom packs ship as ".mgw" — accept both.

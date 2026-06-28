@@ -26,6 +26,7 @@ _PLATFORM: dict[str, tuple[int, ...]] = {
     "a2600": (59,), "a7800": (60,), "amstrad": (25,), "mini": (166,), "gw": (307,),
     "ws": (57, 123), "ngp": (119, 120), "wsv": (415,), "lynx": (61,),
     "videopac": (133,),  # Odyssey 2 / Videopac G7000
+    "zxs": (26,), "c64": (15,),  # ZX Spectrum / Commodore C64
 }
 
 
