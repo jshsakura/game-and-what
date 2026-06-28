@@ -127,6 +127,33 @@ def serve_rom(session_id: str, rom_id: str) -> Response:
     )
 
 
+@router.get("/sessions/{session_id}/roms/{rom_id}/cdfile")
+def serve_cd_track(session_id: str, rom_id: str, name: str) -> Response:
+    """Serve one track/data file from a CD game's folder, for in-browser CD play.
+
+    Folder-per-game CD entries store the .cue + track .bin/.iso next to each other
+    (rom_path's parent). The web emulator fetches the .cue via /rom and each track
+    here, then hands the whole set to the core. `name` is a bare filename (basename
+    only) resolved inside the rom's own folder — no traversal."""
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        rom = _require_rom(conn, session_id, rom_id)
+
+    folder = (storage.session_root(session_id) / rom["rom_path"]).parent
+    target = folder / Path(name).name           # basename only → can't escape the folder
+    if not target.exists() or not target.is_file():
+        raise HTTPException(status_code=404, detail="Track file missing from disk")
+
+    return Response(
+        content=target.read_bytes(),
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f"inline; filename*=UTF-8''{quote(target.name)}",
+            "Cache-Control": "public, max-age=86400",
+        },
+    )
+
+
 @router.get("/sessions/{session_id}/videos/{video_id}/download")
 def download_video(session_id: str, video_id: str) -> Response:
     """Download the encoded .avi for a video entry."""

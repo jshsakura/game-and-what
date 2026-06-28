@@ -272,6 +272,12 @@ export function romFileUrl(romId) {
   return sid ? `/api/sessions/${sid}/roms/${romId}/rom` : null;
 }
 
+// One track/data file from a CD game's folder (for in-browser CD play).
+export function cdTrackUrl(romId, name) {
+  const sid = getSessionId();
+  return sid ? `/api/sessions/${sid}/roms/${romId}/cdfile?name=${encodeURIComponent(name)}` : null;
+}
+
 export function downloadVideoUrl(videoId) {
   const sid = getSessionId();
   return sid ? `/api/sessions/${sid}/videos/${videoId}/download` : null;

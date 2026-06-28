@@ -13,7 +13,18 @@
 // hides the ▶ button for them.
 import React, { useEffect, useRef, useState } from "react";
 import { X, Maximize2, Minimize2, Monitor, Copy, Check } from "lucide-react";
-import { romFileUrl, extraDownloadUrl } from "./api.js";
+import { romFileUrl, cdTrackUrl, extraDownloadUrl } from "./api.js";
+
+// extra_files (CD track sidecars) may arrive as a JSON string or array; return
+// the list of track filenames (empty for non-CD roms).
+function parseExtraFiles(extra) {
+  try {
+    const arr = typeof extra === "string" ? JSON.parse(extra) : extra;
+    return Array.isArray(arr) ? arr.map((e) => e?.name).filter(Boolean) : [];
+  } catch (_) {
+    return [];
+  }
+}
 import { useT } from "./i18n.jsx";
 
 // system_key → libretro core. We SELF-HOST every core in /public/cores/ (see
@@ -261,6 +272,19 @@ export function EmulatorOverlay({ rom, onClose }) {
         const res = await fetch(romFileUrl(rom.id));
         if (!res.ok) throw new Error(t("Failed to load the ROM file."));
         const fileContent = await res.blob();
+        // CD games (PC Engine CD) are a .cue + track files: hand the core the WHOLE
+        // set so it can mount the disc (the .cue references the tracks by name).
+        // NOTE: this pulls every track into browser memory — fine for small discs,
+        // but a large CD (hundreds of MB of CDDA) can exhaust the tab.
+        const tracks = parseExtraFiles(rom.extra_files);
+        const romArg = tracks.length
+          ? [{ fileName: rom.stored_name, fileContent },
+             ...await Promise.all(tracks.map(async (tName) => {
+               const r = await fetch(cdTrackUrl(rom.id, tName));
+               if (!r.ok) throw new Error(t("Failed to load the ROM file."));
+               return { fileName: tName, fileContent: await r.blob() };
+             }))]
+          : { fileName: rom.stored_name, fileContent };
         const bios = await loadBios(rom);
         if (cancelled) return;
 
@@ -271,7 +295,7 @@ export function EmulatorOverlay({ rom, onClose }) {
           // if jsdelivr/libretro goes down, the emulator still works.
           resolveCoreJs: (c) => `${CORE_BASE}/${c}_libretro.js`,
           resolveCoreWasm: (c) => `${CORE_BASE}/${c}_libretro.wasm`,
-          rom: { fileName: rom.stored_name, fileContent },
+          rom: romArg,
           ...(bios.length ? { bios } : {}),
           element: canvasRef.current,
           respondToGlobalEvents: true,
