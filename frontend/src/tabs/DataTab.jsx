@@ -34,9 +34,9 @@ export default function DataTab({ onChanged }) {
   }, []);
   useEffect(() => { reload(); }, [reload]);
 
-  async function handleFiles(list) {
+  async function handleFiles(list, onProgress) {
     setBusy(true); setError("");
-    try { await uploadData(list); reload(); }
+    try { await uploadData(list, onProgress); reload(); }
     catch (e) { setError(e.message); }
     finally { setBusy(false); }
   }

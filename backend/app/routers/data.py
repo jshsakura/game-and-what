@@ -44,9 +44,19 @@ async def upload_data(session_id: str, files: list[UploadFile] = File(...)) -> d
     for upload in files:
         name = upload.filename or "file"
         target = _safe_target(session_id, name)
-        data = await upload.read()
-        storage.write_bytes(target, data)
-        stored.append({"name": target.name, "size": len(data)})
+        # Stream to disk in chunks instead of reading the whole upload into RAM —
+        # CD images / archives can be hundreds of MB and a full read would spike
+        # memory and stall the worker.
+        target.parent.mkdir(parents=True, exist_ok=True)
+        size = 0
+        with target.open("wb") as out:
+            while True:
+                chunk = await upload.read(1 << 20)  # 1 MiB
+                if not chunk:
+                    break
+                out.write(chunk)
+                size += len(chunk)
+        stored.append({"name": target.name, "size": size})
     return {"stored": len(stored), "files": stored}
 
 

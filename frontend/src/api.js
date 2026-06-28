@@ -400,14 +400,14 @@ export async function getData() {
   return res.json();
 }
 
-export async function uploadData(files) {
-  const res = await withSession((sid) => {
-    const form = new FormData();
-    for (const f of files) form.append("files", f);
-    return fetch(`/api/sessions/${sid}/data`, { method: "POST", body: form });
-  });
-  if (!res.ok) throw new Error("Data upload failed");
-  return res.json();
+// XHR (not fetch) so the Data dropzone shows real upload progress — CD images /
+// archives are large and a no-progress spinner looks frozen.
+export async function uploadData(files, onProgress) {
+  const sid = getSessionId();
+  if (!sid) throw new Error("No session");
+  const form = new FormData();
+  for (const f of files) form.append("files", f);
+  return xhrUpload(`/api/sessions/${sid}/data`, form, onProgress);
 }
 
 export async function deleteData(name) {
