@@ -6,6 +6,7 @@ import {
   AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
+import { useDownload } from "./download.jsx";
 import {
   uploadCover, coverUrl, deviceCoverUrl, originalCoverUrl, coverDownloadUrl, downloadRomUrl, downloadVideoUrl, downloadMusicUrl,
   videoThumbUrl, videoPreviewUrl, musicCoverUrl, streamMusicUrl, deleteRom, deleteVideo, deleteMusic,
@@ -857,6 +858,11 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const [playing, setPlaying] = useState(false); // in-browser emulator overlay
   const [copied, setCopied] = useState(false);   // content-hash copy feedback
   const dl = downloadRomUrl(rom.id);
+  // Route downloads through the shared overlay (Preparing… + progress) instead of a
+  // bare <a download>, which showed NOTHING while the server builds a big ZIP (a
+  // CD game's ROM+tracks can be hundreds of MB → felt frozen). dlBusy spins the btn.
+  const { download, busy: dlBusy } = useDownload();
+  const startDownload = () => dl && download(dl, `${rom.stored_name || "rom"}.zip`);
 
   // Copy the raw SHA-256 content hash so the user can diff look-alike dumps
   // (same game, "부제 있고 없고" 차이) outside the app.
@@ -1119,9 +1125,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
       </div>
       <div className="card-actions">
         {dl && (
-          <a className="icon-btn" href={dl} download title={t("Download (ROM + cover)")}>
-            <Download size={13} strokeWidth={2.5} />
-          </a>
+          <button className="icon-btn" disabled={dlBusy} onClick={startDownload}
+            title={t("Download (ROM + cover)")}>
+            {dlBusy ? <Loader size={13} className="spin" strokeWidth={2.5} /> : <Download size={13} strokeWidth={2.5} />}
+          </button>
         )}
         <button className="icon-btn" onClick={openModal} title={t("Edit / delete")}>
           <MoreHorizontal size={13} strokeWidth={2.5} />
@@ -1297,9 +1304,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     <Upload size={13} strokeWidth={2.5} /> {t("Add / replace data file")}
                   </button>
                   {dl && (
-                    <a className="btn ghost" href={dl} download title={t("Download ROM + cover ZIP")}>
-                      <Download size={13} strokeWidth={2.5} /> {t("Download")}
-                    </a>
+                    <button className="btn ghost" disabled={busy || dlBusy} onClick={startDownload}
+                      title={t("Download ROM + cover ZIP")}>
+                      {dlBusy ? <Loader size={13} className="spin" strokeWidth={2.5} /> : <Download size={13} strokeWidth={2.5} />} {t("Download")}
+                    </button>
                   )}
                 </div>
               )}
@@ -1319,9 +1327,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     </button>
                   )}
                   {dl && rom.system_key !== "homebrew" && (
-                    <a className="btn ghost" href={dl} download title={t("Download ROM + cover ZIP")}>
-                      <Download size={13} strokeWidth={2.5} /> {t("Download")}
-                    </a>
+                    <button className="btn ghost" disabled={busy || dlBusy} onClick={startDownload}
+                      title={t("Download ROM + cover ZIP")}>
+                      {dlBusy ? <Loader size={13} className="spin" strokeWidth={2.5} /> : <Download size={13} strokeWidth={2.5} />} {t("Download")}
+                    </button>
                   )}
                 </div>
               )}
