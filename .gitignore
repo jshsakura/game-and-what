@@ -28,3 +28,6 @@ _refs/*
 backend/build_smw_kr.sh
 backend/kr_msg_exgfx.patch
 I18N_HANDOFF.md
+
+# Local session handoff notes — not for the repo
+HANDOFF.md
