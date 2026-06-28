@@ -50,6 +50,9 @@ const CORE_MAP = {
   // arianrhodsandlot/retroarch-emscripten-build set. Needs the o2rom.bin BIOS in
   // the Extra folder (see BIOS below).
   videopac: "o2em",
+  // Commodore 64 via VICE (x64sc). Needs the C64 system ROMs (kernal/basic/
+  // chargen) — see BIOS below. .d64/.t64 load via the normal single-file path.
+  c64: "vice_x64sc",
   col: "gearcoleco",
   gw: "gw",
   tama: "tamalibretro",
@@ -97,7 +100,7 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["gw", "pico8", "pcecd", "videopac"]);
+const EXPERIMENTAL = new Set(["gw", "pico8", "pcecd", "videopac", "c64"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -106,7 +109,7 @@ const MOBILE_QUERY = "(max-width: 640px)";
 // the rest are 4:3. Atari runs in an iframe and is intentionally left alone.
 const SCREEN_ASPECT = {
   nes: "4 / 3", sms: "4 / 3", sg: "4 / 3", md: "4 / 3", pce: "4 / 3",
-  pcecd: "4 / 3", videopac: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
+  pcecd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
   gb: "10 / 9", gbc: "10 / 9",
   pico8: "1 / 1", tama: "1 / 1", wsv: "1 / 1",
   amstrad: "4 / 3",
@@ -149,6 +152,7 @@ const KEY_HINTS = {
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   pcecd: [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   videopac: [DPAD, { k: "Z", b: "Action" }, { k: "Enter", b: "Reset" }],
+  c64: [DPAD, { k: "Z", b: "Fire" }, { k: "Space", b: "Space" }, { k: "Enter", b: "RETURN" }],
   col:   [DPAD, { k: "Z", b: "Left fire" }, { k: "X", b: "Right fire" }, { k: "1~9 0 * #", b: "Keypad" }],
   gw:    [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "Enter", b: "START" }],
   tama:  [{ k: "Z", b: "A" }, { k: "X", b: "B" }, { k: "A", b: "C" }],
