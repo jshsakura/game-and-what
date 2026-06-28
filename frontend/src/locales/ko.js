@@ -236,6 +236,7 @@ export default {
   "Pick a platform → upload ROMs for automatic Korean names & covers. Upload a whole folder to use bundled images (.png) as covers; alt dumps ([a1]) are skipped": "플랫폼 선택 → 롬 올리면 한글명·커버 자동. 폴더째 올리면 동봉 이미지(.png)를 커버로 쓰고 alt덤프([a1])는 건너뜀",
   "Loading platforms…": "플랫폼 목록 불러오는 중…",
   "Drag & drop {name} ROMs here or click": "여기로 {name} 롬을 끌어다 놓거나 클릭",
+  "Drag & drop a {name} game folder (.cue + tracks) or use 'Whole folder'": "{name} 게임 폴더(.cue + 트랙)를 끌어다 놓거나 '폴더 통째로' 사용",
   "{n} saved": "{n}개 저장",
   "🖼 {n} bundled covers": "🖼 동봉 커버 {n}개",
   "{n} alt dumps skipped": "alt덤프 {n}개 건너뜀",

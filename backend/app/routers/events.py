@@ -2,6 +2,9 @@
 for deleted ROMs."""
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 
 from .. import db
@@ -58,6 +61,10 @@ def restore_event(session_id: str, event_id: str) -> dict:
         if not storage.restore_from_trash(session_id, snap.get("rom_path")):
             raise HTTPException(status_code=410, detail="휴지통에서 파일을 찾을 수 없습니다 (보관 기간 만료)")
         storage.restore_from_trash(session_id, snap.get("cover_path"))
+        # Bring co-located sidecars (CD .bin tracks, homebrew .dat) back too.
+        parent = Path(snap["rom_path"]).parent
+        for ef in json.loads(snap.get("extra_files") or "[]"):
+            storage.restore_from_trash(session_id, f"{parent}/{ef['name']}")
 
         _reinsert_rom(conn, snap)
         events.mark_restored(conn, event_id)

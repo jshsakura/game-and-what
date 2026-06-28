@@ -1,6 +1,7 @@
 """Delete / rename ROMs/videos (and their files) in a session."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from fastapi import APIRouter, Body, HTTPException
@@ -31,6 +32,12 @@ def delete_rom(session_id: str, rom_id: str) -> dict:
             raise HTTPException(status_code=404, detail="Unknown rom")
         _remove(session_id, row["rom_path"])
         _remove(session_id, row["cover_path"])
+        # Co-located track/data sidecars (CD .bin tracks, homebrew .dat) live next
+        # to the rom file — trash them too so a folder-per-game delete leaves no
+        # orphans behind (which would otherwise still ship to the SD).
+        parent = Path(row["rom_path"]).parent
+        for ef in json.loads(row["extra_files"] or "[]"):
+            _remove(session_id, f"{parent}/{ef['name']}")
         conn.execute("DELETE FROM roms WHERE id = ?", (rom_id,))
         # Snapshot the whole row so the delete can be undone from the activity
         # feed (files move to _trash; this re-inserts the DB row on restore).

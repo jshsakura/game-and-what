@@ -60,6 +60,11 @@ STEAMGRIDDB_API_KEY = os.getenv("STEAMGRIDDB_API_KEY", "")
 # Upload limits.
 MAX_VIDEO_BYTES = int(os.getenv("GNW_MAX_VIDEO_BYTES", str(512 * 1024 * 1024)))
 MAX_ROM_BYTES = int(os.getenv("GNW_MAX_ROM_BYTES", str(64 * 1024 * 1024)))
+# CD folder-per-game uploads (PC Engine CD etc.): a single data/audio track or a
+# .chd can dwarf a cartridge, and a full disc is hundreds of MB, so these get
+# their own much larger per-file / per-folder caps.
+MAX_CD_FILE_BYTES = int(os.getenv("GNW_MAX_CD_FILE_BYTES", str(1024 * 1024 * 1024)))
+MAX_CD_TOTAL_BYTES = int(os.getenv("GNW_MAX_CD_TOTAL_BYTES", str(2 * 1024 * 1024 * 1024)))
 MAX_MUSIC_BYTES = int(os.getenv("GNW_MAX_MUSIC_BYTES", str(64 * 1024 * 1024)))
 MAX_FIRMWARE_BYTES = int(os.getenv("GNW_MAX_FIRMWARE_BYTES", str(64 * 1024 * 1024)))
 MAX_EXTRA_BYTES = int(os.getenv("GNW_MAX_EXTRA_BYTES", str(128 * 1024 * 1024)))

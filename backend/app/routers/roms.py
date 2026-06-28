@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
+import os
+import shutil
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -202,6 +205,156 @@ async def _autofill_covers(session_id: str, roms: list[dict]) -> None:
         except Exception:
             pass
         await asyncio.sleep(0.25)
+
+
+def _basename(rel: str) -> str:
+    """Last path segment of a (possibly backslash) relative path, NFC-normalized."""
+    return Path((storage.nfc(rel) or "").replace("\\", "/")).name
+
+
+def _ext(name: str) -> str:
+    return name.rsplit(".", 1)[-1].lower() if "." in name else ""
+
+
+@router.post("/sessions/{session_id}/roms/cdfolder")
+async def upload_cd_folder(
+    session_id: str,
+    system: str = Form(...),
+    paths: str = Form(...),               # JSON list of webkitRelativePath, aligned to files
+    files: list[UploadFile] = File(...),
+) -> dict:
+    """Folder-per-game upload for CD systems (e.g. PC Engine CD).
+
+    The whole game folder is stored INTACT under roms/<dir>/<game>/ — a .cue plus
+    its track files (.bin/.iso/.wav…), or a single .chd. One rom row is created:
+    rom_path → the .cue/.chd, extra_files → the co-located tracks. The SD packager
+    (tree walk) and per-rom download (parent-dir derivation) then ship the folder
+    as-is. Track files keep their EXACT names so the .cue's FILE refs stay valid;
+    everything is streamed to disk (CD images are large)."""
+    try:
+        sys_obj = get_system(system)
+    except KeyError:
+        raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
+    with db.connect() as conn:
+        require_session(conn, session_id)
+
+    try:
+        rel_paths = list(json.loads(paths))
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid paths payload")
+    if len(rel_paths) != len(files):
+        raise HTTPException(status_code=400, detail="paths/files length mismatch")
+    if not files:
+        raise HTTPException(status_code=400, detail="No files")
+
+    # Per-file basenames (kept EXACT — never safe_name'd — so .cue FILE refs work).
+    names = [_basename(rel_paths[i]) or storage.nfc(f.filename) or f"track{i}"
+             for i, f in enumerate(files)]
+    # Primary = the .cue (preferred) or a single .chd; the game is built around it.
+    primary_i = next((i for i, n in enumerate(names) if _ext(n) == "cue"), None)
+    if primary_i is None:
+        primary_i = next((i for i, n in enumerate(names) if _ext(n) == "chd"), None)
+    if primary_i is None:
+        raise HTTPException(status_code=400, detail="폴더에 .cue 또는 .chd가 없습니다")
+
+    # Game folder = the dropped folder's top dir; fall back to the primary's stem.
+    def _top(rel: str) -> str:
+        norm = (storage.nfc(rel) or "").replace("\\", "/").strip("/")
+        return norm.split("/", 1)[0] if "/" in norm else ""
+    tops = [t for t in (_top(p) for p in rel_paths) if t]
+    game = tops[0] if tops else Path(names[primary_i]).stem
+    game_dir = storage.safe_name(game)
+    roms_root = storage.roms_dir(session_id, sys_obj.dirname)
+    # Write into a private staging dir first, then atomically rename into the final
+    # game folder once we know it's not a duplicate — so a re-upload of an existing
+    # game can NEVER clobber the live folder it shares a name with.
+    stage_dir = roms_root / f".incoming-{storage.new_id()}"
+    stage_dir.mkdir(parents=True, exist_ok=True)
+
+    written: list[dict] = []
+    total = 0
+    h = hashlib.sha256()
+    try:
+        for i, upload in enumerate(files):
+            name = names[i]
+            if "/" in name or "\\" in name or name in ("", ".", ".."):
+                raise HTTPException(status_code=400, detail=f"잘못된 파일명: {name}")
+            target = stage_dir / name
+            size = 0
+            with target.open("wb") as out:
+                while True:
+                    chunk = await upload.read(1 << 20)
+                    if not chunk:
+                        break
+                    size += len(chunk)
+                    total += len(chunk)
+                    if size > config.MAX_CD_FILE_BYTES:
+                        raise HTTPException(status_code=413, detail=f"파일이 너무 큽니다: {name}")
+                    if total > config.MAX_CD_TOTAL_BYTES:
+                        raise HTTPException(status_code=413, detail="폴더가 너무 큽니다")
+                    out.write(chunk)
+                    if i == primary_i:
+                        h.update(chunk)
+            written.append({"name": name, "size": size})
+
+        chash = h.hexdigest()
+        primary_name = names[primary_i]
+        with db.connect() as conn:
+            dup = conn.execute(
+                "SELECT stored_name FROM roms WHERE session_id = ? AND content_hash = ? "
+                "AND system_key = ? LIMIT 1", (session_id, chash, sys_obj.key)).fetchone()
+        if dup:
+            shutil.rmtree(stage_dir, ignore_errors=True)
+            return {"session_id": session_id, "stored": 0,
+                    "results": [{"name": game, "ok": False, "error": "duplicate",
+                                 "duplicate_of": dup["stored_name"]}]}
+
+        # Promote staging → final folder, keeping a fresh name if one already exists
+        # (same game, different content) so nothing is overwritten.
+        final_dir = roms_root / game_dir
+        n = 2
+        while final_dir.exists():
+            final_dir = roms_root / f"{game_dir} ({n})"
+            n += 1
+        os.rename(stage_dir, final_dir)
+        game_dir = final_dir.name
+    except BaseException:
+        shutil.rmtree(stage_dir, ignore_errors=True)
+        raise
+
+    # Display name = the primary file's name (so rom_path basename == stored_name,
+    # same invariant as cartridge uploads). Region tag stays in its own column.
+    stored_name = primary_name
+    rom_rel = f"{config.ROMS_DIR_NAME}/{sys_obj.dirname}/{game_dir}/{primary_name}"
+    extra = [w for j, w in enumerate(written) if j != primary_i]
+
+    li = langtag.detect(game)
+    region = romtag.region_of(game)
+    rom_id = storage.new_id()
+    with db.connect() as conn:
+        conn.execute(
+            """INSERT INTO roms (id, session_id, system_key, original_name,
+                   stored_name, korean_name, rom_path, cover_path, cover_status,
+                   orig_lang, play_lang, is_korean_patched, lang_source, region,
+                   cover_flag, content_hash, extra_files)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (rom_id, session_id, sys_obj.key, storage.nfc(game), stored_name, None,
+             rom_rel, None, "none", li.orig_lang, li.play_lang, 0, li.source, region,
+             None, chash, json.dumps(extra)),
+        )
+        events.log(conn, session_id, "rom_upload", rom_id=rom_id,
+                   rom_name=stored_name, system_key=sys_obj.key)
+
+    asyncio.create_task(_autofill_covers(session_id, [{
+        "id": rom_id, "system_key": sys_obj.key, "stored_name": stored_name,
+        "original_name": storage.nfc(game), "korean_name": None, "rom_path": rom_rel,
+    }]))
+
+    return {"session_id": session_id, "stored": 1, "results": [{
+        "id": rom_id, "name": game, "ok": True, "system_key": sys_obj.key,
+        "system_name": sys_obj.name, "stored_name": stored_name,
+        "tracks": len(extra), "cover_status": "none",
+    }]}
 
 
 @router.post("/sessions/{session_id}/roms/{rom_id}/replace")

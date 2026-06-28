@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Gamepad2, Upload } from "lucide-react";
-import { getSystems, uploadRomset, coverUrl } from "../api.js";
+import { getSystems, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
 import { Dropzone, SystemSelect, RomCard } from "../components.jsx";
 import { useT } from "../i18n.jsx";
 
@@ -20,7 +20,8 @@ export default function RomTab({ onChanged }) {
   }, []);
 
   const current = systems.find((s) => s.key === active);
-  const accept = current?.exts?.length ? current.exts.map((e) => "." + e).join(",") : "";
+  const isFolder = FOLDER_SYSTEMS.has(active);   // CD systems → upload a game folder
+  const accept = !isFolder && current?.exts?.length ? current.exts.map((e) => "." + e).join(",") : "";
   const okResults = results.filter((r) => r.ok);
   const failed = results.filter((r) => !r.ok);
   const dups = results.filter((r) => r.error === "duplicate");
@@ -30,7 +31,9 @@ export default function RomTab({ onChanged }) {
     if (!active || !current) return;
     setBusy(true); setError(""); setExtra(null);
     try {
-      const res = await uploadRomset(active, current.exts, files, onProgress);
+      const res = isFolder
+        ? await uploadCdFolder(active, files, onProgress)
+        : await uploadRomset(active, current.exts, files, onProgress);
       setResults(res.results);
       setExtra({ covers: res.covers || 0, skippedAlt: res.skippedAlt || 0 });
       onChanged?.();
@@ -61,9 +64,12 @@ export default function RomTab({ onChanged }) {
       <Dropzone
         accept={accept}
         multiple
+        folder={isFolder}
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {t("Drag & drop {name} ROMs here or click", { name: current?.name ?? "" })}
+            <Upload size={16} aria-hidden /> {isFolder
+              ? t("Drag & drop a {name} game folder (.cue + tracks) or use 'Whole folder'", { name: current?.name ?? "" })
+              : t("Drag & drop {name} ROMs here or click", { name: current?.name ?? "" })}
           </span>
         }
         onFiles={handleFiles}

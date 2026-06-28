@@ -94,6 +94,27 @@ export async function uploadRoms(systemKey, files, onProgress) {
   return { session_id: SESSION_ID, stored, results };
 }
 
+// Folder-per-game upload for CD systems (PC Engine CD): send a whole game folder
+// (.cue + track .bin/.iso… or a single .chd) and the backend stores it intact as
+// one library entry. Relative paths (webkitRelativePath) carry the folder name.
+export async function uploadCdFolder(systemKey, files, onProgress) {
+  const sid = getSessionId();
+  if (!sid) throw new Error("No session");
+  const arr = Array.from(files);
+  const form = new FormData();
+  form.append("system", systemKey);
+  const paths = [];
+  for (const f of arr) {
+    form.append("files", f);
+    paths.push(f.webkitRelativePath || f.name);
+  }
+  form.append("paths", JSON.stringify(paths));
+  return xhrUpload(`/api/sessions/${sid}/roms/cdfolder`, form, onProgress);
+}
+
+// Systems managed as a folder-per-game (disc images: .cue + tracks, or .chd).
+export const FOLDER_SYSTEMS = new Set(["pcecd"]);
+
 // Goodtools/No-Intro alt-or-bad dump tags ([a1]/[b1]/[h1]/[o1]/[t1]/[f1]/[p1]).
 const ALT_DUMP_RE = /\[(?:a|b|h|o|t|f|p)\d*\]/i;
 const SIDECAR_IMG_RE = /\.(png|jpe?g|bmp)$/i;
