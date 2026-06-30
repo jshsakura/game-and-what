@@ -56,7 +56,7 @@ SYSTEMS: tuple[System, ...] = (
     # (syscard3.pce in the Extra folder); single-file .chd boots, .cue/.bin sets
     # need their track sidecars so they're not browser-playable (see emulator.jsx).
     System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue")),
-    System("col", "ColecoVision", "col", ("col",)),
+    System("col", "Coleco Vision", "col", ("col",)),
     System("msx", "MSX", "msx", ("dsk", "rom", "mx1", "mx2", "cdk")),
     System("a2600", "Atari 2600", "a2600", ("a26", "bin")),
     System("a7800", "Atari 7800", "a7800", ("a78", "bin")),
@@ -68,7 +68,7 @@ SYSTEMS: tuple[System, ...] = (
     # firmware build that includes the core. Few ROMs each, so mono+Color are kept
     # as ONE combined folder per family (NOT split like gb/gbc).
     System("ngp", "NEOGEO Pocket", "ngp", ("ngp", "ngc", "ngpc")),
-    System("ws", "WonderSwan", "ws", ("ws", "wsc")),
+    System("ws", "Wonder Swan", "ws", ("ws", "wsc")),
     # Atari Lynx. The SD build ships the handy-go core (external/handy-go), so a
     # firmware that registers it can play these on-device; added here for library
     # collection with original No-Intro names. Standard extension is ".lnx".
