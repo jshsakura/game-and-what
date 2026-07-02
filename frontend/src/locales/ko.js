@@ -245,7 +245,7 @@ export default {
   "Bootloader diagnostics menu": "부트로더 진단 메뉴",
   "Force boot to the game list (bypass a problematic save)": "게임 목록으로 강제 부팅 (문제 세이브 우회)",
   "MSX and Amstrad support virtual keyboard input from the PAUSE/SET menu, and Zelda 3 / Super Mario World have different button mappings depending on the Mario/Zelda device version. · Source:": "MSX·Amstrad는 PAUSE/SET 메뉴에서 가상 키보드 입력이 가능하고, 젤다3·슈퍼마리오월드는 마리오/젤다 기기 버전에 따라 버튼 매핑이 다릅니다. · 출처:",
-  "Releases (experimental)": "릴리즈 (실험판)",
+  "Releases (experimental)": "비공식 릴리즈",
   "Temporary reference storage —": "임시 참고자료 보관소 —",
   "excluded from the SD ZIP download": "SD ZIP 다운로드에서 제외",
   ".": "됩니다.",
