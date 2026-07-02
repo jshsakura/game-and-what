@@ -130,7 +130,22 @@ export default function HelpTab() {
         </div>
       </div>
 
-      {/* BIOS / 시스템 롬 */}
+      {/* 단축키 */}
+      {SECTIONS.map((s) => (
+        <div className="help-section" key={s.title}>
+          <div className="help-head"><s.icon size={14} strokeWidth={2.5} aria-hidden /> {t(s.title)}</div>
+          <div className="help-list">
+            {s.rows.map(([combo, action]) => (
+              <div className="help-row" key={combo + action}>
+                <Combo combo={combo} />
+                <span className="help-action">{t(action)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* BIOS / 시스템 롬 — 참조용이라 단축키 아래로 */}
       <div className="help-section">
         <div className="help-head"><Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("BIOS / System ROMs")}</div>
         <div className="muted bios-intro">
@@ -157,21 +172,6 @@ export default function HelpTab() {
           ))}
         </div>
       </div>
-
-      {/* 단축키 */}
-      {SECTIONS.map((s) => (
-        <div className="help-section" key={s.title}>
-          <div className="help-head"><s.icon size={14} strokeWidth={2.5} aria-hidden /> {t(s.title)}</div>
-          <div className="help-list">
-            {s.rows.map(([combo, action]) => (
-              <div className="help-row" key={combo + action}>
-                <Combo combo={combo} />
-                <span className="help-action">{t(action)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
 
       <div className="muted help-note">
         {t("MSX and Amstrad support virtual keyboard input from the PAUSE/SET menu, and Zelda 3 / Super Mario World have different button mappings depending on the Mario/Zelda device version. · Source:")}

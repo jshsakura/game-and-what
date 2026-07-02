@@ -1606,7 +1606,8 @@ body::before {
   box-shadow: 0 2px 5px #00000047, inset 0 1px 0 #ffffff2e;
   transition: filter 0.12s, transform 0.05s;
 }
-.help-project-alt { background: var(--accent-2); color: var(--accent-ink); }
+/* Unofficial-release link: muted grey so it reads as secondary/experimental. */
+.help-project-alt { background: #6b7280; color: #fff; }
 .help-project:hover { filter: brightness(1.07); }
 .help-project:active { transform: translateY(1px); }
 .help-project svg { flex: 0 0 auto; }
@@ -1624,7 +1625,7 @@ body::before {
 .bios-group-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .bios-group-head .sys-ico, .bios-group-head .sys-mono { flex: 0 0 auto; }
 .bios-sys {
-  font-family: var(--body-font); font-size: 14px; font-weight: 700; color: var(--lcd-ink); line-height: 1.4;
+  font-family: var(--body-font); font-size: 14px; font-weight: 700; color: var(--card-ink); line-height: 1.4;
 }
 .bios-tag {
   margin-left: auto; padding: 2px 8px; border-radius: 999px;

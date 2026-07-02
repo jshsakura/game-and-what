@@ -11,7 +11,6 @@ import { BIOS_CATALOG } from "../bios.js";
 // the folder (the file must be named exactly this), so we show the whole path;
 // clicking sets the target folder to its parent dir.
 const BIOS_FILES = BIOS_CATALOG.flatMap((b) => b.files.map((f) => f.sdPath));
-const parentDir = (p) => p.replace(/\/[^/]+$/, "");
 
 // Arbitrary passthrough files → SD root verbatim. Pick a target folder (e.g.
 // bios/nes) and the files land at <folder>/<name> in the SD ZIP.
@@ -28,14 +27,21 @@ export default function ExtraTab({ onChanged }) {
   };
   useEffect(() => { reload(); }, []);
 
+  const trimmed = folder.replace(/^\/+|\/+$/g, "");        // trimmed target; empty = SD root
+  const isFilePath = /\.[^/.]+$/.test(trimmed.split("/").pop() || "");  // ends in a filename
+  const targetDir = isFilePath ? trimmed.replace(/\/?[^/]+$/, "") : trimmed;  // the folder part
+
   async function handleFiles(list, onProgress) {
     const arr = Array.from(list);
     if (!arr.length) return;
     const total = arr.reduce((s, f) => s + f.size, 0) || 1;
+    // A full file path + exactly one dropped file → save it AS that path (rename),
+    // so a BIOS dump named differently still lands as e.g. bios/nes/disksys.rom.
+    const renameSingle = isFilePath && arr.length === 1;
     let done = 0;
     for (const f of arr) {
       const rel = (f.webkitRelativePath || f.name).replace(/^\/+/, "");
-      const path = dir ? `${dir}/${rel}` : rel;
+      const path = renameSingle ? trimmed : (targetDir ? `${targetDir}/${rel}` : rel);
       try {
         await uploadExtra(f, path, (loaded) => onProgress?.(done + loaded, total));
       } catch (e) {
@@ -47,8 +53,6 @@ export default function ExtraTab({ onChanged }) {
     onChanged?.();
   }
 
-  const dir = folder.replace(/^\/+|\/+$/g, "");   // trimmed folder; empty = SD root
-
   async function remove(path) {
     if (!(await toast.confirm(t("Delete the file '/{path}'?", { path }), { confirmText: t("Delete") }))) return;
     try { await deleteExtra(path); await reload(); onChanged?.(); }
@@ -58,10 +62,10 @@ export default function ExtraTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <FolderPlus size={13} aria-hidden /> {t("Upload passthrough files — BIOS / system ROMs, configs, anything. Set the target SD folder and the file ships in the SD ZIP verbatim at that path. See the BIOS list in the INFO (정보) tab for each system's exact path.")}
+        <FolderPlus size={13} aria-hidden /> {t("Upload passthrough files — BIOS / system ROMs, configs, anything. Enter a folder (files keep their names) OR a full file path incl. the filename — then one dropped file is saved under that exact name. See the BIOS list in the INFO (정보) tab and paste a path straight in.")}
       </div>
 
-      <label className="field-label">{t("Target folder (SD path)")}</label>
+      <label className="field-label">{t("Target SD path")}</label>
       <div className="path-group">
         <span className="path-group-tag"><FolderPlus size={13} strokeWidth={2.5} aria-hidden /> SD</span>
         <span className="path-slash">/</span>
@@ -69,10 +73,9 @@ export default function ExtraTab({ onChanged }) {
           className="path-input"
           value={folder}
           spellCheck={false}
-          placeholder={t("e.g. bios/nes — leave empty for the SD root")}
+          placeholder={t("e.g. bios/nes/disksys.rom (or a folder) — empty = SD root")}
           onChange={(e) => setFolder(e.target.value)}
         />
-        <span className="path-trail">/…</span>
       </div>
       <div className="extra-examples">
         <span className="extra-examples-label">{t("BIOS files:")}</span>
@@ -80,22 +83,26 @@ export default function ExtraTab({ onChanged }) {
           <button
             type="button"
             key={p}
-            className={`extra-chip ${dir === parentDir(p) ? "on" : ""}`}
-            onClick={() => setFolder(parentDir(p))}
-            title={t("Set the folder — then name your file exactly: {name}", { name: p.split("/").pop() })}
+            className={`extra-chip ${trimmed === p ? "on" : ""}`}
+            onClick={() => setFolder(p)}
+            title={t("Fills the full path — drop one file and it's saved as {name}", { name: p.split("/").pop() })}
           >
             {p}
           </button>
         ))}
       </div>
-      <div className="muted path-hint">{t("Click a file to fill its folder — your uploaded file must be named exactly as shown (e.g. disksys.rom). Leave the folder empty to save to the SD root.")}</div>
+      <div className="muted path-hint">
+        {isFilePath
+          ? t("Full file path → drop ONE file and it's saved as this exact name (a differently-named dump still works).")
+          : t("Folder path → files keep their own names. Add a filename (e.g. …/disksys.rom) to rename a single upload. Empty = SD root.")}
+      </div>
 
       <Dropzone
         multiple
         label={
           <span className="dz-label">
             <Upload size={16} aria-hidden /> {t("Drag & drop files or click →")}{" "}
-            {dir ? <b>/{dir}/</b> : <b>{t("the SD root")}</b>}{" "}
+            {isFilePath ? <b>/{trimmed}</b> : targetDir ? <b>/{targetDir}/</b> : <b>{t("the SD root")}</b>}{" "}
             {t("to save")}
           </span>
         }
