@@ -256,7 +256,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   return (
     <div className="stack">
       <div className="muted">
-        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} ROM · {lib.videos.length} VIDEO · {lib.music?.length || 0} MUSIC{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} {t("ROM")} · {lib.videos.length} {t("VIDEO")} · {lib.music?.length || 0} {t("MUSIC")}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
       </div>
 
       {error && <div className="badge failed">{error}</div>}
