@@ -38,6 +38,7 @@ _LIBRETRO_REPO = {
     "a2600": "Atari - 2600",
     "a7800": "Atari - 7800",
     "lynx": "Atari - Lynx",
+    "vb": "Nintendo - Virtual Boy",
     "videopac": "Magnavox - Odyssey2",
     "zxs": "Sinclair - ZX Spectrum",
     "c64": "Commodore - 64",

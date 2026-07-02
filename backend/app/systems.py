@@ -73,6 +73,11 @@ SYSTEMS: tuple[System, ...] = (
     # firmware that registers it can play these on-device; added here for library
     # collection with original No-Intro names. Standard extension is ".lnx".
     System("lynx", "Atari Lynx", "lynx", ("lnx",)),
+    # Nintendo Virtual Boy — NOT in rg_emulators.c (no SD core); added as a
+    # library-collection system with original No-Intro names. Standard extension
+    # is ".vb". Browser play works via the mednafen_vb (beetle-vb) core; .vb files
+    # are headerless but the core boots them HLE, so no BIOS is needed.
+    System("vb", "Virtual Boy", "vb", ("vb",)),
     # Magnavox Odyssey² / Philips Videopac (same hardware). The firmware has a
     # videopac core (main_videopac.c) but its add_emulator is commented out, so
     # it's library-collection only for now (TOSEC .bin names). dirname "videopac"

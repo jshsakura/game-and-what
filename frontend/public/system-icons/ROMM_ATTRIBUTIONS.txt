@@ -30,6 +30,12 @@ gamecom.svg (Tiger Game.com) is from the Libretro / RetroArch assets project
 (src/xmb/monochrome/"Tiger - Game.com.svg"), same Libretro/CC BY 4.0 lineage.
   Source:  https://git.libretro.com/libretro-assets/retroarch-assets
 
+vb.svg (Nintendo Virtual Boy) is the full-color console silhouette from the RomM
+project's "systematic" platform icon set (frontend/assets/platforms/systematic/
+virtualboy.svg) — the libretro monochrome VB glyph is a generic gamepad, not the
+console, so the RomM console art is used instead (matches the colored PNG icons).
+  Source:  https://github.com/rommapp/romm
+
 chip8.svg (CHIP-8) is an original icon made for this project (no attribution
 required).
 

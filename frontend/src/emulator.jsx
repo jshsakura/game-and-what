@@ -69,6 +69,10 @@ const CORE_MAP = {
   // the version nostalgist@0.21 pins). .lnx files carry a header, so handy boots
   // them HLE: no lynxboot.img BIOS required.
   lynx: "handy",
+  // Nintendo Virtual Boy via the mednafen_vb (beetle-vb) core, self-hosted from the
+  // same arianrhodsandlot/retroarch-emscripten-build (Nostalgist format, v1.22.2).
+  // .vb files boot HLE, no BIOS needed.
+  vb: "mednafen_vb",
   // NOTE: Atari 2600/7800, Amstrad CPC, MSX, Pokémon Mini have no Nostalgist-compatible
   // core, so they run via a self-hosted JS engine in an iframe instead (see JS_ENGINE —
   // Amstrad uses CPCEC, MSX uses WebMSX, Poké Mini uses the webRcade PokeMini core).
@@ -134,6 +138,8 @@ const SCREEN_ASPECT = {
   // them): Neo Geo Pocket 160×152, WonderSwan 224×144 (landscape default),
   // Atari Lynx 160×102 (square pixels).
   ngp: "20 / 19", ws: "14 / 9", lynx: "80 / 51",
+  // Virtual Boy renders a 384×224 monochrome (red) framebuffer.
+  vb: "12 / 7",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -178,6 +184,8 @@ const KEY_HINTS = {
   wsv:   [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
   // Atari Lynx: A/B + the two Option buttons (→ RetroPad L/R) and Pause (→ Start).
   lynx:  [DPAD, ...AB, { k: "Q", b: "OPTION 1" }, { k: "W", b: "OPTION 2" }, { k: "Enter", b: "PAUSE" }],
+  // Virtual Boy: left D-pad + A/B and the L/R shoulder triggers, plus Select/Start.
+  vb:    [DPAD, ...AB, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],
