@@ -277,7 +277,7 @@ export default {
   "Upload passthrough files — BIOS / system ROMs, configs, anything. Enter a folder (files keep their names) OR a full file path incl. the filename — then one dropped file is saved under that exact name. See the BIOS list in the INFO (정보) tab and paste a path straight in.": "BIOS·시스템 롬, 설정 파일 등 아무 파일이나 올릴 수 있습니다. 폴더를 입력하면 파일 이름 그대로 저장되고, 파일명까지 포함한 전체 경로를 입력하면 올린 파일 1개가 그 이름 그대로 저장됩니다. 정보(INFO) 탭의 BIOS 목록에서 경로를 복사해 바로 붙여넣으세요.",
   "Target SD path": "대상 SD 경로",
   "e.g. bios/nes/disksys.rom (or a folder) — empty = SD root": "예: bios/nes/disksys.rom (또는 폴더) — 비우면 SD 루트",
-  "Required BIOS file paths (reference)": "필수 BIOS 파일 경로 (참고용)",
+  "Required BIOS file paths": "필수 BIOS 파일 경로",
   "System": "시스템",
   "SD path": "SD 경로",
   "Full file path → drop ONE file and it's saved as this exact name (a differently-named dump still works).": "전체 파일 경로 → 파일 1개를 올리면 이 이름 그대로 저장됩니다(파일명이 달라도 OK).",

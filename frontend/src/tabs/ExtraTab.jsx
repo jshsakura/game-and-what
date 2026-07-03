@@ -59,6 +59,40 @@ export default function ExtraTab({ onChanged }) {
         <FolderPlus size={13} aria-hidden /> {t("Upload passthrough files — BIOS / system ROMs, configs, anything. Enter a folder (files keep their names) OR a full file path incl. the filename — then one dropped file is saved under that exact name. See the BIOS list in the INFO (정보) tab and paste a path straight in.")}
       </div>
 
+      {/* Required-BIOS path accordion — the cheat sheet for the path input
+          below. Collapsed by default to keep the tab compact. */}
+      <details className="bios-ref">
+        <summary className="bios-ref-head">
+          <Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("Required BIOS file paths")}
+          <ChevronDown size={14} strokeWidth={2.5} aria-hidden className="bios-ref-chev" />
+        </summary>
+        <table className="bios-ref-table">
+          <thead>
+            <tr>
+              <th>{t("System")}</th>
+              <th>{t("SD path")}</th>
+              <th>{t("Size")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BIOS_CATALOG.flatMap((b) =>
+              b.files.map((f, i) => (
+                <tr key={f.sdPath}>
+                  {i === 0 && (
+                    <td className="bios-ref-sys" rowSpan={b.files.length}>
+                      {t(b.label)}
+                      {b.tag && <span className="bios-ref-tag">{t(b.tag)}</span>}
+                    </td>
+                  )}
+                  <td className="bios-ref-path">/{f.sdPath}</td>
+                  <td className="bios-ref-size">{f.size}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </details>
+
       <label className="field-label">{t("Target SD path")}</label>
       <div className="path-group">
         <span className="path-group-tag"><FolderPlus size={13} strokeWidth={2.5} aria-hidden /> SD</span>
@@ -119,39 +153,6 @@ export default function ExtraTab({ onChanged }) {
         </div>
       )}
 
-      {/* Required-BIOS path reference — read-only cheat sheet for the input
-          above. Collapsed by default to keep the tab compact. */}
-      <details className="bios-ref">
-        <summary className="bios-ref-head">
-          <Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("Required BIOS file paths (reference)")}
-          <ChevronDown size={14} strokeWidth={2.5} aria-hidden className="bios-ref-chev" />
-        </summary>
-        <table className="bios-ref-table">
-          <thead>
-            <tr>
-              <th>{t("System")}</th>
-              <th>{t("SD path")}</th>
-              <th>{t("Size")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {BIOS_CATALOG.flatMap((b) =>
-              b.files.map((f, i) => (
-                <tr key={f.sdPath}>
-                  {i === 0 && (
-                    <td className="bios-ref-sys" rowSpan={b.files.length}>
-                      {t(b.label)}
-                      {b.tag && <span className="bios-ref-tag">{t(b.tag)}</span>}
-                    </td>
-                  )}
-                  <td className="bios-ref-path">/{f.sdPath}</td>
-                  <td className="bios-ref-size">{f.size}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </details>
     </div>
   );
 }

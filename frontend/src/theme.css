@@ -1530,23 +1530,23 @@ body::before {
 }
 .path-input::placeholder { color: var(--card-dim); }
 
-/* Required-BIOS path reference table at the bottom of the Extra tab —
-   a <details> so it stays folded until needed */
-.bios-ref { margin-top: 6px; }
+/* Required-BIOS path accordion at the top of the Extra tab — a <details>
+   card: full-width summary bar, table attached below when open */
+.bios-ref {
+  border-radius: 9px; overflow: hidden;
+  background: var(--card-bg); border: 2px solid #00000033;
+}
 .bios-ref-head {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 7px; padding: 10px 12px;
   font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--card-ink);
-  cursor: pointer; list-style: none; user-select: none; width: fit-content;
+  cursor: pointer; list-style: none; user-select: none;
+  transition: background 0.1s;
 }
 .bios-ref-head::-webkit-details-marker { display: none; }
-.bios-ref-head:hover { color: var(--accent); }
-.bios-ref-chev { transition: transform 0.15s; }
+.bios-ref-head:hover { background: #00000015; }
+.bios-ref-chev { margin-left: auto; color: var(--card-dim); transition: transform 0.15s; }
 .bios-ref[open] .bios-ref-chev { transform: rotate(180deg); }
-.bios-ref[open] .bios-ref-head { margin-bottom: 8px; }
-.bios-ref-table {
-  width: 100%; border-collapse: separate; border-spacing: 0;
-  background: var(--card-bg); border: 2px solid #00000033; border-radius: 9px; overflow: hidden;
-}
+.bios-ref-table { width: 100%; border-collapse: collapse; }
 .bios-ref-table th, .bios-ref-table td {
   padding: 7px 12px; text-align: left; vertical-align: middle;
   border-bottom: 1px solid #00000022;
@@ -1555,7 +1555,7 @@ body::before {
 .bios-ref-table th {
   font-family: var(--body-font); font-size: 11px; font-weight: 700; color: var(--card-dim);
   text-transform: uppercase; letter-spacing: 0.5px;
-  background: #00000018; border-bottom: 2px solid #00000033;
+  background: #00000018; border-top: 2px solid #00000033; border-bottom: 2px solid #00000033;
 }
 .bios-ref-table th:last-child { text-align: right; }
 .bios-ref-sys {
