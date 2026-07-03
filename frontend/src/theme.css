@@ -1558,6 +1558,24 @@ body::before {
   background: #00000018; border-top: 2px solid #00000033; border-bottom: 2px solid #00000033;
 }
 .bios-ref-table th:last-child { text-align: right; }
+
+/* Mobile: swap the 3-column table for stacked groups (paths under each system) */
+.bios-ref-stack { display: none; }
+.bios-ref-group-head {
+  display: flex; align-items: center; gap: 7px; padding: 8px 12px;
+  font-family: var(--body-font); font-size: 12px; font-weight: 700; color: var(--card-ink);
+  background: #00000018; border-top: 1px solid #00000033; border-bottom: 1px solid #00000022;
+}
+.bios-ref-row {
+  display: flex; align-items: baseline; gap: 10px; padding: 7px 12px;
+  border-bottom: 1px solid #00000018;
+}
+.bios-ref-row:last-child { border-bottom: none; }
+.bios-ref-row .bios-ref-path { flex: 1; min-width: 0; }
+@media (max-width: 640px) {
+  .bios-ref-table { display: none; }
+  .bios-ref-stack { display: block; }
+}
 .bios-ref-sys {
   font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--card-ink);
   border-right: 1px solid #00000022; white-space: nowrap;

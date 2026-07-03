@@ -91,6 +91,24 @@ export default function ExtraTab({ onChanged }) {
             )}
           </tbody>
         </table>
+        {/* Narrow screens: the 3-column table cramps, so stack paths under
+            each system name instead (CSS swaps the two views at 640px). */}
+        <div className="bios-ref-stack">
+          {BIOS_CATALOG.map((b) => (
+            <div className="bios-ref-group" key={b.key}>
+              <div className="bios-ref-group-head">
+                {t(b.label)}
+                {b.tag && <span className="bios-ref-tag">{t(b.tag)}</span>}
+              </div>
+              {b.files.map((f) => (
+                <div className="bios-ref-row" key={f.sdPath}>
+                  <span className="bios-ref-path">/{f.sdPath}</span>
+                  <span className="bios-ref-size">{f.size}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </details>
 
       <label className="field-label">{t("Target SD path")}</label>
