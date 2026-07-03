@@ -279,26 +279,26 @@ export default function App() {
             </React.Fragment>
           ))}
         </nav>
-        {loading ? (
-          // Fixed-position button set — show skeletons in place so they don't pop in.
+        {/* Select-all + SD ZIP belong to the library view — hide the whole
+            group on other tabs instead of letting SD ZIP tag along alone. */}
+        {tab !== "library" ? null : loading ? (
+          // Show skeletons in place so the buttons don't pop in.
           <div className="tabbar-dl">
-            {tab === "library" && <span className="btn-skel sel" aria-hidden />}
+            <span className="btn-skel sel" aria-hidden />
             <span className="btn-skel dl" aria-hidden />
           </div>
         ) : count > 0 ? (
           <div className="tabbar-dl">
-            {tab === "library" && (
-              <button
-                className={`btn tab-selall ${allSelected ? "on" : ""}`}
-                onClick={toggleAll}
-                disabled={libKeys.length === 0}
-                title={t("Select / clear all platforms")}
-              >
-                {allSelected
-                  ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All")}</>
-                  : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
-              </button>
-            )}
+            <button
+              className={`btn tab-selall ${allSelected ? "on" : ""}`}
+              onClick={toggleAll}
+              disabled={libKeys.length === 0}
+              title={t("Select / clear all platforms")}
+            >
+              {allSelected
+                ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All")}</>
+                : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
+            </button>
             <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
               onClick={() => dl.download(
                 allSelected ? zip : packageUrl(selKey),
