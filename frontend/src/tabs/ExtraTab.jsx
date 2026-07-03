@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FolderPlus, Upload, Download, Trash2, Cpu } from "lucide-react";
+import { FolderPlus, Upload, Download, Trash2, Cpu, ChevronDown } from "lucide-react";
 import { getExtra, uploadExtra, deleteExtra, extraDownloadUrl, formatBytes } from "../api.js";
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
@@ -119,11 +119,13 @@ export default function ExtraTab({ onChanged }) {
         </div>
       )}
 
-      {/* Required-BIOS path reference — read-only cheat sheet for the input above. */}
-      <div className="bios-ref">
-        <div className="bios-ref-head">
+      {/* Required-BIOS path reference — read-only cheat sheet for the input
+          above. Collapsed by default to keep the tab compact. */}
+      <details className="bios-ref">
+        <summary className="bios-ref-head">
           <Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("Required BIOS file paths (reference)")}
-        </div>
+          <ChevronDown size={14} strokeWidth={2.5} aria-hidden className="bios-ref-chev" />
+        </summary>
         <table className="bios-ref-table">
           <thead>
             <tr>
@@ -149,7 +151,7 @@ export default function ExtraTab({ onChanged }) {
             )}
           </tbody>
         </table>
-      </div>
+      </details>
     </div>
   );
 }

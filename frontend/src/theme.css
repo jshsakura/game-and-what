@@ -1530,12 +1530,19 @@ body::before {
 }
 .path-input::placeholder { color: var(--card-dim); }
 
-/* Required-BIOS path reference table at the bottom of the Extra tab */
+/* Required-BIOS path reference table at the bottom of the Extra tab —
+   a <details> so it stays folded until needed */
 .bios-ref { margin-top: 6px; }
 .bios-ref-head {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
   font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--card-ink);
+  cursor: pointer; list-style: none; user-select: none; width: fit-content;
 }
+.bios-ref-head::-webkit-details-marker { display: none; }
+.bios-ref-head:hover { color: var(--accent); }
+.bios-ref-chev { transition: transform 0.15s; }
+.bios-ref[open] .bios-ref-chev { transform: rotate(180deg); }
+.bios-ref[open] .bios-ref-head { margin-bottom: 8px; }
 .bios-ref-table {
   width: 100%; border-collapse: separate; border-spacing: 0;
   background: var(--card-bg); border: 2px solid #00000033; border-radius: 9px; overflow: hidden;
