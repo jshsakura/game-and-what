@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FolderPlus, Upload, Download, Trash2 } from "lucide-react";
+import { FolderPlus, Upload, Download, Trash2, Cpu } from "lucide-react";
 import { getExtra, uploadExtra, deleteExtra, extraDownloadUrl, formatBytes } from "../api.js";
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
 import { BIOS_CATALOG } from "../bios.js";
-
-// Every BIOS file's FULL SD path (folder + exact filename) from the shared
-// catalog — offered as one-click example chips. The filename matters as much as
-// the folder (the file must be named exactly this), so we show the whole path;
-// clicking sets the target folder to its parent dir.
-const BIOS_FILES = BIOS_CATALOG.flatMap((b) => b.files.map((f) => f.sdPath));
 
 // Arbitrary passthrough files → SD root verbatim. Pick a target folder (e.g.
 // bios/nes) and the files land at <folder>/<name> in the SD ZIP.
@@ -77,20 +71,6 @@ export default function ExtraTab({ onChanged }) {
           onChange={(e) => setFolder(e.target.value)}
         />
       </div>
-      <div className="extra-examples">
-        <span className="extra-examples-label">{t("BIOS files:")}</span>
-        {BIOS_FILES.map((p) => (
-          <button
-            type="button"
-            key={p}
-            className={`extra-chip ${trimmed === p ? "on" : ""}`}
-            onClick={() => setFolder(p)}
-            title={t("Fills the full path — drop one file and it's saved as {name}", { name: p.split("/").pop() })}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
       <div className="muted path-hint">
         {isFilePath
           ? t("Full file path → drop ONE file and it's saved as this exact name (a differently-named dump still works).")
@@ -138,6 +118,38 @@ export default function ExtraTab({ onChanged }) {
           ))}
         </div>
       )}
+
+      {/* Required-BIOS path reference — read-only cheat sheet for the input above. */}
+      <div className="bios-ref">
+        <div className="bios-ref-head">
+          <Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("Required BIOS file paths (reference)")}
+        </div>
+        <table className="bios-ref-table">
+          <thead>
+            <tr>
+              <th>{t("System")}</th>
+              <th>{t("SD path")}</th>
+              <th>{t("Size")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BIOS_CATALOG.flatMap((b) =>
+              b.files.map((f, i) => (
+                <tr key={f.sdPath}>
+                  {i === 0 && (
+                    <td className="bios-ref-sys" rowSpan={b.files.length}>
+                      {t(b.label)}
+                      {b.tag && <span className="bios-ref-tag">{t(b.tag)}</span>}
+                    </td>
+                  )}
+                  <td className="bios-ref-path">/{f.sdPath}</td>
+                  <td className="bios-ref-size">{f.size}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1530,22 +1530,43 @@ body::before {
 }
 .path-input::placeholder { color: var(--card-dim); }
 
-/* Quick-pick BIOS folder chips under the Extra target-folder input */
-.extra-examples {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+/* Required-BIOS path reference table at the bottom of the Extra tab */
+.bios-ref { margin-top: 6px; }
+.bios-ref-head {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--card-ink);
 }
-.extra-examples-label {
-  font-family: var(--body-font); font-size: 12px; color: var(--card-dim); margin-right: 2px;
+.bios-ref-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: var(--card-bg); border: 2px solid #00000033; border-radius: 9px; overflow: hidden;
 }
-.extra-chip {
-  cursor: pointer; padding: 4px 9px; border-radius: 999px;
-  background: var(--card-bg); border: 1.5px solid #00000044; color: var(--card-ink);
-  font-family: monospace; font-size: 12px; line-height: 1.4;
-  transition: filter 0.1s, border-color 0.1s, transform 0.05s;
+.bios-ref-table th, .bios-ref-table td {
+  padding: 7px 12px; text-align: left; vertical-align: middle;
+  border-bottom: 1px solid #00000022;
 }
-.extra-chip:hover { filter: brightness(1.08); border-color: var(--accent); }
-.extra-chip:active { transform: translateY(1px); }
-.extra-chip.on { background: var(--accent); color: #fff; border-color: #00000055; }
+.bios-ref-table tr:last-child td { border-bottom: none; }
+.bios-ref-table th {
+  font-family: var(--body-font); font-size: 11px; font-weight: 700; color: var(--card-dim);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  background: #00000018; border-bottom: 2px solid #00000033;
+}
+.bios-ref-table th:last-child { text-align: right; }
+.bios-ref-sys {
+  font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--card-ink);
+  border-right: 1px solid #00000022; white-space: nowrap;
+}
+.bios-ref-tag {
+  margin-left: 7px; padding: 2px 8px; border-radius: 999px; vertical-align: 1px;
+  background: var(--accent-2); color: var(--accent-ink);
+  font-family: var(--pixel); font-size: 7px; line-height: 1.5; white-space: nowrap;
+}
+.bios-ref-path {
+  font-family: monospace; font-size: 13px; color: var(--card-ink);
+  word-break: break-all; user-select: all;
+}
+.bios-ref-size {
+  font-family: var(--body-font); font-size: 12px; color: var(--card-dim); white-space: nowrap; text-align: right;
+}
 
 /* DATA list (scratch/reference files) */
 .data-list { display: flex; flex-direction: column; gap: 6px; }
