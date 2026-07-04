@@ -55,7 +55,11 @@ const CORE_MAP = {
   // chargen) — see BIOS below. .d64/.t64 load via the normal single-file path.
   c64: "vice_x64sc",
   col: "gearcoleco",
-  gw: "gw",
+  // Game & Watch is DEVICE-ONLY: the real firmware plays LCD-Game-Shrinker .gw
+  // files (its own gw_system), which no browser core can run. The gw-libretro
+  // web core only reads a different format (.mgw), so browser preview was
+  // dropped — the SD library ships .gw for the hardware. No CORE_MAP entry →
+  // canPlay("gw") is false → no in-browser play button.
   tama: "tamalibretro",
   pico8: "retro8",
   // Watara Supervision — potator core compiled from source for emscripten (MODULARIZE,
@@ -120,7 +124,7 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["gw", "pico8", "pcecd", "videopac", "c64", "zxs"]);
+const EXPERIMENTAL = new Set(["pico8", "pcecd", "videopac", "c64", "zxs"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -179,7 +183,6 @@ const KEY_HINTS = {
   // the real keys (fuse maps the RetroPad to keyboard for menu/typing too).
   zxs: [DPAD, { k: "Z", b: "Fire" }, { k: "Enter", b: "ENTER" }, { k: "Space", b: "Space" }],
   col:   [DPAD, { k: "Z", b: "Left fire" }, { k: "X", b: "Right fire" }, { k: "1~9 0 * #", b: "Keypad" }],
-  gw:    [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "Q", b: "GAME A" }, { k: "W", b: "GAME B" }, { k: "E", b: "TIME" }],
   tama:  [{ k: "Z", b: "A" }, { k: "X", b: "B" }, { k: "A", b: "C" }],
   pico8: [DPAD, { k: "Z", b: "O (○)" }, { k: "X", b: "X (✕)" }],
   wsv:   [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
@@ -408,30 +411,6 @@ export function EmulatorOverlay({ rom, onClose }) {
   const hold = (btn) => sendPad(btn, true);
   const release = (btn) => sendPad(btn, false);
 
-  // Game & Watch console buttons (GAME A / GAME B / TIME). The bundled .mgw
-  // ROMs (MADrigal romset) bind these to the pad's shoulder buttons, so a tap
-  // switches game mode directly — GAME A = L1, GAME B = R1, TIME = L2. The core
-  // reads input once per rendered frame, so we hold the press across a handful
-  // of animation frames (not a wall-clock timer) — that way it's always sampled
-  // even when the browser throttles the frame rate.
-  const GW_CONSOLE = { a: "l", b: "r", time: "l2" };
-  const GW_HOLD_FRAMES = 8;
-  const gwBusyRef = useRef(false);
-  const gwConsole = async (which) => {
-    const btn = GW_CONSOLE[which];
-    if (!btn || gwBusyRef.current) return;
-    gwBusyRef.current = true;
-    const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
-    try {
-      sendPad(btn, true);
-      for (let i = 0; i < GW_HOLD_FRAMES; i++) await frame();
-      sendPad(btn, false);
-      await frame();
-    } finally {
-      gwBusyRef.current = false;
-    }
-  };
-
   const title = rom.korean_name || rom.stored_name;
 
   // Copy the on-device filename to the clipboard — handy for matching the cart on
@@ -513,10 +492,7 @@ export function EmulatorOverlay({ rom, onClose }) {
           )}
         </div>
 
-        {status === "running" && (
-          <VirtualPad onDown={hold} onUp={release}
-            systemKey={rom.system_key} onConsole={gwConsole} />
-        )}
+        {status === "running" && <VirtualPad onDown={hold} onUp={release} />}
 
         {/* Control legend — detached panel pinned just below the device shell.
             Hidden for JS-engine (Javatari) systems: their keyboard map differs and
@@ -569,12 +545,10 @@ function PadButton({ btn, className, label, glyph, onDown, onUp }) {
 
 // Game & Watch control deck, mirroring the real Zelda/Mario layout: D-pad on the
 // left, and a right cluster with the grouped SELECT/START frame stacked ABOVE the
-// red A/B buttons. For gw ROMs we add a center column with the real console's
-// GAME A / GAME B / TIME buttons (see gwConsole for how they reach the core).
-function VirtualPad({ onDown, onUp, systemKey, onConsole }) {
+// red A/B buttons.
+function VirtualPad({ onDown, onUp }) {
   const t = useT();
   const p = { onDown, onUp };
-  const isGw = systemKey === "gw";
   return (
     <div className="emu-pad">
       <div className="pad-dpad">
@@ -586,19 +560,6 @@ function VirtualPad({ onDown, onUp, systemKey, onConsole }) {
         <PadButton btn="right" glyph="▶︎" label={t("Right")} className="dp dp-right" {...p} />
         <PadButton btn="down" glyph="▼︎" label={t("Down")} className="dp dp-down" {...p} />
       </div>
-      {isGw && (
-        <div className="pad-console" aria-label={t("Console buttons")}>
-          <button type="button" className="console-btn"
-            onContextMenu={(e) => e.preventDefault()}
-            onClick={() => onConsole?.("a")} title={t("GAME A")}>GAME A</button>
-          <button type="button" className="console-btn"
-            onContextMenu={(e) => e.preventDefault()}
-            onClick={() => onConsole?.("b")} title={t("GAME B")}>GAME B</button>
-          <button type="button" className="console-btn"
-            onContextMenu={(e) => e.preventDefault()}
-            onClick={() => onConsole?.("time")} title={t("TIME")}>TIME</button>
-        </div>
-      )}
       <div className="pad-right">
         <div className="pad-ss">
           <div className="pad-ss-labels"><em>SELECT</em><em>START</em></div>
