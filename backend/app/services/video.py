@@ -5,7 +5,8 @@ Hard hardware fact: the chip has NO H.264/HEVC decoder, only a hardware JPEG
 decoder. So the ONLY playable video is MJPEG inside an .avi container. This
 is the EXACT command build_command() emits (default 'fit' mode shown):
 
-  ffmpeg -hide_banner -y -i input -c:v mjpeg -q:v 17 \
+  ffmpeg -hide_banner -y -i input -c:v mjpeg \
+    -b:v 1600k -maxrate 1600k -bufsize 320k -qmin 17 -qmax 31 \
     -vf scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20 \
     -c:a libmp3lame -ac 1 -b:a 96k -ar 44100 output.avi
 
@@ -49,16 +50,23 @@ from pathlib import Path
 # Device-verified encode parameters (bench-tested on hardware).
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
-VIDEO_QSCALE = 17         # -q:v 17. MJPEG is intra-only, so per-frame bytes track
-                          # SCENE COMPLEXITY: at q10 a calm verse is ~110 KB/s but a
-                          # busy chorus (stage lights, fast motion) balloons to 150-170
-                          # KB/s — well over the SD read budget, so the player drops/
-                          # judders mid-clip ("fine until 1:30, then stutter"). NOTE a
-                          # bitrate cap (-b:v) does NOT help: intra MJPEG has no inter-
-                          # frame buffer, so ffmpeg only hits the AVERAGE and leaves the
-                          # peaks. Only a higher CONSTANT qscale flattens the peaks. q17
-                          # keeps the whole clip under ~100 KB/s peak (bench: YENA clip
-                          # peak 163->98 KB/s, 0 seconds over 110) at a modest quality cost.
+VIDEO_QSCALE = 17         # Quality anchor (used as -qmin). MJPEG is intra-only, so
+                          # per-frame bytes track SCENE COMPLEXITY: a calm verse is
+                          # small but a busy chorus balloons — over the SD read budget,
+                          # so the player drops/judders mid-clip. Two layers flatten it:
+                          #   1. -qmin VIDEO_QSCALE pins easy/medium scenes to exactly
+                          #      the old constant-q17 output (measured byte-identical);
+                          #   2. VBV rate control (-maxrate/-bufsize below) raises q
+                          #      only on the heaviest scenes, cutting their read load
+                          #      ~26% (measured on a full-noise worst case) and giving
+                          #      a hard per-frame byte ceiling well under the device's
+                          #      64 KB frame-slot limit.
+                          # (An earlier note here said -b:v "does not help" — that was
+                          # plain -b:v without qmin/bufsize; the VBV form does bound
+                          # the peaks, verified per-frame with ffprobe.)
+VIDEO_BITRATE = "1600k"   # VBV target/ceiling: ~200 KB/s. Sits above q17's typical
+                          # ~100 KB/s, so RC only intervenes in the top complexity band.
+VIDEO_VBV_BUF = "320k"    # ~40 KB VBV window -> worst frames bounded near it.
 FRAME_RATE = 20           # fps=20 — fewer frames/s = fewer SD reads. per-read latency
                           # is the bottleneck, so fps↓ (read count) + q↑ (sectors/read)
                           # both cut SD load directly. 20fps (down from 24) trims ~17%
@@ -111,7 +119,9 @@ def build_command(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_M
     return [
         "ffmpeg", "-hide_banner", "-y",
         "-i", str(input_path),
-        "-c:v", "mjpeg", "-q:v", str(VIDEO_QSCALE),
+        "-c:v", "mjpeg",
+        "-b:v", VIDEO_BITRATE, "-maxrate", VIDEO_BITRATE, "-bufsize", VIDEO_VBV_BUF,
+        "-qmin", str(VIDEO_QSCALE), "-qmax", "31",
         "-vf", _VIDEO_FILTERS.get(mode, _VIDEO_FILTERS[DEFAULT_FIT_MODE]),
         "-c:a", "libmp3lame", "-ac", "1", "-b:a", AUDIO_BITRATE, "-ar", str(AUDIO_RATE),
         str(output_path),
