@@ -392,7 +392,7 @@ export function Badge({ status }) {
 }
 
 // Centered popup over a dimmed backdrop.
-export function Modal({ title, onClose, children }) {
+export function Modal({ title, onClose, children, wide = false }) {
   // Close ONLY on the X button or Escape — never on an outside/backdrop click
   // (avoids losing work by mis-clicking).
   useEffect(() => {
@@ -402,7 +402,7 @@ export function Modal({ title, onClose, children }) {
   }, [onClose]);
   return (
     <div className="modal-backdrop">
-      <div className="modal">
+      <div className={`modal ${wide ? "wide" : ""}`}>
         <div className="modal-head">
           <span className="modal-title">{title}</span>
           <button className="icon-btn" onClick={onClose} aria-label="close">
@@ -1166,7 +1166,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
       </div>
 
       {open && (
-        <Modal title={title} onClose={() => { closeCropper(); setOpen(false); }}>
+        <Modal wide title={title} onClose={() => { closeCropper(); setOpen(false); }}>
           {cropper ? (
             <CoverCropper src={cropper.src} aspect={coverAspect(rom.system_key)} busy={busy} onCancel={closeCropper} onDone={applyCrop} />
           ) : (
@@ -1486,7 +1486,7 @@ export function VideoCard({ video, onChanged }) {
         </div>
       </div>
       {open && (
-        <Modal title={title} onClose={() => setOpen(false)}>
+        <Modal wide title={title} onClose={() => setOpen(false)}>
           <video className="media-detail-player" controls autoPlay poster={thumb} src={prev} />
           <dl className="media-detail-info">
             <dt>{t("Original")}</dt><dd>{video.original_name || "—"}</dd>

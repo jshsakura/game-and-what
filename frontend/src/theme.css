@@ -836,6 +836,8 @@ body::before {
   max-height: calc(100dvh - 32px);
   display: flex; flex-direction: column;
 }
+/* Detail/info popups get more room on desktop; 92vw still caps mobile. */
+.modal.wide { width: 640px; }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--gold);
