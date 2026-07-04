@@ -92,8 +92,11 @@ SYSTEMS: tuple[System, ...] = (
     System("gamecom", "Tiger Game.com", "gamecom", ("bin", "tgc")),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
-    # Firmware registers ext "gw"; many G&W rom packs ship as ".mgw" — accept both.
-    System("gw", "Game & Watch", "gw", ("gw", "mgw")),
+    # Device-only: the firmware plays LCD-Game-Shrinker ".gw" files. The MADrigal
+    # ".mgw" format (web gw-libretro only) was dropped — it can't run on hardware
+    # and can't be converted to .gw (it carries a behavioural script, not the SM510
+    # CPU dump that .gw needs). See the gw-format-device-only note.
+    System("gw", "Game & Watch", "gw", ("gw",)),
     # "bin" = homebrew app payload; "dat" = the assets file some ports need at
     # /roms/homebrew/ (SMW → smw_assets.dat, Zelda3 → zelda3_assets.dat), uploaded
     # as its own item + cover. Both ride along when opted into the SD ZIP.
