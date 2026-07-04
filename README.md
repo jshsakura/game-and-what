@@ -37,7 +37,7 @@ with sample data (no backend; uploads/edits are disabled).
   per-ROM **"Exclude from SD"** toggle drops a ROM from the SD download while
   keeping it in the library — slim the device menu without deleting anything.
 - **18 systems:** NES, Game Boy / GB Color, Game Gear, Master System, Genesis,
-  SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800, Amstrad CPC, Watara,
+  SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800, Amstrad CPC, Watara Supervision,
   Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
 - **11-language UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) with
   per-locale CJK/Cyrillic fonts lazy-loaded on demand.

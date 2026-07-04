@@ -61,7 +61,7 @@ SYSTEMS: tuple[System, ...] = (
     System("a2600", "Atari 2600", "a2600", ("a26", "bin")),
     System("a7800", "Atari 7800", "a7800", ("a78", "bin")),
     System("amstrad", "Amstrad CPC", "amstrad", ("dsk", "cdk")),
-    System("wsv", "Watara", "wsv", ("wsv", "sv", "bin")),
+    System("wsv", "Watara Supervision", "wsv", ("wsv", "sv", "bin")),
     # Neo Geo Pocket (mono + Color share one core). NOT yet in rg_emulators.c —
     # added for library collection (original No-Intro names, no Korean conversion);
     # all NGP/NGPC exts go in the single /roms/ngp/ folder. On-device play needs a
