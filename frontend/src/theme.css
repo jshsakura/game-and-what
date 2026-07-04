@@ -1269,7 +1269,8 @@ body::before {
 /* System cards: icon centered, name bottom, /dirname top-right, count top-left,
    per-system accent color (--sys). */
 .lib-chips {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 9px;
+  /* min 108px so an 11-char pixel-font name ("Supervision") fits one line */
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 9px;
   /* breathing room + a subtle divider so the system selector reads separately
      from the games below (not crammed together). */
   margin-bottom: 6px; padding-bottom: 18px;
