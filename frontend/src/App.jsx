@@ -12,7 +12,7 @@ import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
 import { useExperimentalMode } from "./config.jsx";
 import { LOCALES } from "./i18n.locales.js";
-import { DEMO } from "./demo.js";
+import { DEMO, DEMO_LAB } from "./demo.js";
 
 const REPO_URL = "https://github.com/jshsakura/game-and-what";
 
@@ -28,6 +28,10 @@ function DemoBanner() {
       <span className="demo-banner-links">
         <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub ★</a>
         <a href={`${REPO_URL}#quick-start-docker`} target="_blank" rel="noreferrer">🐳 Docker</a>
+        {/* Preview both deploy flavours: official (default) ↔ experimental lab. */}
+        {DEMO_LAB
+          ? <a href={window.location.pathname}>🧪 {t("Official mode preview")}</a>
+          : <a href={`${window.location.pathname}?lab`}>🧪 {t("Experimental mode preview")}</a>}
       </span>
       <span className="demo-banner-tip">
         💡 {t("Self-host")}:&nbsp;

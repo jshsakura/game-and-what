@@ -228,6 +228,8 @@ export default {
   "Korean (English) names and covers are added automatically.": "한글명(영문) 이름과 커버가 자동으로 붙습니다.",
   "Experimental": "실험적",
   "Experimental — fork firmware only": "실험적 — 포크 펌웨어 전용",
+  "Experimental mode preview": "실험 모드 미리보기",
+  "Official mode preview": "공식 모드 미리보기",
   "If needed, rename, search/upload covers, and adjust the crop position from the card details.": "필요하면 카드 상세에서 이름 변경·커버 검색/업로드·위치(크롭) 조정을 합니다.",
   "Download via 'SD ZIP' at the top right (or 'Current Platform ZIP' in the library). The estimated size is shown on the label.": "우측 상단 'SD ZIP'(또는 라이브러리의 '현재 플랫폼 ZIP')으로 받습니다. 예상 용량이 라벨로 표시됩니다.",
   "Just extract the downloaded ZIP to the root of your SD card and you're done — the /roms, /covers, /cores structure is already set up.": "받은 ZIP을 SD카드 루트에 그대로 압축 해제하면 끝 — /roms, /covers, /cores 구조가 맞춰져 있습니다.",
