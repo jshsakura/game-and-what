@@ -50,7 +50,8 @@ export default function ClockBgTab() {
         <Clock size={13} aria-hidden /> {t("Turn any image or video into a 320×240 clock background. A still image becomes a static background; a video/GIF loops on the device.")}
       </div>
       <div className="vtab-safe">
-        <Info size={13} strokeWidth={2.5} aria-hidden /> {t("The screen is 320×240 — the output is pinned to that size (a larger source only wastes space). Download bg.gif, then copy it to")} <b>/clock/bg.gif</b> {t("on the SD card and pick “GIF” as the clock background.")}
+        <Info size={13} strokeWidth={2.5} aria-hidden />
+        <span>{t("The screen is 320×240 — the output is pinned to that size (a larger source only wastes space). Download bg.gif, then copy it to")} <b>/clock/bg.gif</b> {t("on the SD card and pick “GIF” as the clock background.")}</span>
       </div>
 
       <FitSelect mode={mode} setMode={setMode} t={t} />
