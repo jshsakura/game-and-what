@@ -431,4 +431,12 @@ export default {
   "Restored": "복구됨",
   "Expired": "복구 만료",
   "Restore failed": "복구 실패",
+  "Clock": "시계",
+  "Turn any image or video into a 320×240 clock background. A still image becomes a static background; a video/GIF loops on the device.": "아무 이미지나 영상을 320×240 시계 배경으로 변환합니다. 정지 이미지는 고정 배경이 되고, 영상/GIF는 기기에서 반복 재생됩니다.",
+  "The screen is 320×240 — the output is pinned to that size (a larger source only wastes space). Download bg.gif, then copy it to": "화면은 320×240입니다 — 출력은 그 크기로 고정됩니다(더 큰 원본은 용량만 낭비). bg.gif를 내려받아 SD 카드의",
+  "on the SD card and pick “GIF” as the clock background.": "위치에 복사한 뒤, 시계 배경으로 “GIF”를 선택하세요.",
+  "Drag an image or video here or click": "이미지나 영상을 여기로 끌어놓거나 클릭하세요",
+  "bg.gif downloaded": "bg.gif 내려받음",
+  "Downloaded bg.gif — copy it to /clock/ on the SD card": "bg.gif를 내려받았습니다 — SD 카드의 /clock/ 폴더에 복사하세요",
+  "Convert failed": "변환 실패",
 };

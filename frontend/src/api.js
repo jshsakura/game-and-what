@@ -196,6 +196,40 @@ export async function uploadMusic(file, onProgress) {
   return xhrUpload(`/api/sessions/${SESSION_ID}/music`, form, onProgress);
 }
 
+// POST a FormData, resolve the response BODY as a Blob (for one-shot file
+// downloads like the clock bg.gif — nothing is stored server-side).
+function xhrUploadBlob(url, form, onProgress) {
+  if (DEMO) return Promise.reject(new Error("Demo mode — install via Docker to enable uploads."));
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.responseType = "blob";
+    if (onProgress) {
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) onProgress(e.loaded, e.total);
+      };
+    }
+    xhr.onload = async () => {
+      if (xhr.status >= 200 && xhr.status < 300) { resolve(xhr.response); return; }
+      // error bodies are JSON even with responseType=blob — read the detail back
+      let detail = `Convert failed (${xhr.status})`;
+      try { detail = JSON.parse(await xhr.response.text()).detail || detail; } catch (_) { /* keep */ }
+      reject(new Error(detail));
+    };
+    xhr.onerror = () => reject(new Error("Convert failed due to a network error"));
+    xhr.send(form);
+  });
+}
+
+// Image/video → a 320×240 clock background gif. Resolves the gif Blob to download
+// (stateless: the user drops it at /clock/bg.gif on the SD card).
+export async function uploadClockBackground(file, onProgress, { mode = "fit" } = {}) {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("mode", mode);  // fit (letterbox) | fill (crop) | stretch (distort)
+  return xhrUploadBlob("/api/clock/background", form, onProgress);
+}
+
 
 export async function uploadCover(romId, file, crop) {
   const res = await withSession((sid) => {

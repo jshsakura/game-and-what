@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db
-from .routers import covers, data, downloads, events, extra, firmware, gamelist, igdb, jobs, lang, libretro, manage, music, package, roms, scores, sessions, sgdb, tgdb, uploads, videos
+from .routers import clock, covers, data, downloads, events, extra, firmware, gamelist, igdb, jobs, lang, libretro, manage, music, package, roms, scores, sessions, sgdb, tgdb, uploads, videos
 from .services.video import ffmpeg_available
 from .systems import SYSTEMS
 
@@ -39,6 +39,7 @@ async def _cross_origin_isolation(request, call_next):
 app.include_router(sessions.router)
 app.include_router(roms.router)
 app.include_router(videos.router)
+app.include_router(clock.router)
 app.include_router(jobs.router)
 app.include_router(package.router)
 app.include_router(scores.router)

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Clapperboard, Music } from "lucide-react";
+import { Clapperboard, Music, Clock } from "lucide-react";
 import VideoTab from "./VideoTab.jsx";
 import MusicTab from "./MusicTab.jsx";
+import ClockBgTab from "./ClockBgTab.jsx";
 import { VideoCard, MusicList } from "../components.jsx";
 import { getLibrary } from "../api.js";
 import { useT } from "../i18n.jsx";
@@ -35,9 +36,12 @@ export default function MediaTab({ onChanged }) {
           <Music size={14} strokeWidth={2.5} aria-hidden /> {t("Music")}
           {media.music.length > 0 && <span className="media-count">{media.music.length}</span>}
         </button>
+        <button className={`media-subtab ${sub === "clock" ? "on" : ""}`} onClick={() => setSub("clock")}>
+          <Clock size={14} strokeWidth={2.5} aria-hidden /> {t("Clock")}
+        </button>
       </div>
 
-      {sub === "video" ? (
+      {sub === "video" && (
         <section className="media-section">
           <VideoTab onChanged={refresh} />
           {media.videos.length > 0 && (
@@ -46,10 +50,16 @@ export default function MediaTab({ onChanged }) {
             </div>
           )}
         </section>
-      ) : (
+      )}
+      {sub === "music" && (
         <section className="media-section">
           <MusicTab onChanged={refresh} />
           {media.music.length > 0 && <MusicList tracks={media.music} onChanged={refresh} />}
+        </section>
+      )}
+      {sub === "clock" && (
+        <section className="media-section">
+          <ClockBgTab />
         </section>
       )}
     </div>
