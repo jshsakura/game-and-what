@@ -1075,6 +1075,15 @@ body::before {
 .cropper-actions { display: flex; gap: 8px; }
 .cropper-actions .btn { flex: 1; justify-content: center; }
 
+/* Clock tab: section headers for the two tools (bg.gif / .565 album) */
+.clock-section-head {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--body-font); font-size: 13px; font-weight: 700;
+  color: var(--lcd-ink); padding-bottom: 4px; margin-top: 6px;
+  border-bottom: 2px solid #00000033;
+}
+.clock-section-head svg { flex: 0 0 auto; }
+
 /* Clock (album) batch converter: thumbnail strip + stable download row */
 .clock-thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
 .clock-thumb { position: relative; flex: 0 0 auto; }

@@ -21,16 +21,34 @@ from ..services import storage, video
 router = APIRouter(prefix="/api", tags=["clock"])
 
 
+def _parse_crop(raw: str | None) -> video.ClockCrop | None:
+    """Validate the cropper's fraction rectangle ("x,y,w,h", fractions of the
+    source frame). Malformed or outside the frame → None (falls back to fit)."""
+    if not raw:
+        return None
+    try:
+        x, y, w, h = (float(v) for v in raw.split(","))
+    except ValueError:
+        return None
+    eps = 0.001   # cropper rounding slack
+    if w <= 0 or h <= 0 or x < -eps or y < -eps or x + w > 1 + eps or y + h > 1 + eps:
+        return None
+    x, y = max(x, 0.0), max(y, 0.0)
+    return (x, y, min(w, 1.0 - x), min(h, 1.0 - y))
+
+
 @router.post("/clock/background")
 async def clock_background(
     file: UploadFile = File(...),
-    mode: str = Form(video.DEFAULT_FIT_MODE),  # fit (letterbox) | fill (crop) | stretch
+    mode: str = Form(video.DEFAULT_FIT_MODE),  # fit | fill | stretch | custom (user crop)
+    crop: str = Form(""),                      # custom mode: "x,y,w,h" source fractions
 ) -> FileResponse:
     """Convert an uploaded image or video into a clock-ready bg.gif and return it
     as a download. A still image becomes a 1-frame static background; a video/GIF
     is length-capped and loops on-device. The temp workspace is removed once the
     response has been sent."""
-    if mode not in video.FIT_MODES:
+    crop_box = _parse_crop(crop)
+    if mode not in video.CLOCK_FIT_MODES or (mode == "custom" and crop_box is None):
         mode = video.DEFAULT_FIT_MODE
     if not video.ffmpeg_available():
         raise HTTPException(status_code=503, detail="ffmpeg is not installed on the server")
@@ -47,7 +65,7 @@ async def clock_background(
     storage.write_bytes(src, data)
 
     try:
-        await video.encode_to_clock_gif(src, out, mode=mode)
+        await video.encode_to_clock_gif(src, out, mode=mode, crop=crop_box)
     except video.VideoEncodeError as exc:
         shutil.rmtree(work, ignore_errors=True)
         raise HTTPException(status_code=422, detail=str(exc))

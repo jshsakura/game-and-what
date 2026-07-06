@@ -223,10 +223,11 @@ function xhrUploadBlob(url, form, onProgress) {
 
 // Image/video → a 320×240 clock background gif. Resolves the gif Blob to download
 // (stateless: the user drops it at /clock/bg.gif on the SD card).
-export async function uploadClockBackground(file, onProgress, { mode = "fit" } = {}) {
+export async function uploadClockBackground(file, onProgress, { mode = "fit", crop = "" } = {}) {
   const form = new FormData();
   form.append("file", file);
-  form.append("mode", mode);  // fit (letterbox) | fill (crop) | stretch (distort)
+  form.append("mode", mode);  // fit | fill | stretch | custom (user crop)
+  if (crop) form.append("crop", crop);  // custom: "x,y,w,h" source fractions
   return xhrUploadBlob("/api/clock/background", form, onProgress);
 }
 

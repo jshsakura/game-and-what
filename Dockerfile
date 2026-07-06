@@ -16,9 +16,9 @@ RUN npm run build
 # ── Stage 2: Python backend + built frontend ──────────────────────────────────
 FROM python:3.12-slim
 
-# ffmpeg for video encoding.
+# ffmpeg for video encoding; gifsicle for the clock bg.gif lossy shrink pass.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get install -y --no-install-recommends ffmpeg gifsicle && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

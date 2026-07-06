@@ -280,25 +280,49 @@ async def make_web_preview(input_path: Path, output_path: Path) -> Path:
 #   • fps is low — the whole face repaints per GIF frame (the app labels this
 #     the "high" battery level), and a background doesn't need motion; duration
 #     is capped since it loops on-device.
-CLOCK_GIF_FPS = 10
-CLOCK_GIF_MAX_COLORS = 128
-CLOCK_GIF_MAX_SECONDS = 15
+#   • File size is kept under a byte budget with a quality LADDER: each rung
+#     re-encodes with lower fps/colors and a heavier gifsicle lossy pass, and we
+#     stop at the first rung that fits. Quality knobs drop BEFORE motion knobs,
+#     so the source's loop/movement survives even on pathological inputs.
+CLOCK_GIF_MAX_SECONDS = 15        # non-loop sources (videos) get cut here
+CLOCK_GIF_LOOP_MAX_SECONDS = 30   # a GIF source is a loop — cutting it breaks the
+                                  # motion, so whole loops are kept up to this
+CLOCK_GIF_TARGET_BYTES = 2_000_000  # device-comfortable budget: small enough for
+                                    # smooth SD streaming, roomy enough for quality
+# Ladder rungs, best quality first. Worst-case measured (every pixel changing,
+# 8s 25fps source): 2.8MB / 1.8MB / 1.2MB — real footage lands far lower.
+CLOCK_GIF_LADDER = (
+    {"fps": 12, "colors": 128, "lossy": 35},
+    {"fps": 10, "colors": 96, "lossy": 80},
+    {"fps": 8, "colors": 64, "lossy": 120},
+)
 CLOCK_GIF_SUFFIX = ".gif"
+CLOCK_FIT_MODES = FIT_MODES + ("custom",)   # custom = user crop rectangle
+
+# User-adjusted crop rectangle as FRACTIONS of the source frame (resolution-
+# independent, straight from the web cropper): x/y = top-left, w/h = size.
+ClockCrop = tuple[float, float, float, float]
 
 
-def _clock_scale(mode: str, animated: bool = True) -> str:
-    """320×240 fit/fill/stretch (mirrors _VIDEO_FILTERS). `animated` adds the
-    fps resample; a still image must NOT (fps on a timeline-less single frame
-    yields zero frames), it just flows through as one frame."""
-    m = mode if mode in _VIDEO_FILTERS else DEFAULT_FIT_MODE
-    fps = f",fps={CLOCK_GIF_FPS}" if animated else ""
+def _clock_scale(mode: str, fps: int, animated: bool = True,
+                 crop: ClockCrop | None = None) -> str:
+    """320×240 fit/fill/stretch/custom (mirrors _VIDEO_FILTERS). `animated` adds
+    the fps resample; a still image must NOT (fps on a timeline-less single frame
+    yields zero frames), it just flows through as one frame. `custom` cuts the
+    user's crop rectangle first, then scales it to the full screen."""
+    m = mode if mode in CLOCK_FIT_MODES else DEFAULT_FIT_MODE
+    fps_f = f",fps={fps}" if animated else ""
+    if m == "custom" and crop:
+        cx, cy, cw, ch = crop
+        return (f"crop=iw*{cw:.6f}:ih*{ch:.6f}:iw*{cx:.6f}:ih*{cy:.6f}"
+                f",scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:flags=lanczos{fps_f}")
     if m == "fill":
-        return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=increase"
-                f",crop={SCREEN_WIDTH}:{SCREEN_HEIGHT}{fps}")
+        return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=increase:flags=lanczos"
+                f",crop={SCREEN_WIDTH}:{SCREEN_HEIGHT}{fps_f}")
     if m == "stretch":
-        return f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}{fps}"
-    return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease"
-            f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black{fps}")
+        return f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:flags=lanczos{fps_f}"
+    return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease:flags=lanczos"
+            f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black{fps_f}")
 
 
 def _probe_seconds(input_path: Path) -> float:
@@ -318,15 +342,17 @@ def _probe_seconds(input_path: Path) -> float:
 
 def build_clock_gif_command(input_path: Path, output_path: Path,
                             mode: str = DEFAULT_FIT_MODE,
-                            max_colors: int = CLOCK_GIF_MAX_COLORS,
+                            fps: int = CLOCK_GIF_LADDER[0]["fps"],
+                            max_colors: int = CLOCK_GIF_LADDER[0]["colors"],
                             seconds: int = CLOCK_GIF_MAX_SECONDS,
-                            still: bool = False) -> list[str]:
+                            still: bool = False,
+                            crop: ClockCrop | None = None) -> list[str]:
     """ffmpeg argv for a device-optimized 320×240 clock-background GIF: one
     filter graph does the screen-fit scale + a per-clip optimized palette
     (palettegen) applied with ordered dithering (paletteuse). A `still` input
     yields a single-frame GIF (a static background — the app just loops it);
-    a video is capped at `seconds`."""
-    scale = _clock_scale(mode, animated=not still)
+    an animated one is capped at `seconds`."""
+    scale = _clock_scale(mode, fps, animated=not still, crop=crop)
     graph = (
         f"{scale},split[a][b]"
         f";[a]palettegen=max_colors={max_colors}:stats_mode=diff[p]"
@@ -334,25 +360,66 @@ def build_clock_gif_command(input_path: Path, output_path: Path,
     )
     cmd = ["ffmpeg", "-hide_banner", "-y"]
     if not still:
-        cmd += ["-t", str(seconds)]          # cap video length (loops on device)
+        cmd += ["-t", str(seconds)]          # cap length (loops on device)
     cmd += ["-i", str(input_path), "-filter_complex", graph,
             "-loop", "0", str(output_path)]
     return cmd
 
 
+def gifsicle_available() -> bool:
+    return shutil.which("gifsicle") is not None
+
+
+async def _gifsicle_optimize(path: Path, lossy: int) -> None:
+    """In-place gifsicle -O3 lossy pass — 15–30%+ smaller on top of ffmpeg's
+    output. Quietly skipped if gifsicle isn't installed or fails (the ffmpeg
+    GIF is already valid, just bigger)."""
+    if not gifsicle_available():
+        return
+    tmp = path.with_suffix(".opt.gif")
+    proc = await asyncio.create_subprocess_exec(
+        "gifsicle", "-O3", f"--lossy={lossy}", "-o", str(tmp), str(path),
+        stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL,
+    )
+    await proc.communicate()
+    if proc.returncode == 0 and tmp.exists() and 0 < tmp.stat().st_size < path.stat().st_size:
+        tmp.replace(path)
+    else:
+        tmp.unlink(missing_ok=True)
+
+
 async def encode_to_clock_gif(input_path: Path, output_path: Path,
-                              mode: str = DEFAULT_FIT_MODE) -> Path:
+                              mode: str = DEFAULT_FIT_MODE,
+                              crop: ClockCrop | None = None) -> Path:
     """Encode any image/video into a clock-ready /clock/bg.gif (320×240, palette-
-    optimized, ordered-dithered). `mode` = fit / fill / stretch, same as video.
-    A still image becomes a 1-frame static background; a video/GIF is capped and
-    loops on-device. Raises VideoEncodeError on failure."""
+    optimized, ordered-dithered). `mode` = fit / fill / stretch / custom (with
+    `crop` fractions). A still image becomes a 1-frame static background; an
+    animated source loops on-device — a GIF source keeps its WHOLE loop (up to
+    CLOCK_GIF_LOOP_MAX_SECONDS) so the original motion survives.
+
+    Walks the quality ladder until the file fits CLOCK_GIF_TARGET_BYTES: every
+    input comes out device-playable, degrading quality (colors/fps/lossy) before
+    ever touching the motion. Raises VideoEncodeError on failure."""
     if not ffmpeg_available():
         raise VideoEncodeError("ffmpeg is not installed on the server")
     if not input_path.exists():
         raise VideoEncodeError(f"Input not found: {input_path}")
     still = _probe_seconds(input_path) <= 0.0
-    cmd = build_clock_gif_command(input_path, output_path, mode=mode, still=still)
-    return await _run_ffmpeg(cmd, output_path, "clock gif")
+    is_gif_loop = input_path.suffix.lower() == CLOCK_GIF_SUFFIX
+    seconds = CLOCK_GIF_LOOP_MAX_SECONDS if is_gif_loop else CLOCK_GIF_MAX_SECONDS
+
+    for rung in CLOCK_GIF_LADDER:
+        cmd = build_clock_gif_command(
+            input_path, output_path, mode=mode, fps=rung["fps"],
+            max_colors=rung["colors"], seconds=seconds, still=still, crop=crop,
+        )
+        await _run_ffmpeg(cmd, output_path, "clock gif")
+        await _gifsicle_optimize(output_path, rung["lossy"])
+        if still or output_path.stat().st_size <= CLOCK_GIF_TARGET_BYTES:
+            break   # fits (or single frame — the ladder won't shrink it further)
+    # If even the last rung is over budget (pathological input) it's still the
+    # most compressed encode — ship it rather than cutting the loop.
+    return output_path
 
 
 async def extract_mp3(input_path: Path, output_path: Path) -> Path:

@@ -12,8 +12,9 @@ from app.services import video
 
 
 def _client(monkeypatch, *, ffmpeg=True):
-    async def fake_encode(src, out, mode="fit"):
-        out.write_bytes(b"GIF89a-fake-" + mode.encode())
+    async def fake_encode(src, out, mode="fit", crop=None):
+        tag = mode if crop is None else f"{mode}:{','.join(f'{v:.2f}' for v in crop)}"
+        out.write_bytes(b"GIF89a-fake-" + tag.encode())
         return out
 
     monkeypatch.setattr(video, "ffmpeg_available", lambda: ffmpeg)
@@ -47,6 +48,40 @@ def test_bad_mode_falls_back_to_fit(monkeypatch):
     assert r.content == b"GIF89a-fake-fit"
 
 
+def test_custom_mode_threads_crop_through(monkeypatch):
+    c = _client(monkeypatch)
+    r = c.post(
+        "/api/clock/background",
+        files={"file": ("pic.png", b"x", "image/png")},
+        data={"mode": "custom", "crop": "0.25,0.10,0.50,0.40"},
+    )
+    assert r.status_code == 200
+    assert r.content == b"GIF89a-fake-custom:0.25,0.10,0.50,0.40"
+
+
+def test_custom_mode_without_crop_falls_back_to_fit(monkeypatch):
+    c = _client(monkeypatch)
+    r = c.post(
+        "/api/clock/background",
+        files={"file": ("pic.png", b"x", "image/png")},
+        data={"mode": "custom"},
+    )
+    assert r.status_code == 200
+    assert r.content == b"GIF89a-fake-fit"
+
+
+@pytest.mark.parametrize("raw", ["", "0.1,0.2,0.3", "a,b,c,d", "0.5,0.5,0.6,0.6", "0,0,0,1", "-0.2,0,0.5,0.5"])
+def test_parse_crop_rejects_bad_rects(raw):
+    assert clock._parse_crop(raw) is None
+
+
+def test_parse_crop_clamps_rounding_slack():
+    box = clock._parse_crop("-0.0005,0.0,1.0004,1.0")
+    assert box is not None
+    x, y, w, h = box
+    assert x >= 0 and y >= 0 and x + w <= 1.0 and y + h <= 1.0
+
+
 def test_empty_upload_rejected(monkeypatch):
     c = _client(monkeypatch)
     r = c.post("/api/clock/background", files={"file": ("empty.png", b"", "image/png")})
@@ -60,7 +95,7 @@ def test_ffmpeg_missing_returns_503(monkeypatch):
 
 
 def test_encode_failure_returns_422(monkeypatch):
-    async def boom(src, out, mode="fit"):
+    async def boom(src, out, mode="fit", crop=None):
         raise video.VideoEncodeError("ffmpeg exploded")
 
     monkeypatch.setattr(video, "ffmpeg_available", lambda: True)
@@ -72,3 +107,9 @@ def test_encode_failure_returns_422(monkeypatch):
     )
     assert r.status_code == 422
     assert "ffmpeg exploded" in r.json()["detail"]
+
+
+def test_custom_scale_filter_contains_crop():
+    graph = video._clock_scale("custom", fps=10, crop=(0.25, 0.1, 0.5, 0.4))
+    assert graph.startswith("crop=iw*0.500000:ih*0.400000:iw*0.250000:ih*0.100000")
+    assert "scale=320:240" in graph and "fps=10" in graph
