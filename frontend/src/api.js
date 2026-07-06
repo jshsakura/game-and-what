@@ -1,6 +1,6 @@
 // API client. Single SHARED library — every visitor uses the same workspace,
 // so what anyone uploads is visible to everyone (no per-browser isolation).
-import { DEMO, PLACEHOLDER_COVER } from "./demo.js";
+import { DEMO, demoCoverUrl } from "./demo.js";
 
 const SESSION_ID = "public";
 
@@ -245,7 +245,7 @@ export async function uploadCover(romId, file, crop) {
 }
 
 export function coverUrl(romId) {
-  if (DEMO) return PLACEHOLDER_COVER;
+  if (DEMO) return demoCoverUrl(romId);
   const sid = getSessionId();
   // cache-bust so a freshly uploaded cover shows immediately
   return sid ? `/api/sessions/${sid}/roms/${romId}/cover` : null;
@@ -253,12 +253,14 @@ export function coverUrl(romId) {
 
 // The RAW device .img (fixed size) — what the hardware actually displays.
 export function deviceCoverUrl(romId) {
+  if (DEMO) return demoCoverUrl(romId);   // no backend on Pages — a real URL would 404 (broken <img>)
   const sid = getSessionId();
   return sid ? `/api/sessions/${sid}/roms/${romId}/cover?device=1` : null;
 }
 
 // The UNTOUCHED full original art (crop-tool source) — never the cropped display.
 export function originalCoverUrl(romId) {
+  if (DEMO) return demoCoverUrl(romId);
   const sid = getSessionId();
   return sid ? `/api/sessions/${sid}/roms/${romId}/cover?full=1` : null;
 }

@@ -85,6 +85,11 @@ export function scoreFace(score) {
 // Try the real asset (svg first, then png — RomM ico-derived), then fall back
 // to the colored monogram chip when no asset exists (tama/gw/homebrew).
 const ICON_EXTS = ["svg", "png"];
+// Systems whose shipped icon is a .png (see frontend/public/system-icons) — try
+// png FIRST for these so every page load doesn't 404-probe the missing .svg
+// (console noise that reads like broken images). Fallback chain still applies.
+const PNG_ICON_SYSTEMS = new Set(["c64", "mini", "msx", "pce", "pico8", "sg", "sms", "wsv", "zxs"]);
+const iconExtsFor = (dirname) => (PNG_ICON_SYSTEMS.has(dirname) ? ["png", "svg"] : ICON_EXTS);
 // Cache-buster for the static /system-icons assets. They live under a fixed URL,
 // so a browser/Cloudflare cache serves the OLD file after we swap an icon (no
 // Cache-Control on the origin → CF caches .svg by default). Bump this whenever a
@@ -94,7 +99,8 @@ export function SystemIcon({ dirname, size = 16 }) {
   const [extIdx, setExtIdx] = useState(0);
   const imgRef = useRef(null);
   useEffect(() => { setExtIdx(0); }, [dirname]);
-  const exhausted = extIdx >= ICON_EXTS.length;
+  const exts = iconExtsFor(dirname);
+  const exhausted = extIdx >= exts.length;
   const next = () => setExtIdx((i) => i + 1);
 
   // A cached/transient broken image won't fire onError (it's already `complete`
@@ -110,7 +116,7 @@ export function SystemIcon({ dirname, size = 16 }) {
       <img
         ref={imgRef}
         className="sys-ico"
-        src={`${import.meta.env.BASE_URL}system-icons/${dirname}.${ICON_EXTS[extIdx]}?v=${ICON_VER}`}
+        src={`${import.meta.env.BASE_URL}system-icons/${dirname}.${exts[extIdx]}?v=${ICON_VER}`}
         width={size}
         height={size}
         alt=""
