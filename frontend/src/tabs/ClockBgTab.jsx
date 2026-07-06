@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Clock, Upload, Info, Download, ImageOff, X } from "lucide-react";
 import Cropper from "react-easy-crop";
 import { downloadBlob } from "../localencode.js";
+import { buildZip } from "../zip.js";
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
@@ -15,8 +16,6 @@ const SCREEN_ASPECT = SCREEN_W / SCREEN_H;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
 const STEM_MAX = 40;
-// Breathing room between files so the browser accepts every download in a batch.
-const BATCH_DOWNLOAD_GAP_MS = 300;
 
 const FIT_MODES = [
   ["custom", "Custom (drag & zoom)"],
@@ -177,24 +176,24 @@ export default function ClockBgTab() {
     if (selectedId === id) setSelectedId(next[0]?.id ?? null);
   }
 
-  function downloadOne(item, name) {
+  function renderBytes(item) {
     const canvas = document.createElement("canvas");
     renderItem(canvas, item);
-    downloadBlob(new Blob([canvasToRgb565(canvas)], { type: "application/octet-stream" }), name);
+    return canvasToRgb565(canvas);
   }
 
   function downloadSelected() {
     if (!selected) return;
-    downloadOne(selected, names[selectedIndex]);
+    downloadBlob(new Blob([renderBytes(selected)], { type: "application/octet-stream" }), names[selectedIndex]);
     toast.success(t("Saved .565 — copy it into /clock/album on the SD card"));
   }
 
-  async function downloadAll() {
-    for (let i = 0; i < items.length; i++) {
-      downloadOne(items[i], names[i]);
-      await new Promise((resolve) => setTimeout(resolve, BATCH_DOWNLOAD_GAP_MS));
-    }
-    toast.success(t("Saved {n} .565 files — copy them into /clock/album on the SD card", { n: items.length }));
+  // One ZIP for the whole batch — N separate downloads trip the browser's
+  // multi-download blocking and shred filenames.
+  function downloadAll() {
+    const files = items.map((item, i) => ({ name: names[i], data: renderBytes(item) }));
+    downloadBlob(buildZip(files), `clock_album_${stampRef.current}.zip`);
+    toast.success(t("Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card", { n: items.length }));
   }
 
   return (

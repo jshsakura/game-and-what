@@ -258,7 +258,7 @@ export default {
   "Custom (drag & zoom)": "自定义（拖动缩放）",
   "Drag photos here or click (multiple allowed)": "拖入照片或点击（可多选）",
   "Download all ({n})": "全部下载（{n}）",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": "已保存 {n} 个 .565 文件 — 请复制到 SD 卡的 /clock/album 文件夹",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": "已将 {n} 个 .565 打包为一个 ZIP — 解压后放入 SD 卡的 /clock/album",
   "Drag to move · scroll to zoom": "拖动移动 · 滚轮缩放",
   "Remove": "移除",
   "ffmpeg is not available on the server": "服务器上没有 ffmpeg",

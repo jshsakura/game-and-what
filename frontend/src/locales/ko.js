@@ -299,7 +299,7 @@ export default {
   "Custom (drag & zoom)": "직접 (드래그·줌)",
   "Drag photos here or click (multiple allowed)": "사진을 끌어다 놓거나 클릭하세요 (여러 장 가능)",
   "Download all ({n})": "전체 다운로드 ({n}장)",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": ".565 파일 {n}개 저장됨 — SD 카드의 /clock/album 폴더에 복사하세요",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": "ZIP 하나로 .565 파일 {n}개 저장됨 — 압축을 풀어 SD 카드의 /clock/album에 넣으세요",
   "Drag to move · scroll to zoom": "드래그로 이동 · 스크롤로 확대/축소",
   "Remove": "제거",
   "ffmpeg is not available on the server": "서버에 ffmpeg가 없습니다",

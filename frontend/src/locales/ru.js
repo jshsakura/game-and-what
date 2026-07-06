@@ -260,7 +260,7 @@ export default {
   "Custom (drag & zoom)": "Вручную (перетаскивание и зум)",
   "Drag photos here or click (multiple allowed)": "Перетащите фото сюда или нажмите (можно несколько)",
   "Download all ({n})": "Скачать все ({n})",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": "Сохранено {n} файлов .565 — скопируйте их в /clock/album на SD-карте",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": "{n} файлов .565 сохранены одним ZIP — распакуйте их в /clock/album на SD-карте",
   "Drag to move · scroll to zoom": "Перетащите для сдвига · колесо для зума",
   "Remove": "Убрать",
   "ffmpeg is not available on the server": "ffmpeg недоступен на сервере",

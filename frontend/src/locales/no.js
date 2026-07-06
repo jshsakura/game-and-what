@@ -260,7 +260,7 @@ export default {
   "Custom (drag & zoom)": "Egendefinert (dra og zoom)",
   "Drag photos here or click (multiple allowed)": "Dra bilder hit eller klikk (flere er mulig)",
   "Download all ({n})": "Last ned alle ({n})",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": "{n} .565-filer lagret — kopier dem til /clock/album på SD-kortet",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": "{n} .565-filer lagret som én ZIP — pakk ut til /clock/album på SD-kortet",
   "Drag to move · scroll to zoom": "Dra for å flytte · rull for å zoome",
   "Remove": "Fjern",
   "ffmpeg is not available on the server": "ffmpeg er ikke tilgjengelig på serveren",

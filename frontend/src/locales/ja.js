@@ -258,7 +258,7 @@ export default {
   "Custom (drag & zoom)": "カスタム（ドラッグ＆ズーム）",
   "Drag photos here or click (multiple allowed)": "写真をドラッグ＆ドロップまたはクリック（複数可）",
   "Download all ({n})": "すべてダウンロード（{n}）",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": ".565ファイルを{n}個保存しました — SDカードの /clock/album にコピーしてください",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": ".565ファイル{n}個を1つのZIPに保存しました — 解凍してSDカードの /clock/album に入れてください",
   "Drag to move · scroll to zoom": "ドラッグで移動 · スクロールでズーム",
   "Remove": "削除",
   "ffmpeg is not available on the server": "サーバーにffmpegがありません",

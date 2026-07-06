@@ -260,7 +260,7 @@ export default {
   "Custom (drag & zoom)": "Personalizado (arrastar e zoom)",
   "Drag photos here or click (multiple allowed)": "Arraste fotos aqui ou clique (várias permitidas)",
   "Download all ({n})": "Baixar tudo ({n})",
-  "Saved {n} .565 files — copy them into /clock/album on the SD card": "{n} arquivos .565 salvos — copie-os para /clock/album no cartão SD",
+  "Saved {n} .565 files as one ZIP — unzip into /clock/album on the SD card": "{n} arquivos .565 salvos em um ZIP — descompacte-os em /clock/album no cartão SD",
   "Drag to move · scroll to zoom": "Arraste para mover · rolagem para zoom",
   "Remove": "Remover",
   "ffmpeg is not available on the server": "ffmpeg não está disponível no servidor",
