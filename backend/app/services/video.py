@@ -265,6 +265,96 @@ async def make_web_preview(input_path: Path, output_path: Path) -> Path:
     return await _run_ffmpeg(cmd, output_path, "preview")
 
 
+# ── Clock background GIF ────────────────────────────────────────────────────
+# The firmware Clock app plays /clock/bg.gif behind the digits (PAUSE → Background
+# → GIF). It decodes ONE frame at a time into an RGB565 canvas and scale-fills it
+# onto the 320×240 LCD, so:
+#   • Resolution is EXACTLY 320×240. The screen is 320×240 and the app downscales
+#     anything bigger, so a larger GIF only wastes decode RAM/time on pixels that
+#     get thrown away (and a >~480×360 GIF won't even fit the app's RAM budget).
+#     Producing it at 320×240 is both the safe limit AND the optimal size.
+#   • The palette is reduced (device renders RGB565 ≈ 65k colours and GIF is
+#     ≤256 anyway): fewer colours = smaller file + faster LZW decode on-device.
+#     palettegen + Bayer (ordered) dither maps cleanly onto 565 without the
+#     inter-frame shimmer that error-diffusion causes on a loop.
+#   • fps is low — the whole face repaints per GIF frame (the app labels this
+#     the "high" battery level), and a background doesn't need motion; duration
+#     is capped since it loops on-device.
+CLOCK_GIF_FPS = 10
+CLOCK_GIF_MAX_COLORS = 128
+CLOCK_GIF_MAX_SECONDS = 15
+CLOCK_GIF_SUFFIX = ".gif"
+
+
+def _clock_scale(mode: str, animated: bool = True) -> str:
+    """320×240 fit/fill/stretch (mirrors _VIDEO_FILTERS). `animated` adds the
+    fps resample; a still image must NOT (fps on a timeline-less single frame
+    yields zero frames), it just flows through as one frame."""
+    m = mode if mode in _VIDEO_FILTERS else DEFAULT_FIT_MODE
+    fps = f",fps={CLOCK_GIF_FPS}" if animated else ""
+    if m == "fill":
+        return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=increase"
+                f",crop={SCREEN_WIDTH}:{SCREEN_HEIGHT}{fps}")
+    if m == "stretch":
+        return f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}{fps}"
+    return (f"scale={SCREEN_WIDTH}:{SCREEN_HEIGHT}:force_original_aspect_ratio=decrease"
+            f",pad={SCREEN_WIDTH}:{SCREEN_HEIGHT}:-1:-1:color=black{fps}")
+
+
+def _probe_seconds(input_path: Path) -> float:
+    """Source duration in seconds via ffprobe; 0.0 for a still image (no
+    timeline) or if ffprobe can't tell."""
+    import subprocess
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=nk=1:nw=1", str(input_path)],
+            capture_output=True, text=True, timeout=20,
+        ).stdout.strip()
+        return float(out)
+    except (ValueError, OSError, subprocess.SubprocessError):
+        return 0.0
+
+
+def build_clock_gif_command(input_path: Path, output_path: Path,
+                            mode: str = DEFAULT_FIT_MODE,
+                            max_colors: int = CLOCK_GIF_MAX_COLORS,
+                            seconds: int = CLOCK_GIF_MAX_SECONDS,
+                            still: bool = False) -> list[str]:
+    """ffmpeg argv for a device-optimized 320×240 clock-background GIF: one
+    filter graph does the screen-fit scale + a per-clip optimized palette
+    (palettegen) applied with ordered dithering (paletteuse). A `still` input
+    yields a single-frame GIF (a static background — the app just loops it);
+    a video is capped at `seconds`."""
+    scale = _clock_scale(mode, animated=not still)
+    graph = (
+        f"{scale},split[a][b]"
+        f";[a]palettegen=max_colors={max_colors}:stats_mode=diff[p]"
+        f";[b][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle"
+    )
+    cmd = ["ffmpeg", "-hide_banner", "-y"]
+    if not still:
+        cmd += ["-t", str(seconds)]          # cap video length (loops on device)
+    cmd += ["-i", str(input_path), "-filter_complex", graph,
+            "-loop", "0", str(output_path)]
+    return cmd
+
+
+async def encode_to_clock_gif(input_path: Path, output_path: Path,
+                              mode: str = DEFAULT_FIT_MODE) -> Path:
+    """Encode any image/video into a clock-ready /clock/bg.gif (320×240, palette-
+    optimized, ordered-dithered). `mode` = fit / fill / stretch, same as video.
+    A still image becomes a 1-frame static background; a video/GIF is capped and
+    loops on-device. Raises VideoEncodeError on failure."""
+    if not ffmpeg_available():
+        raise VideoEncodeError("ffmpeg is not installed on the server")
+    if not input_path.exists():
+        raise VideoEncodeError(f"Input not found: {input_path}")
+    still = _probe_seconds(input_path) <= 0.0
+    cmd = build_clock_gif_command(input_path, output_path, mode=mode, still=still)
+    return await _run_ffmpeg(cmd, output_path, "clock gif")
+
+
 async def extract_mp3(input_path: Path, output_path: Path) -> Path:
     """Extract the audio track of any media file (video or audio) to an MP3 — used
     by the Music tab to turn an uploaded video into a /music track. No video stream."""
