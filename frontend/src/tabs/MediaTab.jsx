@@ -37,7 +37,7 @@ export default function MediaTab({ onChanged }) {
           {media.music.length > 0 && <span className="media-count">{media.music.length}</span>}
         </button>
         <button className={`media-subtab ${sub === "clock" ? "on" : ""}`} onClick={() => setSub("clock")}>
-          <Clock size={14} strokeWidth={2.5} aria-hidden /> {t("Clock")}
+          <Clock size={14} strokeWidth={2.5} aria-hidden /> {t("Clock (album)")}
         </button>
       </div>
 
