@@ -3,7 +3,7 @@ import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search,
 import { getLibrary, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
-import { useKoreanMode } from "../config.jsx";
+import { useExperimentalMode, useKoreanMode } from "../config.jsx";
 import { useI18n } from "../i18n.jsx";
 
 // Desktop: 30 fills whole rows (5/6-wide grid). Mobile: 21 (3-wide grid) so the
@@ -90,6 +90,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   const toast = useToast();
   const { t, lang } = useI18n();
   const koreanMode = useKoreanMode();
+  const experimental = useExperimentalMode();
   // 한글명-누락 filter/badge: Korean deploy AND Korean UI only (hidden in English).
   const koFeature = koreanMode && lang === "ko";
   const [lib, setLib] = useState({ roms: [], videos: [], music: [] });
@@ -256,7 +257,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   return (
     <div className="stack">
       <div className="muted">
-        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} {t("ROM")} · {lib.videos.length} {t("VIDEO")} · {lib.music?.length || 0} {t("MUSIC")}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
       </div>
 
       {error && <div className="badge failed">{error}</div>}

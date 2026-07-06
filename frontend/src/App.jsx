@@ -10,6 +10,7 @@ import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, Hard
 import { getLibrary, packageUrl, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
+import { useExperimentalMode } from "./config.jsx";
 import { LOCALES } from "./i18n.locales.js";
 import { DEMO } from "./demo.js";
 
@@ -49,7 +50,9 @@ const TABS = [
   { key: "library", label: "Library", Icon: Library },
   { key: "rom", label: "Upload", Icon: Upload },
   { key: "extra", label: "Extra", Icon: HardDrive },
-  { key: "media", label: "Media", Icon: Clapperboard, secondary: true, media: true },
+  // MEDIA (video/music/clock converters) targets the fork firmware only —
+  // hidden unless the deploy runs in experimental ("personal lab") mode.
+  { key: "media", label: "Media", Icon: Clapperboard, secondary: true, media: true, experimental: true },
   { key: "data", label: "Data", Icon: Database, secondary: true, data: true },
   { key: "help", label: "Info", Icon: Info, secondary: true, help: true },
 ];
@@ -183,6 +186,8 @@ function LangToggle() {
 
 export default function App() {
   const t = useT();
+  const experimental = useExperimentalMode();
+  const visibleTabs = TABS.filter((td) => experimental || !td.experimental);
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "zelda");
   const [tab, setTab] = useState("library");
   const [reloadKey, setReloadKey] = useState(0);
@@ -266,9 +271,9 @@ export default function App() {
 
       <div className="tabbar">
         <nav className="tabs">
-          {TABS.map((tabDef, i) => (
+          {visibleTabs.map((tabDef, i) => (
             <React.Fragment key={tabDef.key}>
-              {tabDef.secondary && !TABS[i - 1]?.secondary && <span className="tab-divider" aria-hidden />}
+              {tabDef.secondary && !visibleTabs[i - 1]?.secondary && <span className="tab-divider" aria-hidden />}
               <button
                 className={`tab ${tab === tabDef.key ? "active" : ""} ${tabDef.secondary ? "tab-secondary" : ""} ${tabDef.media ? "tab-media" : ""} ${tabDef.help ? "tab-help" : ""} ${tabDef.data ? "tab-data" : ""} ${loading ? "is-skel" : ""}`}
                 onClick={() => setTab(tabDef.key)}
@@ -319,7 +324,7 @@ export default function App() {
         <div className="lcd">
           {tab === "rom" && <RomTab onChanged={bumpLibrary} />}
           {tab === "extra" && <ExtraTab onChanged={bumpLibrary} />}
-          {tab === "media" && <MediaTab onChanged={bumpLibrary} />}
+          {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
           {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected} onToggleSel={toggleSel} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
           {tab === "help" && <HelpTab />}

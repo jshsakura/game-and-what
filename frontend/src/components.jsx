@@ -135,11 +135,15 @@ export function SystemIcon({ dirname, size = 16 }) {
 // "Cartridge slot" dropdown for picking a system — replaces the wall of chips.
 // Closes on outside click / Escape. The trigger reads like a cartridge seated
 // in a slot; the panel lists all systems with their icon + accepted extensions.
+// Fork-only (experimental) systems are grouped after the official set behind a
+// labeled divider so users can't mistake them for upstream-supported ones.
 export function SystemSelect({ systems, value, onChange }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const current = systems.find((s) => s.key === value);
+  const officialSystems = systems.filter((s) => !s.experimental);
+  const experimentalSystems = systems.filter((s) => s.experimental);
 
   useEffect(() => {
     if (!open) return;
@@ -165,25 +169,32 @@ export function SystemSelect({ systems, value, onChange }) {
         <span className="sysselect-tag">{t("Platform")}</span>
         <span className="sysselect-cart">{current?.Icon ? <current.Icon size={18} aria-hidden /> : <SystemIcon dirname={current?.dirname} size={18} />}</span>
         <span className="sysselect-name">{current?.name ?? t("Select")}</span>
+        {current?.experimental && <span className="exp-badge">{t("Experimental")}</span>}
         {current?.exts?.length > 0 && <span className="sysselect-ext">.{current.exts.join(" .")}</span>}
         <span className="sysselect-chev"><ChevronDown size={16} strokeWidth={2.5} aria-hidden /></span>
       </button>
       {open && (
         <div className="sysselect-panel" role="listbox">
-          {systems.map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              role="option"
-              aria-selected={s.key === value}
-              className={`sysselect-opt ${s.key === value ? "on" : ""}`}
-              onClick={() => { onChange(s.key); setOpen(false); }}
-            >
-              {s.Icon ? <s.Icon size={18} aria-hidden /> : <SystemIcon dirname={s.dirname} size={18} />}
-              <span className="sysselect-opt-name">{s.name}</span>
-              {s.exts?.length > 0 && <span className="sysselect-opt-ext">.{s.exts.join(" .")}</span>}
-              {s.key === value && <Check size={14} strokeWidth={3} aria-hidden />}
-            </button>
+          {[...officialSystems, ...experimentalSystems].map((s, i) => (
+            <React.Fragment key={s.key}>
+              {s.experimental && i === officialSystems.length && (
+                <div className="sysselect-group" aria-hidden>
+                  {t("Experimental — fork firmware only")}
+                </div>
+              )}
+              <button
+                type="button"
+                role="option"
+                aria-selected={s.key === value}
+                className={`sysselect-opt ${s.key === value ? "on" : ""} ${s.experimental ? "exp" : ""}`}
+                onClick={() => { onChange(s.key); setOpen(false); }}
+              >
+                {s.Icon ? <s.Icon size={18} aria-hidden /> : <SystemIcon dirname={s.dirname} size={18} />}
+                <span className="sysselect-opt-name">{s.name}</span>
+                {s.exts?.length > 0 && <span className="sysselect-opt-ext">.{s.exts.join(" .")}</span>}
+                {s.key === value && <Check size={14} strokeWidth={3} aria-hidden />}
+              </button>
+            </React.Fragment>
           ))}
         </div>
       )}

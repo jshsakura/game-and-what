@@ -24,25 +24,30 @@ with sample data (no backend; uploads/edits are disabled).
   (IGDB → TheGamesDB → libretro-thumbnails), rendered to the device spec
   (**186×100 `.img`**, aspect-preserved), and filed as `/covers/<sys>/Name.img`
   beside `/roms/<sys>/Name.<ext>`. Search/upload/crop covers manually too.
-- **Video → `/media`.** Re-encodes to the only format the chip's HW JPEG decoder
-  accepts — **MJPEG in `.avi`** (320×240, 30 fps, mono) — via `ffmpeg`.
-- **Music → `/music`.** MP3 kept as-is (or extracted from video); the firmware's
-  Music app reads ID3 tags + album art directly.
-- **One-click SD ZIP.** Download the whole card (`/roms`, `/covers`, `/cores`,
-  `/media`, `/music`) in the exact firmware layout — extract to the SD root, done.
+- **One-click SD ZIP.** Download the whole card (`/roms`, `/covers`, `/cores`)
+  in the exact firmware layout — extract to the SD root, done.
 - **Play in browser.** Experimental in-page emulation (Nostalgist.js) for systems
   that have a WASM core.
 - **Curate a bloated set.** Each ROM shows its **IGDB rating** (0-100, color-tiered
   badge on the cover's bottom-right) so you can judge quality at a glance, and a
   per-ROM **"Exclude from SD"** toggle drops a ROM from the SD download while
   keeping it in the library — slim the device menu without deleting anything.
-- **18 systems:** NES, Game Boy / GB Color, Game Gear, Master System, Genesis,
-  SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800, Amstrad CPC, Supervision,
-  Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
+- **All 20 officially supported systems** — everything the upstream
+  [sylverb firmware](https://github.com/sylverb/game-and-watch-retro-go-sd)
+  registers, up to Atari Lynx: NES, Game Boy / GB Color, Game Gear, Master System,
+  Genesis, SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800 / Lynx,
+  Amstrad CPC, Supervision, Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
 - **11-language UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) with
   per-locale CJK/Cyrillic fonts lazy-loaded on demand.
 - **Optional Korean mode** (`GNW_KOREAN_MODE=true`) — Korean auto-naming, the
   "Korean-patched" flag, and related filters. **Off by default** (international image).
+- **Optional experimental mode** (`GNW_EXPERIMENTAL_MODE=true`) — a "personal
+  lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
+  extra systems the upstream firmware doesn't register (Neo Geo Pocket,
+  WonderSwan, PC Engine CD, Virtual Boy, Odyssey², ZX Spectrum, C64, Game.com)
+  plus the MEDIA tab (video → `/media` MJPEG `.avi`, music → `/music`, clock
+  backgrounds). **Off by default** — everything above stays hidden and the app
+  tracks only what the official firmware supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
 
 ## 💾 BIOS / system ROMs
@@ -105,6 +110,7 @@ There is **no in-app settings screen** — everything is an environment variable
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | IGDB cover search/auto-fill (optional) |
 | `TGDB_API_KEY` | TheGamesDB cover search/auto-fill (optional, monthly quota) |
 | `GNW_KOREAN_MODE` | Korea-specific features (default `false`) |
+| `GNW_EXPERIMENTAL_MODE` | "Personal lab": fork-firmware extras — experimental systems + MEDIA tab (default `false`) |
 | `GNW_CORS_ORIGINS` | CORS allow-list (default `*`) |
 
 ## 🔒 Security — no built-in login

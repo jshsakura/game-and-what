@@ -3,16 +3,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db
 from .routers import clock, covers, data, downloads, events, extra, firmware, gamelist, igdb, jobs, lang, libretro, manage, music, package, roms, scores, sessions, sgdb, tgdb, uploads, videos
 from .services.video import ffmpeg_available
-from .systems import SYSTEMS
+from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.5.1")
+app = FastAPI(title="gnw-retro-manager", version="1.8.0")
 
 # No cookies/auth, so wildcard origins are fine (credentials must be off with "*").
 app.add_middleware(
@@ -36,10 +36,13 @@ async def _cross_origin_isolation(request, call_next):
     return response
 
 # API routers — must be registered BEFORE the SPA catch-all below.
+# videos/clock/music are fork-firmware features (avi media player, clock bg.gif,
+# music app) → whole routers 403 unless GNW_EXPERIMENTAL_MODE is on.
+_EXPERIMENTAL_ONLY = [Depends(sessions.require_experimental_mode)]
 app.include_router(sessions.router)
 app.include_router(roms.router)
-app.include_router(videos.router)
-app.include_router(clock.router)
+app.include_router(videos.router, dependencies=_EXPERIMENTAL_ONLY)
+app.include_router(clock.router, dependencies=_EXPERIMENTAL_ONLY)
 app.include_router(jobs.router)
 app.include_router(package.router)
 app.include_router(scores.router)
@@ -47,7 +50,7 @@ app.include_router(downloads.router)
 app.include_router(covers.router)
 app.include_router(uploads.router)
 app.include_router(manage.router)
-app.include_router(music.router)
+app.include_router(music.router, dependencies=_EXPERIMENTAL_ONLY)
 app.include_router(firmware.router)
 app.include_router(extra.router)
 app.include_router(igdb.router)
@@ -105,6 +108,9 @@ def client_config() -> dict:
     the ones without an API key (libretro is keyless → always on)."""
     return {
         "korean_mode": config.KOREAN_MODE,
+        # "Personal lab" flag: fork-firmware extras (experimental systems, the
+        # MEDIA tab). Off → the UI shows the upstream-official feature set only.
+        "experimental_mode": config.EXPERIMENTAL_MODE,
         "cover_sources": {
             "libretro": True,
             "igdb": bool(config.IGDB_CLIENT_ID and config.IGDB_CLIENT_SECRET),
@@ -116,7 +122,9 @@ def client_config() -> dict:
 
 @app.get("/api/systems")
 def list_systems() -> dict:
-    """The systems the SD firmware registers, with /roms/<dirname> + extensions."""
+    """The systems this deploy exposes (upstream-official only unless experimental
+    mode is on), with /roms/<dirname> + extensions. `experimental` marks fork-only
+    systems so the UI can visually separate them from the official set."""
     return {
         "systems": [
             {
@@ -125,8 +133,9 @@ def list_systems() -> dict:
                 "dirname": s.dirname,
                 "exts": list(s.exts),
                 "pico8": s.pico8,
+                "experimental": s.experimental,
             }
-            for s in SYSTEMS
+            for s in available_systems()
         ]
     }
 

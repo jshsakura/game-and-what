@@ -13,7 +13,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from .. import config, db
 from ..systems import accepts_extension, get_system
 from ..services import artfetch, covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romtag, storage
-from .sessions import require_session
+from .sessions import require_session, require_system_enabled
 
 router = APIRouter(prefix="/api", tags=["roms"])
 
@@ -51,6 +51,7 @@ async def upload_roms(
         sys_obj = get_system(system)
     except KeyError:
         raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
+    require_system_enabled(sys_obj)
 
     with db.connect() as conn:
         require_session(conn, session_id)
@@ -235,6 +236,7 @@ async def upload_cd_folder(
         sys_obj = get_system(system)
     except KeyError:
         raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
+    require_system_enabled(sys_obj)
     with db.connect() as conn:
         require_session(conn, session_id)
 

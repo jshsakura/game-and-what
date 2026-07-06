@@ -16,6 +16,25 @@ def require_korean_mode() -> None:
         raise HTTPException(status_code=403, detail="한국어 모드에서만 사용할 수 있는 기능입니다")
 
 
+def require_experimental_mode() -> None:
+    """Block fork-firmware-only endpoints (media/music/clock converters) when the
+    deploy tracks the upstream sylverb firmware only (GNW_EXPERIMENTAL_MODE off)."""
+    if not config.EXPERIMENTAL_MODE:
+        raise HTTPException(
+            status_code=403,
+            detail="This feature needs the fork firmware — enable GNW_EXPERIMENTAL_MODE",
+        )
+
+
+def require_system_enabled(system) -> None:
+    """Reject uploads for fork-only (experimental) systems on an official deploy."""
+    if system.experimental and not config.EXPERIMENTAL_MODE:
+        raise HTTPException(
+            status_code=403,
+            detail=f"'{system.name}' is not supported by the upstream firmware — enable GNW_EXPERIMENTAL_MODE",
+        )
+
+
 def _enrich_rom(r: dict) -> dict:
     """Add derived display fields without touching stored files:
     - display_name: the clean title (Korean name if present, else the filename

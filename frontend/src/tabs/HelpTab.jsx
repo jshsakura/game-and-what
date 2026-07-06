@@ -2,24 +2,27 @@ import React, { useState } from "react";
 import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive, Rocket, Cpu, Copy, Check } from "lucide-react";
 import { useT } from "../i18n.jsx";
 import { SystemIcon } from "../components.jsx";
+import { useExperimentalMode } from "../config.jsx";
 import { BIOS_CATALOG } from "../bios.js";
 
-// Steps to prepare the SD with this tool
-const STEPS = [
-  "In the UPLOAD tab (or an empty library), pick a platform and drag in your ROMs.",
-  "Korean (English) names and covers are added automatically. Videos are converted to .avi in the VIDEO tab and placed in /media.",
+// Steps to prepare the SD with this tool. The VIDEO/.avi sentence exists only in
+// experimental mode (the /media player is a fork-firmware feature).
+const STEP_UPLOAD = "In the UPLOAD tab (or an empty library), pick a platform and drag in your ROMs.";
+const STEP_NAMES_OFFICIAL = "Korean (English) names and covers are added automatically.";
+const STEP_NAMES_EXPERIMENTAL = "Korean (English) names and covers are added automatically. Videos are converted to .avi in the VIDEO tab and placed in /media.";
+const STEPS_REST = [
   "If needed, rename, search/upload covers, and adjust the crop position from the card details.",
   "Download via 'SD ZIP' at the top right (or 'Current Platform ZIP' in the library). The estimated size is shown on the label.",
   "Just extract the downloaded ZIP to the root of your SD card and you're done — the /roms, /covers, /cores structure is already set up.",
 ];
 
-// SD card / folder structure
+// SD card / folder structure. Rows flagged experimental are fork-firmware only.
 const SDCARD = [
   ["Format", "exFAT recommended (or FAT32)"],
   ["/roms/<platform>/", "ROM files per platform (uncompressed)"],
   ["/covers/<platform>/", "Cover .img (186×100, filename matches the ROM) — auto-generated"],
   ["/cores/", "PICO-8 cores (pico8.bin, etc.) — automatically included in the SD ZIP"],
-  ["/media/", "Entertainment videos .avi (excluded from the SD ZIP by default, included with ?video)"],
+  ["/media/", "Entertainment videos .avi (excluded from the SD ZIP by default, included with ?video)", true],
 ];
 
 // Device button shortcuts (source: github.com/sylverb/game-and-watch-retro-go-sd)
@@ -103,17 +106,27 @@ function Combo({ combo }) {
 
 export default function HelpTab() {
   const t = useT();
+  const experimental = useExperimentalMode();
+  const steps = [
+    STEP_UPLOAD,
+    experimental ? STEP_NAMES_EXPERIMENTAL : STEP_NAMES_OFFICIAL,
+    ...STEPS_REST,
+  ];
+  const sdcardRows = SDCARD.filter(([, , isExp]) => experimental || !isExp);
+  const biosEntries = BIOS_CATALOG.filter((b) => experimental || !b.experimental);
   return (
     <div className="stack help-tab">
       <div className="muted">
-        <Info size={13} aria-hidden /> {t("Upload ROMs & videos — Korean names and covers are added automatically and packed into a ZIP in the retro-go SD card layout.")}
+        <Info size={13} aria-hidden /> {t(experimental
+          ? "Upload ROMs & videos — Korean names and covers are added automatically and packed into a ZIP in the retro-go SD card layout."
+          : "Upload ROMs — Korean names and covers are added automatically and packed into a ZIP in the retro-go SD card layout.")}
       </div>
 
       {/* 사용법 */}
       <div className="help-section">
         <div className="help-head"><ListOrdered size={14} strokeWidth={2.5} aria-hidden /> {t("Basic Usage")}</div>
         <ol className="help-steps">
-          {STEPS.map((s, i) => <li key={i}>{t(s)}</li>)}
+          {steps.map((s, i) => <li key={i}>{t(s)}</li>)}
         </ol>
       </div>
 
@@ -121,7 +134,7 @@ export default function HelpTab() {
       <div className="help-section">
         <div className="help-head"><HardDrive size={14} strokeWidth={2.5} aria-hidden /> {t("SD Card / Folder Structure")}</div>
         <div className="help-list">
-          {SDCARD.map(([k, v]) => (
+          {sdcardRows.map(([k, v]) => (
             <div className="help-row" key={k}>
               <span className="help-combo"><kbd className="keycap">{t(k)}</kbd></span>
               <span className="help-action">{t(v)}</span>
@@ -152,7 +165,7 @@ export default function HelpTab() {
           {t("A few systems need a copyrighted BIOS we can't bundle. Upload each file in the Extra (추가파일) tab at the exact SD path below — click a path to copy it. It then ships in the SD ZIP at that path, where both the device firmware and the in-browser player load it.")}
         </div>
         <div className="bios-list">
-          {BIOS_CATALOG.map((b) => (
+          {biosEntries.map((b) => (
             <div className="bios-group" key={b.key}>
               <div className="bios-group-head">
                 <SystemIcon dirname={b.key} size={22} />
@@ -182,11 +195,14 @@ export default function HelpTab() {
           <GithubMark size={18} />
           <span className="help-project-name">game-and-watch-retro-go-sd</span>
         </a>
-        {/* My experimental firmware fork — release/download page */}
-        <a className="help-project help-project-alt" href="https://github.com/jshsakura/game-and-watch-retro-go-sd/releases" target="_blank" rel="noreferrer">
-          <Rocket size={16} strokeWidth={2.5} aria-hidden />
-          <span className="help-project-name">{t("Releases (experimental)")}</span>
-        </a>
+        {/* Experimental fork firmware releases — "personal lab" mode only. On an
+            official deploy the upstream sylverb repo is the only guidance. */}
+        {experimental && (
+          <a className="help-project help-project-alt" href="https://github.com/jshsakura/game-and-watch-retro-go-sd/releases" target="_blank" rel="noreferrer">
+            <Rocket size={16} strokeWidth={2.5} aria-hidden />
+            <span className="help-project-name">{t("Releases (experimental)")}</span>
+          </a>
+        )}
       </div>
     </div>
   );

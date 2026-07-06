@@ -18,7 +18,7 @@ from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile
 from .. import config, db
 from ..services import artfetch, covers, covers_pico8, jobs, metadata, storage, video
 from ..systems import accepts_extension, get_system
-from .sessions import require_session
+from .sessions import require_experimental_mode, require_session, require_system_enabled
 
 router = APIRouter(prefix="/api", tags=["uploads"])
 
@@ -66,12 +66,17 @@ def init_upload(
             sys_obj = get_system(system)
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
+        require_system_enabled(sys_obj)
         if not accepts_extension(sys_obj, filename):
             raise HTTPException(status_code=400, detail="File extension not accepted for system")
         if total_size > config.MAX_ROM_BYTES:
             raise HTTPException(status_code=400, detail="ROM exceeds maximum allowed size")
-    if kind == "video" and total_size > config.MAX_VIDEO_BYTES:
-        raise HTTPException(status_code=400, detail="Video exceeds maximum allowed size")
+    if kind == "video":
+        # Chunked video uploads bypass the (gated) videos router, so gate here too:
+        # the /media player exists only on the fork firmware.
+        require_experimental_mode()
+        if total_size > config.MAX_VIDEO_BYTES:
+            raise HTTPException(status_code=400, detail="Video exceeds maximum allowed size")
 
     with db.connect() as conn:
         require_session(conn, session_id)

@@ -4,6 +4,7 @@ import { getExtra, uploadExtra, deleteExtra, extraDownloadUrl, formatBytes } fro
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
+import { useExperimentalMode } from "../config.jsx";
 import { BIOS_CATALOG } from "../bios.js";
 
 // Arbitrary passthrough files → SD root verbatim. Pick a target folder (e.g.
@@ -11,6 +12,9 @@ import { BIOS_CATALOG } from "../bios.js";
 export default function ExtraTab({ onChanged }) {
   const toast = useToast();
   const t = useT();
+  const experimental = useExperimentalMode();
+  // Official deploys don't list fork-only systems' BIOS paths (pcecd, c64, …).
+  const biosEntries = BIOS_CATALOG.filter((b) => experimental || !b.experimental);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +79,7 @@ export default function ExtraTab({ onChanged }) {
             </tr>
           </thead>
           <tbody>
-            {BIOS_CATALOG.flatMap((b) =>
+            {biosEntries.flatMap((b) =>
               b.files.map((f, i) => (
                 <tr key={f.sdPath}>
                   {i === 0 && (
@@ -94,7 +98,7 @@ export default function ExtraTab({ onChanged }) {
         {/* Narrow screens: the 3-column table cramps, so stack paths under
             each system name instead (CSS swaps the two views at 640px). */}
         <div className="bios-ref-stack">
-          {BIOS_CATALOG.map((b) => (
+          {biosEntries.map((b) => (
             <div className="bios-ref-group" key={b.key}>
               <div className="bios-ref-group-head">
                 {t(b.label)}

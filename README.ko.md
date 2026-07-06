@@ -23,20 +23,24 @@ ROM·영상·음악을 올리면 이름과 기기 규격 커버를 자동으로 
   (IGDB → TheGamesDB → libretro-thumbnails)해 기기 규격(**186×100 `.img`**, 비율 유지)으로
   렌더링하고 `/roms/<sys>/이름.<ext>` 옆에 `/covers/<sys>/이름.img`로 저장합니다.
   커버를 직접 검색·업로드·크롭할 수도 있습니다.
-- **영상 → `/media`.** 칩의 HW JPEG 디코더가 받는 유일한 형식 — **`.avi` 컨테이너의 MJPEG**
-  (320×240, 30fps, 모노) — 으로 `ffmpeg` 재인코딩.
-- **음악 → `/music`.** MP3는 그대로 보관(또는 영상에서 추출); 펌웨어 음악 앱이 ID3 태그와
-  앨범아트를 직접 읽습니다.
-- **원클릭 SD ZIP.** 카드 전체(`/roms`, `/covers`, `/cores`, `/media`, `/music`)를 펌웨어
+- **원클릭 SD ZIP.** 카드 전체(`/roms`, `/covers`, `/cores`)를 펌웨어
   레이아웃 그대로 받아 SD 루트에 압축 해제하면 끝.
 - **브라우저 플레이.** WASM 코어가 있는 시스템은 페이지 내 에뮬레이션(Nostalgist.js, 실험적).
-- **18개 시스템:** NES, 게임보이 / GB 컬러, 게임기어, 마스터시스템, 제네시스, SG-1000,
-  PC 엔진, 콜레코비전, MSX, 아타리 2600 / 7800, 암스트라드 CPC, 와타라, 다마고치,
-  포켓몬 미니, Game & Watch, 홈브루, PICO-8.
+- **공식 지원 20개 시스템 전부** — 업스트림
+  [sylverb 펌웨어](https://github.com/sylverb/game-and-watch-retro-go-sd)가 등록하는
+  기종 전체(아타리 링스까지): NES, 게임보이 / GB 컬러, 게임기어, 마스터시스템, 제네시스,
+  SG-1000, PC 엔진, 콜레코비전, MSX, 아타리 2600 / 7800 / 링스, 암스트라드 CPC, 와타라,
+  다마고치, 포켓몬 미니, Game & Watch, 홈브루, PICO-8.
 - **11개국어 UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) — 로케일별
   CJK/키릴 폰트를 필요할 때 지연 로드.
 - **선택형 한국어 모드** (`GNW_KOREAN_MODE=true`) — 한글 자동 명명, "한글패치" 플래그,
   관련 필터. **기본 비활성**(국제판 이미지).
+- **선택형 실험 모드** (`GNW_EXPERIMENTAL_MODE=true`) — 개인 실험실.
+  [jshsakura 포크 펌웨어](https://github.com/jshsakura/game-and-watch-retro-go-sd)
+  전용 기능을 켭니다: 업스트림이 등록하지 않는 추가 기종(네오지오 포켓, 원더스완,
+  PC 엔진 CD, 버추얼보이, 오디세이², ZX 스펙트럼, C64, Game.com)과 MEDIA 탭
+  (영상 → `/media` MJPEG `.avi`, 음악 → `/music`, 시계 배경). **기본 비활성** —
+  꺼져 있으면 공식 펌웨어가 지원하는 범위만 보입니다.
 - 레트로 **픽셀아트 UI**, Zelda ↔ Mario 에디션 토글.
 
 ## 💾 BIOS / 시스템 롬
@@ -97,6 +101,7 @@ compose `.env`, 또는 로컬 개발용 `backend/.env`로 주입하세요. 기�
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | IGDB 커버 검색/자동완성 (선택) |
 | `TGDB_API_KEY` | TheGamesDB 커버 검색/자동완성 (선택, 월 할당량) |
 | `GNW_KOREAN_MODE` | 한국 특화 기능 (기본 `false`) |
+| `GNW_EXPERIMENTAL_MODE` | "개인 실험실": 포크 펌웨어 전용 — 실험 기종 + MEDIA 탭 (기본 `false`) |
 | `GNW_CORS_ORIGINS` | CORS 허용 목록 (기본 `*`) |
 
 ## 🔒 보안 — 내장 로그인 없음

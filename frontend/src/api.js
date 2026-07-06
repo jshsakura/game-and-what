@@ -47,9 +47,10 @@ export async function getHealth() {
   return res.ok ? res.json() : { status: "down", ffmpeg: false };
 }
 
-// Runtime feature flags (korean_mode gates the Korea-specific UI).
+// Runtime feature flags (korean_mode gates the Korea-specific UI,
+// experimental_mode the fork-firmware extras — MEDIA tab, extra systems).
 export async function getConfig() {
-  const fallback = { korean_mode: false, cover_sources: { libretro: true, igdb: false, tgdb: false, sgdb: false } };
+  const fallback = { korean_mode: false, experimental_mode: false, cover_sources: { libretro: true, igdb: false, tgdb: false, sgdb: false } };
   try {
     const res = await fetch("/api/config");
     return res.ok ? res.json() : fallback;

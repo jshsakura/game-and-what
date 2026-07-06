@@ -406,6 +406,24 @@ body::before {
 .sysselect-opt-ext { font-family: var(--pixel); font-size: 6px; color: var(--card-dim); flex: 0 0 auto; }
 .sysselect-opt > svg { color: var(--accent-2); flex: 0 0 auto; }
 
+/* Experimental (fork-firmware-only) split: group divider inside the panel +
+   an amber badge next to a selected experimental system. */
+.sysselect-group {
+  display: flex; align-items: center; gap: 8px;
+  margin: 6px 2px 3px; padding-top: 7px;
+  border-top: 1px dashed color-mix(in srgb, var(--card-dim) 55%, transparent);
+  font-family: var(--pixel); font-size: 6.5px; letter-spacing: 0.4px;
+  color: #d9a53c; text-transform: uppercase;
+}
+.sysselect-opt.exp .sysselect-opt-name { color: #d9a53c; }
+.exp-badge {
+  flex: 0 0 auto; padding: 2px 5px; border-radius: 5px;
+  font-family: var(--pixel); font-size: 6px; letter-spacing: 0.4px;
+  text-transform: uppercase; color: #d9a53c;
+  border: 1px solid color-mix(in srgb, #d9a53c 60%, transparent);
+  background: color-mix(in srgb, #d9a53c 14%, transparent);
+}
+
 /* Cover grid */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .card {

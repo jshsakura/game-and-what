@@ -8,6 +8,7 @@ import zipfile
 from pathlib import Path
 
 from .. import config
+from ..systems import EXPERIMENTAL_DIRNAMES
 from . import pico8core, storage
 
 
@@ -30,7 +31,17 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
         # _firmware / _extra are internal; added at the SD ROOT below (with the
         # firmware filename / the user's chosen passthrough paths).
         return True
-    if not include_video and config.MEDIA_DIR_NAME in parts:
+    # /media exists only on the fork firmware — never ship it on an official deploy.
+    if (not include_video or not config.EXPERIMENTAL_MODE) and config.MEDIA_DIR_NAME in parts:
+        return True
+    # /music (fork Music app) likewise stays off the card on an official deploy.
+    if not config.EXPERIMENTAL_MODE and config.MUSIC_DIR_NAME in parts:
+        return True
+    # Official mode: drop fork-only system folders (roms/<dir>, covers/<dir>) even
+    # if the library still holds files from an earlier experimental deploy.
+    if (not config.EXPERIMENTAL_MODE and len(parts) >= 2
+            and parts[0] in (config.ROMS_DIR_NAME, config.COVERS_DIR_NAME)
+            and parts[1] in EXPERIMENTAL_DIRNAMES):
         return True
     # Homebrew: .bin apps are bundled IN the firmware (flashed, not loaded from SD)
     # → SD needs only their COVER, unless the user explicitly opts that .bin in.
@@ -99,6 +110,7 @@ def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[s
     would change → used as the cache key and HTTP ETag."""
     h = hashlib.sha1()
     h.update(_SD_CACHE_VERSION.encode())
+    h.update(f"|exp={config.EXPERIMENTAL_MODE}".encode())  # mode changes what _excluded drops
     h.update(f"|video={include_video}|sys={sorted(systems) if systems else None}"
              f"|hb={sorted(homebrew_roms) if homebrew_roms else None}"
              f"|ex={sorted(excluded_roms) if excluded_roms else None}|".encode())

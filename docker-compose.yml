@@ -32,4 +32,7 @@ services:
       STEAMGRIDDB_API_KEY: ${STEAMGRIDDB_API_KEY:-}
       # Korea-specific features — public image keeps this off.
       GNW_KOREAN_MODE: ${GNW_KOREAN_MODE:-false}
+      # "Personal lab" mode: fork-firmware extras (systems beyond the upstream
+      # sylverb set, the MEDIA tab converters). Off = official feature set only.
+      GNW_EXPERIMENTAL_MODE: ${GNW_EXPERIMENTAL_MODE:-false}
     restart: unless-stopped

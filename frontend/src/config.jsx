@@ -7,10 +7,10 @@ import { getConfig } from "./api.js";
 // libretro is keyless → always available; the keyed providers default off until
 // /api/config confirms a key is configured (so their buttons start disabled).
 const DEFAULT_COVER_SOURCES = { libretro: true, igdb: false, tgdb: false, sgdb: false };
-const ConfigContext = createContext({ korean_mode: false, cover_sources: DEFAULT_COVER_SOURCES });
+const ConfigContext = createContext({ korean_mode: false, experimental_mode: false, cover_sources: DEFAULT_COVER_SOURCES });
 
 export function ConfigProvider({ children }) {
-  const [config, setConfig] = useState({ korean_mode: false, cover_sources: DEFAULT_COVER_SOURCES });
+  const [config, setConfig] = useState({ korean_mode: false, experimental_mode: false, cover_sources: DEFAULT_COVER_SOURCES });
   useEffect(() => {
     let alive = true;
     getConfig().then((c) => { if (alive) setConfig(c); });
@@ -26,6 +26,12 @@ export function useConfig() {
 // Convenience: the Korea-specific feature flag.
 export function useKoreanMode() {
   return !!useContext(ConfigContext).korean_mode;
+}
+
+// "Personal lab" flag: fork-firmware extras (experimental systems, MEDIA tab,
+// the experimental-releases link). Off → upstream-official feature set only.
+export function useExperimentalMode() {
+  return !!useContext(ConfigContext).experimental_mode;
 }
 
 // Which cover-search providers are configured (have an API key). libretro is

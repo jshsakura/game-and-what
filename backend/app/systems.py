@@ -8,6 +8,10 @@ so dirname/exts below are taken verbatim from that file — only systems the SD
 build actually registers appear here (Homebrew tab is excluded: it's for the
 bundled apps, not user uploads).
 
+Systems the UPSTREAM sylverb firmware does not register (fork-only additions)
+carry `experimental=True` and are hidden unless GNW_EXPERIMENTAL_MODE is on —
+see `available_systems()`.
+
 `lzma` is a cross-system compression wrapper the firmware also accepts; it is
 not a per-system format, so it's tracked separately, not in each row.
 """
@@ -24,6 +28,7 @@ class System:
     exts: tuple[str, ...]  # accepted rom extensions (lowercase, no dot)
     pico8: bool = False    # special cover handling (.p8 / .p8.png label)
     square: bool = False   # 1:1 label-style art instead of 3:4 box art
+    experimental: bool = False  # NOT in upstream sylverb rg_emulators.c — needs the fork firmware
 
 
 # Cover aspect policy. The firmware grid (gui_draw_coverflow_v) sizes the
@@ -55,7 +60,7 @@ SYSTEMS: tuple[System, ...] = (
     # play uses the beetle-pce-fast core + a user-uploaded System Card BIOS
     # (syscard3.pce in the Extra folder); single-file .chd boots, .cue/.bin sets
     # need their track sidecars so they're not browser-playable (see emulator.jsx).
-    System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue")),
+    System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue"), experimental=True),
     System("col", "Coleco Vision", "col", ("col",)),
     System("msx", "MSX", "msx", ("dsk", "rom", "mx1", "mx2", "cdk")),
     System("a2600", "Atari 2600", "a2600", ("a26", "bin")),
@@ -67,8 +72,8 @@ SYSTEMS: tuple[System, ...] = (
     # all NGP/NGPC exts go in the single /roms/ngp/ folder. On-device play needs a
     # firmware build that includes the core. Few ROMs each, so mono+Color are kept
     # as ONE combined folder per family (NOT split like gb/gbc).
-    System("ngp", "NEOGEO Pocket", "ngp", ("ngp", "ngc", "ngpc")),
-    System("ws", "WonderSwan", "ws", ("ws", "wsc")),
+    System("ngp", "NEOGEO Pocket", "ngp", ("ngp", "ngc", "ngpc"), experimental=True),
+    System("ws", "WonderSwan", "ws", ("ws", "wsc"), experimental=True),
     # Atari Lynx. The SD build ships the handy-go core (external/handy-go), so a
     # firmware that registers it can play these on-device; added here for library
     # collection with original No-Intro names. Standard extension is ".lnx".
@@ -77,19 +82,19 @@ SYSTEMS: tuple[System, ...] = (
     # library-collection system with original No-Intro names. Standard extension
     # is ".vb". Browser play works via the mednafen_vb (beetle-vb) core; .vb files
     # are headerless but the core boots them HLE, so no BIOS is needed.
-    System("vb", "Virtual Boy", "vb", ("vb",)),
+    System("vb", "Virtual Boy", "vb", ("vb",), experimental=True),
     # Magnavox Odyssey² / Philips Videopac (same hardware). The firmware has a
     # videopac core (main_videopac.c) but its add_emulator is commented out, so
     # it's library-collection only for now (TOSEC .bin names). dirname "videopac"
     # matches the firmware folder so it lines up if that core is ever enabled.
-    System("videopac", "Odyssey²", "videopac", ("bin",)),
+    System("videopac", "Odyssey²", "videopac", ("bin",), experimental=True),
     # ZX Spectrum & Commodore 64 — library-collection only (no firmware/web core
     # yet). Z80/6502 home computers with huge libraries; common emulator formats.
-    System("zxs", "ZX Spectrum", "zxs", ("z80", "tap", "tzx", "sna", "szx")),
-    System("c64", "Commodore 64", "c64", ("d64", "t64", "prg", "crt", "g64", "tap")),
+    System("zxs", "ZX Spectrum", "zxs", ("z80", "tap", "tzx", "sna", "szx"), experimental=True),
+    System("c64", "Commodore 64", "c64", ("d64", "t64", "prg", "crt", "g64", "tap"), experimental=True),
     # Tiger Game.com — cartridge handheld (Sharp SM8500). dirname "gamecom"
     # matches the firmware /roms/gamecom folder; carts are ".bin"/".tgc".
-    System("gamecom", "Tiger Game.com", "gamecom", ("bin", "tgc")),
+    System("gamecom", "Tiger Game.com", "gamecom", ("bin", "tgc"), experimental=True),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
     # Device-only: the firmware plays LCD-Game-Shrinker ".gw" files. The MADrigal
@@ -108,6 +113,20 @@ SYSTEMS: tuple[System, ...] = (
 
 _BY_KEY: dict[str, System] = {s.key: s for s in SYSTEMS}
 _BY_DIRNAME: dict[str, System] = {s.dirname: s for s in SYSTEMS}
+
+# /roms + /covers dirnames that exist only on the fork firmware — used to keep
+# them out of the SD ZIP when experimental mode is off.
+EXPERIMENTAL_DIRNAMES: frozenset[str] = frozenset(s.dirname for s in SYSTEMS if s.experimental)
+
+
+def available_systems() -> tuple[System, ...]:
+    """Systems this deploy exposes: everything in experimental ("personal lab")
+    mode, otherwise only what the upstream sylverb firmware officially registers
+    (up to Atari Lynx)."""
+    from . import config
+    if config.EXPERIMENTAL_MODE:
+        return SYSTEMS
+    return tuple(s for s in SYSTEMS if not s.experimental)
 
 
 def get_system(key: str) -> System:

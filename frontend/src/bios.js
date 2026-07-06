@@ -12,6 +12,9 @@
 // dir — it can differ from the SD filename (e.g. gearcoleco wants
 // "colecovision.rom" while the SD stores the same bytes as "coleco.bin").
 //
+// Entries with `experimental: true` belong to fork-only systems and are
+// hidden from the INFO table when the deploy isn't in experimental mode.
+//
 // BIOS files are copyrighted and must be supplied by the user — we never ship
 // them. Sizes are the standard No-Intro/redump sizes so users can sanity-check
 // a dump before uploading.
@@ -36,6 +39,7 @@ export const BIOS_CATALOG = [
   },
   {
     key: "pcecd",
+    experimental: true,
     label: "PC Engine CD",
     note: "System Card 3.0 — boots essentially the entire CD library.",
     files: [
@@ -44,6 +48,7 @@ export const BIOS_CATALOG = [
   },
   {
     key: "videopac",
+    experimental: true,
     label: "Odyssey² / Videopac",
     note: "The o2rom system BIOS — the o2em core can't boot without it.",
     files: [
@@ -52,6 +57,7 @@ export const BIOS_CATALOG = [
   },
   {
     key: "c64",
+    experimental: true,
     label: "Commodore 64",
     note: "The three C64 system ROMs (© Commodore, user-supplied).",
     files: [
@@ -62,6 +68,7 @@ export const BIOS_CATALOG = [
   },
   {
     key: "gamecom",
+    experimental: true,
     label: "Tiger Game.com",
     note: "Internal OS + external/kernel ROM (© Tiger, user-supplied).",
     files: [
