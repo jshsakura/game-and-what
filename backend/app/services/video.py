@@ -366,6 +366,39 @@ def build_clock_gif_command(input_path: Path, output_path: Path,
     return cmd
 
 
+def _is_animated_webp(input_path: Path) -> bool:
+    """ffmpeg's built-in webp decoder only reads a single VP8/VP8L bitstream —
+    it can't parse the ANIM/ANMF chunks of an animated WebP and fails outright
+    ("Decode error rate 1 exceeds maximum"). Detect that case so it can be
+    re-encoded via Pillow first."""
+    if input_path.suffix.lower() != ".webp":
+        return False
+    from PIL import Image
+    try:
+        with Image.open(input_path) as im:
+            return bool(getattr(im, "is_animated", False))
+    except Exception:
+        return False
+
+
+def _animated_webp_to_gif(input_path: Path) -> Path:
+    """Re-encode an animated WebP into a temporary animated GIF via Pillow (which
+    decodes ANIM/ANMF chunks fine) so ffmpeg gets a format it can actually read."""
+    from PIL import Image
+    gif_path = input_path.with_suffix(".converted.gif")
+    with Image.open(input_path) as im:
+        frames, durations = [], []
+        for i in range(im.n_frames):
+            im.seek(i)
+            frames.append(im.convert("RGBA"))
+            durations.append(im.info.get("duration", 100))
+        frames[0].save(
+            gif_path, save_all=True, append_images=frames[1:],
+            duration=durations, loop=0, disposal=2,
+        )
+    return gif_path
+
+
 def gifsicle_available() -> bool:
     return shutil.which("gifsicle") is not None
 
@@ -404,6 +437,8 @@ async def encode_to_clock_gif(input_path: Path, output_path: Path,
         raise VideoEncodeError("ffmpeg is not installed on the server")
     if not input_path.exists():
         raise VideoEncodeError(f"Input not found: {input_path}")
+    if _is_animated_webp(input_path):
+        input_path = _animated_webp_to_gif(input_path)
     still = _probe_seconds(input_path) <= 0.0
     is_gif_loop = input_path.suffix.lower() == CLOCK_GIF_SUFFIX
     seconds = CLOCK_GIF_LOOP_MAX_SECONDS if is_gif_loop else CLOCK_GIF_MAX_SECONDS
