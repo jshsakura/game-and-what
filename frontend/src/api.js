@@ -223,7 +223,7 @@ function xhrUploadBlob(url, form, onProgress) {
 }
 
 // Image/video → a 320×240 clock background gif. Resolves the gif Blob to download
-// (stateless: the user drops it at /clock/bg.gif on the SD card).
+// (stateless: the user drops it at /clock/gif/bg.gif on the SD card).
 export async function uploadClockBackground(file, onProgress, { mode = "fit", crop = "" } = {}) {
   const form = new FormData();
   form.append("file", file);

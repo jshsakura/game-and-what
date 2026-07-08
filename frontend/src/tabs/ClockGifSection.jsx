@@ -7,7 +7,7 @@ import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
 import { FitSelect, CropStage } from "./clockShared.jsx";
 
-// Clock background GIF: one image/video/GIF → a device-safe 320×240 /clock/bg.gif.
+// Clock background GIF: one image/video/GIF → a device-safe 320×240 /clock/gif/bg.gif.
 // The user frames the shot with the shared drag & zoom cropper (the crop rectangle
 // goes to the server as source fractions), then the server walks a quality ladder
 // (palette + fps + gifsicle lossy) until the file fits the device budget — any
@@ -51,7 +51,7 @@ export default function ClockGifSection() {
       const blob = await uploadClockBackground(src.file, null, { mode, crop: cropStr });
       downloadBlob(blob, "bg.gif");
       setResult({ inBytes: src.file.size, outBytes: blob.size });
-      toast.success(t("Downloaded bg.gif — copy it to /clock/ on the SD card"));
+      toast.success(t("Downloaded bg.gif — copy it into /clock/gif on the SD card"));
     } catch (e) {
       toast.error(e.message || t("Convert failed"));
     } finally {
@@ -70,7 +70,7 @@ export default function ClockGifSection() {
       </div>
       <div className="vtab-safe">
         <Info size={13} strokeWidth={2.5} aria-hidden />
-        <span>{t("The screen is 320×240 — the output is pinned to that size (a larger source only wastes space). Download bg.gif, then copy it to")} <b>/clock/bg.gif</b> {t("on the SD card and pick “GIF” as the clock background.")}</span>
+        <span>{t("The screen is 320×240 — the output is pinned to that size (a larger source only wastes space). Download bg.gif, then copy it to")} <b>/clock/gif/bg.gif</b> {t("on the SD card and pick “GIF” as the clock background. Any .gif in that folder can be picked, so keep several.")}</span>
       </div>
 
       <Dropzone

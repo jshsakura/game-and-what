@@ -1125,6 +1125,20 @@ body::before {
 }
 .clock-file-row .scope-btn { flex: 0 0 auto; }
 
+/* Clock (alarm) trimmer: label · slider · read-out. One grid for BOTH rows
+   (rows are display:contents) so the columns size to the widest label and the
+   two slider tracks stay aligned in every language — "Länge"/"Startpunkt" and
+   "Длина"/"Начало фрагмента" would misalign under a per-row flex layout. */
+.clock-trim-grid {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 6px 9px; align-items: center;
+}
+.clock-trim-row { display: contents; }
+.clock-trim-row .cropper-zoom { min-width: 0; }
+.clock-trim-row .cropper-zoom:disabled { opacity: 0.4; }
+.clock-trim-label { white-space: nowrap; }
+.clock-trim-val { text-align: right; font-variant-numeric: tabular-nums; }
+
 /* IGDB cover search results in the popup */
 .cover-search { display: flex; flex-direction: column; gap: 8px; }
 .cover-results {

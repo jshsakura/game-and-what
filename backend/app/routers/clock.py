@@ -1,9 +1,10 @@
-"""Clock background: any image/video → a 320×240 /clock/bg.gif for download.
+"""Clock background: any image/video → a 320×240 /clock/gif/bg.gif for download.
 
 Stateless — nothing is stored server-side. The user converts a source, downloads
-the resulting bg.gif, and drops it into /clock/ on the SD card (the firmware's
-Clock app reads /clock/bg.gif). The LCD is 320×240 and the clock scale-fills, so
-a larger source only wastes bytes; the encoder pins the output to 320×240.
+the resulting bg.gif, and drops it into /clock/gif/ on the SD card (the firmware's
+Clock app scans that folder; bg.gif is just the default pick). The LCD is 320×240
+and the clock scale-fills, so a larger source only wastes bytes; the encoder pins
+the output to 320×240.
 """
 from __future__ import annotations
 

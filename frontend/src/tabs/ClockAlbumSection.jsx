@@ -131,6 +131,9 @@ export default function ClockAlbumSection() {
         <Info size={13} strokeWidth={2.5} aria-hidden />
         <span>{t("Converted right here in your browser (nothing is uploaded). Download the .565 and copy it into")} <b>/clock/album</b> {t("on the SD card, then pick “Photo Album” as the clock background. Add as many as you like.")}</span>
       </div>
+      <div className="muted" style={{ fontSize: 11 }}>
+        {t("Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.")}
+      </div>
 
       <Dropzone
         accept="image/*"

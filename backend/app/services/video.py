@@ -8,7 +8,7 @@ is the EXACT command build_command() emits (default 'fit' mode shown):
   ffmpeg -hide_banner -y -i input -c:v mjpeg \
     -b:v 1600k -maxrate 1600k -bufsize 320k -qmin 17 -qmax 31 \
     -vf scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20 \
-    -c:a libmp3lame -ac 1 -b:a 96k -ar 44100 output.avi
+    -c:a libmp3lame -ac 1 -b:a 96k -ar 48000 output.avi
 
 Only the -vf filter changes with the screen-fit mode (see _VIDEO_FILTERS):
   fit     scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20
@@ -73,7 +73,11 @@ FRAME_RATE = 20           # fps=20 — fewer frames/s = fewer SD reads. per-read
                           # of the read count for noticeably smoother playback on slow
                           # SD cards, at a barely-perceptible motion cost. Target ~110 KB/s.
 AUDIO_BITRATE = "96k"     # MP3 mono — minimal SD load, reuses minimp3 on device
-AUDIO_RATE = 44100        # -ar 44100 (device resamples to 48k mono internally)
+AUDIO_RATE = 48000        # the device's own rate. Its resampler steps by
+                          # (src_hz << 16) / 48000 and reads the NEAREST sample,
+                          # so 48000 is the one rate that passes through untouched
+                          # (step == 65536). 44100 gave step 60211 and folded an
+                          # image of the source back into the audible band.
 OUTPUT_SUFFIX = ".avi"
 
 # Three ways to map an arbitrary source onto the exact 320x240 screen:
@@ -266,7 +270,7 @@ async def make_web_preview(input_path: Path, output_path: Path) -> Path:
 
 
 # ── Clock background GIF ────────────────────────────────────────────────────
-# The firmware Clock app plays /clock/bg.gif behind the digits (PAUSE → Background
+# The firmware Clock app plays /clock/gif/bg.gif behind the digits (PAUSE → Background
 # → GIF). It decodes ONE frame at a time into an RGB565 canvas and scale-fills it
 # onto the 320×240 LCD, so:
 #   • Resolution is EXACTLY 320×240. The screen is 320×240 and the app downscales
@@ -424,7 +428,7 @@ async def _gifsicle_optimize(path: Path, lossy: int) -> None:
 async def encode_to_clock_gif(input_path: Path, output_path: Path,
                               mode: str = DEFAULT_FIT_MODE,
                               crop: ClockCrop | None = None) -> Path:
-    """Encode any image/video into a clock-ready /clock/bg.gif (320×240, palette-
+    """Encode any image/video into a clock-ready /clock/gif/bg.gif (320×240, palette-
     optimized, ordered-dithered). `mode` = fit / fill / stretch / custom (with
     `crop` fractions). A still image becomes a 1-frame static background; an
     animated source loops on-device — a GIF source keeps its WHOLE loop (up to
