@@ -1,37 +1,69 @@
+<div align="center">
+
 # 🎮 Game & What — Retro SD Manager
+
+**A self-hosted web app that turns a pile of ROMs into a ready-to-flash Game & Watch SD card.**
 
 **English** · [한국어](README.ko.md)
 
-A self-hosted web app that prepares SD cards for **retro-go-sd** firmware on the
-Game & Watch handheld. Drop in ROMs, videos and music — it auto-adds names and
-device-spec covers, then packs everything into a single ZIP that matches the
-retro-go SD card layout. Ready to extract onto your card.
-
-> Targets the [retro-go-sd](https://github.com/sylverb/game-and-watch-retro-go-sd)
-> firmware. The name "Game & What" is a play on words — this project ships **no
-> ROMs, BIOS or copyrighted assets** (see [Disclaimer](#disclaimer)).
-
-**▶︎ [Live demo](https://jshsakura.github.io/game-and-what/)** — a static preview
-with sample data (no backend; uploads/edits are disabled).
+[![Live demo](https://img.shields.io/badge/▶_live-demo-4c9a2a?style=flat-square)](https://jshsakura.github.io/game-and-what/)
+[![Docker image](https://img.shields.io/badge/ghcr.io-game--and--what-2496ED?style=flat-square&logo=docker&logoColor=white)](https://github.com/jshsakura/game-and-what/pkgs/container/game-and-what)
+[![Build](https://img.shields.io/github/actions/workflow/status/jshsakura/game-and-what/docker-publish.yml?style=flat-square&label=image%20build)](https://github.com/jshsakura/game-and-what/actions/workflows/docker-publish.yml)
+[![Version](https://img.shields.io/github/v/tag/jshsakura/game-and-what?style=flat-square&label=version)](https://github.com/jshsakura/game-and-what/tags)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+![Arch](https://img.shields.io/badge/arch-amd64_·_arm64-555?style=flat-square)
 
 ![Game & What preview](docs/preview.png)
+
+</div>
+
+Drop in ROMs, videos and music — Game & What auto-fetches names and device-spec
+covers, then packs everything into a **single ZIP that matches the retro-go SD
+card layout**. Extract it onto your card and you're done.
+
+> Targets the [retro-go-sd](https://github.com/sylverb/game-and-watch-retro-go-sd)
+> firmware for the Game & Watch handheld. The name "Game & What" is a play on
+> words — this project ships **no ROMs, BIOS or copyrighted assets**
+> (see [Disclaimer](#-disclaimer)).
+
+**▶︎ [Try the live demo](https://jshsakura.github.io/game-and-what/)** — a static
+preview with sample data (no backend; uploads/edits are disabled).
+
+---
+
+## 📑 Contents
+
+- [What it does](#-what-it-does)
+- [How it works](#-how-it-works) — the end-to-end flow
+- [Getting started](#-getting-started) — **step-by-step install**
+  - [1. Prerequisites](#1-prerequisites)
+  - [2. Run it](#2-run-it-docker)
+  - [3. First use — from ROM to SD card](#3-first-use--from-rom-to-sd-card)
+  - [4. Updating to a new version](#4-updating-to-a-new-version)
+  - [Platform notes](#platform-notes-nas--raspberry-pi--windows)
+- [BIOS / system ROMs](#-bios--system-roms)
+- [Configuration](#️-configuration)
+- [Security — no built-in login](#-security--no-built-in-login)
+- [FAQ & troubleshooting](#-faq--troubleshooting)
+- [Develop from source](#️-develop-from-source)
+- [Tech stack](#-tech-stack) · [Credits](#-credits) · [Disclaimer](#-disclaimer) · [License](#-license)
 
 ---
 
 ## ✨ What it does
 
 - **ROM → cover.** Upload a ROM for any supported system; a cover is auto-fetched
-  (IGDB → TheGamesDB → libretro-thumbnails), rendered to the device spec
-  (**186×100 `.img`**, aspect-preserved), and filed as `/covers/<sys>/Name.img`
+  (IGDB → TheGamesDB → SteamGridDB → libretro-thumbnails), rendered to the device
+  spec (**186×100 `.img`**, aspect-preserved), and filed as `/covers/<sys>/Name.img`
   beside `/roms/<sys>/Name.<ext>`. Search/upload/crop covers manually too.
-- **One-click SD ZIP.** Download the whole card (`/roms`, `/covers`, `/cores`)
+- **One-click SD ZIP.** Download the whole card (`/roms`, `/covers`, `/cores`, BIOS)
   in the exact firmware layout — extract to the SD root, done.
 - **Play in browser.** Experimental in-page emulation (Nostalgist.js) for systems
-  that have a WASM core.
-- **Curate a bloated set.** Each ROM shows its **IGDB rating** (0-100, color-tiered
-  badge on the cover's bottom-right) so you can judge quality at a glance, and a
-  per-ROM **"Exclude from SD"** toggle drops a ROM from the SD download while
-  keeping it in the library — slim the device menu without deleting anything.
+  that have a WASM core — test a ROM before you flash it.
+- **Curate a bloated set.** Each ROM shows its **IGDB rating** (0–100, color-tiered
+  badge on the cover) so you can judge quality at a glance, and a per-ROM
+  **"Exclude from SD"** toggle drops a ROM from the SD download while keeping it in
+  the library — slim the device menu without deleting anything.
 - **All 20 officially supported systems** — everything the upstream
   [sylverb firmware](https://github.com/sylverb/game-and-watch-retro-go-sd)
   registers, up to Atari Lynx: NES, Game Boy / GB Color, Game Gear, Master System,
@@ -49,6 +81,142 @@ with sample data (no backend; uploads/edits are disabled).
   backgrounds). **Off by default** — everything above stays hidden and the app
   tracks only what the official firmware supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
+
+## 🔄 How it works
+
+Game & What sits between your ROM collection and the SD card. The typical flow:
+
+```
+   your files                Game & What                     SD card
+ ┌────────────┐   upload   ┌───────────────────────┐  ZIP  ┌─────────────┐
+ │ ROMs       │──────────► │ • auto-name           │──────►│ /roms       │
+ │ (+ videos, │            │ • fetch + render cover │       │ /covers     │
+ │  music,    │            │ • rate / curate        │       │ /cores      │
+ │  BIOS)     │            │ • exclude from SD      │       │ bios/…      │
+ └────────────┘            │ • test in browser      │       └─────────────┘
+                           └───────────────────────┘        extract to card
+```
+
+1. **Upload** a ROM (drag & drop, or a whole folder). The app detects the system,
+   normalizes the filename, and stores it under `/roms/<sys>/`.
+2. **Cover art** is fetched from the first provider that has a hit and rendered to
+   the exact device spec. You can override it — search, upload your own, or crop.
+3. **Curate** — sort by rating, hide low-quality dumps from the device with
+   *Exclude from SD*, and (optionally) preview a ROM in the browser emulator.
+4. **Download the SD ZIP.** Everything is packed in the firmware's exact directory
+   layout. Extract to the root of a FAT32 SD card and boot the device.
+
+> The app is **stateless toward your card** — it never writes to the SD directly.
+> It hands you a ZIP; you extract it. Your library (DB + uploads) lives in a mounted
+> volume and survives restarts and upgrades.
+
+## 🚀 Getting started
+
+The app ships as a single Docker image (FastAPI backend + built React UI on one
+port). No database to set up, no build step — pull and run.
+
+### 1. Prerequisites
+
+- **[Docker](https://docs.docker.com/get-docker/)** (Desktop on Windows/macOS, or
+  Engine on Linux). That's the only requirement.
+- A **FAT32-formatted microSD card** and a Game & Watch running the
+  [retro-go-sd](https://github.com/sylverb/game-and-watch-retro-go-sd) firmware
+  (flashing the firmware itself is out of scope — see that project's guide).
+- Your own **legally-obtained ROMs** (this project ships none).
+
+### 2. Run it (Docker)
+
+**Option A — one-liner:**
+
+```bash
+docker run -d --name game-and-what \
+  -p 38472:8080 \
+  -v "$PWD/data:/app/backend/data" \
+  --restart unless-stopped \
+  ghcr.io/jshsakura/game-and-what:latest
+# → open http://localhost:38472
+```
+
+**Option B — Docker Compose** (recommended; easier to update and configure).
+Save this as `docker-compose.yml`:
+
+```yaml
+services:
+  game-and-what:
+    image: ghcr.io/jshsakura/game-and-what:latest
+    container_name: game-and-what
+    ports:
+      - "38472:8080"          # host:container — change the left side freely
+    volumes:
+      - ./data:/app/backend/data   # your library + DB live here
+    environment:
+      # All optional — the app boots with none. See .env.example / DEPLOY.md.
+      IGDB_CLIENT_ID: ""
+      IGDB_CLIENT_SECRET: ""
+      TGDB_API_KEY: ""
+    restart: unless-stopped
+```
+
+Then:
+
+```bash
+docker compose up -d
+# → open http://localhost:38472
+```
+
+No API keys are required — cover search is just limited without them (see
+[Configuration](#️-configuration)). The `./data` folder holds your entire library
+(SQLite DB + uploads); back it up and you back up everything.
+
+### 3. First use — from ROM to SD card
+
+1. Open **`http://localhost:38472`** (or your host's IP + port).
+2. Pick a **system tab** (e.g. Game Boy) and **drag a ROM** onto the page — or use
+   the upload button. The cover is fetched and rendered automatically.
+3. Repeat for as many ROMs as you like. Fix any missed cover with **search /
+   upload / crop**, and toggle **Exclude from SD** on anything you don't want on
+   the device.
+4. Click **Download SD ZIP**. You'll get one archive in the firmware's layout.
+5. **Extract it to the root of your FAT32 SD card** (so the card has `/roms`,
+   `/covers`, `/cores`, etc. at the top level). Eject, insert into the device,
+   power on. Your games are there.
+
+> Need a BIOS for a system (Famicom Disk, ColecoVision, PC Engine CD…)? See
+> [BIOS / system ROMs](#-bios--system-roms) — upload it once and it rides along in
+> the ZIP at the right path.
+
+### 4. Updating to a new version
+
+Your data lives in the mounted volume, so upgrades are safe:
+
+```bash
+# Compose
+docker compose pull && docker compose up -d
+
+# Plain docker run
+docker pull ghcr.io/jshsakura/game-and-what:latest
+docker rm -f game-and-what
+# …then re-run the same `docker run` command from step 2
+```
+
+Images are tagged per release (`:1.8.1`, `:1.8`, `:latest`) — pin a specific tag
+if you prefer to control upgrades.
+
+### Platform notes (NAS / Raspberry Pi / Windows)
+
+- **Raspberry Pi & ARM SBCs** — the image is **multi-arch** (`amd64` + `arm64`);
+  the same `docker pull` works. No emulation, native ARM.
+- **Synology / QNAP NAS** — add the image in Container Manager / Container Station,
+  map a host folder to `/app/backend/data`, and expose port `8080`. Same as any
+  container.
+- **Windows / macOS** — use Docker Desktop; the commands above are identical. On
+  Windows, run them in PowerShell or WSL (in PowerShell, replace `$PWD` with `${PWD}`).
+- **File ownership (Linux hosts)** — if the container can't write to `./data`,
+  build with a matching UID (`UID=1000 docker compose build`) or `chown` the data
+  dir. Details in [DEPLOY.md](DEPLOY.md).
+
+Full deployment reference — env vars, publishing, Zero-Trust access — in
+**[DEPLOY.md](DEPLOY.md)**.
 
 ## 💾 BIOS / system ROMs
 
@@ -84,40 +252,65 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 
 ![Mario edition](docs/screen-mario.png)
 
-## Quick start (Docker)
-
-```bash
-docker run -d --name game-and-what \
-  -p 38472:8080 \
-  -v "$PWD/data:/app/backend/data" \
-  ghcr.io/jshsakura/game-and-what:latest
-# → http://localhost:38472
-```
-
-Or with compose (`docker compose up -d`). No API keys are required — cover search
-is just limited without them. Full deployment guide, env reference, publishing and
-**access/security** in **[DEPLOY.md](DEPLOY.md)**.
-
 ## ⚙️ Configuration
 
 There is **no in-app settings screen** — everything is an environment variable
 (the Docker convention). Provide keys via `docker run -e`, a compose `.env`, or
-`backend/.env` for local dev. Nothing is required to boot. See
+`backend/.env` for local dev. **Nothing is required to boot.** Keys are read at
+startup, so recreate the container after changing one. See
 **[`.env.example`](.env.example)** and the table in [DEPLOY.md](DEPLOY.md).
 
-| Variable | Purpose |
-|---|---|
-| `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | IGDB cover search/auto-fill (optional) |
-| `TGDB_API_KEY` | TheGamesDB cover search/auto-fill (optional, monthly quota) |
-| `GNW_KOREAN_MODE` | Korea-specific features (default `false`) |
-| `GNW_EXPERIMENTAL_MODE` | "Personal lab": fork-firmware extras — experimental systems + MEDIA tab (default `false`) |
-| `GNW_CORS_ORIGINS` | CORS allow-list (default `*`) |
+| Variable | Default | Purpose |
+|---|---|---|
+| `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | — | IGDB cover search / auto-fill (free Twitch dev app) |
+| `TGDB_API_KEY` | — | TheGamesDB cover search / auto-fill (free key, monthly quota) |
+| `STEAMGRIDDB_API_KEY` | — | SteamGridDB cover search (free Bearer token) |
+| `GNW_KOREAN_MODE` | `false` | Korea-specific features (한글패치 / 한글명) |
+| `GNW_EXPERIMENTAL_MODE` | `false` | "Personal lab": fork-firmware extras — experimental systems + MEDIA tab |
+| `GNW_CORS_ORIGINS` | `*` | CORS allow-list (the app has no auth — front it with Zero Trust) |
+
+> **Why bother with cover-search keys?** With none, the app falls back to
+> libretro-thumbnails only. Adding even one provider (IGDB is free and broad)
+> dramatically improves cover hit-rate and gives you IGDB ratings for curation.
 
 ## 🔒 Security — no built-in login
 
-The app has **no authentication** (single shared workspace). **Do not expose it
-raw to the internet.** Put a Zero Trust layer in front (Cloudflare Tunnel +
-Access, or Tailscale). Details and setup steps in [DEPLOY.md](DEPLOY.md#access-control--no-login-use-zero-trust).
+The app has **no authentication** (single shared workspace, `CORS=*`). **Do not
+expose it raw to the internet.** Put a Zero Trust layer in front (Cloudflare
+Tunnel + Access, or Tailscale). Details and setup steps in
+[DEPLOY.md](DEPLOY.md#access-control--no-login-use-zero-trust).
+
+## ❓ FAQ & troubleshooting
+
+**A cover didn't get found / looks wrong.**
+Add an `IGDB` key (free, broad coverage) and re-run cover search on that ROM, or
+just **search / upload / crop** the cover manually from the ROM's card.
+
+**Can I play games in the browser to test them?**
+Yes — systems with a WASM core support in-page emulation (experimental). It's for
+quick verification before flashing, not a full experience.
+
+**The SD ZIP didn't work on my device.**
+Make sure you extracted it to the **root** of a **FAT32** card (so `/roms`,
+`/covers`, etc. sit at the top level), and that your device runs the
+[retro-go-sd](https://github.com/sylverb/game-and-watch-retro-go-sd) firmware.
+Systems needing a [BIOS](#-bios--system-roms) won't boot without it.
+
+**Port `38472` is already in use.**
+Change the host side of the port map — `-p 9000:8080` (docker run) or the
+`ports:` left value in compose. The container always listens on `8080` internally.
+
+**The container can't write to my data folder (Linux).**
+UID mismatch. Rebuild with your UID (`UID=1000 docker compose build`) or `chown`
+the mounted `data` dir to the container's user. See [DEPLOY.md](DEPLOY.md).
+
+**Where's my library stored / how do I back it up?**
+Everything mutable is in the mounted volume (`./data` → `/app/backend/data`):
+SQLite DB + all uploads. Copy that folder and you've backed up the whole install.
+
+**I see extra systems / a MEDIA tab that the README calls "official 20".**
+You (or the image) have `GNW_EXPERIMENTAL_MODE=true`. That's the fork-firmware
+lab; turn it off for the official-only feature set.
 
 ## 🛠️ Develop from source
 
@@ -135,6 +328,7 @@ npm run dev
 ```
 
 Local secrets go in `backend/.env` (git-ignored, auto-loaded by `config.py`).
+Run the backend tests with `cd backend && python3 -m pytest`.
 
 ## 🧱 Tech stack
 
@@ -152,9 +346,10 @@ Local secrets go in `backend/.env` (git-ignored, auto-loaded by `config.py`).
 - [retro-go](https://github.com/ducalex/retro-go) (ducalex) — upstream.
 - The `smw` / `zelda3` reimplementation ports (snesrev) used by the homebrew apps.
 - Cover art: [IGDB](https://www.igdb.com/), [TheGamesDB](https://thegamesdb.net/),
+  [SteamGridDB](https://www.steamgriddb.com/),
   [libretro-thumbnails](https://github.com/libretro-thumbnails).
 
-## Disclaimer
+## ⚖️ Disclaimer
 
 This project ships **no ROMs, BIOS, or copyrighted game assets** — you supply your
 own legally-obtained files. "Game & Watch", game titles and related marks are
