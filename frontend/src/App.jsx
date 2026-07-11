@@ -7,7 +7,7 @@ import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
 import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive } from "lucide-react";
-import { getLibrary, packageUrl, packageSize, formatBytes } from "./api.js";
+import { getLibrary, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
 import { useExperimentalMode } from "./config.jsx";
@@ -237,7 +237,6 @@ export default function App() {
   }, [selKey, reloadKey]);
 
   const bumpLibrary = () => setReloadKey((k) => k + 1);
-  const zip = packageUrl();
 
   const toggleTheme = () => setTheme((t) => (t === "mario" ? "zelda" : "mario"));
 
@@ -309,8 +308,8 @@ export default function App() {
                 : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
             </button>
             <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
-              onClick={() => dl.download(
-                allSelected ? zip : packageUrl(selKey),
+              onClick={() => dl.downloadPackage(
+                allSelected ? undefined : selKey,
                 allSelected ? "gnw-sd.zip" : "gnw-sd-selected.zip",
                 (allSelected ? sdSize : selSize) || 0,
               )}

@@ -669,6 +669,19 @@ export function packageUrl(system) {
     : `/api/sessions/${sid}/package`;
 }
 
+// Kick off (or reuse) the server-side SD-zip build. Returns {ready, job_id}:
+// ready → download immediately; else poll jobUrl(job_id) for build progress.
+export function packageBuildUrl(system) {
+  const sid = getSessionId();
+  if (!sid) return null;
+  return system
+    ? `/api/sessions/${sid}/package/build?system=${encodeURIComponent(system)}`
+    : `/api/sessions/${sid}/package/build`;
+}
+
+export const jobUrl = (id) => `/api/jobs/${id}`;
+export const jobCancelUrl = (id) => `/api/jobs/${id}/cancel`;
+
 // Estimated on-SD byte size of the (optional single-system) package.
 export async function packageSize(system) {
   const sid = getSessionId();

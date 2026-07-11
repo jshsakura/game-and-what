@@ -58,9 +58,14 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
 
 
 # Bump when the zip-building logic changes so old cached zips are invalidated.
-_SD_CACHE_VERSION = "2"
-_SD_CACHE_KEEP = 2                    # max cached zips to retain (LRU)
-_SD_CACHE_MAX_BYTES = 1_200_000_000  # ~1.2 GB total budget across cached zips
+# "3": DEFLATE level 1 (was 6).
+_SD_CACHE_VERSION = "3"
+_SD_CACHE_KEEP = 4                    # max cached zips to retain (LRU)
+# Budget must comfortably hold a couple of FULL-library zips (~2.4 GB each) plus
+# per-system ones, or switching variants (all / +video / single system) evicts
+# the full zip and forces a 1–2 min rebuild every time. A retro SD library is a
+# few GB; 12 GB of cache is a cheap trade for never rebuilding the common ones.
+_SD_CACHE_MAX_BYTES = 12_000_000_000
 
 
 def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None",
@@ -95,12 +100,39 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
         yield fw, storage.FIRMWARE_FILENAME
 
 
+class BuildCancelled(Exception):
+    """Raised inside the zip writer when a caller asks the build to stop."""
+
+
 def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
                   systems: "set[str] | None", homebrew_roms: "set[str] | None",
-                  excluded_roms: "set[str] | None" = None) -> None:
-    """Write the SD-card layout into an OPEN ZipFile."""
-    for abs_path, arcname in _sd_entries(session_id, include_video, systems, homebrew_roms, excluded_roms):
+                  excluded_roms: "set[str] | None" = None,
+                  on_progress=None, should_cancel=None) -> None:
+    """Write the SD-card layout into an OPEN ZipFile.
+
+    on_progress(done_bytes, total_bytes): called after each file (best-effort
+    progress, measured in uncompressed input bytes). should_cancel(): polled
+    before each file; if it returns True, raises BuildCancelled."""
+    entries = list(_sd_entries(session_id, include_video, systems, homebrew_roms, excluded_roms))
+    total = 0
+    for abs_path, _ in entries:
+        try:
+            total += abs_path.stat().st_size
+        except OSError:
+            pass
+    done = 0
+    if on_progress:
+        on_progress(0, total)
+    for abs_path, arcname in entries:
+        if should_cancel and should_cancel():
+            raise BuildCancelled()
         zf.write(abs_path, arcname=arcname)
+        try:
+            done += abs_path.stat().st_size
+        except OSError:
+            pass
+        if on_progress:
+            on_progress(done, total)
 
 
 def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
@@ -120,19 +152,42 @@ def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[s
     return h.hexdigest()
 
 
+def cached_zip_path(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
+                    homebrew_roms: "set[str] | None" = None,
+                    excluded_roms: "set[str] | None" = None) -> tuple[str, str, bool]:
+    """(zip_path, etag, exists) for the current library/params, without building.
+    Lets the caller answer 'is it ready?' before starting a build job."""
+    key = sd_fingerprint(session_id, include_video, systems, homebrew_roms, excluded_roms)
+    cache_dir = config.DATA_DIR / "_cache"
+    cached = cache_dir / f"sd-{key}.zip"
+    exists = cached.exists()
+    if exists:
+        os.utime(cached, None)   # mark recently used (for LRU prune)
+    return str(cached), key, exists
+
+
 def build_sd_zip_cached(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
                         homebrew_roms: "set[str] | None" = None,
-                        excluded_roms: "set[str] | None" = None) -> tuple[str, str]:
+                        excluded_roms: "set[str] | None" = None,
+                        on_progress=None, should_cancel=None) -> tuple[str, str]:
     """Return (zip_path, etag). The zip is CACHED on disk keyed by its content
     fingerprint — rebuilt only when the library/params change (was: rebuilt on
     every download, ~hundreds of MB). Built to disk, never in RAM (no OOM).
-    Returns the cached path (do NOT delete it) + the fingerprint as an ETag."""
+    Returns the cached path (do NOT delete it) + the fingerprint as an ETag.
+
+    on_progress / should_cancel are forwarded to the writer (see _write_sd_zip);
+    a cancelled build raises BuildCancelled and leaves no cache file behind.
+    ROMs are mostly padding/repetition and DEFLATE level 1 gets ~the same ratio
+    as level 6 at ~1.5x the speed, so the build is CPU-bound for the shortest
+    time."""
     key = sd_fingerprint(session_id, include_video, systems, homebrew_roms, excluded_roms)
     cache_dir = config.DATA_DIR / "_cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     cached = cache_dir / f"sd-{key}.zip"
     if cached.exists():
         os.utime(cached, None)   # mark recently used (for LRU prune)
+        if on_progress:
+            on_progress(1, 1)
         return str(cached), key
 
     # Build to a temp file in the same dir, then atomically rename into place so a
@@ -140,8 +195,9 @@ def build_sd_zip_cached(session_id: str, include_video: bool = False, systems: "
     fd, tmp = tempfile.mkstemp(prefix="sd-", suffix=".zip.tmp", dir=str(cache_dir))
     os.close(fd)
     try:
-        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zf:
-            _write_sd_zip(zf, session_id, include_video, systems, homebrew_roms, excluded_roms)
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED, compresslevel=1) as zf:
+            _write_sd_zip(zf, session_id, include_video, systems, homebrew_roms, excluded_roms,
+                          on_progress=on_progress, should_cancel=should_cancel)
         os.replace(tmp, cached)
     except BaseException:
         try:
@@ -151,6 +207,41 @@ def build_sd_zip_cached(session_id: str, include_video: bool = False, systems: "
         raise
     _prune_sd_cache(cache_dir)
     return str(cached), key
+
+
+def run_sd_zip_build_job(job_id: str, session_id: str, include_video: bool = False,
+                         systems: "set[str] | None" = None, homebrew_roms: "set[str] | None" = None,
+                         excluded_roms: "set[str] | None" = None) -> None:
+    """Build the SD zip while reporting progress into the jobs registry and
+    honouring cancellation. Runs in a worker thread (run_in_threadpool). Never
+    raises — terminal state is recorded on the job (done | cancelled | failed)."""
+    from . import jobs  # local import: jobs pulls in nothing from packaging
+
+    # Throttle progress writes: only every ~0.5% so a huge library doesn't spam
+    # the registry once per file.
+    state = {"last": -1.0}
+
+    def on_progress(done: int, total: int) -> None:
+        frac = (done / total) if total else 1.0
+        if frac - state["last"] < 0.005 and frac < 1.0:
+            return
+        state["last"] = frac
+        jobs.update(job_id, status="running", progress=frac,
+                    message=f"{done // 1_000_000}/{max(total // 1_000_000, 1)} MB")
+
+    def should_cancel() -> bool:
+        return jobs.is_cancelled(job_id)
+
+    jobs.update(job_id, status="running", progress=0.0, message="")
+    try:
+        _, etag = build_sd_zip_cached(session_id, include_video, systems, homebrew_roms,
+                                      excluded_roms, on_progress=on_progress,
+                                      should_cancel=should_cancel)
+        jobs.update(job_id, status="done", progress=1.0, message="", result={"etag": etag})
+    except BuildCancelled:
+        jobs.update(job_id, status="cancelled", message="")
+    except BaseException as exc:  # noqa: BLE001 — surface any build failure on the job
+        jobs.update(job_id, status="failed", message=str(exc))
 
 
 def prune_cache() -> int:

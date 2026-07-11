@@ -18,7 +18,7 @@ async def _run_encode(
     mode: str = video.DEFAULT_FIT_MODE,
 ) -> None:
     """Background: encode src -> dst, updating job + DB status."""
-    await jobs.update(job_id, status="running", progress=0.05, message="encoding")
+    jobs.update(job_id, status="running", progress=0.05, message="encoding")
     try:
         await video.encode_to_mjpeg_avi(src, dst, mode=mode)
         # web preview (browser-playable .mp4) + square thumbnail, built from the
@@ -33,7 +33,7 @@ async def _run_encode(
             pass
     except video.VideoEncodeError as exc:
         dst.unlink(missing_ok=True)  # drop any partial/zero-byte .avi ffmpeg left
-        await jobs.update(job_id, status="failed", message=str(exc))
+        jobs.update(job_id, status="failed", message=str(exc))
         with db.connect() as conn:
             conn.execute("UPDATE videos SET status='failed' WHERE id=?", (video_id,))
         return
@@ -45,7 +45,7 @@ async def _run_encode(
         conn.execute(
             "UPDATE videos SET status='ok', avi_path=? WHERE id=?", (rel, video_id)
         )
-    await jobs.update(
+    jobs.update(
         job_id, status="done", progress=1.0, message="done",
         result={"video_id": video_id, "avi_path": rel},
     )
@@ -85,7 +85,7 @@ async def upload_video(
                VALUES (?,?,?,?,?, 'encoding')""",
             (video_id, session_id, original, avi_name, job_id),
         )
-    await jobs.create(job_id, "video_encode")
+    jobs.create(job_id, "video_encode")
     asyncio.create_task(_run_encode(job_id, video_id, src_path, dst_path, session_id, mode=mode))
 
     return {"video_id": video_id, "job_id": job_id, "avi_name": avi_name, "status": "encoding"}

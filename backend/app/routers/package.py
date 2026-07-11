@@ -1,11 +1,15 @@
 """Download the session library as an SD-ready ZIP."""
 from __future__ import annotations
 
+import asyncio
+import uuid
+
 from fastapi import APIRouter, Body, HTTPException, Request
 from fastapi.responses import FileResponse, Response
+from starlette.concurrency import run_in_threadpool
 
 from .. import db
-from ..services import events, packaging
+from ..services import events, jobs, packaging
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["package"])
@@ -157,6 +161,38 @@ def package_size(session_id: str, video: bool = False, system: str | None = None
     systems = _parse_systems(system)
     return {"bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
                                                homebrew_roms=homebrew, excluded_roms=excluded)}
+
+
+@router.post("/sessions/{session_id}/package/build")
+async def start_package_build(session_id: str, video: bool = False, system: str | None = None) -> dict:
+    """Start (or reuse) the SD-zip build. Returns immediately:
+      {ready: true,  job_id: null}  — already cached, download straight away, or
+      {ready: false, job_id: "..."} — building; poll GET /jobs/{id} for progress
+                                       and POST /jobs/{id}/cancel to stop it.
+    The zip is built in a worker thread so the request loop stays responsive and
+    the browser sees live progress instead of a frozen 'Preparing…' for minutes."""
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        homebrew = _homebrew_roms(conn, session_id)
+        excluded = _excluded_roms(conn, session_id)
+    systems = _parse_systems(system)
+    if not packaging.session_has_content(session_id, include_video=video, systems=systems):
+        raise HTTPException(status_code=404, detail="Nothing to package yet")
+
+    _, etag, exists = packaging.cached_zip_path(session_id, include_video=video, systems=systems,
+                                                homebrew_roms=homebrew, excluded_roms=excluded)
+    if exists:
+        return {"ready": True, "job_id": None, "etag": etag}
+
+    job_id = uuid.uuid4().hex
+    jobs.create(job_id, "sd_zip")
+
+    async def _run() -> None:
+        await run_in_threadpool(packaging.run_sd_zip_build_job, job_id, session_id,
+                                video, systems, homebrew, excluded)
+
+    asyncio.create_task(_run())
+    return {"ready": False, "job_id": job_id, "etag": etag}
 
 
 @router.get("/sessions/{session_id}/package")
