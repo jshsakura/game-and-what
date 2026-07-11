@@ -73,6 +73,27 @@ export function DownloadProvider({ children }) {
     setJob(null);
   }, [t]);
 
+  // Plain streaming download for direct endpoints (a ROM card's zip, a video
+  // file): no build job to poll, just the progress overlay while it streams.
+  const download = useCallback(async (url, fallbackName = "download.zip") => {
+    if (activeRef.current) return;
+    activeRef.current = true;
+    cancelledRef.current = false;
+    try {
+      await streamDownload(url, fallbackName, 0);
+    } catch (e) {
+      if (e.name === "AbortError") {
+        setJob(null);
+      } else {
+        setJob({ phase: "error", error: e.message || t("Download failed") });
+        setTimeout(() => setJob(null), 2600);
+      }
+    } finally {
+      activeRef.current = false;
+      abortRef.current = null;
+    }
+  }, [t, streamDownload]);
+
   // Full flow: build (with progress) then download. `system` is undefined for
   // the whole-SD package, or a platform dirname for a single system.
   const downloadPackage = useCallback(async (system, fallbackName = "gnw-sd.zip", knownTotal = 0) => {
@@ -152,7 +173,7 @@ export function DownloadProvider({ children }) {
           : t("Receiving {size}…", { size: formatBytes(job?.received || 0) }));
 
   return (
-    <DownloadCtx.Provider value={{ downloadPackage, busy: !!job }}>
+    <DownloadCtx.Provider value={{ download, downloadPackage, busy: !!job }}>
       {children}
       {job && (
         <div className="dl-overlay" role="dialog" aria-label={t("Download progress")}>
