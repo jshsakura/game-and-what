@@ -346,7 +346,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "¿Ya tienes BMP de 320×240 a 24/32 bits? El reloj también los lee desde /clock/album — no hace falta convertirlos. Lo demás, conviértelo aquí.",
   "Alarm sound (.mp3)": "Sonido de alarma (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "Convierte cualquier canción o vídeo en un sonido de alarma. La alarma suena 60 segundos repitiendo tu fragmento, así que bastan unos segundos de lo mejor.",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "en la tarjeta SD y luego elígelo en Ajustes → Sonido de alarma (GAME lo reproduce).",
+  "on the SD card, then pick it under Settings → Alarm sound.": "en la tarjeta SD y elígelo en Ajustes → Sonido de alarma.",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "Arrastra una canción o un vídeo aquí o haz clic (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "Elige un archivo de audio o vídeo",
   "Clip length": "Duración del fragmento",

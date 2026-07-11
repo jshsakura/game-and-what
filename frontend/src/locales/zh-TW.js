@@ -344,7 +344,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "已經有 320×240 的 24/32 位元 BMP 了嗎？時鐘也能直接讀取 /clock/album 裡的 BMP — 不需轉換。其他格式請在這裡轉換。",
   "Alarm sound (.mp3)": "鬧鈴聲 (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "把任何歌曲或影片變成時鐘鬧鈴。鬧鈴會響 60 秒並循環播放你的片段，所以只需最精彩的幾秒。",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "然後在 設定 → 鬧鈴聲 中選擇它（GAME 鍵試聽）。",
+  "on the SD card, then pick it under Settings → Alarm sound.": "複製到 SD 卡後，在 設定 → 鬧鐘聲音 中選擇。",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "將歌曲或影片拖到這裡或點擊 (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "請選擇音訊或影片檔案",
   "Clip length": "片段長度",

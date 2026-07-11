@@ -469,7 +469,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "이미 320×240 24/32비트 BMP가 있나요? 시계는 /clock/album의 BMP도 그대로 읽습니다 — 변환이 필요 없습니다. 그 외 형식은 여기서 변환하세요.",
   "Alarm sound (.mp3)": "알람 소리 (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "아무 노래나 영상을 시계 알람 소리로 만듭니다. 알람은 60초 동안 클립을 반복 재생하므로, 가장 좋은 부분 몇 초면 충분합니다.",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "위치에 복사한 뒤, 설정 → 알람 소리에서 고르세요 (GAME 키로 미리듣기).",
+  "on the SD card, then pick it under Settings → Alarm sound.": "위치에 복사한 뒤, 설정 → 알람 소리에서 고르세요.",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "노래나 영상을 여기로 끌어놓거나 클릭하세요 (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "오디오나 영상 파일을 선택하세요",
   "Clip length": "클립 길이",

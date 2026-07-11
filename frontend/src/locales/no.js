@@ -346,7 +346,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "Har du allerede 320×240 BMP-filer i 24/32 bit? Klokken leser dem rett fra /clock/album — ingen konvertering nødvendig. Alt annet konverterer du her.",
   "Alarm sound (.mp3)": "Alarmlyd (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "Gjør en hvilken som helst sang eller video om til alarmlyd. Alarmen ringer i 60 sekunder og gjentar klippet ditt — noen sekunder av det beste partiet holder.",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "på SD-kortet, og velg den under Innstillinger → Alarmlyd (GAME spiller den av).",
+  "on the SD card, then pick it under Settings → Alarm sound.": "på SD-kortet, og velg det under Innstillinger → Alarmlyd.",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "Dra en sang eller video hit, eller klikk (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "Velg en lyd- eller videofil",
   "Clip length": "Klipplengde",

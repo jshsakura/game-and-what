@@ -346,7 +346,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "Уже есть BMP 320×240 с 24/32 битами? Часы читают их прямо из /clock/album — конвертация не нужна. Всё остальное конвертируйте здесь.",
   "Alarm sound (.mp3)": "Звук будильника (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "Превратите любую песню или видео в звук будильника. Будильник звонит 60 секунд, зацикливая ваш фрагмент, — хватит нескольких лучших секунд.",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "на SD-карте, затем выберите его в Настройки → Звук будильника (GAME проигрывает его).",
+  "on the SD card, then pick it under Settings → Alarm sound.": "на SD-карте, затем выберите его в Настройки → Звук будильника.",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "Перетащите сюда песню или видео либо нажмите (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "Выберите аудио- или видеофайл",
   "Clip length": "Длина фрагмента",

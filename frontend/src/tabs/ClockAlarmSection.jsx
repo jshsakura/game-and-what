@@ -142,7 +142,7 @@ export default function ClockAlarmSection() {
       </div>
       <div className="vtab-safe">
         <Info size={13} strokeWidth={2.5} aria-hidden />
-        <span>{t("Converted in your browser (nothing is uploaded) to a mono 48 kHz MP3 — the exact format the device plays, so it never resamples your alarm — and turned up to a standard loudness, so a quiet song still wakes you. Copy it into")} <b>/clock/alarm</b> {t("on the SD card, then pick it under Settings → Alarm sound (GAME previews it).")}</span>
+        <span>{t("Converted in your browser (nothing is uploaded) to a mono 48 kHz MP3 — the exact format the device plays, so it never resamples your alarm — and turned up to a standard loudness, so a quiet song still wakes you. Copy it into")} <b>/clock/alarm</b> {t("on the SD card, then pick it under Settings → Alarm sound.")}</span>
       </div>
 
       <Dropzone

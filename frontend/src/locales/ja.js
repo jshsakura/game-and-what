@@ -344,7 +344,7 @@ export default {
   "Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.": "320×240 の 24/32bit BMP をお持ちですか？時計は /clock/album の BMP もそのまま読みます — 変換は不要です。それ以外の形式はここで変換してください。",
   "Alarm sound (.mp3)": "アラーム音 (.mp3)",
   "Turn any song or video into a clock alarm sound. The alarm rings for 60 seconds, looping your clip — so a few seconds of the best part is all you need.": "好きな曲や動画を時計のアラーム音にします。アラームは 60 秒間クリップをループ再生するので、いちばん良い数秒だけで十分です。",
-  "on the SD card, then pick it under Settings → Alarm sound (GAME previews it).": "に入れて、設定 → アラーム音 で選んでください（GAME キーで試聴）。",
+  "on the SD card, then pick it under Settings → Alarm sound.": "に入れて、設定 → アラーム音 で選んでください。",
   "Drag a song or video here or click (mp3/wav/m4a/mp4…)": "曲や動画をここにドラッグ、またはクリック (mp3/wav/m4a/mp4…)",
   "Pick an audio or video file": "音声か動画のファイルを選んでください",
   "Clip length": "クリップの長さ",
