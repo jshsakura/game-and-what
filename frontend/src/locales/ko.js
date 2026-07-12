@@ -187,6 +187,7 @@ export default {
   "Loading track {n}/{total}…": "트랙 불러오는 중 {n}/{total}…",
   "Starting core…": "코어 시작하는 중…",
   "This game needs a BIOS. Upload it to the Extra (추가파일) tab at this exact path: {files}": "이 게임은 BIOS가 필요합니다. 추가파일 탭에 정확히 이 경로로 올리세요: {files}",
+  "This game uses the Game Boy Color's tilt sensor (MBC7), which isn't supported in the browser. Play it on the device instead.": "이 게임은 게임보이 컬러의 기울기 센서(MBC7)를 사용해서 브라우저에서는 지원되지 않습니다. 실제 기기에서 플레이해 주세요.",
   "This platform has experimental support and may not run correctly.": "이 플랫폼은 실험적 지원이라 정상 구동되지 않을 수 있어요.",
   "Can't run.": "실행할 수 없습니다.",
   "Keyboard controls": "키보드 조작 안내",

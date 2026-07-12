@@ -331,6 +331,15 @@ export function EmulatorOverlay({ rom, onClose }) {
         const res = await fetch(romFileUrl(rom.id));
         if (!res.ok) throw new Error(t("Failed to load the ROM file."));
         const fileContent = await res.blob();
+        // MBC7 gate: this cartridge chip (Kirby Tilt 'n' Tumble / Korokoro Kirby,
+        // Command Master) needs the GBC's built-in tilt sensor — gambatte here has
+        // no tilt/pointer input wired up, so it can't be controlled in the browser.
+        if (rom.system_key === "gb" || rom.system_key === "gbc") {
+          const cartType = new Uint8Array(await fileContent.slice(0x147, 0x148).arrayBuffer())[0];
+          if (cartType === 0x22) {
+            throw new Error(t("This game uses the Game Boy Color's tilt sensor (MBC7), which isn't supported in the browser. Play it on the device instead."));
+          }
+        }
         // CD games (PC Engine CD) are a .cue + track files: hand the core the WHOLE
         // set so it can mount the disc (the .cue references the tracks by name).
         // Fetched ONE AT A TIME so we can show progress (a big CD takes a while) and
