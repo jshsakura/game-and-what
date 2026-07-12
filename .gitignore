@@ -45,3 +45,8 @@ backend/scripts/detect_prepatched.py
 backend/scripts/manual_publish.py
 backend/scripts/onion_sync.py
 backend/scripts/pi_crc_scan.py
+
+# coverage
+.coverage
+htmlcov/
+coverage.xml

@@ -42,6 +42,7 @@ preview with sample data (no backend; uploads/edits are disabled).
   - [4. Updating to a new version](#4-updating-to-a-new-version)
   - [Platform notes](#platform-notes-nas--raspberry-pi--windows)
 - [BIOS / system ROMs](#-bios--system-roms)
+- [Homebrew — required files](#-homebrew--required-files)
 - [Configuration](#️-configuration)
 - [Security — no built-in login](#-security--no-built-in-login)
 - [FAQ & troubleshooting](#-faq--troubleshooting)
@@ -64,10 +65,10 @@ preview with sample data (no backend; uploads/edits are disabled).
   badge on the cover) so you can judge quality at a glance, and a per-ROM
   **"Exclude from SD"** toggle drops a ROM from the SD download while keeping it in
   the library — slim the device menu without deleting anything.
-- **All 20 officially supported systems** — everything the upstream
+- **All 21 officially supported systems** — everything the upstream
   [sylverb firmware](https://github.com/sylverb/game-and-watch-retro-go-sd)
-  registers, up to Atari Lynx: NES, Game Boy / GB Color, Game Gear, Master System,
-  Genesis, SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800 / Lynx,
+  registers: NES, Game Boy / GB Color, Game Gear, Master System, Genesis, SG-1000,
+  PC Engine, **PC Engine CD**, ColecoVision, MSX, Atari 2600 / 7800 / **Lynx**,
   Amstrad CPC, Supervision, Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
 - **11-language UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) with
   per-locale CJK/Cyrillic fonts lazy-loaded on demand.
@@ -76,10 +77,10 @@ preview with sample data (no backend; uploads/edits are disabled).
 - **Optional experimental mode** (`GNW_EXPERIMENTAL_MODE=true`) — a "personal
   lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
   extra systems the upstream firmware doesn't register (Neo Geo Pocket,
-  WonderSwan, PC Engine CD, Virtual Boy, Odyssey², ZX Spectrum, C64, Game.com)
-  plus the MEDIA tab (video → `/media` MJPEG `.avi`, music → `/music`, clock
-  backgrounds). **Off by default** — everything above stays hidden and the app
-  tracks only what the official firmware supports.
+  WonderSwan, Virtual Boy, Odyssey², ZX Spectrum, C64, Game.com), the Super
+  Metroid homebrew port, plus the MEDIA tab (video → `/media` MJPEG `.avi`, music
+  → `/music`, clock backgrounds). **Off by default** — everything above stays
+  hidden and the app tracks only what the official firmware supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
 
 ## 🔄 How it works
@@ -239,6 +240,44 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 > (e.g. ColecoVision's core wants `colecovision.rom` for the same bytes) — the app
 > handles that remap for you. The canonical list lives in
 > [`frontend/src/bios.js`](frontend/src/bios.js).
+
+## 🧱 Homebrew — required files
+
+The homebrew apps (Zelda 3, Super Mario World, Celeste, …) are compiled **into the
+firmware**, so "installing" one is really just putting its data files in
+`/roms/homebrew/`. Every file is one of two kinds, and mixing them up is what
+breaks a launch:
+
+- **From the firmware you flashed** — the `.bin` launch template and its siblings
+  (`zelda3.ro`, `sm.xip`). These are a matched pair with that build: a copy from
+  another release links against different addresses and dies on launch. Take them
+  from the release you actually flashed.
+- **From your own ROM** — the assets file (or, for Super Metroid, the ROM itself).
+  This is copyrighted game data, so neither the firmware nor this app ships it.
+
+| App | From the firmware | You supply | How to build it |
+|-----|-------------------|-----------|-----------------|
+| Zelda 3 | `Zelda 3.bin`, `zelda3.ro` | `zelda3_assets.dat` | Original **US** `zelda3.sfc` (sha1 `6d4f10a8…`, hash-checked) → `make -C external/zelda3 tables/zelda3_assets.dat` |
+| Super Mario World | `Super Mario World.bin` | `smw_assets.dat` | Original **US** `smw.sfc` (sha1 `6b47bb75…`) → `make -C external/smw smw_assets.dat` |
+| Super Metroid *(fork only)* | `Super Metroid.bin`, `sm.xip` | `sm.smc` | No tool — it's **the original 3 MB JP ROM itself**, read at runtime |
+| Celeste Classic | `celeste.bin` | — | Nothing to add |
+
+Upload them on the game's card in the library (**Add / replace data file**), or in
+the **Extra (추가파일)** tab at `roms/homebrew/…`. The INFO tab lists the same
+table with one-click path copy. Notes worth knowing:
+
+- **Don't rename a `.bin`.** The firmware dispatches on the exact filename stem, so
+  a renamed app loads and then matches nothing. (The library blocks the rename.)
+- **Missing files are loud, except one.** A missing `.dat` halts with `Missing
+  …_assets.dat` on screen; a missing `zelda3.ro` prints nothing and then crashes.
+- **Super Metroid needs an upgraded flash chip.** Its ROM is cached into external
+  flash — 3 MB does not fit the stock 1 MB.
+- A `.dat` built from a different ROM (or a different build of the extractor) is
+  rejected as `Mismatching …_assets.dat`.
+
+The canonical list lives in [`frontend/src/homebrew.js`](frontend/src/homebrew.js);
+the generator scripts and per-app button maps are in the
+[firmware README](https://github.com/sylverb/game-and-watch-retro-go-sd#homebrew-ports).
 
 ## 📸 Screenshots
 

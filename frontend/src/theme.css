@@ -1784,6 +1784,19 @@ body::before {
   margin-top: 8px; font-family: var(--body-font); font-size: 13px; color: var(--card-ink); line-height: 1.55;
 }
 
+/* Homebrew file list (INFO tab) — reuses the .bios-* group/path/note styles. The
+   only addition is the per-file origin tag: the mistake that actually bricks a
+   launch is mixing a firmware-paired file with a ROM-derived one, so the two are
+   colored apart rather than merely labelled. */
+.hb-src {
+  margin-left: auto; padding: 2px 8px; border-radius: 999px;
+  font-family: var(--body-font); font-size: 11px; font-weight: 700;
+  white-space: nowrap; line-height: 1.5;
+}
+.hb-src-firmware { background: #00000033; color: var(--card-dim); }
+.hb-src-rom { background: var(--accent-2); color: var(--accent-ink); }
+.hb-foot { margin-top: 10px; line-height: 1.6; }
+
 /* Library system groups */
 .sysgroup + .sysgroup { margin-top: 16px; }
 .sysgroup-head {

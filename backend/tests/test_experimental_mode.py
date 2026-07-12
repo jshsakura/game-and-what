@@ -2,10 +2,10 @@
 """GNW_EXPERIMENTAL_MODE ("personal lab") gating.
 
 Official mode (flag off) must expose ONLY what the upstream sylverb firmware
-registers (systems up to Atari Lynx) and keep fork-only content — experimental
-system folders, /media, /music — out of the SD zip. Experimental mode restores
-the full fork feature set. The flag is read at call time from config, so tests
-flip `config.EXPERIMENTAL_MODE` via monkeypatch.
+registers (which now includes PC Engine CD and Atari Lynx) and keep fork-only
+content — experimental system folders, /media, /music — out of the SD zip.
+Experimental mode restores the full fork feature set. The flag is read at call
+time from config, so tests flip `config.EXPERIMENTAL_MODE` via monkeypatch.
 """
 from pathlib import Path
 
@@ -16,9 +16,10 @@ from app.services.packaging import _excluded
 from app.systems import EXPERIMENTAL_DIRNAMES, SYSTEMS, available_systems, get_system
 
 
-# The upstream rg_emulators.c registration, verbatim (up to Atari Lynx).
+# The upstream rg_emulators.c registration, verbatim. PC Engine CD and Atari Lynx
+# joined it upstream on 2026-07-05.
 UPSTREAM_OFFICIAL = {
-    "nes", "gb", "gbc", "gg", "sms", "md", "sg", "pce", "col", "msx",
+    "nes", "gb", "gbc", "gg", "sms", "md", "sg", "pce", "pcecd", "col", "msx",
     "a2600", "a7800", "amstrad", "wsv", "lynx", "tama", "mini", "gw",
     "homebrew", "pico8",
 }
@@ -34,7 +35,7 @@ def _p(root: Path, rel: str) -> Path:
 def test_experimental_flags_match_upstream_registration():
     assert {s.key for s in SYSTEMS if not s.experimental} == UPSTREAM_OFFICIAL
     assert EXPERIMENTAL_DIRNAMES == {
-        "pcecd", "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom",
+        "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom",
     }
 
 
