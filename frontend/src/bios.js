@@ -4,7 +4,7 @@
 //   - the INFO tab reference table (HelpTab.jsx),
 //   - the docs (README).
 //
-// Users upload each file to the Extra (추가파일) tab at the exact `sdPath`; the
+// Users upload each file to the Extra tab at the exact `sdPath`; the
 // SD ZIP then places it at /<sdPath>, where BOTH the real device firmware and
 // the browser core look for it.
 //

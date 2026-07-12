@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive, Rocket, Cpu, Copy, Check, Blocks } from "lucide-react";
 import { useT } from "../i18n.jsx";
 import { SystemIcon } from "../components.jsx";
-import { useExperimentalMode } from "../config.jsx";
+import { useExperimentalMode, useKoreanMode } from "../config.jsx";
 import { BIOS_CATALOG } from "../bios.js";
 import { HOMEBREW_CATALOG, HOMEBREW_SELF_CONTAINED } from "../homebrew.js";
 
@@ -14,11 +14,14 @@ const FILE_SOURCE = {
   rom: "from your own original ROM",
 };
 
-// Steps to prepare the SD with this tool. The VIDEO/.avi sentence exists only in
-// experimental mode (the /media player is a fork-firmware feature).
+// Steps to prepare the SD with this tool. Two of them are conditional, at the
+// same level as every other flagged feature: auto-naming is Korean only in
+// Korean mode (the base build just fills covers), and the VIDEO/.avi step needs
+// the fork firmware's media player.
 const STEP_UPLOAD = "In the UPLOAD tab (or an empty library), pick a platform and drag in your ROMs.";
-const STEP_NAMES_OFFICIAL = "Korean (English) names and covers are added automatically.";
-const STEP_NAMES_EXPERIMENTAL = "Korean (English) names and covers are added automatically. Videos are converted to .avi in the VIDEO tab and placed in /media.";
+const STEP_NAMES = "Covers are added automatically.";
+const STEP_NAMES_KOREAN = "Korean (English) names and covers are added automatically.";
+const STEP_VIDEO = "Videos are converted to .avi in the VIDEO tab and placed in /media.";
 const STEPS_REST = [
   "If needed, rename, search/upload covers, and adjust the crop position from the card details.",
   "Download via 'SD ZIP' at the top right (or 'Current Platform ZIP' in the library). The estimated size is shown on the label.",
@@ -80,7 +83,7 @@ function GithubMark({ size = 15 }) {
 }
 
 // A copyable SD path chip — one click copies the exact `bios/…` path so users
-// can paste it into the Extra (추가파일) tab's target-folder field without typos.
+// can paste it into the Extra tab's target-folder field without typos.
 function CopyPath({ path }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
@@ -116,9 +119,11 @@ function Combo({ combo }) {
 export default function HelpTab() {
   const t = useT();
   const experimental = useExperimentalMode();
+  const korean = useKoreanMode();
   const steps = [
     STEP_UPLOAD,
-    experimental ? STEP_NAMES_EXPERIMENTAL : STEP_NAMES_OFFICIAL,
+    korean ? STEP_NAMES_KOREAN : STEP_NAMES,
+    ...(experimental ? [STEP_VIDEO] : []),
     ...STEPS_REST,
   ];
   const sdcardRows = SDCARD.filter(([, , isExp]) => experimental || !isExp);
@@ -128,8 +133,8 @@ export default function HelpTab() {
     <div className="stack help-tab">
       <div className="muted">
         <Info size={13} aria-hidden /> {t(experimental
-          ? "Upload ROMs & videos — Korean names and covers are added automatically and packed into a ZIP in the retro-go SD card layout."
-          : "Upload ROMs — Korean names and covers are added automatically and packed into a ZIP in the retro-go SD card layout.")}
+          ? "Upload ROMs & videos — covers are added automatically and packed into a ZIP in the retro-go SD card layout."
+          : "Upload ROMs — covers are added automatically and packed into a ZIP in the retro-go SD card layout.")}
       </div>
 
       {/* 사용법 */}
@@ -172,7 +177,7 @@ export default function HelpTab() {
       <div className="help-section">
         <div className="help-head"><Cpu size={14} strokeWidth={2.5} aria-hidden /> {t("BIOS / System ROMs")}</div>
         <div className="muted bios-intro">
-          {t("A few systems need a copyrighted BIOS we can't bundle. Upload each file in the Extra (추가파일) tab at the exact SD path below — click a path to copy it. It then ships in the SD ZIP at that path, where both the device firmware and the in-browser player load it.")}
+          {t("A few systems need a copyrighted BIOS we can't bundle. Upload each file in the Extra tab at the exact SD path below — click a path to copy it. It then ships in the SD ZIP at that path, where both the device firmware and the in-browser player load it.")}
         </div>
         <div className="bios-list">
           {biosEntries.map((b) => (
@@ -201,7 +206,7 @@ export default function HelpTab() {
       <div className="help-section">
         <div className="help-head"><Blocks size={14} strokeWidth={2.5} aria-hidden /> {t("Homebrew — required files")}</div>
         <div className="muted bios-intro">
-          {t("Homebrew apps are compiled into the firmware, so installing one means putting its data files on the SD card. Each file is either taken from the firmware release you flashed, or built by you from your own original ROM — we ship neither. Drop them on the game's card in the library (Add / replace data file), or in the Extra (추가파일) tab at the path below.")}
+          {t("Homebrew apps are compiled into the firmware, so installing one means putting its data files on the SD card. Each file is either taken from the firmware release you flashed, or built by you from your own original ROM — we ship neither. Drop them on the game's card in the library (Add / replace data file), or in the Extra tab at the path below.")}
         </div>
         <div className="bios-list">
           {homebrewEntries.map((h) => (

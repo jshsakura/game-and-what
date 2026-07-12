@@ -3,11 +3,13 @@ import { Gamepad2, Loader2, Upload } from "lucide-react";
 import { getSystems, getLibrary, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
 import { Dropzone, SystemSelect, RomCard } from "../components.jsx";
 import { useT } from "../i18n.jsx";
+import { useKoreanMode } from "../config.jsx";
 
 const COVER_POLL_MS = 3000;
 
 export default function RomTab({ onChanged }) {
   const t = useT();
+  const koreanMode = useKoreanMode();   // auto-naming is Korean only on a Korean deploy
   const [systems, setSystems] = useState([]);
   const [active, setActive] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -74,7 +76,9 @@ export default function RomTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Gamepad2 size={13} aria-hidden /> {t("Pick a platform → upload ROMs for automatic Korean names & covers. Upload a whole folder to use bundled images (.png) as covers; alt dumps ([a1]) are skipped")}
+        <Gamepad2 size={13} aria-hidden /> {t(koreanMode
+          ? "Pick a platform → upload ROMs for automatic Korean names & covers. Upload a whole folder to use bundled images (.png) as covers; alt dumps ([a1]) are skipped"
+          : "Pick a platform → upload ROMs for automatic covers. Upload a whole folder to use bundled images (.png) as covers; alt dumps ([a1]) are skipped")}
       </div>
 
       {systems.length === 0 && !error ? (

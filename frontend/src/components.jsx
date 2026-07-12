@@ -1237,7 +1237,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               )}
 
               {rom.patch_ver && (
-                <div className="patch-ver-row" title={t("Korean-patch version parsed from the filename — used to tell newer vs older builds of the same game")}>
+                <div className="patch-ver-row" title={t("Patch version parsed from the filename — used to tell newer vs older builds of the same game")}>
                   <span className="patch-ver-label">{t("Patch version")}</span>
                   <code className="patch-ver-val">{rom.patch_ver}</code>
                 </div>
@@ -1286,7 +1286,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
 
               {rom.system_key !== "homebrew" && (
                 <div className="flag-row">
-                  <span className="flag-row-label" title={t("Flag shown at the cover's top-right — independent of the Korean-patch toggle")}>{t("Cover flag")}</span>
+                  <span className="flag-row-label" title={t("Flag shown at the cover's top-right — independent of the patch toggle")}>{t("Cover flag")}</span>
                   <div className="flag-opts" role="group" aria-label={t("Cover flag")}>
                     {FLAG_OPTIONS.map((opt) => {
                       const on = (rom.cover_flag || "") === opt.code;

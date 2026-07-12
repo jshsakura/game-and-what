@@ -322,7 +322,7 @@ export function EmulatorOverlay({ rom, onClose }) {
         if (missing.length) {
           // Show the EXACT Extra path to upload to (folder + filename) — that's the
           // actionable instruction; the core's internal BIOS name is irrelevant here.
-          throw new Error(t("This game needs a BIOS. Upload it to the Extra (추가파일) tab at this exact path: {files}",
+          throw new Error(t("This game needs a BIOS. Upload it to the Extra tab at this exact path: {files}",
             { files: missing.map((b) => b.path).join(", ") }));
         }
         if (cancelled) return;
