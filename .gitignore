@@ -34,3 +34,14 @@ HANDOFF.md
 
 # ROM-translation tooling (kept out of the public repo; lives in the private tools repo)
 backend/tools/
+
+# teammp Korean-patch staging (patch files + adhoc applied roms) — personal use only
+/korean-patches/
+
+# Personal Korean-patch pipeline scripts (teammp scraper/matcher etc.) — local
+# only, like backend/tools/: patch staging is personal-use, not for the repo
+backend/scripts/teammp_*.py
+backend/scripts/detect_prepatched.py
+backend/scripts/manual_publish.py
+backend/scripts/onion_sync.py
+backend/scripts/pi_crc_scan.py
