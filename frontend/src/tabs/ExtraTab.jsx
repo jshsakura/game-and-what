@@ -18,12 +18,27 @@ export default function ExtraTab({ onChanged }) {
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dir, setDir] = useState("all");   // folder filter (passthrough files group by SD path)
 
   const reload = () => {
     setLoading(true);
     return getExtra().then((d) => setFiles(d.files)).catch(() => setFiles([])).finally(() => setLoading(false));
   };
   useEffect(() => { reload(); }, []);
+
+  // Passthrough files land on the SD by their PATH, so group them by folder
+  // (bios/nes, bios/gba, …) instead of one long flat list. Root files → "/".
+  const ROOT = "/";
+  const dirOf = (p) => { const i = p.lastIndexOf("/"); return i > 0 ? p.slice(0, i) : ROOT; };
+  const dirs = [...new Set(files.map((f) => dirOf(f.path)))].sort((a, b) =>
+    a === ROOT ? -1 : b === ROOT ? 1 : a.localeCompare(b));
+  const shown = dir === "all" ? files : files.filter((f) => dirOf(f.path) === dir);
+  const shownByDir = dirs
+    .map((d) => ({ dir: d, items: shown.filter((f) => dirOf(f.path) === d) }))
+    .filter((g) => g.items.length > 0);
+  const dirLabel = (d) => (d === ROOT ? t("SD root") : `/${d}`);
+  // A file's leaf name (the folder is shown once in the section header).
+  const leafOf = (p) => p.slice(p.lastIndexOf("/") + 1);
 
   const trimmed = folder.replace(/^\/+|\/+$/g, "");        // trimmed target; empty = SD root
   const isFilePath = /\.[^/.]+$/.test(trimmed.split("/").pop() || "");  // ends in a filename
@@ -145,6 +160,19 @@ export default function ExtraTab({ onChanged }) {
         onFiles={handleFiles}
       />
 
+      {!loading && files.length > 0 && dirs.length > 1 && (
+        <div className="data-filter">
+          <button className={`scope-btn ${dir === "all" ? "on" : ""}`} onClick={() => setDir("all")}>
+            {t("All")} ({files.length})
+          </button>
+          {dirs.map((d) => (
+            <button key={d} className={`scope-btn ${dir === d ? "on" : ""}`} onClick={() => setDir(d)}>
+              {dirLabel(d)} ({files.filter((f) => dirOf(f.path) === d).length})
+            </button>
+          ))}
+        </div>
+      )}
+
       {loading ? (
         <div className="data-list">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -160,17 +188,25 @@ export default function ExtraTab({ onChanged }) {
         <div className="muted">{t("No files uploaded (not included in SD).")}</div>
       ) : (
         <div className="data-list">
-          {files.map((f) => (
-            <div className="data-row" key={f.path}>
-              <span className="data-name">/{f.path}</span>
-              <span className="data-size">{formatBytes(f.size_bytes)}</span>
-              <a className="icon-btn" href={extraDownloadUrl(f.path)} download title={t("Download")}>
-                <Download size={13} strokeWidth={2.5} />
-              </a>
-              <button className="icon-btn danger" onClick={() => remove(f.path)} title={t("Delete")}>
-                <Trash2 size={13} strokeWidth={2.5} />
-              </button>
-            </div>
+          {shownByDir.map((g) => (
+            <React.Fragment key={g.dir}>
+              <div className="data-cat-head">
+                <FolderPlus size={13} strokeWidth={2.5} aria-hidden /> {dirLabel(g.dir)}
+                <span className="data-cat-count">{g.items.length}</span>
+              </div>
+              {g.items.map((f) => (
+                <div className="data-row" key={f.path}>
+                  <span className="data-name">{leafOf(f.path)}</span>
+                  <span className="data-size">{formatBytes(f.size_bytes)}</span>
+                  <a className="icon-btn" href={extraDownloadUrl(f.path)} download title={t("Download")}>
+                    <Download size={13} strokeWidth={2.5} />
+                  </a>
+                  <button className="icon-btn danger" onClick={() => remove(f.path)} title={t("Delete")}>
+                    <Trash2 size={13} strokeWidth={2.5} />
+                  </button>
+                </div>
+              ))}
+            </React.Fragment>
           ))}
         </div>
       )}

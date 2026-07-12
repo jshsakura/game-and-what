@@ -1664,6 +1664,17 @@ body::before {
 
 /* DATA list (scratch/reference files) */
 .data-list { display: flex; flex-direction: column; gap: 6px; }
+/* Role-section header inside the DATA list (ROMs / Patches / …) */
+.data-cat-head {
+  display: flex; align-items: center; gap: 6px;
+  margin: 8px 2px 1px; font-family: var(--pixel); font-size: 8px;
+  color: var(--card-dim); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.data-cat-head:first-child { margin-top: 0; }
+.data-cat-count {
+  font-size: 7px; background: #00000033; color: var(--card-dim);
+  padding: 1px 5px; border-radius: 8px;
+}
 .data-row {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 10px; border-radius: 8px;
