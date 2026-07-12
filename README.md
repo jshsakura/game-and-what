@@ -244,36 +244,32 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 ## 🧱 Homebrew — required files
 
 The homebrew apps (Zelda 3, Super Mario World, Celeste, …) are compiled **into the
-firmware**, so "installing" one is really just putting its data files in
-`/roms/homebrew/`. Every file is one of two kinds, and mixing them up is what
-breaks a launch:
+firmware**, and the firmware update unpacks its own half of `/roms/homebrew/` onto
+the card. **The only file you add is the one that comes from your own cartridge** —
+so in practice: put in the cart, nothing else.
 
-- **From the firmware you flashed** — the `.bin` launch template and its siblings
-  (`zelda3.ro`, `sm.xip`). These are a matched pair with that build: a copy from
-  another release links against different addresses and dies on launch. Take them
-  from the release you actually flashed.
-- **From your own ROM** — the assets file (or, for Super Metroid, the ROM itself).
-  This is copyrighted game data, so neither the firmware nor this app ships it.
-
-| App | From the firmware | You supply | How to build it |
-|-----|-------------------|-----------|-----------------|
+| App | The firmware update installs | You add | How to make it |
+|-----|------------------------------|---------|----------------|
 | Zelda 3 | `Zelda 3.bin`, `zelda3.ro` | `zelda3_assets.dat` | Original **US** `zelda3.sfc` (sha1 `6d4f10a8…`, hash-checked) → `make -C external/zelda3 tables/zelda3_assets.dat` |
 | Super Mario World | `Super Mario World.bin` | `smw_assets.dat` | Original **US** `smw.sfc` (sha1 `6b47bb75…`) → `make -C external/smw smw_assets.dat` |
 | Super Metroid *(fork only)* | `Super Metroid.bin`, `sm.xip` | `sm.smc` | No tool — it's **the original 3 MB JP ROM itself**, read at runtime |
 | Celeste Classic | `celeste.bin` | — | Nothing to add |
 
-Upload them on the game's card in the library (**Add / replace data file**), or in
-the **Extra (추가파일)** tab at `roms/homebrew/…`. The INFO tab lists the same
-table with one-click path copy. Notes worth knowing:
+Add your file on the game's card in the library (**Add / replace data file**); it
+then rides along in the SD ZIP. The INFO tab lists the same table with one-click
+path copy. Notes worth knowing:
 
+- **Keep the firmware's own files out of the library.** `.bin`, `zelda3.ro` and
+  `sm.xip` are a matched pair with the build you flashed — they link against that
+  build's addresses. Let the firmware update place them; a copy kept here would
+  only overwrite the fresh one with a stale one on the next SD ZIP.
 - **Don't rename a `.bin`.** The firmware dispatches on the exact filename stem, so
   a renamed app loads and then matches nothing. (The library blocks the rename.)
-- **Missing files are loud, except one.** A missing `.dat` halts with `Missing
-  …_assets.dat` on screen; a missing `zelda3.ro` prints nothing and then crashes.
 - **Super Metroid needs an upgraded flash chip.** Its ROM is cached into external
   flash — 3 MB does not fit the stock 1 MB.
 - A `.dat` built from a different ROM (or a different build of the extractor) is
-  rejected as `Mismatching …_assets.dat`.
+  rejected as `Mismatching …_assets.dat`; a missing one halts with
+  `Missing …_assets.dat` on screen.
 
 The canonical list lives in [`frontend/src/homebrew.js`](frontend/src/homebrew.js);
 the generator scripts and per-app button maps are in the

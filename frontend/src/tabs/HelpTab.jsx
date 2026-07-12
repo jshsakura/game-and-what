@@ -6,12 +6,12 @@ import { useExperimentalMode, useKoreanMode } from "../config.jsx";
 import { BIOS_CATALOG } from "../bios.js";
 import { HOMEBREW_CATALOG, HOMEBREW_SELF_CONTAINED } from "../homebrew.js";
 
-// Where a homebrew file comes from — the one thing users get wrong. A file from
-// the firmware must match the build they flashed; a ROM-derived one they make
-// themselves. Ordered firmware-first, matching the catalog.
+// Where a homebrew file comes from — the one thing users get wrong. The firmware
+// update writes its own half of the folder; the only file to add by hand is the
+// one made from the user's cartridge. Ordered firmware-first, like the catalog.
 const FILE_SOURCE = {
-  firmware: "from the firmware you flashed",
-  rom: "from your own original ROM",
+  firmware: "the firmware update installs it",
+  rom: "you add this one",
 };
 
 // Steps to prepare the SD with this tool. Two of them are conditional, at the
@@ -206,7 +206,7 @@ export default function HelpTab() {
       <div className="help-section">
         <div className="help-head"><Blocks size={14} strokeWidth={2.5} aria-hidden /> {t("Homebrew — required files")}</div>
         <div className="muted bios-intro">
-          {t("Homebrew apps are compiled into the firmware, so installing one means putting its data files on the SD card. Each file is either taken from the firmware release you flashed, or built by you from your own original ROM — we ship neither. Drop them on the game's card in the library (Add / replace data file), or in the Extra tab at the path below.")}
+          {t("Homebrew apps are compiled into the firmware, and the firmware update lays down its own files (the .bin and its pair). The only thing left to add is the one file that comes from your own cartridge — the assets .dat, or for Super Metroid the ROM itself. Add it on the game's card in the library (Add / replace data file). Keep the firmware's own files out of the library: an old copy would overwrite the one the update just installed.")}
         </div>
         <div className="bios-list">
           {homebrewEntries.map((h) => (
