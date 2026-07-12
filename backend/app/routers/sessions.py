@@ -1,6 +1,8 @@
 """Session lifecycle + library listing. No login (MVP): a session == a workspace."""
 from __future__ import annotations
 
+import zlib
+
 from fastapi import APIRouter, HTTPException
 
 from .. import config, db
@@ -35,13 +37,31 @@ def require_system_enabled(system) -> None:
         )
 
 
-def _enrich_rom(r: dict) -> dict:
+def _cover_ver(session_id: str, r: dict) -> str:
+    """A short token the client appends to the cover URL so it refetches the
+    moment the cover CHANGES — and reuses the browser cache when it doesn't.
+    Must move on every visible change: the flag is rendered live from cover_flag
+    (no file write), the crop re-renders the display, and a new fetch rewrites
+    the .img — so fold all three plus the .img mtime into the token."""
+    mtime = 0
+    cover_path = r.get("cover_path")
+    if cover_path:
+        try:
+            mtime = int((storage.session_root(session_id) / cover_path).stat().st_mtime)
+        except OSError:
+            mtime = 0
+    key = f"{r.get('cover_flag') or ''}|{r.get('crop_box') or ''}|{r.get('cover_status') or ''}|{mtime}"
+    return f"{zlib.crc32(key.encode()):08x}"
+
+
+def _enrich_rom(r: dict, session_id: str) -> dict:
     """Add derived display fields without touching stored files:
     - display_name: the clean title (Korean name if present, else the filename
       with its region tag + extension stripped) — '(USA, Europe)' etc. live in
       the `region` column now, not the shown name.
     - display_region: the region you actually PLAY in. A Japanese dump with a
-      Korean patch reads as 'Korea' (play_lang ko), never 'Japan'."""
+      Korean patch reads as 'Korea' (play_lang ko), never 'Japan'.
+    - cover_ver: cache-bust token for the cover URL (see _cover_ver)."""
     if r.get("korean_name"):
         display = r["korean_name"]
     else:
@@ -50,6 +70,7 @@ def _enrich_rom(r: dict) -> dict:
         display = stem.strip() or (r.get("stored_name") or "")
     r["display_name"] = display
     r["display_region"] = "Korea" if r.get("is_korean_patched") else r.get("region")
+    r["cover_ver"] = _cover_ver(session_id, r)
     return r
 
 
@@ -76,7 +97,7 @@ def get_library(session_id: str) -> dict:
     with db.connect() as conn:
         require_session(conn, session_id)
         roms = [
-            _enrich_rom(dict(r))
+            _enrich_rom(dict(r), session_id)
             for r in conn.execute(
                 "SELECT * FROM roms WHERE session_id = ? ORDER BY created_at DESC",
                 (session_id,),

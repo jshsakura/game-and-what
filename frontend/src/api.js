@@ -244,11 +244,16 @@ export async function uploadCover(romId, file, crop) {
   return res.json();
 }
 
-export function coverUrl(romId) {
+export function coverUrl(romId, ver) {
   if (DEMO) return demoCoverUrl(romId);
   const sid = getSessionId();
-  // cache-bust so a freshly uploaded cover shows immediately
-  return sid ? `/api/sessions/${sid}/roms/${romId}/cover` : null;
+  if (!sid) return null;
+  // ver = the library's per-rom cover_ver token: it changes the moment the cover
+  // (or its flag/crop) changes, so the browser refetches then — and reuses its
+  // cache while it doesn't. Without it a re-baked/flagged cover shows the stale
+  // cached image.
+  const q = ver != null ? `?v=${encodeURIComponent(ver)}` : "";
+  return `/api/sessions/${sid}/roms/${romId}/cover${q}`;
 }
 
 // The RAW device .img (fixed size) — what the hardware actually displays.

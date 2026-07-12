@@ -174,6 +174,10 @@ async def upload_roms(
                 "original_name": storage.nfc(meta.original_name),
                 "korean_name": storage.nfc(meta.korean_name),
                 "rom_path": storage.relative_to_session(session_id, rom_path),
+                # Carry the flag so the BACKGROUND cover render bakes it in — without
+                # this a freshly-fetched cover is baked flagless and a 한글패치 ROM
+                # shows no 🇰🇷 until something re-bakes it.
+                "cover_flag": cover_flag,
             })
         results.append({
             "id": rom_id,
