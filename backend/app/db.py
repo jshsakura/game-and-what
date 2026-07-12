@@ -199,6 +199,19 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # NULL = no patch-version tag found. See services/patchver.py.
         conn.execute("ALTER TABLE roms ADD COLUMN patch_ver TEXT")
 
+    # Videos moved from media/ to video/ (the folder the firmware actually browses),
+    # so the stored relative paths have to follow. Idempotent: after the first run no
+    # row starts with the legacy prefix. The files themselves are moved by
+    # storage.migrate_legacy_media_dir() at startup.
+    legacy_prefix = f"{config.LEGACY_MEDIA_DIR_NAME}/"
+    has_videos = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='videos'").fetchone()
+    if has_videos:
+        conn.execute(
+            "UPDATE videos SET avi_path = ? || substr(avi_path, ?) WHERE avi_path LIKE ?",
+            (f"{config.MEDIA_DIR_NAME}/", len(legacy_prefix) + 1, f"{legacy_prefix}%"),
+        )
+
     # Multi-language prep: the name-mapping cache is currently Korean ('ko'). A
     # `lang` column lets other languages (en/ja…) coexist later without a rebuild.
     rn_cols = {r["name"] for r in conn.execute("PRAGMA table_info(rom_names)")}

@@ -75,7 +75,7 @@ ROM·영상·음악을 올리면 이름과 기기 규격 커버를 자동으로 
   [jshsakura 포크 펌웨어](https://github.com/jshsakura/game-and-watch-retro-go-sd)
   전용 기능을 켭니다: 업스트림이 등록하지 않는 추가 기종(네오지오 포켓, 원더스완,
   버추얼보이, 오디세이², ZX 스펙트럼, C64, Game.com), 슈퍼 메트로이드 홈브루 포팅,
-  그리고 MEDIA 탭(영상 → `/media` MJPEG `.avi`, 음악 → `/music`, 시계 배경).
+  그리고 MEDIA 탭(영상 → `/video` MJPEG `.avi`, 음악 → `/music`, 시계 배경).
   **기본 비활성** — 꺼져 있으면 공식 펌웨어가 지원하는 범위만 보입니다.
 - 레트로 **픽셀아트 UI**, Zelda ↔ Mario 에디션 토글.
 

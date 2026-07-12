@@ -878,14 +878,14 @@ def test_download_package_video_opt_in_requires_experimental_mode(client, make_r
 
     monkeypatch.setattr(config, "EXPERIMENTAL_MODE", False)
     official = client.get(f"/api/sessions/{session_id}/package", params={"video": "1"})
-    assert "media/clip.avi" not in _zip_names(official.content)
+    assert f"{config.MEDIA_DIR_NAME}/clip.avi" not in _zip_names(official.content)
 
     monkeypatch.setattr(config, "EXPERIMENTAL_MODE", True)
     lab_with_video = client.get(f"/api/sessions/{session_id}/package", params={"video": "1"})
-    assert "media/clip.avi" in _zip_names(lab_with_video.content)
+    assert f"{config.MEDIA_DIR_NAME}/clip.avi" in _zip_names(lab_with_video.content)
 
     lab_default = client.get(f"/api/sessions/{session_id}/package")  # video not opted in
-    assert "media/clip.avi" not in _zip_names(lab_default.content)
+    assert f"{config.MEDIA_DIR_NAME}/clip.avi" not in _zip_names(lab_default.content)
 
 
 def test_download_package_experimental_system_folders_gated(client, make_rom, session_id, monkeypatch):

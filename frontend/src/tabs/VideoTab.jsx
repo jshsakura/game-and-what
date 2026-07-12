@@ -101,7 +101,7 @@ export default function VideoTab({ onChanged }) {
   const [queue, setQueue] = useState([]);  // [{name, status:'pending'|'converting'|'done'|'failed'|'cancelled', progress, error}]
   const cancelledRef = useRef(new Set());  // indices the user cancelled
   const convertingRef = useRef(-1);        // index currently converting
-  // Shared-storage section (upload → server ffmpeg → /media)
+  // Shared-storage section (upload → server ffmpeg → /video)
   const [srvJob, setSrvJob] = useState(null);
   const [srvName, setSrvName] = useState("");
   const [srvError, setSrvError] = useState("");
@@ -158,7 +158,7 @@ export default function VideoTab({ onChanged }) {
     cancelEncode();
   }
 
-  // Shared storage: upload the source, the server encodes it into /media (visible
+  // Shared storage: upload the source, the server encodes it into /video (visible
   // to everyone using this library).
   async function handleServer(files, onProgress) {
     const file = files[0];
@@ -192,7 +192,7 @@ export default function VideoTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Clapperboard size={13} aria-hidden /> {t("For the device's /media player")} · <b>MJPEG · AVI · 320×240 · 20fps · mono MP3 (q17)</b>
+        <Clapperboard size={13} aria-hidden /> {t("For the device's /video player")} · <b>MJPEG · AVI · 320×240 · 20fps · mono MP3 (q17)</b>
       </div>
 
       <FitSelect mode={mode} setMode={setMode} t={t} />
@@ -209,7 +209,7 @@ export default function VideoTab({ onChanged }) {
           <ShieldCheck size={13} strokeWidth={2.5} aria-hidden /> {t("Your video is NOT uploaded — it's processed entirely in your browser and only the .avi downloads.")}
         </div>
         <div className="muted vtab-note">
-          {t("Very large files may hit the browser's memory limit — use Shared storage below for those. After it downloads, copy the .avi into the SD card's /media folder.")}
+          {t("Very large files may hit the browser's memory limit — use Shared storage below for those. After it downloads, copy the .avi into the SD card's /video folder.")}
         </div>
         <Dropzone
           accept="video/*"
@@ -221,13 +221,13 @@ export default function VideoTab({ onChanged }) {
         <QueueList queue={queue} onCancelItem={cancelItem} onCancelAll={cancelAll} t={t} />
       </section>
 
-      {/* ── BOTTOM: upload to the shared library (server encodes into /media) ── */}
+      {/* ── BOTTOM: upload to the shared library (server encodes into /video) ── */}
       <section className="vtab-section">
         <div className="vtab-head">
-          <Server size={14} strokeWidth={2.5} aria-hidden /> {t("Shared storage (saved to /media)")}
+          <Server size={14} strokeWidth={2.5} aria-hidden /> {t("Shared storage (saved to /video)")}
         </div>
         <div className="muted vtab-note">
-          {t("Uploads the source; the server encodes it into the shared /media library (everyone sees it).")}
+          {t("Uploads the source; the server encodes it into the shared /video library (everyone sees it).")}
         </div>
         {!ffmpeg && (
           <div className="badge failed">

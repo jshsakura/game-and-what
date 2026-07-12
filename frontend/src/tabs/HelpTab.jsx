@@ -21,7 +21,7 @@ const FILE_SOURCE = {
 const STEP_UPLOAD = "In the UPLOAD tab (or an empty library), pick a platform and drag in your ROMs.";
 const STEP_NAMES = "Covers are added automatically.";
 const STEP_NAMES_KOREAN = "Korean (English) names and covers are added automatically.";
-const STEP_VIDEO = "Videos are converted to .avi in the VIDEO tab and placed in /media.";
+const STEP_VIDEO = "Videos are converted to .avi in the VIDEO tab and placed in /video.";
 const STEPS_REST = [
   "If needed, rename, search/upload covers, and adjust the crop position from the card details.",
   "Download via 'SD ZIP' at the top right (or 'Current Platform ZIP' in the library). The estimated size is shown on the label.",
@@ -34,7 +34,7 @@ const SDCARD = [
   ["/roms/<platform>/", "ROM files per platform (uncompressed)"],
   ["/covers/<platform>/", "Cover .img (186×100, filename matches the ROM) — auto-generated"],
   ["/cores/", "PICO-8 cores (pico8.bin, etc.) — automatically included in the SD ZIP"],
-  ["/media/", "Entertainment videos .avi (excluded from the SD ZIP by default, included with ?video)", true],
+  ["/video/", "Entertainment videos .avi (excluded from the SD ZIP by default, included with ?video)", true],
 ];
 
 // Device button shortcuts (source: github.com/sylverb/game-and-watch-retro-go-sd)

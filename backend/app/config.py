@@ -55,7 +55,11 @@ EXPERIMENTAL_MODE = os.getenv("GNW_EXPERIMENTAL_MODE", "false").strip().lower() 
 # SD-card folder names (must mirror the device layout exactly).
 ROMS_DIR_NAME = "roms"
 COVERS_DIR_NAME = "covers"
-MEDIA_DIR_NAME = "media"
+# The fork firmware's Video app browses /video (VIDEO_ROOT in main_video.c) — it
+# has never read /media, so anything we shipped there was invisible on the
+# device. LEGACY_MEDIA_DIR_NAME is only for the one-time migration at startup.
+MEDIA_DIR_NAME = "video"
+LEGACY_MEDIA_DIR_NAME = "media"
 MUSIC_DIR_NAME = "music"   # firmware Music app scans /music (MP3 played directly)
 
 # External metadata/art providers — keys via env only (security rule).

@@ -1296,7 +1296,7 @@ body::before {
 }
 
 /* Video tab: two bordered sections — top = browser convert (download), bottom =
-   shared storage (server /media). */
+   shared storage (server /video). */
 .vtab-section {
   display: flex; flex-direction: column; gap: 10px;
   border: 1px solid #ffffff1f; border-radius: 10px; padding: 12px 13px;

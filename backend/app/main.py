@@ -72,6 +72,11 @@ def _startup() -> None:
     swept = storage.sweep_temp_uploads()
     if swept:
         print(f"[startup] swept {swept} orphaned upload temp file(s)")
+    # Videos used to be filed under media/, which the firmware never reads (its
+    # Video app browses /video). Move them once; no-op thereafter.
+    moved_videos = storage.migrate_legacy_media_dir()
+    if moved_videos:
+        print(f"[startup] moved {moved_videos} video(s) from media/ to video/")
     # Backfill language/한글패치 for legacy roms (lang_source IS NULL) once — new
     # uploads already auto-detect, so this converges immediately and is a no-op
     # thereafter. Metadata-only: never touches filenames, covers or files.

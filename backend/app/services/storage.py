@@ -81,6 +81,34 @@ def sweep_temp_uploads() -> int:
     return removed
 
 
+def migrate_legacy_media_dir() -> int:
+    """Move every session's old `media/` folder to `video/` — the name the firmware
+    actually browses. Idempotent; returns the number of files moved. Existing files
+    in `video/` win, so re-running (or a half-finished move) can't clobber them."""
+    moved = 0
+    if not config.LIBRARY_DIR.exists():
+        return 0
+    for legacy in config.LIBRARY_DIR.glob(f"*/{config.LEGACY_MEDIA_DIR_NAME}"):
+        if not legacy.is_dir():
+            continue
+        target = legacy.parent / config.MEDIA_DIR_NAME
+        target.mkdir(parents=True, exist_ok=True)
+        for f in legacy.iterdir():
+            dest = target / f.name
+            if dest.exists():
+                continue
+            try:
+                f.rename(dest)
+                moved += 1
+            except OSError:
+                pass
+        try:
+            legacy.rmdir()          # only when we emptied it
+        except OSError:
+            pass
+    return moved
+
+
 def music_dir(session_id: str) -> Path:
     return session_root(session_id) / config.MUSIC_DIR_NAME
 

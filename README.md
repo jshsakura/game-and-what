@@ -78,7 +78,7 @@ preview with sample data (no backend; uploads/edits are disabled).
   lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
   extra systems the upstream firmware doesn't register (Neo Geo Pocket,
   WonderSwan, Virtual Boy, Odyssey², ZX Spectrum, C64, Game.com), the Super
-  Metroid homebrew port, plus the MEDIA tab (video → `/media` MJPEG `.avi`, music
+  Metroid homebrew port, plus the MEDIA tab (video → `/video` MJPEG `.avi`, music
   → `/music`, clock backgrounds). **Off by default** — everything above stays
   hidden and the app tracks only what the official firmware supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
