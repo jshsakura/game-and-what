@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS roms (
     korean_name  TEXT,                   -- resolved title, null if unmatched
     rom_path     TEXT NOT NULL,
     cover_path   TEXT,                   -- .img path, null until generated
-    cover_status TEXT NOT NULL DEFAULT 'none',  -- none|ok|failed
+    cover_status TEXT NOT NULL DEFAULT 'none',  -- none|pending|ok|failed
     created_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS videos (

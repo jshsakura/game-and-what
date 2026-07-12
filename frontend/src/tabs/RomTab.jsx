@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Gamepad2, Upload } from "lucide-react";
-import { getSystems, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
+import React, { useEffect, useMemo, useState } from "react";
+import { Gamepad2, Loader2, Upload } from "lucide-react";
+import { getSystems, getLibrary, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
 import { Dropzone, SystemSelect, RomCard } from "../components.jsx";
 import { useT } from "../i18n.jsx";
+
+const COVER_POLL_MS = 3000;
 
 export default function RomTab({ onChanged }) {
   const t = useT();
@@ -18,6 +20,30 @@ export default function RomTab({ onChanged }) {
       .then((s) => { setSystems(s); setActive(s[0]?.key ?? null); })
       .catch((e) => setError(e.message));
   }, []);
+
+  // Covers are fetched in the background after the upload responds, so the cards
+  // land as 'pending'. Poll the library until each one resolves and swap the
+  // spinner for the artwork in place — no manual refresh, nothing to guess at.
+  const searching = useMemo(
+    () => results.filter((r) => r.ok && r.cover_status === "pending").length,
+    [results],
+  );
+  useEffect(() => {
+    if (!searching) return undefined;
+    const id = setInterval(async () => {
+      try {
+        const lib = await getLibrary();
+        const status = new Map(lib.roms.map((r) => [r.id, r.cover_status]));
+        setResults((prev) => prev.map((r) => (
+          status.has(r.id) && status.get(r.id) !== r.cover_status
+            ? { ...r, cover_status: status.get(r.id) }
+            : r
+        )));
+        onChanged?.();
+      } catch { /* transient — the next tick retries */ }
+    }, COVER_POLL_MS);
+    return () => clearInterval(id);
+  }, [searching, onChanged]);
 
   const current = systems.find((s) => s.key === active);
   const isFolder = FOLDER_SYSTEMS.has(active);   // CD systems → upload a game folder
@@ -83,6 +109,13 @@ export default function RomTab({ onChanged }) {
           {extra?.covers > 0 ? ` · ${t("🖼 {n} bundled covers", { n: extra.covers })}` : ""}
           {extra?.skippedAlt > 0 ? ` · ${t("{n} alt dumps skipped", { n: extra.skippedAlt })}` : ""}
           {failed.length > 0 ? ` · ${t("{n} skipped", { n: failed.length })}` : ""}
+        </div>
+      )}
+
+      {searching > 0 && (
+        <div className="muted cover-searching">
+          <Loader2 size={13} className="spin" aria-hidden />
+          {" "}{t("Searching covers for {n} ROM(s)… they appear here as they arrive", { n: searching })}
         </div>
       )}
 

@@ -84,6 +84,14 @@ def _startup() -> None:
         seeded = events.seed_uploads(conn, config.SHARED_SESSION_ID)
         if seeded:
             print(f"[startup] seeded {seeded} upload event(s) into the activity feed")
+    # A cover autofill only lives in memory (background task), so a restart mid-run
+    # strands its roms on cover_status='pending' — a spinner that never resolves and
+    # a library that polls forever. Nothing is in flight at boot: clear them.
+    with db.connect() as conn:
+        stranded = conn.execute(
+            "UPDATE roms SET cover_status = 'none' WHERE cover_status = 'pending'").rowcount
+    if stranded:
+        print(f"[startup] cleared {stranded} stranded 'pending' cover(s)")
     # Purge deleted files past the recovery window so _trash can't grow forever.
     purged = storage.purge_trash(config.SHARED_SESSION_ID, events.RETENTION_DAYS)
     if purged:

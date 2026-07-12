@@ -41,6 +41,7 @@ export default {
   "Whole folder": "폴더 통째로",
   "Click for details": "클릭해서 상세 보기",
   "Searching cover…": "커버 검색중…",
+  "Searching covers for {n} ROM(s)… they appear here as they arrive": "롬 {n}개의 커버를 검색 중… 찾는 대로 여기에 표시됩니다",
   "Add cover": "커버 추가",
   "Loading…": "불러오는 중…",
   "IGDB key is not set": "IGDB 키가 설정되지 않았습니다",

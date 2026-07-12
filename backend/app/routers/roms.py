@@ -141,6 +141,13 @@ async def upload_roms(
             _cf = ""
         cover_flag = _cf if _cf in covers.FLAG_CODES else None
 
+        # A rom that still needs artwork goes out as 'pending', not 'none': the
+        # background autofill below is about to look for it, and the UI polls that
+        # state to turn a spinner into the cover the moment it lands.
+        needs_cover = cover_status != "ok" and not sys_obj.pico8
+        if needs_cover:
+            cover_status = "pending"
+
         rom_id = storage.new_id()
         with db.connect() as conn:
             conn.execute(
@@ -159,7 +166,7 @@ async def upload_roms(
             )
             events.log(conn, session_id, "rom_upload", rom_id=rom_id,
                        rom_name=stored_name, system_key=sys_obj.key)
-        if cover_status != "ok" and not sys_obj.pico8:
+        if needs_cover:
             pending_cover.append({
                 "id": rom_id, "system_key": sys_obj.key, "stored_name": stored_name,
                 "original_name": storage.nfc(meta.original_name),
@@ -190,7 +197,11 @@ async def upload_roms(
 async def _autofill_covers(session_id: str, roms: list[dict]) -> None:
     """Background: best-effort IGDB/TheGamesDB cover for each freshly-uploaded rom.
     Paced (~4/s) to stay under IGDB's rate limit, with one retry pass for the
-    transient failures a fast burst would otherwise drop."""
+    transient failures a fast burst would otherwise drop.
+
+    Every rom here was stored as cover_status='pending', so each one MUST end up
+    resolved — 'ok' (autofill_rom sets it) or back to 'none'. A rom left 'pending'
+    would spin in the UI forever and keep the library polling."""
     from .covers import autofill_rom
     still: list[dict] = []
     for rom in roms:
@@ -201,11 +212,23 @@ async def _autofill_covers(session_id: str, roms: list[dict]) -> None:
             still.append(rom)
         await asyncio.sleep(0.25)
     for rom in still:                 # retry the ones that missed (often transient)
+        found = False
         try:
-            await autofill_rom(session_id, rom)
+            found = await autofill_rom(session_id, rom)
         except Exception:
             pass
+        if not found:
+            _settle_cover(rom["id"])
         await asyncio.sleep(0.25)
+
+
+def _settle_cover(rom_id: str) -> None:
+    """Clear a 'pending' rom that never got artwork, so the UI stops waiting."""
+    with db.connect() as conn:
+        conn.execute(
+            "UPDATE roms SET cover_status = 'none' WHERE id = ? AND cover_status = 'pending'",
+            (rom_id,),
+        )
 
 
 def _basename(rel: str) -> str:
