@@ -9,6 +9,11 @@ Korean translation exists. Without a marker we fall back to the standard region
 tag ('(Japan)', '(USA)', '(Europe)', '(World)', '(Korea)'…) for the original
 language; the play language then equals the original (no patch applied).
 
+Other sites tag prepatched dumps their own way ('... (KP).gb' = Korean Patch);
+those are NOT detected on purpose — one-off conventions aren't worth chasing.
+Flag such a rom by hand instead (PATCH /roms/{id}/lang → lang_source='manual',
+which the auto-scan then leaves alone).
+
 Pure + immutable: every function returns a NEW frozen LangInfo, never mutates.
 """
 from __future__ import annotations
