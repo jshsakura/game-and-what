@@ -6,7 +6,7 @@ import LibraryTab from "./tabs/LibraryTab.jsx";
 import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
-import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive } from "lucide-react";
+import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages } from "lucide-react";
 import { getLibrary, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
@@ -201,6 +201,7 @@ export default function App() {
   const [libKeys, setLibKeys] = useState([]);        // system keys that have roms (selectable)
   const [selected, setSelected] = useState(() => new Set()); // checked systems for download
   const [selSize, setSelSize] = useState(null);
+  const [koOnly, setKoOnly] = useState(false);   // SD ZIP: ship only 한글패치 roms
   const dl = useDownload();
 
   useEffect(() => {
@@ -216,8 +217,8 @@ export default function App() {
       })
       .catch(() => { setCount(0); setLibKeys([]); })
       .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
-    packageSize().then(setSdSize).catch(() => setSdSize(null));
-  }, [reloadKey]);
+    packageSize(undefined, koOnly).then(setSdSize).catch(() => setSdSize(null));
+  }, [reloadKey, koOnly]);
 
   // Download selection (system key == dirname). 전체 선택 + 다운로드 live together top-right.
   const toggleSel = (key) => setSelected((s) => {
@@ -232,9 +233,9 @@ export default function App() {
   // Size of the checked-systems selection (for the top-right download button).
   useEffect(() => {
     let alive = true; setSelSize(null);
-    if (selKey) packageSize(selKey).then((b) => alive && setSelSize(b)).catch(() => {});
+    if (selKey) packageSize(selKey, koOnly).then((b) => alive && setSelSize(b)).catch(() => {});
     return () => { alive = false; };
-  }, [selKey, reloadKey]);
+  }, [selKey, reloadKey, koOnly]);
 
   const bumpLibrary = () => setReloadKey((k) => k + 1);
 
@@ -307,11 +308,20 @@ export default function App() {
                 ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All")}</>
                 : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
             </button>
+            <button
+              className={`btn tab-ko ${koOnly ? "on" : ""}`}
+              onClick={() => setKoOnly((v) => !v)}
+              aria-pressed={koOnly}
+              title={t("SD ZIP: include only Korean-patched ROMs")}
+            >
+              <Languages size={14} strokeWidth={2.5} aria-hidden /> {t("KO only")}
+            </button>
             <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
               onClick={() => dl.downloadPackage(
                 allSelected ? undefined : selKey,
-                allSelected ? "gnw-sd.zip" : "gnw-sd-selected.zip",
+                `gnw-sd${allSelected ? "" : "-selected"}${koOnly ? "-korean" : ""}.zip`,
                 (allSelected ? sdSize : selSize) || 0,
+                koOnly,
               )}
               title={hasSel ? (allSelected ? t("Download the full SD (incl. firmware & BIOS) as ZIP") : t("Download the checked platforms as an SD ZIP")) : t("Check a platform (or select all) to download")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> SD ZIP

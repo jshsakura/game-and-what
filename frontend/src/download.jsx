@@ -95,15 +95,17 @@ export function DownloadProvider({ children }) {
   }, [t, streamDownload]);
 
   // Full flow: build (with progress) then download. `system` is undefined for
-  // the whole-SD package, or a platform dirname for a single system.
-  const downloadPackage = useCallback(async (system, fallbackName = "gnw-sd.zip", knownTotal = 0) => {
+  // the whole-SD package, or a platform dirname for a single system. `korean`
+  // ships only 한글패치 roms.
+  const downloadPackage = useCallback(async (system, fallbackName = "gnw-sd.zip", knownTotal = 0,
+                                             korean = false) => {
     if (activeRef.current) return;
     activeRef.current = true;
     cancelledRef.current = false;
     jobIdRef.current = null;
     setJob({ phase: "building", label: fallbackName, progress: 0, doneMB: 0, totalMB: 0 });
     try {
-      const buildRes = await fetch(packageBuildUrl(system), { method: "POST" });
+      const buildRes = await fetch(packageBuildUrl(system, korean), { method: "POST" });
       if (!buildRes.ok) {
         const detail = await buildRes.json().catch(() => ({}));
         throw new Error(detail.detail || t("Download failed ({status})", { status: buildRes.status }));
@@ -130,7 +132,7 @@ export function DownloadProvider({ children }) {
         }
       }
       jobIdRef.current = null;
-      await streamDownload(packageUrl(system), fallbackName, knownTotal);
+      await streamDownload(packageUrl(system, korean), fallbackName, knownTotal);
     } catch (e) {
       if (e.name === "AbortError") {
         setJob(null);

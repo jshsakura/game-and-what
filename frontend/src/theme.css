@@ -1500,7 +1500,9 @@ body::before {
 /* 전체 선택 + 다운로드 grouped at the right (PC: auto width, right-aligned). */
 .tabbar-dl { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 /* match the tab labels (라이브러리 등) — 11px, not the default .btn 12px */
-.tab-dl, .tab-selall { white-space: nowrap; font-size: 11px; }
+.tab-dl, .tab-selall, .tab-ko { white-space: nowrap; font-size: 11px; }
+/* 한글판만 toggle — active state uses the shared .btn.on look */
+.tab-ko.on { box-shadow: 0 0 0 1px var(--accent), 0 1px 3px #0000006b; }
 /* Loading skeletons for the fixed top-right button set (전체 / SD ZIP) — same box
    as the real .btn so they swap in with no layout shift. */
 .btn-skel { display: inline-block; height: 43px; border-radius: 8px; border: 2px solid #1c2027; pointer-events: none; vertical-align: middle; }
@@ -1856,11 +1858,12 @@ body::before {
   .pad-cap { gap: 10px; }
   .pad-cap em { font-size: 9px; }
   .topbar h1 { font-size: 13px; }
-  /* 탭바: 탭들은 한 줄, 전체선택+다운로드는 그 아래 한 줄 전체너비로 3:7 분할 */
+  /* 탭바: 탭들은 한 줄, 전체선택+한글판만+다운로드는 그 아래 한 줄 전체너비로 분할 */
   .tabbar .tabs { flex: 1 0 100%; }
   .tabbar-dl { flex: 1 0 100%; }
   .tabbar-dl .tab-selall { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .tab-dl { flex: 7; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  .tabbar-dl .tab-ko { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  .tabbar-dl .tab-dl { flex: 6; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   /* skeletons mirror the real 3:7 split + height on phones */
   .tabbar-dl .btn-skel { width: auto; height: 48px; }
   .tabbar-dl .btn-skel.sel { flex: 3; }

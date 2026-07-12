@@ -661,33 +661,38 @@ export async function autoresolve(system) {
   return res.json();
 }
 
-export function packageUrl(system) {
+// Build the query string shared by the package endpoints: optional system
+// filter + optional Korean-patched-only flag.
+function packageQuery(system, korean) {
+  const p = new URLSearchParams();
+  if (system) p.set("system", system);
+  if (korean) p.set("korean", "1");
+  const s = p.toString();
+  return s ? `?${s}` : "";
+}
+
+export function packageUrl(system, korean = false) {
   const sid = getSessionId();
   if (!sid) return null;
-  return system
-    ? `/api/sessions/${sid}/package?system=${encodeURIComponent(system)}`
-    : `/api/sessions/${sid}/package`;
+  return `/api/sessions/${sid}/package${packageQuery(system, korean)}`;
 }
 
 // Kick off (or reuse) the server-side SD-zip build. Returns {ready, job_id}:
 // ready → download immediately; else poll jobUrl(job_id) for build progress.
-export function packageBuildUrl(system) {
+export function packageBuildUrl(system, korean = false) {
   const sid = getSessionId();
   if (!sid) return null;
-  return system
-    ? `/api/sessions/${sid}/package/build?system=${encodeURIComponent(system)}`
-    : `/api/sessions/${sid}/package/build`;
+  return `/api/sessions/${sid}/package/build${packageQuery(system, korean)}`;
 }
 
 export const jobUrl = (id) => `/api/jobs/${id}`;
 export const jobCancelUrl = (id) => `/api/jobs/${id}/cancel`;
 
-// Estimated on-SD byte size of the (optional single-system) package.
-export async function packageSize(system) {
+// Estimated on-SD byte size of the (optional single-system, optional Korean-only) package.
+export async function packageSize(system, korean = false) {
   const sid = getSessionId();
   if (!sid) return null;
-  const q = system ? `?system=${encodeURIComponent(system)}` : "";
-  const res = await fetch(`/api/sessions/${sid}/package/size${q}`);
+  const res = await fetch(`/api/sessions/${sid}/package/size${packageQuery(system, korean)}`);
   if (!res.ok) return null;
   return (await res.json()).bytes;
 }

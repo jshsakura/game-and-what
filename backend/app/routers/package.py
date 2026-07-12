@@ -132,16 +132,8 @@ def _homebrew_roms(conn, session_id: str) -> "set[str]":
     return {r["rom_path"] for r in rows}
 
 
-def _excluded_roms(conn, session_id: str) -> "set[str]":
-    """Relative paths (ROM file + its cover) dropped from the SD card while kept
-    in the library. Two sources:
-      • sd_exclude=1 — the user opted this ROM out manually.
-      • pico8_compat='broken' — a PICO-8 cart that doesn't run on the real G&W
-        (구동불가); never worth shipping, so it's auto-excluded."""
-    rows = conn.execute(
-        "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
-        "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
-        (session_id,)).fetchall()
+def _rom_and_cover_paths(rows) -> "set[str]":
+    """Flatten (rom_path, cover_path) rows into one set of SD-relative paths."""
     out: set[str] = set()
     for r in rows:
         if r["rom_path"]:
@@ -151,20 +143,45 @@ def _excluded_roms(conn, session_id: str) -> "set[str]":
     return out
 
 
+def _excluded_roms(conn, session_id: str, korean_only: bool = False) -> "set[str]":
+    """Relative paths (ROM file + its cover) dropped from the SD card while kept
+    in the library. Sources:
+      • sd_exclude=1 — the user opted this ROM out manually.
+      • pico8_compat='broken' — a PICO-8 cart that doesn't run on the real G&W
+        (구동불가); never worth shipping, so it's auto-excluded.
+      • korean_only — a Korean-only card: every ROM WITHOUT the Korean flag
+        (cover_flag='ko') is dropped, its cover with it. The flag is the user-
+        facing "이건 한글판" mark and covers BOTH fan 한글패치 AND Korean official/
+        made releases (정식발매·국산), which is_korean_patched alone would miss.
+        A system with no 국기 ROMs contributes nothing → it drops out entirely."""
+    excluded = _rom_and_cover_paths(conn.execute(
+        "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
+        "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
+        (session_id,)).fetchall())
+    if korean_only:
+        excluded |= _rom_and_cover_paths(conn.execute(
+            "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
+            "AND IFNULL(cover_flag, '') != 'ko'",
+            (session_id,)).fetchall())
+    return excluded
+
+
 @router.get("/sessions/{session_id}/package/size")
-def package_size(session_id: str, video: bool = False, system: str | None = None) -> dict:
+def package_size(session_id: str, video: bool = False, system: str | None = None,
+                 korean: bool = False) -> dict:
     """Estimated on-SD byte size for the (optionally filtered) package."""
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id)
+        excluded = _excluded_roms(conn, session_id, korean_only=korean)
     systems = _parse_systems(system)
     return {"bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
                                                homebrew_roms=homebrew, excluded_roms=excluded)}
 
 
 @router.post("/sessions/{session_id}/package/build")
-async def start_package_build(session_id: str, video: bool = False, system: str | None = None) -> dict:
+async def start_package_build(session_id: str, video: bool = False, system: str | None = None,
+                              korean: bool = False) -> dict:
     """Start (or reuse) the SD-zip build. Returns immediately:
       {ready: true,  job_id: null}  — already cached, download straight away, or
       {ready: false, job_id: "..."} — building; poll GET /jobs/{id} for progress
@@ -174,7 +191,7 @@ async def start_package_build(session_id: str, video: bool = False, system: str 
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id)
+        excluded = _excluded_roms(conn, session_id, korean_only=korean)
     systems = _parse_systems(system)
     if not packaging.session_has_content(session_id, include_video=video, systems=systems):
         raise HTTPException(status_code=404, detail="Nothing to package yet")
@@ -197,17 +214,18 @@ async def start_package_build(session_id: str, video: bool = False, system: str 
 
 @router.get("/sessions/{session_id}/package")
 def download_package(request: Request, session_id: str, video: bool = False,
-                     system: str | None = None) -> Response:
+                     system: str | None = None, korean: bool = False) -> Response:
     """ZIP mirroring the SD card (/roms, /covers). Video (/media) is excluded by
     default — pass ?video=1 to include it. Pass ?system=<dirname> (or a
-    comma-separated list) to package only those systems.
+    comma-separated list) to package only those systems. Pass ?korean=1 to ship
+    only 한글패치 ROMs (non-Korean roms + their covers are dropped).
 
     Cached & ETagged: the zip is built to disk only when the library/params change
     (not on every download), and an unchanged client gets a 304."""
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id)
+        excluded = _excluded_roms(conn, session_id, korean_only=korean)
     systems = _parse_systems(system)
     if not packaging.session_has_content(session_id, include_video=video, systems=systems):
         raise HTTPException(status_code=404, detail="Nothing to package yet")
@@ -229,6 +247,8 @@ def download_package(request: Request, session_id: str, video: bool = False,
         suffix = "-selected"
     else:
         suffix = ""
+    if korean:
+        suffix += "-korean"
     return FileResponse(
         zip_path,
         media_type="application/zip",
