@@ -165,6 +165,8 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       if (dups.length) {
         toast.warn(`${t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}: ${dups.map((d) => d.name).join(", ")}`);
       }
+      const warned = (res.results || []).filter((r) => r.warning);
+      warned.forEach((r) => toast.warn(`${r.stored_name}: ${r.warning}`));
       toast.success(t("Upload complete"));
       refresh();
     } catch (e) { setError(e.message); toast.error(e.message); }

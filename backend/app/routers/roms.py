@@ -12,7 +12,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import artfetch, covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romtag, storage
+from ..services import artfetch, covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
 from .sessions import require_session, require_system_enabled
 
 router = APIRouter(prefix="/api", tags=["roms"])
@@ -86,6 +86,8 @@ async def upload_roms(
             results.append({"name": original, "ok": False, "error": "duplicate",
                             "duplicate_of": dup["stored_name"]})
             continue
+
+        header_warning = romcheck.md_header_warning(sys_obj.key, data)
 
         meta = metadata.resolve_metadata(sys_obj.key, original)
         # Filename is kept AS UPLOADED — NO automatic Korean conversion (it caused
@@ -183,6 +185,7 @@ async def upload_roms(
             "korean_name": meta.korean_name,
             "screenshot_url": meta.screenshot_url,
             "cover_status": cover_status,
+            "warning": header_warning,
         })
 
     # Auto-fetch covers asynchronously AFTER responding — the user doesn't wait,

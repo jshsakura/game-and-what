@@ -52,6 +52,7 @@ export default function RomTab({ onChanged }) {
   const failed = results.filter((r) => !r.ok);
   const dups = results.filter((r) => r.error === "duplicate");
   const badExt = failed.filter((r) => r.error !== "duplicate");
+  const warned = okResults.filter((r) => r.warning);
 
   async function handleFiles(files, onProgress) {
     if (!active || !current) return;
@@ -127,6 +128,12 @@ export default function RomTab({ onChanged }) {
 
       {badExt.length > 0 && (
         <div className="muted">{t("Skipped:")} {badExt.map((f) => f.name).join(", ")} {t("(unsupported extension)")}</div>
+      )}
+
+      {warned.length > 0 && (
+        <div className="badge failed">
+          {warned.map((r) => (<div key={r.id}>⚠ {r.stored_name}: {r.warning}</div>))}
+        </div>
       )}
 
       {okResults.length > 0 && (
