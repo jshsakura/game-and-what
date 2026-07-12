@@ -105,7 +105,12 @@ SYSTEMS: tuple[System, ...] = (
     # "bin" = homebrew app payload; "dat" = the assets file some ports need at
     # /roms/homebrew/ (SMW → smw_assets.dat, Zelda3 → zelda3_assets.dat), uploaded
     # as its own item + cover. Both ride along when opted into the SD ZIP.
-    System("homebrew", "Homebrew", "homebrew", ("bin", "dat"), square=True),
+    # "xip"/"smc" = Super Metroid's two extra files. It does not have an assets
+    # file: the port reads the original SNES ROM at runtime (sm.smc), and its cold
+    # banks plus rodata execute out of QSPI flash from sm.xip. Neither is a ".bin",
+    # so both always ship — which is what the port needs; it will not boot without
+    # them. Zelda3's zelda3.ro rides along the same way.
+    System("homebrew", "Homebrew", "homebrew", ("bin", "dat", "xip", "smc"), square=True),
     System("pico8", "PICO-8", "pico8", ("p8", "png"), pico8=True, square=True),
 )
 # NOTE: "videopac" is commented out (disabled) in rg_emulators.c, so it is NOT a
