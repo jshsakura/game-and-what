@@ -12,6 +12,11 @@
   --lcd-ink-dim: #3c4225;      /* "off" segment ghost (still readable) */
   --shell-shadow: rgba(0, 0, 0, 0.35);
   --gold: #c9a227;             /* signature gold ring */
+  /* Cover-corner chips (system icon, SD-excluded, crop/hand/no-cover, score) —
+     ONE box for all four so the poster's corners read as one set: same height,
+     same rounded-rectangle corner (never a pill/circle). */
+  --cover-chip-h: 19px;
+  --cover-chip-radius: 5px;
   /* FIXED dark tile — does NOT follow the theme/LCD background; only the
      card border picks up the theme accent. */
   --card-bg: #2c331c;          /* deep tile — strong contrast vs olive LCD */
@@ -659,10 +664,12 @@ body::before {
 /* Platform icon — small, pinned to the cover image's top-left corner (no big box) */
 .cover-corner {
   /* Vertically centered on the baked flag (flag center ≈ 9.25% of cover height);
-     box is ~18px tall → offset half of that so the icon lines up with the flag. */
-  position: absolute; left: 4px; top: calc(9% - 9px); z-index: 2;
+     the chip is --cover-chip-h tall → offset half of that so the icon lines up
+     with the flag. */
+  position: absolute; left: 4px; top: calc(9% - var(--cover-chip-h) / 2); z-index: 2;
   display: inline-flex; align-items: center; justify-content: center; gap: 3px;
-  padding: 2px 3px; border-radius: 4px;
+  height: var(--cover-chip-h); min-width: var(--cover-chip-h); box-sizing: border-box;
+  padding: 0 4px; border-radius: var(--cover-chip-radius);
   background: #00000066;
   filter: drop-shadow(0 1px 1px #000000aa);
   pointer-events: none;
@@ -1920,14 +1927,16 @@ body::before {
 .cover-badge:not(.bl) > .cover-crop,
 .cover-badge:not(.bl) > .cover-manual {
   display: inline-flex; align-items: center; justify-content: center;
-  height: 19px; min-width: 19px; box-sizing: border-box; padding: 0 4px; border-radius: 999px;
+  height: var(--cover-chip-h); min-width: var(--cover-chip-h); box-sizing: border-box;
+  padding: 0 4px; border-radius: var(--cover-chip-radius);
   background: #000000b0; border: 1px solid #ffffff2e; box-shadow: 0 1px 3px #00000066;
 }
 /* IGDB score pill (bottom-right). Color band by quality tier. Height matches the
    status-icon chip beside it so the bottom-right row is even. */
 .cover-score {
   display: inline-flex; align-items: center; justify-content: center; gap: 2px;
-  height: 19px; box-sizing: border-box; padding: 0 8px; min-width: 30px; border-radius: 999px;
+  height: var(--cover-chip-h); box-sizing: border-box; padding: 0 8px; min-width: 30px;
+  border-radius: var(--cover-chip-radius);
   font-family: var(--body-font); font-size: 11px; line-height: 1; font-weight: 500;
   color: #fff; letter-spacing: 0;
 }
@@ -1957,7 +1966,8 @@ body::before {
 /* Bottom-LEFT badge (PICO-8 실기 호환 아이콘) — mirrors the bottom-right one. */
 .cover-badge.bl {
   left: 5px; right: auto;
-  padding: 3px; border-radius: 5px;
+  height: var(--cover-chip-h); box-sizing: border-box;
+  padding: 0 4px; border-radius: var(--cover-chip-radius);
   background: #000000b0; border: 1px solid #ffffff2e; box-shadow: 0 1px 3px #00000066;
 }
 .cover-badge.bl .p8compat { margin-right: 0; padding: 0; }
