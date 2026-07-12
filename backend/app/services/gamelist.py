@@ -181,9 +181,19 @@ def _read_archive(p: Path) -> dict:
         with zipfile.ZipFile(p) as zf:
             return {n: zf.read(n) for n in zf.namelist() if not n.endswith("/")}
     if suf == ".7z":
+        # py7zr dropped readall() in 1.x, so extract to a scratch dir and read the
+        # files back. Members are read as bytes to match the .zip branch.
+        import tempfile
+
         import py7zr
-        with py7zr.SevenZipFile(p, "r") as z:
-            return {n: bio.read() for n, bio in z.readall().items()}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with py7zr.SevenZipFile(p, "r") as z:
+                z.extractall(path=root)
+            return {
+                str(f.relative_to(root)): f.read_bytes()
+                for f in sorted(root.rglob("*")) if f.is_file()
+            }
     return {}
 
 
@@ -194,6 +204,10 @@ def load_games(path) -> dict:
     Accepts .zip / .7z archives (꿀렁 bundles) or a bare .xml."""
     p = Path(path)
     if p.suffix.lower() not in ARCHIVE_SUFFIXES:
+        # Deliberately NOT guarded: a bare file the user picked AS the gamelist
+        # must fail loudly (the router turns ParseError into a 400) rather than
+        # look like a list that matched nothing. Archive members are best-effort
+        # because the bundle carries files we didn't ask for.
         return {"regex": [], "key": parse_games(path)}
 
     contents = _read_archive(p)
