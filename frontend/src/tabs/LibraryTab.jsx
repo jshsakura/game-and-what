@@ -324,7 +324,10 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               {koFeature && (
                 <button className={`scope-btn ${nonKoOnly ? "on" : ""}`} onClick={() => setNonKoOnly((m) => !m)}
                   title={t("Show only non-Korean-named ROMs (English/Japanese names)")} aria-pressed={nonKoOnly}>
-                  <Languages size={13} strokeWidth={2.5} /> {t("Korean")}
+                  {/* Negative label like its siblings ("No cover", "Unrated") — this
+                      filter selects roms that LACK a Korean name, and a bare "Korean"
+                      reads as the opposite. */}
+                  <Languages size={13} strokeWidth={2.5} /> {t("Non-Korean")}
                 </button>
               )}
               <button className={`scope-btn ${unratedOnly ? "on" : ""}`} onClick={() => setUnratedOnly((m) => !m)}
