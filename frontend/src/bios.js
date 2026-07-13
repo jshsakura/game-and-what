@@ -39,6 +39,7 @@ export const BIOS_CATALOG = [
   },
   {
     key: "pcecd",
+    experimental: true,
     label: "PC Engine CD",
     note: "System Card 3.0 — boots essentially the entire CD library.",
     files: [

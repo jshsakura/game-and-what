@@ -65,22 +65,24 @@ preview with sample data (no backend; uploads/edits are disabled).
   badge on the cover) so you can judge quality at a glance, and a per-ROM
   **"Exclude from SD"** toggle drops a ROM from the SD download while keeping it in
   the library — slim the device menu without deleting anything.
-- **All 21 officially supported systems** — everything the upstream
+- **All 19 officially supported systems** — everything the latest upstream
   [sylverb firmware](https://github.com/sylverb/game-and-watch-retro-go-sd)
-  registers: NES, Game Boy / GB Color, Game Gear, Master System, Genesis, SG-1000,
-  PC Engine, **PC Engine CD**, ColecoVision, MSX, Atari 2600 / 7800 / **Lynx**,
-  Amstrad CPC, Supervision, Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
+  **release** registers: NES, Game Boy / GB Color, Game Gear, Master System,
+  Genesis, SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800, Amstrad CPC,
+  Supervision, Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
 - **11-language UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) with
   per-locale CJK/Cyrillic fonts lazy-loaded on demand.
 - **Optional Korean mode** (`GNW_KOREAN_MODE=true`) — Korean auto-naming, the
   "Korean-patched" flag, and related filters. **Off by default** (international image).
 - **Optional experimental mode** (`GNW_EXPERIMENTAL_MODE=true`) — a "personal
   lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
-  extra systems the upstream firmware doesn't register (Neo Geo Pocket,
-  WonderSwan, Virtual Boy, Odyssey², ZX Spectrum, C64, Game.com), the Super
-  Metroid homebrew port, plus the MEDIA tab (video → `/video` MJPEG `.avi`, music
-  → `/music`, clock backgrounds). **Off by default** — everything above stays
-  hidden and the app tracks only what the official firmware supports.
+  systems no upstream *release* registers yet — **PC Engine CD** and **Atari Lynx**
+  (both merged into upstream `main` on 2026-07-05, so they graduate to official the
+  moment upstream cuts a release), plus Neo Geo Pocket, WonderSwan, Virtual Boy,
+  Odyssey², ZX Spectrum, C64, Game.com — the Super Metroid homebrew port, and the
+  MEDIA tab (video → `/video` MJPEG `.avi`, music → `/music`, clock backgrounds).
+  **Off by default** — everything above stays hidden and the app tracks only what a
+  firmware you can actually flash today supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
 
 ## 🔄 How it works

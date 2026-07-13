@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 """GNW_EXPERIMENTAL_MODE ("personal lab") gating.
 
-Official mode (flag off) must expose ONLY what the upstream sylverb firmware
-registers (which now includes PC Engine CD and Atari Lynx) and keep fork-only
-content — experimental system folders, /media, /music — out of the SD zip.
+Official mode (flag off) must expose ONLY what a firmware people can actually
+flash registers — the newest upstream sylverb RELEASE — and keep fork-only
+content (experimental system folders, /video, /music) out of the SD zip.
 Experimental mode restores the full fork feature set. The flag is read at call
 time from config, so tests flip `config.EXPERIMENTAL_MODE` via monkeypatch.
+
+Note PC Engine CD and Atari Lynx sit in upstream MAIN (merged 2026-07-05) but not
+in the newest release (v1.3.2, 2026-06-13), so they are experimental here: an
+official-mode user cannot run them yet. Flip them when upstream cuts a release.
 """
 from pathlib import Path
 
@@ -16,11 +20,10 @@ from app.services.packaging import _excluded
 from app.systems import EXPERIMENTAL_DIRNAMES, SYSTEMS, available_systems, get_system
 
 
-# The upstream rg_emulators.c registration, verbatim. PC Engine CD and Atari Lynx
-# joined it upstream on 2026-07-05.
+# rg_emulators.c as of the newest upstream RELEASE (v1.3.2), verbatim.
 UPSTREAM_OFFICIAL = {
-    "nes", "gb", "gbc", "gg", "sms", "md", "sg", "pce", "pcecd", "col", "msx",
-    "a2600", "a7800", "amstrad", "wsv", "lynx", "tama", "mini", "gw",
+    "nes", "gb", "gbc", "gg", "sms", "md", "sg", "pce", "col", "msx",
+    "a2600", "a7800", "amstrad", "wsv", "tama", "mini", "gw",
     "homebrew", "pico8",
 }
 
@@ -35,7 +38,7 @@ def _p(root: Path, rel: str) -> Path:
 def test_experimental_flags_match_upstream_registration():
     assert {s.key for s in SYSTEMS if not s.experimental} == UPSTREAM_OFFICIAL
     assert EXPERIMENTAL_DIRNAMES == {
-        "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom",
+        "pcecd", "lynx", "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom",
     }
 
 
@@ -60,7 +63,7 @@ def test_official_zip_drops_experimental_system_folders(tmp_path, monkeypatch, d
 
 def test_official_zip_keeps_official_system_folders(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "EXPERIMENTAL_MODE", False)
-    rom = _p(tmp_path, f"{config.ROMS_DIR_NAME}/lynx/Game.lnx")
+    rom = _p(tmp_path, f"{config.ROMS_DIR_NAME}/nes/Game.nes")
     assert _excluded(tmp_path, rom, include_video=False) is False
 
 
@@ -102,7 +105,7 @@ def test_require_system_enabled_blocks_experimental_uploads(monkeypatch):
     assert exc.value.status_code == 403
     with pytest.raises(HTTPException):
         require_experimental_mode()
-    require_system_enabled(get_system("lynx"))  # official → no raise
+    require_system_enabled(get_system("nes"))   # official → no raise
 
     monkeypatch.setattr(config, "EXPERIMENTAL_MODE", True)
     require_system_enabled(get_system("ngp"))  # lab mode → no raise
