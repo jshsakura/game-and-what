@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, HardDriveDownload, StarOff } from "lucide-react";
+import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, X, HardDriveDownload, StarOff } from "lucide-react";
 import { getLibrary, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
@@ -86,13 +86,19 @@ function usePageSize() {
   return size;
 }
 
-export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel }) {
+// koOnly/koKeys come from the SD-ZIP scope control: in Korean-only scope a platform
+// with no ko-flagged rom would ship nothing, so its chip is not selectable and says
+// so, instead of taking a check that silently produces an empty folder.
+export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel, koOnly = false, koKeys }) {
   const toast = useToast();
   const { t, lang } = useI18n();
   const koreanMode = useKoreanMode();
   const experimental = useExperimentalMode();
   // 한글명-누락 filter/badge: Korean deploy AND Korean UI only (hidden in English).
   const koFeature = koreanMode && lang === "ko";
+  // Not selectable while the zip scope is Korean-only: this platform has no rom
+  // carrying the ko flag, so it would contribute an empty folder.
+  const noKo = (key) => koOnly && !!koKeys && !koKeys.has(key);
   const [lib, setLib] = useState({ roms: [], videos: [], music: [] });
   // Seed from the last-known systems (cached) so the loading skeleton renders the
   // RIGHT number of platform chips on first paint — otherwise it starts at the
@@ -360,7 +366,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
             return (
             <button
               key={g.key}
-              className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"}`}
+              className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"} ${noKo(g.key) ? "no-ko" : ""}`}
               style={{ "--sys": systemColor(g.key) }}
               onClick={() => setActive(g.key)}
             >
@@ -374,11 +380,14 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               </span>
               {g.roms.length > 0 && (
                 <span
-                  className={`lib-chip-check ${selected.has(g.key) ? "on" : ""}`}
-                  role="checkbox" aria-checked={selected.has(g.key)} title={t("Select for download")}
-                  onClick={(e) => { e.stopPropagation(); onToggleSel(g.key); }}
+                  className={`lib-chip-check ${selected.has(g.key) ? "on" : ""} ${noKo(g.key) ? "off" : ""}`}
+                  role="checkbox" aria-checked={selected.has(g.key)} aria-disabled={noKo(g.key)}
+                  title={noKo(g.key) ? t("No Korean ROMs on this platform — nothing to put in a Korean-only SD ZIP") : t("Select for download")}
+                  onClick={(e) => { e.stopPropagation(); if (!noKo(g.key)) onToggleSel(g.key); }}
                 >
-                  {selected.has(g.key) && <Check size={16} strokeWidth={4} aria-hidden />}
+                  {noKo(g.key)
+                    ? <X size={14} strokeWidth={4} aria-hidden />
+                    : selected.has(g.key) && <Check size={16} strokeWidth={4} aria-hidden />}
                 </span>
               )}
               <SystemIcon dirname={g.system.dirname} size={30} />

@@ -6,7 +6,7 @@ import LibraryTab from "./tabs/LibraryTab.jsx";
 import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
-import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages } from "lucide-react";
+import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages, Loader2 } from "lucide-react";
 import { getLibrary, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
@@ -202,7 +202,8 @@ export default function App() {
   const [libKeys, setLibKeys] = useState([]);        // system keys that have roms (selectable)
   const [selected, setSelected] = useState(() => new Set()); // checked systems for download
   const [selSize, setSelSize] = useState(null);
-  const [koOnly, setKoOnly] = useState(false);   // SD ZIP: ship only 한글패치 roms
+  const [koOnly, setKoOnly] = useState(false);   // SD ZIP scope: only ko-flagged roms
+  const [koKeys, setKoKeys] = useState(() => new Set());  // platforms that HAVE ko-flagged roms
   const dl = useDownload();
 
   useEffect(() => {
@@ -215,21 +216,49 @@ export default function App() {
       .then((l) => {
         setCount(l.roms.length + l.videos.length + (l.music?.length || 0));
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
+        // Platforms that would survive a Korean-only zip. The filter goes by the
+        // cover FLAG, not the 한글패치 mark — an official Korean release counts too.
+        setKoKeys(new Set(l.roms.filter((r) => r.cover_flag === "ko").map((r) => r.system_key)));
       })
-      .catch(() => { setCount(0); setLibKeys([]); })
+      .catch(() => { setCount(0); setLibKeys([]); setKoKeys(new Set()); })
       .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
-    packageSize(undefined, koOnly).then(setSdSize).catch(() => setSdSize(null));
+  }, [reloadKey]);
+
+  // Full-library size. Cleared BEFORE the refetch: changing the scope changes the
+  // answer, and leaving the old number up until the new one lands reads as "the
+  // toggle did nothing" — the exact complaint. null == recalculating.
+  useEffect(() => {
+    let alive = true;
+    setSdSize(null);
+    packageSize(undefined, koOnly)
+      .then((b) => alive && setSdSize(b))
+      .catch(() => alive && setSdSize(null));
+    return () => { alive = false; };
   }, [reloadKey, koOnly]);
 
   // Download selection (system key == dirname). 전체 선택 + 다운로드 live together top-right.
+  // In Korean-only scope a platform with no ko-flagged rom would contribute nothing
+  // to the zip, so it isn't selectable at all — the choice narrows the board rather
+  // than letting you check a platform that then silently ships nothing.
+  const pickableKeys = useMemo(
+    () => (koOnly ? libKeys.filter((k) => koKeys.has(k)) : libKeys),
+    [koOnly, libKeys, koKeys],
+  );
   const toggleSel = (key) => setSelected((s) => {
     const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n;
   });
-  const selectedDirs = useMemo(() => libKeys.filter((k) => selected.has(k)), [libKeys, selected]);
-  const allSelected = libKeys.length > 0 && libKeys.every((k) => selected.has(k));
-  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(libKeys));
+  const selectedDirs = useMemo(
+    () => pickableKeys.filter((k) => selected.has(k)), [pickableKeys, selected]);
+  const allSelected = pickableKeys.length > 0 && pickableKeys.every((k) => selected.has(k));
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(pickableKeys));
   const selKey = selectedDirs.join(",");
   const hasSel = selectedDirs.length > 0;
+
+  // Switching TO Korean-only checks exactly the platforms that have Korean ROMs —
+  // the useful selection, without making the user hunt for which ones those are.
+  useEffect(() => {
+    if (koOnly) setSelected(new Set(libKeys.filter((k) => koKeys.has(k))));
+  }, [koOnly, libKeys, koKeys]);
 
   // Size of the checked-systems selection (for the top-right download button).
   useEffect(() => {
@@ -237,6 +266,11 @@ export default function App() {
     if (selKey) packageSize(selKey, koOnly).then((b) => alive && setSelSize(b)).catch(() => {});
     return () => { alive = false; };
   }, [selKey, reloadKey, koOnly]);
+
+  // The size shown on the SD ZIP button. null while the server recomputes it — a
+  // scope/selection change makes the old number wrong, so it is not left standing.
+  const shownSize = allSelected ? sdSize : selSize;
+  const sizing = hasSel && shownSize == null;
 
   const bumpLibrary = () => setReloadKey((k) => k + 1);
 
@@ -291,18 +325,15 @@ export default function App() {
         </nav>
         {/* Select-all + SD ZIP belong to the library view — hide the whole
             group on other tabs instead of letting SD ZIP tag along alone. */}
-        {tab !== "library" ? null : loading ? (
-          // Show skeletons in place so the buttons don't pop in.
-          <div className="tabbar-dl">
-            <span className="btn-skel sel" aria-hidden />
-            <span className="btn-skel dl" aria-hidden />
-          </div>
-        ) : count > 0 ? (
+        {tab !== "library" ? null : (loading || count > 0) ? (
+          // While the library loads, the REAL controls render shimmered in place
+          // (is-skel). Fixed-width skeleton boxes can't track a localized label or
+          // the scope segment, so they always swapped in at the wrong size.
           <div className="tabbar-dl">
             <button
-              className={`btn tab-selall ${allSelected ? "on" : ""}`}
+              className={`btn tab-selall ${allSelected ? "on" : ""} ${loading ? "is-skel" : ""}`}
               onClick={toggleAll}
-              disabled={libKeys.length === 0}
+              disabled={loading || pickableKeys.length === 0}
               title={t("Select / clear all platforms")}
             >
               {allSelected
@@ -315,7 +346,8 @@ export default function App() {
                 feature (the flag it filters on is only ever set there), so on any
                 other deploy there is no choice to make and the control is absent. */}
             {koreanMode && (
-              <div className="scope-seg" role="group" aria-label={t("What goes in the SD ZIP")}>
+              <div className={`scope-seg ${loading ? "is-skel" : ""}`} role="group"
+                   aria-label={t("What goes in the SD ZIP")}>
                 <button
                   type="button"
                   className={`seg ${koOnly ? "" : "on"}`}
@@ -336,17 +368,23 @@ export default function App() {
                 </button>
               </div>
             )}
-            <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
+            <button className={`btn tab-dl has-size ${loading ? "is-skel" : ""}`}
+              disabled={loading || !hasSel || dl.busy}
               onClick={() => dl.downloadPackage(
                 allSelected ? undefined : selKey,
                 `gnw-sd${allSelected ? "" : "-selected"}${koOnly ? "-korean" : ""}.zip`,
-                (allSelected ? sdSize : selSize) || 0,
+                shownSize || 0,
                 koOnly,
               )}
               title={hasSel ? (allSelected ? t("Download the full SD (incl. firmware & BIOS) as ZIP") : t("Download the checked platforms as an SD ZIP")) : t("Check a platform (or select all) to download")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> SD ZIP
               {hasSel && (
-                <span className="size-tag">{(allSelected ? sdSize : selSize) != null ? formatBytes(allSelected ? sdSize : selSize) : "…"}</span>
+                <span className={`size-tag ${sizing ? "sizing" : ""}`}
+                  title={sizing ? t("Recalculating the size for this selection…") : undefined}>
+                  {sizing
+                    ? <><Loader2 size={10} strokeWidth={3} className="spin" aria-hidden /> {t("Sizing…")}</>
+                    : formatBytes(shownSize)}
+                </span>
               )}
             </button>
           </div>
@@ -358,7 +396,8 @@ export default function App() {
           {tab === "rom" && <RomTab onChanged={bumpLibrary} />}
           {tab === "extra" && <ExtraTab onChanged={bumpLibrary} />}
           {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
-          {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected} onToggleSel={toggleSel} />}
+          {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected}
+            onToggleSel={toggleSel} koOnly={koOnly} koKeys={koKeys} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
           {tab === "help" && <HelpTab />}
         </div>
