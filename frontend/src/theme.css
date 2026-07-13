@@ -1962,7 +1962,10 @@ body::before {
   .tabbar-dl .tab-selall { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   /* the scope choice takes its own full-width row on a phone rather than being
      squeezed to two unreadable slivers next to the download button */
-  .tabbar-dl .scope-seg { flex: 1 0 100%; order: 3; }
+  /* The scope decides WHAT the download contains, so it comes first — its own
+     full-width row above the platform/download pair, not stranded under the button
+     it is supposed to qualify. */
+  .tabbar-dl .scope-seg { flex: 1 0 100%; order: -1; }
   .tabbar-dl .scope-seg .seg { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   .tabbar-dl .tab-dl { flex: 6; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   /* skeletons mirror the real 3:7 split + height on phones */
