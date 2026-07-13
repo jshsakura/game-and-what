@@ -783,11 +783,14 @@ def test_download_package_korean_filter_and_filename_suffix(client, make_rom, se
 
 def test_download_package_drops_sd_excluded_rom(client, make_rom, session_id):
     rom = make_rom(system_key="nes", name="Game.nes")
+    kept = make_rom(system_key="nes", name="Keep.nes")   # or the build has nothing left to do
     client.patch(f"/api/sessions/{session_id}/roms/{rom['id']}/sd-exclude", json={"exclude": True})
 
     resp = client.get(f"/api/sessions/{session_id}/package")
 
-    assert rom["rom_path"] not in _zip_names(resp.content)
+    names = _zip_names(resp.content)
+    assert rom["rom_path"] not in names
+    assert kept["rom_path"] in names
 
 
 def test_download_package_homebrew_bin_covers_only_by_default(client, make_rom, session_id):
@@ -802,12 +805,7 @@ def test_download_package_homebrew_bin_covers_only_by_default(client, make_rom, 
 
 
 def test_download_package_homebrew_bin_opted_in(client, make_rom, session_id):
-    # A cover is included alongside the .bin here (not just to mirror a
-    # realistic upload) because of a related gating quirk — see
-    # test_download_package_404s_for_lone_opted_in_homebrew_bin_without_cover
-    # below: session_has_content() doesn't know about sd_include, so an
-    # opted-in .bin with NO cover as the only library content 404s instead of
-    # being packaged.
+    # A cover rides along with the .bin, mirroring a realistic homebrew upload.
     cover_rel = _add_cover(session_id, "homebrew", "App.img")
     rom = make_rom(system_key="homebrew", name="App.bin", cover_path=cover_rel)
     client.patch(f"/api/sessions/{session_id}/roms/{rom['id']}/sd-include", json={"include": True})
@@ -817,18 +815,25 @@ def test_download_package_homebrew_bin_opted_in(client, make_rom, session_id):
     assert rom["rom_path"] in _zip_names(resp.content)
 
 
-def test_download_package_404s_for_lone_opted_in_homebrew_bin_without_cover(client, make_rom, session_id):
-    """Pins a real gating quirk: `packaging.session_has_content()` checks
-    `_excluded()` WITHOUT `homebrew_roms`, so it doesn't know a homebrew .bin
-    was opted into the SD via sd_include. If that opted-in .bin (with no
-    cover) is the session's ONLY content, the "has anything to package?" gate
-    reports False and this 404s — even though the zip builder itself (which
-    DOES receive homebrew_roms) would include the file if the gate let it
-    through. Not exercised in practice (homebrew uploads always get a cover),
-    but real: opt a cover-less .bin in as the sole item and the package
-    download breaks."""
+def test_download_package_ships_a_lone_opted_in_homebrew_bin_without_cover(client, make_rom, session_id):
+    """The "is there anything to package?" gate has to ask the same question the zip
+    builder answers. It used to run _excluded() WITHOUT homebrew_roms, so it couldn't
+    see that a homebrew .bin had been opted into the SD — and a cover-less opted-in
+    .bin as the session's only content 404'd on a build that would have contained it."""
     rom = make_rom(system_key="homebrew", name="App.bin")
     client.patch(f"/api/sessions/{session_id}/roms/{rom['id']}/sd-include", json={"include": True})
+
+    resp = client.get(f"/api/sessions/{session_id}/package")
+
+    assert resp.status_code == 200
+    assert rom["rom_path"] in _zip_names(resp.content)
+
+
+def test_download_package_still_404s_when_the_only_rom_is_excluded_from_sd(client, make_rom, session_id):
+    """The mirror image: the gate must also honour sd_exclude, or it would promise a
+    build whose every file the builder then filters out."""
+    rom = make_rom(system_key="nes", name="Game.nes")
+    client.patch(f"/api/sessions/{session_id}/roms/{rom['id']}/sd-exclude", json={"exclude": True})
 
     resp = client.get(f"/api/sessions/{session_id}/package")
 

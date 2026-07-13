@@ -89,14 +89,6 @@ def _rom_lang(rom: dict) -> "str | None":
     return (rom.get("cover_flag") or "").lower() or None
 
 
-def _derive_flag(rom: dict) -> "str | None":
-    """Default flag for a NEW rom (filename-derived): 한글패치 → ko, else play/orig
-    lang, but only if we have a flag asset for it. The user can change it after."""
-    cand = "ko" if rom.get("is_korean_patched") else (rom.get("play_lang") or rom.get("orig_lang") or "")
-    cand = cand.lower()
-    return cand if cand in covers.FLAG_CODES else None
-
-
 def rebake_cover_img(session_id: str, rom: dict) -> bool:
     """Re-render ONLY the device .img from the stored preview using the rom's
     current crop_box + flag (so the baked corner flag reflects the latest choice).

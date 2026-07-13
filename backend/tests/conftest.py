@@ -9,7 +9,7 @@ EXACT signatures, do not rename):
         `LIBRARY_DIR`, `DB_PATH`, `TMP_DIR` (and every module-level constant
         elsewhere derived from them at IMPORT time, e.g.
         `services.name_map.MAP_PATH` and `services.pico8core._CACHE`/`_CORES`/
-        `_TAG_FILE`) are monkeypatched to live under it, and the directories are
+        `_CORES`) are monkeypatched to live under it, and the directories are
         created. Nothing is written outside `tmp_path`.
 
     session_id(data_dir) -> str
@@ -93,7 +93,6 @@ def data_dir(tmp_path: Path, monkeypatch) -> Path:
     pico8_cache = d / "tmp" / "pico8_cores"
     monkeypatch.setattr(pico8core, "_CACHE", pico8_cache)
     monkeypatch.setattr(pico8core, "_CORES", pico8_cache / "cores")
-    monkeypatch.setattr(pico8core, "_TAG_FILE", pico8_cache / ".tag")
 
     config.ensure_dirs()
     return d

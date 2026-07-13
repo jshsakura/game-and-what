@@ -628,6 +628,28 @@ def test_gamelist_apply_renames_matched_roms_on_disk_and_in_the_db(client, monke
     assert row["stored_name"] != "Contra (USA).nes"
 
 
+def test_gamelist_apply_skips_a_desynced_row_instead_of_aborting_the_batch(
+        client, monkeypatch, make_rom, session_id):
+    """A row whose file is already gone makes rename_rom raise (it refuses to deepen a
+    desync). That must cost one entry, not the whole batch: the rest still get their
+    Korean names, and the ones that couldn't are reported back."""
+    monkeypatch.setattr(config, "KOREAN_MODE", True)
+    gone = make_rom(system_key="nes", name="Contra (USA).nes")
+    (storage.session_root(session_id) / gone["rom_path"]).unlink()   # DB row, no file
+    _write_scratch_file(session_id, "gamelist-nes.xml", _GAMELIST_XML)
+
+    r = client.post(
+        f"/api/sessions/{session_id}/gamelist/apply",
+        json={"filename": "gamelist-nes.xml"},
+    )
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["renamed"] == 0
+    assert body["matched"] == 1
+    assert body["skipped"] == ["Contra (USA).nes"]
+
+
 # ---------------------------------------------------------------------------
 # events.py
 # ---------------------------------------------------------------------------

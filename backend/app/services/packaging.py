@@ -315,12 +315,20 @@ def sd_content_size(session_id: str, include_video: bool = False, systems: "set[
     return total
 
 
-def session_has_content(session_id: str, include_video: bool = False, systems: "set[str] | None" = None) -> bool:
-    """Any SD-bound content? Scratch/DATA (and video, by default) don't count."""
+def session_has_content(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
+                        homebrew_roms: "set[str] | None" = None,
+                        excluded_roms: "set[str] | None" = None) -> bool:
+    """Any SD-bound content? Scratch/DATA (and video, by default) don't count.
+
+    Takes the same opt-in/opt-out sets as the zip builder: this is the gate in front
+    of it, so asking a different question ("is anything there?" vs "is anything there
+    once the filters run?") means a build the user CAN download gets 404'd — e.g. a
+    session whose only content is a homebrew .bin that was opted into the SD.
+    """
     root = storage.session_root(session_id)
     if not root.exists():
         return False
     return any(
-        p.is_file() and not _excluded(root, p, include_video, systems)
+        p.is_file() and not _excluded(root, p, include_video, systems, homebrew_roms, excluded_roms)
         for p in root.rglob("*")
     )

@@ -1005,20 +1005,12 @@ def test_dirname_of_short_path_falls_back_to_unknown():
     assert covers_router._dirname_of({"rom_path": "Game.nes"}) == "unknown"
 
 
-def test_derive_flag_korean_patch_wins():
-    assert covers_router._derive_flag({"is_korean_patched": 1}) == "ko"
 
 
-def test_derive_flag_uses_play_lang_when_supported():
-    assert covers_router._derive_flag({"is_korean_patched": 0, "play_lang": "ja"}) == "ja"
 
 
-def test_derive_flag_none_when_unsupported():
-    assert covers_router._derive_flag({"is_korean_patched": 0, "orig_lang": "xx"}) is None
 
 
-def test_derive_flag_none_when_nothing_set():
-    assert covers_router._derive_flag({}) is None
 
 
 def test_rom_lang_lowercases_and_defaults_to_none():

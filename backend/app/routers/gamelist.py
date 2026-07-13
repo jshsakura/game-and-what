@@ -57,12 +57,19 @@ def apply(session_id: str, payload: dict = Body(...)) -> dict:
         plan = result["plan"]
 
         renamed = 0
+        skipped: list[str] = []
         for item in plan:
             row = conn.execute(
                 "SELECT id, system_key, stored_name, rom_path, cover_path FROM roms WHERE id = ?",
                 (item["rom_id"],),
             ).fetchone()
-            if row:
+            if not row:
+                continue
+            try:
                 renames.rename_rom(conn, session_id, dict(row), item["new"], suffix_on_clash=True)
                 renamed += 1
-    return {"renamed": renamed, "matched": len(plan)}
+            except ValueError:
+                # One desynced row (its file is gone) must not abort the rest of the
+                # batch — rename what we can and report what we couldn't.
+                skipped.append(row["stored_name"])
+    return {"renamed": renamed, "matched": len(plan), "skipped": skipped}

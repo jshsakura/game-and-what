@@ -18,7 +18,6 @@ _REPO = "Macs75/pico8_gnw_distro"
 _LATEST_API = f"https://api.github.com/repos/{_REPO}/releases/latest"
 _CACHE = config.TMP_DIR / "pico8_cores"
 _CORES = _CACHE / "cores"
-_TAG_FILE = _CACHE / ".tag"
 _UA = {"User-Agent": "gnw-retro-manager"}
 
 
@@ -32,19 +31,17 @@ def _cached() -> Path | None:
 
 def ensure_cores_dir(force: bool = False) -> Path | None:
     """Return a dir holding the PICO-8 `cores/*` files, downloading the latest
-    release on first use (or when `force`). Falls back to the cache on any network
+    release on first use (or when `force` — which always re-downloads, so it doubles
+    as a repair for a half-written cache). Falls back to the cache on any network
     error and returns None only if nothing is available — never raises."""
     if _cached() and not force:
         return _CORES
 
     try:
         rel = json.load(_http(_LATEST_API))
-        tag = rel.get("tag_name", "")
         asset = next((a for a in rel.get("assets", []) if a["name"].endswith(".zip")), None)
         if not asset:
             return _cached()
-        if _cached() and _TAG_FILE.exists() and _TAG_FILE.read_text().strip() == tag and not force:
-            return _CORES
         data = _http(asset["browser_download_url"]).read()
     except Exception:
         return _cached()
@@ -65,7 +62,6 @@ def ensure_cores_dir(force: bool = False) -> Path | None:
             dest = _CORES / rel_name
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(zf.read(name))
-        _TAG_FILE.write_text(tag)
         return _cached()
     except Exception:
         return _cached()

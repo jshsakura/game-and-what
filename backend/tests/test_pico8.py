@@ -184,15 +184,13 @@ def _zip_bytes(files: dict[str, bytes]) -> bytes:
 def cache_dirs(tmp_path, monkeypatch):
     cache = tmp_path / "pico8_cores"
     cores = cache / "cores"
-    tag_file = cache / ".tag"
     monkeypatch.setattr(pico8core, "_CACHE", cache)
     monkeypatch.setattr(pico8core, "_CORES", cores)
-    monkeypatch.setattr(pico8core, "_TAG_FILE", tag_file)
-    return cache, cores, tag_file
+    return cache, cores
 
 
 def test_returns_cached_dir_without_hitting_network_when_present(cache_dirs, monkeypatch):
-    cache, cores, tag_file = cache_dirs
+    cache, cores = cache_dirs
     cores.mkdir(parents=True)
     (cores / "pico8.elf").write_bytes(b"existing")
 
@@ -213,7 +211,7 @@ def test_no_cache_and_network_error_returns_none(cache_dirs, monkeypatch):
 
 
 def test_downloads_and_extracts_cores_on_first_use(cache_dirs, monkeypatch):
-    cache, cores, tag_file = cache_dirs
+    cache, cores = cache_dirs
     release = {
         "tag_name": "v1.2.3",
         "assets": [{"name": "dist.zip", "browser_download_url": "http://x/dist.zip"}],
@@ -239,7 +237,6 @@ def test_downloads_and_extracts_cores_on_first_use(cache_dirs, monkeypatch):
     assert (cores / "pico8.elf").read_bytes() == b"COREBIN"
     assert (cores / "sub" / "extra.bin").read_bytes() == b"EXTRA"
     assert not (cores / "README.md").exists()
-    assert tag_file.read_text() == "v1.2.3"
     assert len(calls) == 2
 
 
@@ -268,18 +265,14 @@ def test_corrupt_zip_falls_back_to_cache(cache_dirs, monkeypatch):
     assert pico8core.ensure_cores_dir() is None
 
 
-def test_force_with_matching_tag_still_redownloads_bug(cache_dirs, monkeypatch):
-    """Pins an observed smell: the 'same tag, skip re-download' branch inside
-    ensure_cores_dir() is guarded by `and not force`, but that branch is only
-    reachable when the outer `if _cached() and not force` guard already let us
-    through -- which requires `force` to be True. So the inner check can never
-    be True in practice; force=True with a matching tag still re-downloads
-    the zip every time instead of short-circuiting. This test pins the ACTUAL
-    (wasteful, but not incorrect) behavior."""
-    cache, cores, tag_file = cache_dirs
+def test_force_redownloads_even_when_the_release_is_unchanged(cache_dirs, monkeypatch):
+    """force=True always re-downloads and re-extracts, which is what makes it usable
+    as a repair for a half-written cache. (There used to be a "same release tag ->
+    skip" short-circuit here, but it was unreachable — the guard above it already
+    returned for every non-forced call — so the tag file it read was dead weight.)"""
+    cache, cores = cache_dirs
     cores.mkdir(parents=True)
     (cores / "old.elf").write_bytes(b"old")
-    tag_file.write_text("v1.2.3")
 
     release = {
         "tag_name": "v1.2.3",
@@ -298,7 +291,6 @@ def test_force_with_matching_tag_still_redownloads_bug(cache_dirs, monkeypatch):
     result = pico8core.ensure_cores_dir(force=True)
 
     assert result == cores
-    # The asset zip WAS re-fetched even though the tag matched -- confirms the
-    # "skip when tag unchanged" branch is dead code under the current guard.
-    assert asset_calls == ["http://x/dist.zip"]
+    assert asset_calls == ["http://x/dist.zip"]       # re-fetched despite the same tag
     assert (cores / "new.elf").exists()
+    assert not (cores / "old.elf").exists()           # stale cache replaced, not merged

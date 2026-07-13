@@ -12,31 +12,20 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import artfetch, covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
+from ..services import covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
 from .sessions import require_session, require_system_enabled
 
 router = APIRouter(prefix="/api", tags=["roms"])
 
 
-def _stored_rom_name(meta: metadata.GameMeta, original: str) -> str:
-    """On-device rom filename: Korean title (if any) + original extension."""
-    ext = original.rsplit(".", 1)[-1] if "." in original else ""
-    base = storage.safe_name(meta.title)
-    return f"{base}.{ext}" if ext else base
-
-
-async def _make_cover(system, rom_path: Path, meta: metadata.GameMeta) -> bytes | None:
-    """Generate cover bytes: Pico-8 from its own label, else from screenshot."""
+def _pico8_cover(rom_path: Path) -> bytes | None:
+    """PICO-8 label art, rendered from the cart itself — the only cover made inline
+    at upload (no network, so it's fast even for a big batch). Every other system's
+    art is fetched by the background autofill."""
     try:
-        if system.pico8:
-            return covers_pico8.render_pico8_cover(rom_path)
-        if meta.art_url:
-            art = await artfetch.fetch_image(meta.art_url)
-            if art:
-                return covers.render_cover(art)
+        return covers_pico8.render_pico8_cover(rom_path)
     except covers.CoverError:
         return None
-    return None
 
 
 @router.post("/sessions/{session_id}/roms")
@@ -111,7 +100,7 @@ async def upload_roms(
         cover_rel = None
         cover_status = "none"
         if sys_obj.pico8:
-            cover_bytes = await _make_cover(sys_obj, rom_path, meta)
+            cover_bytes = _pico8_cover(rom_path)
             if cover_bytes:
                 cover_name = covers.cover_filename(stored_name)
                 cover_path = storage.covers_dir(session_id, sys_obj.dirname) / cover_name

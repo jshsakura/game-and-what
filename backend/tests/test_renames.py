@@ -137,25 +137,27 @@ def test_rename_sanitizes_new_name_for_fat_filesystem(conn):
     assert (storage.roms_dir(sid, "nes") / result["stored_name"]).exists()
 
 
-def test_rename_missing_source_file_updates_db_without_raising(conn):
-    """Sharp edge: if the underlying rom file is already gone (e.g. manually
-    deleted, or a prior operation left the DB out of sync), rename_rom silently
-    updates the DB to point at a path where no file was ever moved."""
+def test_rename_raises_when_the_rom_file_is_already_gone(conn):
+    """A row whose file has vanished (manual delete, earlier desync) must not be
+    renamed: it used to update the DB anyway, pointing the row at a path nothing was
+    ever moved to — deepening the desync silently. Now it refuses, and the DB is left
+    exactly as it was so the old path is still there to reconcile against."""
     sid = config.SHARED_SESSION_ID
     row = _insert_rom(conn, rom_id="r1", system_key="nes", stored_name="Old.nes",
                        rom_path="roms/nes/Old.nes")  # no file written to disk
 
-    result = renames.rename_rom(conn, sid, row, "New.nes")
+    with pytest.raises(ValueError):
+        renames.rename_rom(conn, sid, row, "New.nes")
 
-    assert result["stored_name"] == "New.nes"
-    assert not (storage.roms_dir(sid, "nes") / "New.nes").exists()  # nothing to move
-    assert _fetch(conn, "r1")["rom_path"] == "roms/nes/New.nes"  # DB updated anyway
+    kept = _fetch(conn, "r1")
+    assert kept["stored_name"] == "Old.nes"
+    assert kept["rom_path"] == "roms/nes/Old.nes"
 
 
-def test_rename_onto_existing_cover_silently_overwrites_it(conn):
-    """Sharp edge: unlike the rom-file path, the cover move has no collision
-    guard — Path.rename onto an existing cover overwrites it outright (POSIX
-    rename semantics)."""
+def test_rename_onto_existing_cover_overwrites_it(conn):
+    """The cover move has no collision guard, and must not: the firmware finds a
+    cover by matching the ROM's filename, so that name belongs to this rom now. The
+    rom rename resolved any genuine clash first, so whatever sat here was an orphan."""
     sid = config.SHARED_SESSION_ID
     _write(storage.roms_dir(sid, "nes") / "Old.nes")
     _write(storage.covers_dir(sid, "nes") / "Old.img", b"old-cover")

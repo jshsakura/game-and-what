@@ -249,7 +249,7 @@ def test_upload_multiple_files_mixed_ok_and_rejected(client, session_id):
 
 
 # ---------------------------------------------------------------------------
-# _autofill_covers / _settle_cover / _stored_rom_name — background helpers
+# _autofill_covers / _settle_cover — background helpers
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -328,22 +328,8 @@ def test_settle_cover_only_clears_a_still_pending_rom(session_id, make_rom):
     assert _fetch_rom(already_ok["id"])["cover_status"] == "ok"  # untouched
 
 
-def test_stored_rom_name_appends_original_extension_to_the_title():
-    from app.services import metadata
-    meta = metadata.GameMeta(
-        original_name="Game", title="게임", korean_name="게임",
-        screenshot_url=None, boxart_url=None, source="none",
-    )
-    assert roms_router._stored_rom_name(meta, "Game (USA).nes") == "게임.nes"
 
 
-def test_stored_rom_name_with_no_extension_returns_bare_title():
-    from app.services import metadata
-    meta = metadata.GameMeta(
-        original_name="Game", title="Game", korean_name=None,
-        screenshot_url=None, boxart_url=None, source="none",
-    )
-    assert roms_router._stored_rom_name(meta, "noext") == "Game"
 
 
 # ===========================================================================

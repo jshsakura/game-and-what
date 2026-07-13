@@ -193,7 +193,8 @@ async def start_package_build(session_id: str, video: bool = False, system: str 
         homebrew = _homebrew_roms(conn, session_id)
         excluded = _excluded_roms(conn, session_id, korean_only=korean)
     systems = _parse_systems(system)
-    if not packaging.session_has_content(session_id, include_video=video, systems=systems):
+    if not packaging.session_has_content(session_id, include_video=video, systems=systems,
+                                         homebrew_roms=homebrew, excluded_roms=excluded):
         raise HTTPException(status_code=404, detail="Nothing to package yet")
 
     _, etag, exists = packaging.cached_zip_path(session_id, include_video=video, systems=systems,
@@ -227,7 +228,8 @@ def download_package(request: Request, session_id: str, video: bool = False,
         homebrew = _homebrew_roms(conn, session_id)
         excluded = _excluded_roms(conn, session_id, korean_only=korean)
     systems = _parse_systems(system)
-    if not packaging.session_has_content(session_id, include_video=video, systems=systems):
+    if not packaging.session_has_content(session_id, include_video=video, systems=systems,
+                                         homebrew_roms=homebrew, excluded_roms=excluded):
         raise HTTPException(status_code=404, detail="Nothing to package yet")
 
     # ETag = content fingerprint. If the client already has this exact build, skip.

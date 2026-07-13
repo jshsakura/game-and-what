@@ -29,6 +29,12 @@ def rename_rom(conn, session_id: str, row: dict, new_name: str, *, suffix_on_cla
     root = storage.session_root(session_id)
 
     old_rom = root / row["rom_path"]
+    # The file has to be there. Renaming a row whose file is already gone used to
+    # update the DB anyway, pointing it at a path nothing was ever moved to — the
+    # desync got worse and stayed silent. Say so instead (the router turns this
+    # into a 409).
+    if not old_rom.exists():
+        raise ValueError("원본 파일을 찾을 수 없습니다 (라이브러리와 파일이 어긋남)")
     if len(Path(row["rom_path"]).parts) >= 4:
         # Folder-per-game (CD systems): rom_path is roms/<dir>/<game>/<file>. Rename
         # the GAME FOLDER and the primary .cue/.chd inside it, but leave the sidecar
@@ -69,6 +75,10 @@ def rename_rom(conn, session_id: str, row: dict, new_name: str, *, suffix_on_cla
     if cover_rel:
         old_cover = root / cover_rel
         if old_cover.exists():
+            # Overwrites any file already at the target name, and must: the firmware
+            # finds a cover by matching the ROM's filename, so this name belongs to
+            # this rom now. The rom rename above already resolved a genuine clash,
+            # so anything sitting here is an orphan of a rom that no longer has it.
             new_cover = storage.covers_dir(session_id, dirname) / covers.cover_filename(new_name)
             new_cover.parent.mkdir(parents=True, exist_ok=True)
             old_cover.rename(new_cover)
