@@ -1065,7 +1065,17 @@ body::before {
 
 /* Rename field in the ROM modal */
 .field-label { font-family: var(--body-font); font-weight: 700; font-size: 12px; color: var(--card-ink); margin-bottom: 2px; }
-.hb-bin-note { font-family: var(--body-font); font-size: 11px; line-height: 1.45; color: var(--lcd-ink-dim, #cbd2bb); opacity: 0.85; margin: 6px 0 0; }
+/* Homebrew .bin warning — a mismatched .bin crashes the app on launch, so it reads
+   as a warning: gold rule, gold heading colour, full-strength ink on a tinted
+   panel. It used to be dim grey text at 85% opacity directly on the tile, which is
+   the one thing a warning must not be. */
+.hb-bin-note {
+  margin: 8px 0 0; padding: 9px 11px;
+  border-radius: 8px; border-left: 3px solid var(--gold);
+  background: #00000040;
+  font-family: var(--body-font); font-size: 12px; line-height: 1.55;
+  color: var(--card-ink);
+}
 .rename-row { display: flex; gap: 8px; align-items: stretch; }
 /* read-only ROM path shown in front of the filename so the destination is clear */
 .path-prefix {
