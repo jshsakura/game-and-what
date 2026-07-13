@@ -1,7 +1,9 @@
 """Filesystem layout for the persistent library. Mirrors the SD card."""
 from __future__ import annotations
 
+import os
 import re
+import time
 import unicodedata
 import uuid
 from pathlib import Path
@@ -176,6 +178,12 @@ def move_to_trash(session_id: str, rel_path: str) -> None:
         dest = trash_dir(session_id) / rel_path.replace("/", "__")
         dest.parent.mkdir(parents=True, exist_ok=True)
         src.replace(dest)
+        # Start the recovery clock NOW. purge_trash() ages files by mtime, and a
+        # rename keeps the original one — so deleting a ROM that was uploaded
+        # months ago used to make it purgeable immediately, silently voiding the
+        # 30-day window the activity feed offers to restore it.
+        now = time.time()
+        os.utime(dest, (now, now))
     except OSError:
         pass
 
@@ -198,11 +206,38 @@ def restore_from_trash(session_id: str, rel_path: str | None) -> bool:
         return False
 
 
-def purge_trash(session_id: str, older_than_days: int) -> int:
-    """Delete _trash files older than N days (by mtime). Returns count removed.
-    Caps how long deleted ROMs stay recoverable. Never raises."""
-    import time
+# Pre-encode source videos/audio, kept beside the encoded file after a re-encode so
+# a bad convert can be redone from the original instead of from the .avi. Ours, not
+# the card's: the underscore keeps it out of the SD zip (see packaging._excluded),
+# and it is purged on the same clock as the trash — a source video is big, and
+# keeping it forever would quietly eat the disk.
+ORIG_BACKUP_DIR_NAME = "_orig_backup"
 
+
+def purge_orig_backups(session_id: str, older_than_days: int) -> int:
+    """Delete pre-encode source backups older than N days (by mtime), in the video
+    and music folders. Returns count removed. Never raises."""
+    removed = 0
+    root = session_root(session_id)
+    cutoff = time.time() - older_than_days * 86400
+    for parent in (config.MEDIA_DIR_NAME, config.MUSIC_DIR_NAME):
+        d = root / parent / ORIG_BACKUP_DIR_NAME
+        if not d.is_dir():
+            continue
+        for p in sorted(d.rglob("*")):
+            try:
+                if p.is_file() and p.stat().st_mtime < cutoff:
+                    p.unlink()
+                    removed += 1
+            except OSError:
+                pass
+    return removed
+
+
+def purge_trash(session_id: str, older_than_days: int) -> int:
+    """Delete _trash files older than N days (by mtime — stamped at delete time, see
+    move_to_trash). Returns count removed. Caps how long deleted ROMs stay
+    recoverable. Never raises."""
     removed = 0
     try:
         d = trash_dir(session_id)

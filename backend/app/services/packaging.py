@@ -26,10 +26,12 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
     rel = "/".join(parts)
     if excluded_roms and rel in excluded_roms:
         return True
-    if {storage.SCRATCH_DIR_NAME, storage.PREVIEW_DIR_NAME, storage.TRASH_DIR_NAME,
-            storage.FIRMWARE_DIR_NAME, storage.EXTRA_DIR_NAME} & set(parts):
-        # _firmware / _extra are internal; added at the SD ROOT below (with the
-        # firmware filename / the user's chosen passthrough paths).
+    # An underscore-prefixed FOLDER is ours, not the card's: _trash, _data,
+    # _previews, _firmware, _extra — and the _orig_backup of pre-encode source
+    # videos. The device reads none of them, so none of them ship. (_firmware and
+    # _extra are re-added at the SD ROOT below, under their real names.) Only
+    # folder names are tested: a rom may legitimately be called "_Test.nes".
+    if any(part.startswith("_") for part in parts[:-1]):
         return True
     # /media exists only on the fork firmware — never ship it on an official deploy.
     if (not include_video or not config.EXPERIMENTAL_MODE) and config.MEDIA_DIR_NAME in parts:

@@ -101,6 +101,11 @@ def _startup() -> None:
     purged = storage.purge_trash(config.SHARED_SESSION_ID, events.RETENTION_DAYS)
     if purged:
         print(f"[startup] purged {purged} expired trash file(s)")
+    # Same clock for the pre-encode source backups: recoverable for a while, then
+    # gone (they are full-size videos — the biggest thing we keep).
+    purged_src = storage.purge_orig_backups(config.SHARED_SESSION_ID, events.RETENTION_DAYS)
+    if purged_src:
+        print(f"[startup] purged {purged_src} expired source-video backup(s)")
     # Tidy the SD-zip build cache so it never lingers oversized.
     from .services import packaging
     pruned = packaging.prune_cache()
