@@ -781,6 +781,22 @@ def test_download_package_korean_filter_and_filename_suffix(client, make_rom, se
     assert "-korean" in resp.headers["content-disposition"]
 
 
+def test_korean_only_still_ships_homebrew(client, make_rom, session_id):
+    """Homebrew is not a game with a language: the .dat / .smc on the card are what the
+    firmware's built-in apps need to boot. Dropping them from a Korean card because
+    they carry no ko flag would kill those menu entries, so they ship regardless."""
+    ko = make_rom(system_key="nes", name="Korean.nes", cover_flag="ko")
+    plain = make_rom(system_key="nes", name="Other.nes")
+    assets = make_rom(system_key="homebrew", name="smw_assets.dat")   # no flag, ever
+
+    names = _zip_names(client.get(
+        f"/api/sessions/{session_id}/package", params={"korean": "1"}).content)
+
+    assert assets["rom_path"] in names
+    assert ko["rom_path"] in names
+    assert plain["rom_path"] not in names
+
+
 def test_download_package_drops_sd_excluded_rom(client, make_rom, session_id):
     rom = make_rom(system_key="nes", name="Game.nes")
     kept = make_rom(system_key="nes", name="Keep.nes")   # or the build has nothing left to do

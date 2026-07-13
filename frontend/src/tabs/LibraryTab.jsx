@@ -89,7 +89,7 @@ function usePageSize() {
 // koOnly/koKeys come from the SD-ZIP scope control: in Korean-only scope a platform
 // with no ko-flagged rom would ship nothing, so its chip is not selectable and says
 // so, instead of taking a check that silently produces an empty folder.
-export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel, koOnly = false, koKeys }) {
+export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel, koOnly = false, koKeys, alwaysKeys }) {
   const toast = useToast();
   const { t, lang } = useI18n();
   const koreanMode = useKoreanMode();
@@ -99,6 +99,8 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   // Not selectable while the zip scope is Korean-only: this platform has no rom
   // carrying the ko flag, so it would contribute an empty folder.
   const noKo = (key) => koOnly && !!koKeys && !koKeys.has(key);
+  // Ships regardless of the scope (homebrew: the firmware's apps need these files).
+  const always = (key) => koOnly && !!alwaysKeys && alwaysKeys.has(key);
   const [lib, setLib] = useState({ roms: [], videos: [], music: [] });
   // Seed from the last-known systems (cached) so the loading skeleton renders the
   // RIGHT number of platform chips on first paint — otherwise it starts at the
@@ -374,6 +376,10 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
                   priority; the 한글제목 badge only shows once covers are done. */}
               <span className="lib-chip-badges">
                 <span className="lib-chip-count">{incl.length}</span>
+                {always(g.key) && (
+                  <span className="lib-chip-always"
+                    title={t("Always on the card — the firmware's built-in apps need these files, Korean or not")}>!</span>
+                )}
                 {miss > 0
                   ? <span className="lib-chip-miss" title={t("{n} missing covers", { n: miss })}>{miss}</span>
                   : koFeature && koMiss > 0 && <span className="lib-chip-komiss" title={t("{n} without Korean titles", { n: koMiss })}>{koMiss}</span>}

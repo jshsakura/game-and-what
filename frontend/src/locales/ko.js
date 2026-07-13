@@ -417,6 +417,7 @@ export default {
   "SD ZIP: only ROMs flagged Korean (the size updates to match)": "SD ZIP에 한글판으로 표시된 롬만 담습니다 (용량도 그에 맞게 갱신됩니다)",
   "All platforms": "플랫폼 전체",
   "Sizing…": "재계산 중…",
+  "Always on the card — the firmware's built-in apps need these files, Korean or not": "한글판 여부와 무관하게 항상 SD에 담깁니다 — 펌웨어 내장 앱이 이 파일들 없이는 실행되지 않습니다",
   "Recalculating the size for this selection…": "이 선택에 맞춰 용량을 다시 계산하고 있습니다…",
   "No Korean ROMs on this platform — nothing to put in a Korean-only SD ZIP": "이 플랫폼에는 한글판 롬이 없습니다 — 한글판만 SD ZIP에 담을 게 없습니다",
   "Not on SD": "SD 제외",

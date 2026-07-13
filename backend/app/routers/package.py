@@ -153,7 +153,12 @@ def _excluded_roms(conn, session_id: str, korean_only: bool = False) -> "set[str
         (cover_flag='ko') is dropped, its cover with it. The flag is the user-
         facing "이건 한글판" mark and covers BOTH fan 한글패치 AND Korean official/
         made releases (정식발매·국산), which is_korean_patched alone would miss.
-        A system with no 국기 ROMs contributes nothing → it drops out entirely."""
+        A system with no 국기 ROMs contributes nothing → it drops out entirely.
+
+        Homebrew is the exception: those apps live IN the firmware and what the card
+        carries is the data they cannot boot without (an assets .dat, Super Metroid's
+        ROM). Dropping them because they carry no Korean flag would leave the
+        firmware's own menu entries dead on a Korean card, so they always ship."""
     excluded = _rom_and_cover_paths(conn.execute(
         "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
         "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
@@ -161,7 +166,7 @@ def _excluded_roms(conn, session_id: str, korean_only: bool = False) -> "set[str
     if korean_only:
         excluded |= _rom_and_cover_paths(conn.execute(
             "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
-            "AND IFNULL(cover_flag, '') != 'ko'",
+            "AND IFNULL(cover_flag, '') != 'ko' AND system_key != 'homebrew'",
             (session_id,)).fetchall())
     return excluded
 

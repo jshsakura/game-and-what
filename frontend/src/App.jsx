@@ -46,6 +46,12 @@ function DemoBanner() {
 
 const THEME_KEY = "gnw_theme";
 
+// Systems that go on the card no matter what the SD-ZIP scope says. Homebrew holds
+// the data files the firmware's built-in apps (Zelda 3, SMW, Super Metroid) cannot
+// boot without — they are not games with a language, so a Korean-only card still
+// needs them or those menu entries die on launch.
+const ALWAYS_SHIPPED = new Set(["homebrew"]);
+
 // Edition mark — swaps with the theme (CSS hides the inactive one).
 const TABS = [
   // Primary: LIBRARY (default landing) + UPLOAD. Secondary (gray): MEDIA + DATA + HELP.
@@ -218,7 +224,10 @@ export default function App() {
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
         // Platforms that would survive a Korean-only zip. The filter goes by the
         // cover FLAG, not the 한글패치 mark — an official Korean release counts too.
-        setKoKeys(new Set(l.roms.filter((r) => r.cover_flag === "ko").map((r) => r.system_key)));
+        // Homebrew rides along whatever the scope: its files are what the firmware's
+        // built-in apps need to boot, not games with a language (see ALWAYS_SHIPPED).
+        const ko = new Set(l.roms.filter((r) => r.cover_flag === "ko").map((r) => r.system_key));
+        setKoKeys(new Set([...ko, ...l.roms.map((r) => r.system_key).filter((k) => ALWAYS_SHIPPED.has(k))]));
       })
       .catch(() => { setCount(0); setLibKeys([]); setKoKeys(new Set()); })
       .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
@@ -397,7 +406,7 @@ export default function App() {
           {tab === "extra" && <ExtraTab onChanged={bumpLibrary} />}
           {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
           {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected}
-            onToggleSel={toggleSel} koOnly={koOnly} koKeys={koKeys} />}
+            onToggleSel={toggleSel} koOnly={koOnly} koKeys={koKeys} alwaysKeys={ALWAYS_SHIPPED} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
           {tab === "help" && <HelpTab />}
         </div>
