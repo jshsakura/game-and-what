@@ -213,9 +213,14 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   // Count only ROMs that actually ship — excluded ones (manual opt-out or PICO-8
   // 구동불가) stay in the library but won't be in the SD ZIP, so they shouldn't
   // inflate the selection.
+  // …and it must answer the CURRENT scope: in Korean-only the zip carries just the
+  // ko-flagged roms (plus homebrew), so counting every rom on the checked platforms
+  // would promise a card several times the one you'd actually get.
+  const goesOnCard = (rom) => shipsToSd(rom)
+    && (!koOnly || rom.cover_flag === "ko" || !!alwaysKeys?.has(rom.system_key));
   const selectedFileCount = useMemo(
-    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter(shipsToSd).length || 0), 0),
-    [selected, bySystem]
+    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter(goesOnCard).length || 0), 0),
+    [selected, bySystem, koOnly, alwaysKeys]
   );
 
   // ALL supported systems show as chips (don't omit any) — empty ones are dimmed
@@ -266,8 +271,13 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
 
   return (
     <div className="stack">
+      {/* Counts of a library that hasn't arrived yet are all zero, which reads as an
+          empty library rather than a loading one — shimmer the line instead. */}
       <div className="muted">
-        <Library size={13} aria-hidden /> {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+        <Library size={13} aria-hidden />{" "}
+        <span className={`lib-summary ${loading ? "is-skel" : ""}`}>
+          {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+        </span>
       </div>
 
       {error && <div className="badge failed">{error}</div>}
@@ -303,7 +313,9 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
         <div className="lib-searchbar">
           <div className="lib-search">
             {selected.size > 0 && (
-              <span className="sel-count-badge">{t("{n} platforms", { n: selected.size })} · {t("{n} files selected", { n: selectedFileCount.toLocaleString() })}</span>
+              <span className={`sel-count-badge ${loading ? "is-skel" : ""}`}>
+                {t("{n} platforms", { n: selected.size })} · {t("{n} files selected", { n: selectedFileCount.toLocaleString() })}
+              </span>
             )}
             <Search size={14} strokeWidth={2.5} aria-hidden />
             <input
