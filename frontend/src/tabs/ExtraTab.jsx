@@ -6,6 +6,7 @@ import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
 import { useExperimentalMode } from "../config.jsx";
 import { BIOS_CATALOG } from "../bios.js";
+import { relTime, fullTime } from "../time.js";
 
 // Arbitrary passthrough files → SD root verbatim. Pick a target folder (e.g.
 // bios/nes) and the files land at <folder>/<name> in the SD ZIP.
@@ -197,6 +198,11 @@ export default function ExtraTab({ onChanged }) {
               {g.items.map((f) => (
                 <div className="data-row" key={f.path}>
                   <span className="data-name">{leafOf(f.path)}</span>
+                  {/* When it was uploaded — the first thing to fold away when the row
+                      runs out of width (CSS), since the name and size matter more. */}
+                  <time className="data-time" title={fullTime(f.uploaded_at)}>
+                    {relTime(f.uploaded_at, t)}
+                  </time>
                   <span className="data-size">{formatBytes(f.size_bytes)}</span>
                   <a className="icon-btn" href={extraDownloadUrl(f.path)} download title={t("Download")}>
                     <Download size={13} strokeWidth={2.5} />

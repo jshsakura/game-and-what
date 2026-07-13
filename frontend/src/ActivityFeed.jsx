@@ -4,27 +4,11 @@ import { getEvents, restoreEvent } from "./api.js";
 import { SystemIcon } from "./components.jsx";
 import { useT } from "./i18n.jsx";
 import { useToast } from "./toast.jsx";
+import { relTime } from "./time.js";
 
 const SEEN_KEY = "gnw_events_seen";   // newest created_at the user has already seen
 const POLL_MS = 20000;                // background refresh cadence for the badge
 const FEED_LIMIT = 50;
-
-// Server timestamps are UTC "YYYY-MM-DD HH:MM:SS" — parse as UTC, not local.
-function toDate(s) {
-  return s ? new Date(s.replace(" ", "T") + "Z") : null;
-}
-
-// Compact relative time: "now", "5m", "3h", "2d", else a date.
-function relTime(s, t) {
-  const d = toDate(s);
-  if (!d || isNaN(d)) return "";
-  const sec = Math.max(0, (Date.now() - d.getTime()) / 1000);
-  if (sec < 45) return t("now");
-  if (sec < 3600) return `${Math.round(sec / 60)}m`;
-  if (sec < 86400) return `${Math.round(sec / 3600)}h`;
-  if (sec < 86400 * 7) return `${Math.round(sec / 86400)}d`;
-  return d.toLocaleDateString();
-}
 
 // PICO-8 compat status → translatable English source word (ko.js renders
 // "won't run" → 구동불가, etc.).

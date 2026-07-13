@@ -592,7 +592,32 @@ def test_upload_extra_stores_file_at_given_sd_path(client, session_id):
     assert stored.read_bytes() == b"bios-bytes"
 
     listing = client.get(f"/api/sessions/{session_id}/extra").json()["files"]
-    assert listing == [{"path": "bios/nes/disksys.rom", "size_bytes": len(b"bios-bytes")}]
+    assert len(listing) == 1
+    assert listing[0]["path"] == "bios/nes/disksys.rom"
+    assert listing[0]["size_bytes"] == len(b"bios-bytes")
+
+
+def test_list_extra_reports_when_the_file_was_uploaded(client, session_id):
+    """The file list shows an upload time. These files are hand-uploaded and never
+    rewritten, so the file's own mtime IS that time — no DB row needed. It goes out
+    in the same UTC "YYYY-MM-DD HH:MM:SS" shape as the activity feed, so the UI
+    formats both with one formatter."""
+    import re
+    from datetime import datetime, timezone
+
+    before = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    client.post(
+        f"/api/sessions/{session_id}/extra",
+        data={"path": "bios/nes/disksys.rom"},
+        files={"file": ("disksys.rom", b"bios-bytes")},
+    )
+
+    stamp = client.get(f"/api/sessions/{session_id}/extra").json()["files"][0]["uploaded_at"]
+
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", stamp)
+    uploaded = datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    assert (uploaded - before).total_seconds() >= -1        # stamped now, not epoch 0
+    assert (uploaded - before).total_seconds() < 60
 
 
 def test_upload_extra_path_traversal_is_confined_under_extra_dir(client, session_id):

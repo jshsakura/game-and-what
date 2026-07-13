@@ -1693,6 +1693,15 @@ body::before {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .data-size { font-family: var(--pixel); font-size: 7px; color: var(--card-dim); flex: 0 0 auto; }
+/* Upload time — nice to have, not load-bearing: the first thing to go when the row
+   gets tight, so the filename keeps its width on a phone. */
+.data-time {
+  font-family: var(--body-font); font-size: 11px; color: var(--card-dim);
+  flex: 0 0 auto; white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .data-time { display: none; }
+}
 /* Data 탭 드랍존도 업로드 탭과 동일한 accent 스타일을 공유 (회색 오버라이드 제거) */
 /* tabs live on a dark card now → light ink + light borders */
 .tabbar .tab { color: var(--card-ink); border-color: #ffffff2e; }

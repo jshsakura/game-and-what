@@ -4,6 +4,7 @@ path and added to the SD ZIP root unchanged."""
 from __future__ import annotations
 
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -31,8 +32,15 @@ def _list(session_id: str) -> list[dict]:
     out = []
     for p in sorted(root.rglob("*")):
         if p.is_file():
+            st = p.stat()
             out.append({"path": str(p.relative_to(root)).replace("\\", "/"),
-                        "size_bytes": p.stat().st_size})
+                        "size_bytes": st.st_size,
+                        # When it was put here. These files are hand-uploaded and
+                        # never rewritten, so mtime IS the upload time — no DB row
+                        # needs to carry it. Same UTC "YYYY-MM-DD HH:MM:SS" shape the
+                        # activity feed emits, so the UI formats both the same way.
+                        "uploaded_at": datetime.fromtimestamp(
+                            st.st_mtime, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")})
     return out
 
 
