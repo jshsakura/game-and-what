@@ -10,7 +10,7 @@ import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, Hard
 import { getLibrary, packageSize, formatBytes } from "./api.js";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
-import { useExperimentalMode } from "./config.jsx";
+import { useExperimentalMode, useKoreanMode } from "./config.jsx";
 import { LOCALES } from "./i18n.locales.js";
 import { DEMO, DEMO_LAB } from "./demo.js";
 
@@ -191,6 +191,7 @@ function LangToggle() {
 export default function App() {
   const t = useT();
   const experimental = useExperimentalMode();
+  const koreanMode = useKoreanMode();
   const visibleTabs = TABS.filter((td) => experimental || !td.experimental);
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "zelda");
   const [tab, setTab] = useState("library");
@@ -305,17 +306,36 @@ export default function App() {
               title={t("Select / clear all platforms")}
             >
               {allSelected
-                ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All")}</>
-                : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All")}</>}
+                ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All platforms")}</>
+                : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All platforms")}</>}
             </button>
-            <button
-              className={`btn tab-ko ${koOnly ? "on" : ""}`}
-              onClick={() => setKoOnly((v) => !v)}
-              aria-pressed={koOnly}
-              title={t("SD ZIP: include only Korean-patched ROMs")}
-            >
-              <Languages size={14} strokeWidth={2.5} aria-hidden /> {t("KO only")}
-            </button>
+            {/* What goes IN the zip — a different question from which platforms are
+                checked, so it reads as a choice between two, not as a second toggle
+                sitting next to the platform one. Korean-only is a Korean-deploy
+                feature (the flag it filters on is only ever set there), so on any
+                other deploy there is no choice to make and the control is absent. */}
+            {koreanMode && (
+              <div className="scope-seg" role="group" aria-label={t("What goes in the SD ZIP")}>
+                <button
+                  type="button"
+                  className={`seg ${koOnly ? "" : "on"}`}
+                  onClick={() => setKoOnly(false)}
+                  aria-pressed={!koOnly}
+                  title={t("SD ZIP: every ROM in the library")}
+                >
+                  {t("All ROMs")}
+                </button>
+                <button
+                  type="button"
+                  className={`seg ${koOnly ? "on" : ""}`}
+                  onClick={() => setKoOnly(true)}
+                  aria-pressed={koOnly}
+                  title={t("SD ZIP: only ROMs flagged Korean (the size updates to match)")}
+                >
+                  <Languages size={13} strokeWidth={2.5} aria-hidden /> {t("Korean only")}
+                </button>
+              </div>
+            )}
             <button className="btn tab-dl has-size" disabled={!hasSel || dl.busy}
               onClick={() => dl.downloadPackage(
                 allSelected ? undefined : selKey,

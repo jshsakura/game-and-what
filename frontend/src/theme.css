@@ -1507,9 +1507,27 @@ body::before {
 /* 전체 선택 + 다운로드 grouped at the right (PC: auto width, right-aligned). */
 .tabbar-dl { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 /* match the tab labels (라이브러리 등) — 11px, not the default .btn 12px */
-.tab-dl, .tab-selall, .tab-ko { white-space: nowrap; font-size: 11px; }
-/* 한글판만 toggle — active state uses the shared .btn.on look */
-.tab-ko.on { box-shadow: 0 0 0 1px var(--accent), 0 1px 3px #0000006b; }
+.tab-dl, .tab-selall { white-space: nowrap; font-size: 11px; }
+
+/* SD-ZIP scope: 전체 | 한글판만. One choice, two segments — the selected one is
+   filled with the accent so it reads at a glance, and it stays filled on hover
+   (a plain .btn.on loses to .btn:hover, which is exactly how the old toggle
+   managed to look unpressed the whole time the pointer was on it). */
+.scope-seg {
+  display: inline-flex; align-items: stretch; flex: 0 0 auto;
+  border: 2px solid #1c2027; border-radius: 8px; overflow: hidden;
+  background: #2a2d28;
+}
+.scope-seg .seg {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 11px 12px; border: 0; cursor: pointer;
+  font-family: var(--body-font); font-size: 11px; font-weight: 700;
+  white-space: nowrap; background: transparent; color: var(--card-dim);
+}
+.scope-seg .seg + .seg { border-left: 2px solid #1c2027; }
+.scope-seg .seg:hover { color: var(--card-ink); background: #ffffff12; }
+.scope-seg .seg.on,
+.scope-seg .seg.on:hover { background: var(--accent); color: var(--accent-ink); }
 /* Loading skeletons for the fixed top-right button set (전체 / SD ZIP) — same box
    as the real .btn so they swap in with no layout shift. */
 .btn-skel { display: inline-block; height: 43px; border-radius: 8px; border: 2px solid #1c2027; pointer-events: none; vertical-align: middle; }
@@ -1901,8 +1919,12 @@ body::before {
   /* 탭바: 탭들은 한 줄, 전체선택+한글판만+다운로드는 그 아래 한 줄 전체너비로 분할 */
   .tabbar .tabs { flex: 1 0 100%; }
   .tabbar-dl { flex: 1 0 100%; }
+  .tabbar-dl { flex-wrap: wrap; }
   .tabbar-dl .tab-selall { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .tab-ko { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  /* the scope choice takes its own full-width row on a phone rather than being
+     squeezed to two unreadable slivers next to the download button */
+  .tabbar-dl .scope-seg { flex: 1 0 100%; order: 3; }
+  .tabbar-dl .scope-seg .seg { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   .tabbar-dl .tab-dl { flex: 6; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   /* skeletons mirror the real 3:7 split + height on phones */
   .tabbar-dl .btn-skel { width: auto; height: 48px; }
