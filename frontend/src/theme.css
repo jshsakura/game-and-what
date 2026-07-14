@@ -1506,12 +1506,12 @@ body::before {
 /* Image loading skeleton (shimmer). The sweep animates `transform` on an overlay
    pseudo-element (GPU-composited, no per-frame repaint) instead of
    `background-position`, which repainted every frame and stuttered on mobile. */
-.skeleton, .skel-line, .skel-ico, .btn-skel {
+.skeleton, .skel-line, .skel-ico {
   position: relative; overflow: hidden;
   background: #2a2f1e; /* static base — no animated paint */
 }
 .skeleton { position: absolute; inset: 0; border-radius: 4px; }
-.skeleton::after, .skel-line::after, .skel-ico::after, .btn-skel::after {
+.skeleton::after, .skel-line::after, .skel-ico::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(100deg, transparent 20%, #3a4029 50%, transparent 80%);
   transform: translateX(-100%);
@@ -1660,11 +1660,6 @@ body::before {
   display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
   font-family: var(--body-font); font-size: 11px; color: var(--card-ink);
 }
-/* Loading skeletons for the fixed top-right button set (전체 / SD ZIP) — same box
-   as the real .btn so they swap in with no layout shift. */
-.btn-skel { display: inline-block; height: 43px; border-radius: 8px; border: 2px solid #1c2027; pointer-events: none; vertical-align: middle; }
-.btn-skel.sel { width: 66px; }
-.btn-skel.dl  { width: 104px; }
 /* In-place shimmer overlay — turns any control into a skeleton while keeping its
    exact box, so nothing shifts when the real content swaps back in (used on tabs). */
 .is-skel { pointer-events: none; position: relative; overflow: hidden; color: transparent !important; }
@@ -2072,9 +2067,6 @@ body::before {
   .tabbar-dl .sdf { position: static; }
   .tabbar-dl .sdf-panel { left: 0; right: 0; width: auto; max-width: none; }
   .tabbar-dl .tab-dl { flex: 1 0 100%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .btn-skel { width: auto; height: 48px; }
-  .tabbar-dl .btn-skel.sel { flex: 1 1 44%; }
-  .tabbar-dl .btn-skel.dl { flex: 1 0 100%; }
   /* Localized tab labels may be longer — slightly smaller font on phones */
   .tab { font-size: 10px; padding: 12px 9px; }
   .device {

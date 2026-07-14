@@ -16,7 +16,7 @@ import { sdFilterCount, EMPTY_SD_FILTER } from "./api.js";
 const SIZE_CAPS = [2, 4, 8, 16, 32];        // MB — the useful cart-size cliffs
 const SCORE_FLOORS = [60, 70, 80, 90];
 
-export default function SdFilterPanel({ filter, onChange, flagCounts, disabled }) {
+export default function SdFilterPanel({ filter, onChange, flagCounts, disabled, loading }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -44,7 +44,7 @@ export default function SdFilterPanel({ filter, onChange, flagCounts, disabled }
     <div className={`sdf ${open ? "open" : ""}`} ref={ref}>
       <button
         type="button"
-        className={`btn sdf-trigger ${count ? "on" : ""}`}
+        className={`btn sdf-trigger ${count ? "on" : ""} ${loading ? "is-skel" : ""}`}
         onClick={() => setOpen((o) => !o)}
         disabled={disabled}
         aria-expanded={open}

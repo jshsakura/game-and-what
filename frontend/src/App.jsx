@@ -388,8 +388,10 @@ export default function App() {
             </button>
             {/* Every condition on what lands on the card lives in one panel — flags,
                 size cap, rating floor, favorites, patched. Not a toggle per idea. */}
+            {/* loading, not just disabled: its two neighbours shimmer while the library
+                loads, and a plain button sitting between them reads as the odd one out. */}
             <SdFilterPanel filter={sdFilter} onChange={setSdFilter}
-              flagCounts={flagCounts} disabled={loading} />
+              flagCounts={flagCounts} disabled={loading} loading={loading} />
             <button className={`btn tab-dl has-size ${loading ? "is-skel" : ""}`}
               disabled={loading || !hasSel || dl.busy}
               onClick={() => dl.downloadPackage(
