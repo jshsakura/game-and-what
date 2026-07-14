@@ -716,7 +716,11 @@ function CoverCropper({ src, aspect = 3 / 4, busy, onCancel, onDone }) {
           crop={crop}
           zoom={zoom}
           aspect={aspect}
-          restrictPosition={false}
+          // Keep the image covering the crop frame — never let it be dragged past its own
+          // edges into empty space. Off, the photo slid out of the box and the crop filled
+          // with black, which was miserable to line up. This is react-easy-crop's default;
+          // the crop percentages now stay in 0–100 (so the saved box stays 0–1) too.
+          restrictPosition={true}
           onCropChange={setCrop}
           onZoomChange={setZoom}
           onCropComplete={(areaPct, areaPx) => { pctRef.current = areaPct; pxRef.current = areaPx; drawPreview(); }}
