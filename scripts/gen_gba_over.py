@@ -14,7 +14,7 @@ filename, header or region warns you.
 Every address here was measured by RUNNING the rom (scripts/idlefind) — only entries
 gpSP can be shown to actually skip on. `exec` is the game's real CPU work per frame
 with the skip active, out of a 280,896-cycle frame; the M7 leaves the CPU roughly
-160,000 of them at a 340MHz OC (an estimate — see docs/GBA_FIRMWARE_HANDOFF.md §5).
+90,000 of them — timed on the device, not estimated (see docs/GBA_FIRMWARE_HANDOFF.md §5).
 
     python3 scripts/gen_gba_over.py            # all of them
     python3 scripts/gen_gba_over.py --korean   # just the Korean ones
@@ -26,7 +26,19 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).with_name("gba_idle_loop_db.json")
 FRAME_CYCLES = 280896
-CPU_BUDGET = 160000
+# Cycles of real CPU work the M7 can emulate in one 16.74 ms frame, once the renderer has
+# taken its share. From the DEVICE, not from arithmetic — its own frame breakdown, timed:
+#
+#            Emu only   PPU     Scale    -> ns per emulated cycle   -> its own budget
+#   Emerald   10.05 ms  1.87 ms  1.01 ms      128 ns (78,294 cy)        107,900 cy
+#   FFTA      17.89 ms  3.56 ms  0.96 ms      154 ns (116,375 cy)        79,500 cy
+#
+# Both numbers move per game — a bigger working set means worse cache and a dearer cycle,
+# and the PPU costs what the game draws — so a single budget is a model. 90,000 is the
+# middle of the two, and it reproduces what the hardware does: Emerald runs (and idles
+# 1.65 ms of every frame waiting for the LCD), FFTA does not (0.75x). NOT a hardware
+# constant: it tracks how fast the interpreter is, so re-derive it when that changes.
+CPU_BUDGET = 90000
 
 # Korean releases and 한글패치 in this library — confirmed by rendering each rom and
 # reading the screen (scripts/idlefind/shot.c), the only place a patch shows up.

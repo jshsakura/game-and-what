@@ -151,7 +151,8 @@ Three filters, and each one killed addresses that the previous one let through:
    does less. **5 more died here**, all at a 0% drop: KOF EX2 (×2), Ghost Trap, Space
    Invaders, F-Zero Climax.
 
-89 survive. Every one has a measured drop behind it.
+89 survived that first pass. A later hunt (a per-PC cycle histogram, for the loops mGBA's
+detector cannot see at all) took it to **121**. Every one has a measured drop behind it.
 
 > One of those five only surfaced after fixing a bug in the harness itself: it looked
 > roms up **by filename**, and this library renames files, so F-Zero Climax's address
@@ -162,8 +163,7 @@ Three filters, and each one killed addresses that the previous one let through:
 ### The 13 Korean games — measured
 
 `exec` = real CPU work per frame with the skip **active**, out of a 280,896-cycle frame.
-The CPU budget on the M7 at a 340 MHz OC is roughly **160,000 cycles** (that figure is the
-project's own estimate — see §5).
+The CPU budget on the M7 is **90,000 cycles** — timed on the device, not estimated (§5).
 
 | game | code | `idle_loop_target_pc` | exec (median) | p90 | idle |
 |---|---|---|---|---|---|
@@ -262,15 +262,27 @@ full — it *works*, it just gets slower.
 ## 5. What is NOT verified — read before trusting the numbers
 
 - **Nothing here ran on real hardware.** All cycle counts come from mGBA on a PC.
-- **The 160,000-cycle budget is the project's own estimate, and the device says it is too
-  generous.** The port's own DWT timings (`gnw-gba`, `1eec5c72` and `f08cfd6c`) split the
-  16.67 ms frame as `Emulate 12.3 / Draw 4.1` and, after the renderer moved,
-  `Emulate 7.58 / Draw 9.08`. Ruby measures 73,266 cycles here, so the M7 is spending
-  ~103–168 ns per emulated GBA cycle — and whatever Draw leaves is what the CPU gets. Back
-  out the arithmetic and the real budget is **roughly 73k–121k cycles, not 160k**, and it
-  moves with the player's scaling/filter setting because that is what Draw costs. Every
-  "within budget" verdict in this repo is optimistic by something like 1.3–2.2×. Pin the
-  number by timing ONE known game on the device before trusting any of them.
+- **The CPU budget is 90,000 cycles, and it came from the device.** It used to be 160,000,
+  which was this project's own arithmetic and was flattering — it called FFTA 73% and green
+  for a game that manages 0.75x. The port's frame timers settled it:
+
+  | | Emu only | PPU | Scale | ns per emulated cycle | its own budget |
+  |---|---|---|---|---|---|
+  | Pokémon Emerald | 10.05 ms | 1.87 ms | 1.01 ms | 128 ns (78,294 cy) | 107,900 cy |
+  | FFTA | 17.89 ms | 3.56 ms | 0.96 ms | 154 ns (116,375 cy) | 79,500 cy |
+
+  A frame is 16.74 ms; what the renderer does not take, the interpreter gets. Both numbers
+  move per game — a bigger working set means worse cache and a dearer cycle — so 90,000 is
+  the middle, and it reproduces what the hardware does: Emerald runs (and sits idle 1.65 ms
+  of every frame waiting for the LCD), FFTA does not.
+
+  **It is not a hardware constant.** It says how fast the interpreter currently is, so it
+  moves when the interpreter does: get FFTA from 154 ns/cycle to 113 and it plays at 0.95x,
+  the budget becomes ~110,000, and 91 of the 121 measured games fit instead of 77. Re-derive
+  it — do not guess it forward:
+
+      budget = (16.74 ms - PPU - Scale) / (that game's interpreter ms ÷ its exec_cycles)
+
 - **The measurements describe what the bot reached.** It presses START/A/B, the d-pad and
   the shoulders, and gets through intros and early play — not a Pokémon battle, not a
   late-game boss. The p90 column is the honest warning: several games already touch a full

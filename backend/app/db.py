@@ -216,8 +216,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # is the missing half: the cycles the CPU actually spends executing per frame,
         # out of a 280,896-cycle frame, measured by running the rom with the skip
         # active (scripts/idlefind). Weigh it against what the M7 leaves the CPU
-        # (~160,000 cycles at a 340MHz OC) for a verdict instead of a guess.
-        # NULL = not measured.
+        # (~90,000 cycles — timed on the device, see GBA_CPU_BUDGET in components.jsx)
+        # for a verdict instead of a guess. NULL = not measured.
         conn.execute("ALTER TABLE roms ADD COLUMN exec_cycles INTEGER")
 
     if "probe_status" not in cols:

@@ -388,6 +388,21 @@ export default {
   "Running the game to measure its CPU load…": "게임을 실제로 돌려 CPU 부하를 재는 중입니다…",
   "No wait loop exists — we ran the game and looked. The frame goes into real work.":
     "대기 루프가 없습니다 — 실제로 돌려서 찾아봤습니다. 프레임이 진짜 작업에 쓰입니다.",
+  "CPU {pct}% of the device's per-frame budget": "CPU — 실기 프레임 예산의 {pct}%",
+  "Measured by running the game: {cycles} cycles of real work per frame, out of the GBA's {frame}. The Game & Watch's M7 can only emulate about {budget} of them in one frame, so this is the share of what it has.":
+    "게임을 실제로 돌려서 쟀습니다: 프레임당 진짜 작업이 {cycles} 사이클, GBA 한 프레임 {frame} 중에서요. 게임앤워치의 M7은 한 프레임에 약 {budget} 사이클만 흉내낼 수 있으니, 이건 그 몫에 대한 비율입니다.",
+  "The budget was timed on the device (two games), but it is a model, not a promise: a game with a bigger working set pays more per cycle, and the number rises whenever the interpreter gets faster.":
+    "예산은 실기에서 두 게임(에메랄드·FFTA)의 프레임 시간을 재서 뽑았습니다. 다만 약속이 아니라 모델입니다: 작업집합이 큰 게임은 캐시가 나빠져 사이클당 단가가 오르고, 인터프리터가 빨라지면 이 숫자 자체가 올라갑니다.",
+  "Idle skip gives back {pct}% of the frame": "아이들 스킵이 프레임의 {pct}%를 되돌려줌",
+  "No idle skip — and none needed": "아이들 스킵 없음 — 필요도 없음",
+  "A GBA game spends much of each frame doing nothing, waiting for the screen. gpSP can jump over that wait — but only if it is told where the wait loop is, and it has no way to find one itself. For this game it is at {pc}, found by running the rom and confirming the work actually drops.":
+    "GBA 게임은 매 프레임의 상당 부분을 화면을 기다리며 아무것도 안 하고 보냅니다. gpSP는 그 기다림을 건너뛸 수 있지만, 대기 루프가 어디인지 알려줘야만 합니다 — 스스로 찾아내지 못합니다. 이 게임은 {pc}이고, 롬을 실제로 돌려 작업량이 정말 줄어드는지 확인해서 찾았습니다.",
+  "We ran this game and searched for a wait loop. There is none: it works through the whole frame. No address would make it lighter.":
+    "이 게임을 돌려서 대기 루프를 찾아봤습니다. 없습니다 — 프레임 내내 진짜로 일합니다. 어떤 주소를 줘도 가벼워지지 않습니다.",
+  "This game waits through the BIOS instead of spinning, and gpSP already skips that. Nothing to look up.":
+    "이 게임은 스핀 대신 BIOS로 기다리고, gpSP는 그건 이미 건너뜁니다. 찾아줄 게 없습니다.",
+  "Without that address the wait is emulated instruction by instruction and fills the frame — the game cannot reach full speed however light it really is.":
+    "그 주소가 없으면 기다림이 명령어 하나하나 흉내내지면서 프레임을 다 채웁니다 — 실제로는 아무리 가벼운 게임이라도 풀스피드에 못 닿습니다.",
   "CPU — what the game costs the real device": "CPU — 이 게임이 실기에 지우는 부담",
   "Idle skip — how much of the frame it takes back": "아이들 스킵 — 프레임을 얼마나 되찾아 주는지",
   "The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.":

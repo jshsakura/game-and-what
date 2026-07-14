@@ -553,6 +553,34 @@ body::before {
 }
 
 /* content-hash (SHA-256) row in the rom detail modal + copy button */
+/* GBA detail: the two rings on the cover are the whole verdict, and nowhere else did the
+   card say what they mean or where they came from. A dot per reading, coloured like its
+   ring, so the paragraph and the ring it explains are visibly the same thing. */
+.gba-detail {
+  margin: 10px 0 2px; padding: 9px 10px; border-radius: 8px;
+  background: #00000033; border: 1px solid #ffffff14;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.gba-detail-row { display: flex; align-items: flex-start; gap: 8px; }
+.gba-detail-row b {
+  display: block; font-family: var(--body-font); font-size: 11px; font-weight: 700;
+  color: var(--card-ink); margin-bottom: 3px;
+}
+.gba-detail-row p {
+  margin: 0; font-family: var(--body-font); font-size: 10.5px; line-height: 1.6;
+  color: var(--card-dim);
+}
+/* The caveat is the honest part: the budget is a model timed on one device, and the
+   number moves when the interpreter does. Dimmer, but not hidden. */
+.gba-detail-row p.gba-caveat { margin-top: 4px; font-size: 10px; opacity: 0.72; font-style: italic; }
+.gba-dot {
+  flex: 0 0 auto; width: 8px; height: 8px; margin-top: 3px;
+  border-radius: 50%; background: #35c46a;
+}
+.gba-dot.tight { background: #e0a72c; }
+.gba-dot.over { background: #d94b3f; }
+.gba-dot.skip { background: #62c8f5; }
+
 .hash-section { margin: 8px 0 2px; }
 .hash-row { display: flex; align-items: stretch; gap: 8px; }
 .hash-value {
@@ -597,25 +625,41 @@ body::before {
 /* Not measured — its idle loop was never found, so the wait got counted as work. Grey,
    deliberately: red would say "heavy game", and that is exactly what this is NOT. */
 .cover-corner:has(.idle-tag.unknown) { background: #4a4a55e6; color: #e6e6ee; }
-/* The measured card: two small rings — CPU load, and what the idle skip took back.
+/* The measured card: two rings — CPU load, and what the idle skip took back. Just the
+   rings: no chip around them. Each carries its OWN round backdrop, so what sits on the
+   cover is two discs rather than a box with discs in it.
+
    MUST sit after the .cover-corner:has(.idle-tag) rules above, which paint the corner a
-   solid green/amber/red pill. Here the colour belongs to the rings, over a translucent
-   backdrop that lets the cover through; same specificity, so the order is what decides.
-   (theme.css has bitten us on exactly this before.) */
+   solid green/amber/red pill; here the corner gives up its box entirely and the colour
+   belongs to the rings. Same specificity, so the order is what decides. (theme.css has
+   bitten us on exactly this before.) */
 .cover-corner:has(.idle-tag.gauge) {
-  background: #101018b3;
-  backdrop-filter: blur(4px);
-  color: #d6d6e2;
-  padding: 2px 4px;
-  box-shadow: 0 1px 3px #00000059;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  color: #eaeaf2;
+  /* The chip's fixed height would crop rings taller than it. */
+  height: auto; min-width: 0;
+  /* .cover-corner is pointer-events:none so it does not eat clicks meant for the cover —
+     which also meant the rings' own tooltips never fired. They need the mouse back. */
+  pointer-events: auto;
 }
 .idle-tag.gauge { display: inline-flex; align-items: center; gap: 3px; }
-.ring-wrap { position: relative; display: inline-flex; }
+.ring-wrap {
+  position: relative; display: inline-flex;
+  cursor: help;
+  /* The disc IS the background — translucent, so the cover still reads underneath, and
+     dark enough that the number on top of it survives a bright box-art. */
+  background: #101018bf;
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px #00000073;
+}
 /* inset:0 with its own centring — an absolutely-positioned child does not inherit the
    parent's, and without it the number sits off to one side of its ring. */
 .ring-wrap b {
   position: absolute; inset: 0; display: grid; place-items: center;
-  font-size: 8px; font-weight: 800; letter-spacing: -0.3px;
+  font-size: 9px; font-weight: 800; letter-spacing: -0.3px;
 }
 .load-ring .track { stroke: #ffffff24; }
 .load-ring .fill { stroke: #35c46a; }

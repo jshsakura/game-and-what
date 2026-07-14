@@ -62,11 +62,42 @@ const SYS_PALETTE = {
   vb: "#a01730", gba: "#5b45c9",
 };
 
-// What the Game & Watch's M7 leaves the GBA core per frame, in GBA cycles, once the
-// PPU/audio/DMA have taken their share (~160k of a 280,896-cycle frame at a 340MHz OC).
-// A game measured above this cannot hold 60fps no matter how well its idle loop is
-// skipped. NOTE: this is a cycle-budget estimate, not a hardware measurement.
-const GBA_CPU_BUDGET = 160000;
+// What the Game & Watch's M7 leaves the GBA core per frame, in GBA cycles. A game
+// measured above this cannot hold 60fps however well its idle loop is skipped.
+//
+// 90,000, and it comes FROM THE DEVICE now — the 160,000 that used to sit here was this
+// project's own arithmetic and it was flattering. Two games timed on real hardware:
+//
+//   Pokémon Emerald   78,294 cy  ->  10.05 ms of interpreter  (128 ns per emulated cycle)
+//   FFTA            116,375 cy  ->  17.89 ms                  (154 ns — a bigger working
+//                                                              set, so worse cache, so a
+//                                                              dearer cycle)
+//
+// The device's own frame breakdown (FFTA, fullscreen/no filter) says what is left for the
+// interpreter after everything else has been paid:
+//
+//   Emu+ppu 21.46 ms | Emu only 17.89 | = PPU 3.56 | Scale 0.96 | Ovl 0.00 | LCD wait 0.00
+//
+// Drawing costs PPU + Scale = 4.52 ms of a 16.74 ms frame, so the CPU gets ~12.22 ms —
+// 79,500 cycles at FFTA's rate, 95,200 at Emerald's. 90,000 is the middle of that, and it
+// reproduces both verdicts the hardware actually gives: Emerald 87% (runs at full speed),
+// FFTA 129% (does not — it blows the frame with the renderer switched OFF entirely). At
+// 160,000 the badge called FFTA 73% and painted it green, which was a lie about a game
+// that manages 0.75x.
+//
+// It still moves with the player's settings — a soft filter buys its smoothing out of
+// this same 16.74 ms. This is a model, not a promise.
+//
+// AND IT IS NOT A HARDWARE CONSTANT. It is a statement about how fast the interpreter
+// currently is, so it MOVES when the interpreter does. To re-derive it, time one game on
+// the device and divide:
+//
+//     budget = (16.74 ms - PPU - Scale) / (that game's ms ÷ its exec_cycles here)
+//
+// e.g. get FFTA from 154 ns/cycle to 113 (a 1.37x interpreter) and it plays at 0.95x —
+// and this constant becomes ~110,000, with 91 of the 121 measured games fitting instead
+// of 77. Bump it when that lands; do not guess it forward.
+const GBA_CPU_BUDGET = 90000;
 const GBA_FRAME_CYCLES = 280896;
 
 // A rom whose idle loop we never found spins through the whole frame, and the probe
@@ -98,7 +129,7 @@ function gbaReading(rom) {
 // would eat the card's width. Fills clockwise from the top. `tone` picks which fraction
 // it is: the CPU load against the device's budget (green → amber → red once it cannot
 // fit), or what the idle skip took back (blue, and always a good thing).
-function Ring({ pct, tone, title, size = 22 }) {
+function Ring({ pct, tone, title, size = 27 }) {
   const R = 7.5;
   const CIRC = 2 * Math.PI * R;
   const state = tone === "skip" ? "skip" : pct > 100 ? "over" : pct > 80 ? "tight" : "";
@@ -1208,14 +1239,18 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
         status={rom.cover_status}
         overlay={
           <>
-            <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
-              onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
-              {rom.favorite
-                ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
-                : gba != null
-                  ? <Gauge size={14} strokeWidth={2.5} aria-hidden />
+            {/* On a measured GBA card the corner belongs to the rings — the system icon
+                next to them was just crowding a narrow space (and everything in this
+                corner is a GBA anyway). A favourited rom still shows its star; to favourite
+                one that is not, use the star in the card's detail panel. */}
+            {(gba == null || gba.unknown || rom.favorite) && (
+              <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
+                onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
+                {rom.favorite
+                  ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
                   : (rom.system_key ? <SystemIcon dirname={rom.system_key} size={14} /> : <Star size={14} strokeWidth={2.5} aria-hidden />)}
-            </button>
+              </button>
+            )}
             {/* Takes the system-icon corner: it has to be readable at a glance across
                 the grid, and in the title row a long name pushed it out of sight. */}
             {gba == null && rom.probe_status === "pending" && (
@@ -1384,6 +1419,50 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       <span>{t("{n} rom(s) with identical content", { n: dupes.length })}: {dupes.map((d) => d.name).join(", ")}</span>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* GBA only. The two rings on the cover are the whole verdict, and nowhere
+                  else does the card say what they mean or where they came from. Here it
+                  does — including the part that matters most: the budget is an estimate,
+                  so the CPU figure is a model, not a promise. */}
+              {gba && !gba.unknown && (
+                <div className="gba-detail">
+                  <div className="gba-detail-row">
+                    <span className={`gba-dot ${gba.load > 100 ? "over" : gba.load > 80 ? "tight" : ""}`} aria-hidden />
+                    <div>
+                      <b>{t("CPU {pct}% of the device's per-frame budget", { pct: gba.load })}</b>
+                      <p>
+                        {t("Measured by running the game: {cycles} cycles of real work per frame, out of the GBA's {frame}. The Game & Watch's M7 can only emulate about {budget} of them in one frame, so this is the share of what it has.",
+                          { cycles: gba.cycles.toLocaleString(), frame: "280,896",
+                            budget: GBA_CPU_BUDGET.toLocaleString() })}
+                      </p>
+                      <p className="gba-caveat">
+                        {t("The budget was timed on the device (two games), but it is a model, not a promise: a game with a bigger working set pays more per cycle, and the number rises whenever the interpreter gets faster.")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="gba-detail-row">
+                    <span className="gba-dot skip" aria-hidden />
+                    <div>
+                      <b>{gba.skip != null
+                        ? t("Idle skip gives back {pct}% of the frame", { pct: gba.skip })
+                        : t("No idle skip — and none needed")}</b>
+                      <p>
+                        {rom.idle_pc
+                          ? t("A GBA game spends much of each frame doing nothing, waiting for the screen. gpSP can jump over that wait — but only if it is told where the wait loop is, and it has no way to find one itself. For this game it is at {pc}, found by running the rom and confirming the work actually drops.",
+                            { pc: rom.idle_pc })
+                          : rom.idle_hunted
+                            ? t("We ran this game and searched for a wait loop. There is none: it works through the whole frame. No address would make it lighter.")
+                            : t("This game waits through the BIOS instead of spinning, and gpSP already skips that. Nothing to look up.")}
+                      </p>
+                      {gba.skip != null && (
+                        <p className="gba-caveat">
+                          {t("Without that address the wait is emulated instruction by instruction and fills the frame — the game cannot reach full speed however light it really is.")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
