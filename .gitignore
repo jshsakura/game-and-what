@@ -50,3 +50,9 @@ backend/scripts/pi_crc_scan.py
 .coverage
 htmlcov/
 coverage.xml
+
+# scripts/idlefind: the mGBA clone and the binary it builds are artifacts, not sources.
+scripts/idlefind/mgba/
+scripts/idlefind/idlefind
+scripts/idlefind/shot
+scripts/idlefind/.*.rsp

@@ -216,12 +216,18 @@ async def _probe_gba(session_id: str, roms: list[dict]) -> None:
     'failed'. One left 'pending' would spin in the UI forever.
     """
     for rom in roms:
-        status, idle_pc, cycles = "failed", None, None
+        status, idle_pc, cycles, drop, hunted = "failed", None, None, None, False
         try:
             result = await gba_probe.probe(Path(rom["rom_path"]))
             if result:
                 status = "ok"
                 idle_pc, cycles = result.idle_pc, result.exec_cycles
+                # Both of these are new facts the probe now has and the row must keep.
+                # `idle_drop` is what the skip bought (the card shows it); `idle_hunted`
+                # says we RAN this game and searched — so a full frame of work is the
+                # game's own answer ("it is this heavy"), not the probe's failure to
+                # measure it, and the UI must stop calling it "not measured".
+                drop, hunted = result.idle_drop, result.hunted
         except Exception:                                    # noqa: BLE001 — never wedge the queue
             log.exception("gba probe crashed for %s", rom["id"])
 
@@ -229,8 +235,10 @@ async def _probe_gba(session_id: str, roms: list[dict]) -> None:
             with db.connect() as conn:
                 conn.execute(
                     "UPDATE roms SET probe_status = ?, idle_loop = ?, idle_pc = ?, "
-                    "exec_cycles = ? WHERE id = ? AND session_id = ?",
-                    (status, int(bool(idle_pc)), idle_pc, cycles, rom["id"], session_id),
+                    "exec_cycles = ?, idle_drop = ?, idle_hunted = ? "
+                    "WHERE id = ? AND session_id = ?",
+                    (status, int(bool(idle_pc)), idle_pc, cycles, drop, int(hunted),
+                     rom["id"], session_id),
                 )
         except Exception:                                    # noqa: BLE001
             log.exception("could not store the gba probe for %s", rom["id"])

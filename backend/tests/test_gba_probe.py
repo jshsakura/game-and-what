@@ -80,8 +80,45 @@ def test_probe_gives_up_quietly_on_a_file_that_is_not_a_rom(tmp_path):
     assert asyncio.run(gba_probe.probe(_fake_rom(tmp_path, "BPEK", magic=0))) is None
 
 
-@pytest.mark.skipif(gba_probe.BINARY is None, reason="idlefind is not in this build")
+@pytest.mark.skipif(not gba_probe._runner.available(),
+                    reason="idlefind is not in this build")
 def test_measure_needs_a_real_rom(tmp_path):
     # A header with no code behind it cannot boot: the prober must return None rather
     # than leave the caller with a rom stuck 'pending'.
     assert asyncio.run(gba_probe.measure(_fake_rom(tmp_path, "ZZZZ"))) is None
+
+
+def test_measure_is_skipped_when_the_tool_is_not_installed(tmp_path, monkeypatch):
+    """A dev checkout has no binary. Lookup must still work and measurement must decline
+    quietly — never crash, and never leave a rom stuck 'pending'."""
+    monkeypatch.setattr(gba_probe._runner, "available", lambda: False)
+
+    assert asyncio.run(gba_probe.measure(_fake_rom(tmp_path, "ZZZZ"))) is None
+
+
+def test_the_prober_owns_no_rules_of_its_own():
+    """The rules live in ONE place (scripts/idlefind/gbaidle/verify.py) and this module is
+    an adapter over them. It used to keep its own copy — and its copy had no A/B at all, so
+    an upload could write an address mGBA merely *detected* into the shared table, which is
+    exactly what 22 of 111 detections turned out not to deserve."""
+    import inspect
+
+    src = inspect.getsource(gba_probe)
+
+    for smell in ("MIN_DROP", "0.15", "SAME_SCREENS", "capstone", "_BRANCHES"):
+        assert smell not in src, f"{smell} is a rule; it belongs in gbaidle.verify"
+
+
+def test_a_hunted_rom_with_no_loop_is_reported_as_hunted(tmp_path, monkeypatch):
+    """The distinction the old prober could not make. A full frame of work with `hunted`
+    set is the GAME's answer ('it works the whole frame'), not ours ('we failed to find
+    its loop') — and the UI must stop calling it 'not measured'."""
+    monkeypatch.setattr(gba_probe._runner, "available", lambda: True)
+    monkeypatch.setattr(gba_probe._hunt, "find", lambda _p: (None, 227722))
+
+    result = asyncio.run(gba_probe.measure(_fake_rom(tmp_path, "FDKE")))
+
+    assert result is not None
+    assert result.idle_pc is None
+    assert result.hunted is True
+    assert result.exec_cycles == 227722

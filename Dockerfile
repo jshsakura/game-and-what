@@ -79,6 +79,9 @@ COPY backend/ ./backend/
 # looks a rom up there first and only runs the game when it has never seen it).
 COPY --from=gba-probe-builder /build/idlefind-bin /usr/local/bin/idlefind
 COPY scripts/gba_idle_loop_db.json ./scripts/gba_idle_loop_db.json
+# The tool's python side. gba_probe.py is a thin adapter over it and owns no rules of its
+# own — an uploaded rom is judged by exactly the same A/B as an offline sweep.
+COPY scripts/idlefind/gbaidle/ ./scripts/idlefind/gbaidle/
 
 # The Korean name dictionary — hash -> name, 1,900-odd of them. A Korean deploy
 # (GNW_KOREAN_MODE) seeds an empty database from this at startup, so a fresh install can

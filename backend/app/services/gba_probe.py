@@ -1,175 +1,129 @@
-"""Work out whether a GBA rom can run on the real hardware.
+"""Work out whether an uploaded GBA rom can run on the real hardware.
 
 Two things decide it, and the cart header carries neither.
 
-1. **Where is the game's VBlank idle loop?** gpSP has no automatic detection — it
-   defaults `idle_loop_target_pc` to 0xFFFFFFFF and only overrides it when the cart's
-   4-char code is in its hand-maintained table. A game absent from that table
-   busy-waits through the whole frame and cannot reach full speed on the M7.
+1. **Where is the game's VBlank wait loop?** gpSP has no automatic detection — it defaults
+   `idle_loop_target_pc` to 0xFFFFFFFF and only overrides it when the cart's 4-char code is
+   in a hand-maintained table. A game absent from that table busy-waits through the whole
+   frame and cannot reach full speed on the M7 however light it really is.
 
-2. **How much work does the game actually do per frame?** Knowing the loop only says
-   the skip is *available*, not that it is *enough*.
+2. **How much work does the game actually do per frame?** Knowing the loop only says the
+   skip is *available*, not that it is *enough*.
 
-Neither can be read off the rom: a spin loop and an ordinary polling loop are the same
-shape in a disassembly. So we run the game — see `scripts/idlefind`, which drives mGBA
-headless with its idle-loop detector on and counts the cycles actually executed.
+Neither can be read off the rom, so we run the game. **This module is a thin adapter over
+`scripts/idlefind` — the tool that does that — and it deliberately owns no rules of its
+own.** It used to: it took whatever mGBA's detector reported, converted it to a branch pc
+and wrote it down as a verified address. That is precisely the mistake the tool exists to
+prevent — across a 633-rom sweep, 22 of 111 detections were doing nothing at all, and one
+of them would still have been shipped into a firmware table. Now an upload goes through
+the same gate as everything else: the address must measurably cut the work AND leave the
+game drawing what it drew (`gbaidle/verify.py`).
 
 Two paths, in order:
 
-* **Look it up.** `scripts/gba_idle_loop_db.json` holds everything already measured.
-  Free, instant, and covers the games we have.
-* **Measure it.** Only for a rom we have never seen. ~15s of one core, so callers run
-  it in the background and behind a semaphore.
+* **Look it up.** `scripts/gba_idle_loop_db.json` holds everything already measured — free,
+  instant, and it covers the games we have.
+* **Hunt it.** Only for a rom we have never seen. It is a full core for ~30 s (detector,
+  then the frame's own cycle histogram, then an A/B per candidate), so callers run it in
+  the background and behind a semaphore.
 
-If the `idlefind` binary is not in the image (a plain dev checkout, say), measurement
-is skipped and lookup still works. Never raises: a probe that fails leaves the rom
-unmeasured, which the UI shows honestly.
+If the `idlefind` binary is not in the image (a plain dev checkout, say), measurement is
+skipped and lookup still works. Never raises: a probe that fails leaves the rom unmeasured,
+which the UI shows honestly rather than calling it heavy.
 """
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
-import shutil
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# GBA cartridge header (GBATEK).
-GAME_CODE_OFFSET = 0xAC
-GAME_CODE_LENGTH = 4
-FIXED_BYTE_OFFSET = 0xB2
-FIXED_BYTE_VALUE = 0x96
-HEADER_LENGTH = 0xC0
+# The tool lives in scripts/idlefind and is copied into the image beside the app. It is a
+# standalone package on purpose — the firmware repo can take the same directory and use it.
+_TOOL = Path(__file__).resolve().parents[3] / "scripts" / "idlefind"
+if str(_TOOL) not in sys.path:
+    sys.path.insert(0, str(_TOOL))
 
-ROM_BASE = 0x8000000
-FRAME_CYCLES = 280896
-PROBE_FRAMES = "1500"          # ~25s of play: past the intro, into the game
-PROBE_TIMEOUT = 300            # seconds; a hung rom must not wedge the queue
+from gbaidle import hunt as _hunt          # noqa: E402
+from gbaidle import rom as _rom            # noqa: E402
+from gbaidle import runner as _runner      # noqa: E402
+from gbaidle import table as _table        # noqa: E402
+from gbaidle import verify as _verify      # noqa: E402
 
-BINARY = shutil.which("idlefind")
-DB_PATH = Path(__file__).resolve().parents[3] / "scripts" / "gba_idle_loop_db.json"
+FRAME_CYCLES = _verify.FRAME_CYCLES
 
-# One at a time. Measuring is a full core for ~15s, and a bulk upload would otherwise
-# bury the box under a rom-per-core stampede while someone is trying to browse.
+# One at a time. A hunt is a full core for ~30 s, and a bulk upload would otherwise bury
+# the box under a rom-per-core stampede while someone is trying to browse.
 _probe_lock = asyncio.Semaphore(1)
-
-_BRANCHES = {"b", "beq", "bne", "bcs", "bcc", "bmi", "bpl", "bhi", "bls",
-             "bge", "blt", "bgt", "ble"}
 
 
 @dataclass(frozen=True)
 class Probe:
-    """What we learned about a rom. `idle_pc` is the backward BRANCH that closes the
-    wait loop — the PC gpSP compares against — not the loop's start, which is what
-    mGBA reports."""
+    """What we learned about a rom.
+
+    `idle_pc` is the PC gpSP ends the frame slice at — usually the backward branch that
+    closes the wait loop, or a landing point inside it where the loop hops rather than
+    branching straight back. It is None unless the address PASSED the A/B.
+    """
     game_code: str
     idle_pc: str | None
     exec_cycles: int | None
     source: str            # "db" | "measured"
+    idle_drop: float | None = None   # what the skip bought, measured
+    hunted: bool = False             # we ran it and searched: a full frame is the GAME's answer
 
 
 def game_code(path: Path) -> str | None:
-    """The 4-char code from the cart header, or None if this is not a GBA rom."""
-    try:
-        header = path.open("rb").read(HEADER_LENGTH)
-    except OSError:
-        return None
-    if len(header) < HEADER_LENGTH or header[FIXED_BYTE_OFFSET] != FIXED_BYTE_VALUE:
-        return None
-    return header[GAME_CODE_OFFSET:GAME_CODE_OFFSET + GAME_CODE_LENGTH].decode("ascii", "replace")
-
-
-def _load_db() -> dict[str, dict]:
-    try:
-        rows = json.loads(DB_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        log.warning("gba idle-loop db unreadable (%s); measurement only", exc)
-        return {}
-    return {r["game_code"]: r for r in rows}
+    """The 4 chars at rom[0xAC]. The key — never the filename, which a library renames."""
+    return _rom.game_code(path)
 
 
 def lookup(code: str) -> Probe | None:
-    """A rom we have already measured. Only run-verified rows count: an address that
-    was guessed and never executed is worse than none, because gpSP would jump out of
-    the frame somewhere that is not the wait loop."""
-    row = _load_db().get(code)
-    if not row or not row.get("exec_median"):
+    """A rom the table has already measured."""
+    row = _table.load().get(code)
+    if not row or not _table.measured(row):
         return None
-    idle_pc = row.get("idle_verified") if row.get("verify_tier") == "R" else None
-    return Probe(code, idle_pc, row["exec_median"], "db")
+    return Probe(
+        game_code=code,
+        idle_pc=_table.shippable_pc(row),
+        exec_cycles=row["exec_median"],
+        source="db",
+        idle_drop=row.get("idle_drop"),
+        hunted=bool(row.get("idle_hunted")),
+    )
 
 
-def _branch_pc(rom: Path, loop_start: int) -> str | None:
-    """mGBA reports the loop's START; gpSP wants the branch that jumps back to it."""
-    if loop_start < ROM_BASE:
-        return None   # some games copy the loop into IWRAM — not readable off disk
-    try:
-        from capstone import CS_ARCH_ARM, CS_MODE_THUMB, Cs
-    except ImportError:
-        log.warning("capstone missing; cannot convert the loop start to a branch pc")
-        return None
-
-    with rom.open("rb") as handle:
-        handle.seek(loop_start - ROM_BASE)
-        window = handle.read(64)
-
-    for ins in Cs(CS_ARCH_ARM, CS_MODE_THUMB).disasm(window, loop_start):
-        if ins.mnemonic not in _BRANCHES:
-            continue
-        try:
-            target = int(ins.op_str.lstrip("#"), 16)
-        except ValueError:
-            continue
-        if target == loop_start:
-            return hex(ins.address)
-    return None
+def _hunt_sync(rom_path: Path, code: str) -> Probe | None:
+    found, exec_off = _hunt.find(rom_path)
+    if not found and not exec_off:
+        return None                     # the rom did not run at all
+    if found:
+        return Probe(code, found.pc_hex, found.exec_cycles, "measured",
+                     idle_drop=round(found.verdict.drop, 3), hunted=True)
+    # Hunted, and there is nothing to skip. The no-skip cost IS what the device will pay,
+    # so it is the honest number — and `hunted` is what stops the UI calling it unmeasured.
+    log.info("gba: no wait loop in %s (%d cy/frame — it works the whole frame)",
+             rom_path.name, exec_off)
+    return Probe(code, None, exec_off, "measured", hunted=True)
 
 
-async def measure(rom: Path) -> Probe | None:
+async def measure(rom_path: Path) -> Probe | None:
     """Run the game. None if we have no binary, or the rom would not boot."""
-    code = game_code(rom)
-    if not code or not BINARY:
+    code = game_code(rom_path)
+    if not code or not _runner.available():
         return None
 
     async with _probe_lock:
-        try:
-            proc = await asyncio.create_subprocess_exec(
-                BINARY, str(rom), PROBE_FRAMES,
-                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL,
-            )
-            raw, _ = await asyncio.wait_for(proc.communicate(), timeout=PROBE_TIMEOUT)
-        except (asyncio.TimeoutError, OSError) as exc:
-            log.warning("gba probe failed for %s: %s", rom.name, exc)
-            return None
-
-    try:
-        data = json.loads(raw.decode().strip().splitlines()[-1])
-    except (ValueError, IndexError, UnicodeDecodeError):
-        log.warning("gba probe returned nothing usable for %s", rom.name)
-        return None
-
-    cycles = data.get("exec_median")
-    if not cycles:
-        return None
-
-    start = data.get("loop_start")
-    idle_pc = _branch_pc(rom, int(start, 16)) if start else None
-
-    # A rom whose loop was never found reports a full frame of work. That is not a
-    # heavy game — it is a rom we failed to measure — so do not record it as an idle
-    # loop, and let the cycle count stand as the (pessimistic) truth it is.
-    if not idle_pc and cycles > 0.9 * FRAME_CYCLES:
-        log.info("gba probe: no idle loop found for %s (%d cy/frame)", rom.name, cycles)
-
-    return Probe(code, idle_pc, cycles, "measured")
+        # The hunt is blocking subprocess work; keep it off the event loop.
+        return await asyncio.to_thread(_hunt_sync, rom_path, code)
 
 
-async def probe(rom: Path) -> Probe | None:
-    """Look it up; measure only if we have never seen it."""
-    code = game_code(rom)
+async def probe(rom_path: Path) -> Probe | None:
+    """Look it up; hunt only if we have never seen it."""
+    code = game_code(rom_path)
     if not code:
         return None
-    hit = lookup(code)
-    return hit if hit else await measure(rom)
+    return lookup(code) or await measure(rom_path)
