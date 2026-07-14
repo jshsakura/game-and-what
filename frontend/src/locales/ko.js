@@ -388,8 +388,12 @@ export default {
   "Running the game to measure its CPU load…": "게임을 실제로 돌려 CPU 부하를 재는 중입니다…",
   "No wait loop exists — we ran the game and looked. The frame goes into real work.":
     "대기 루프가 없습니다 — 실제로 돌려서 찾아봤습니다. 프레임이 진짜 작업에 쓰입니다.",
+  "CPU — what the game costs the real device": "CPU — 이 게임이 실기에 지우는 부담",
+  "Idle skip — how much of the frame it takes back": "아이들 스킵 — 프레임을 얼마나 되찾아 주는지",
   "The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.":
     "아이들 루프 스킵이 이 게임 프레임의 {pct}%를 되찾아 줍니다 — 스킵이 없으면 예산 안에 드는 게임이 하나도 없습니다.",
+  "Measured by running the game twice: once with the address, once without.":
+    "게임을 두 번 돌려서 측정했습니다: 주소를 준 채로 한 번, 안 준 채로 한 번.",
   "CPU {pct}%": "CPU {pct}%",
   "CPU load on the real device: {pct}% of its per-frame budget":
     "실기 CPU 부하: 프레임 예산의 {pct}%",

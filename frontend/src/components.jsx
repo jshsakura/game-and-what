@@ -98,12 +98,14 @@ function gbaReading(rom) {
 // would eat the card's width. Fills clockwise from the top. `tone` picks which fraction
 // it is: the CPU load against the device's budget (green → amber → red once it cannot
 // fit), or what the idle skip took back (blue, and always a good thing).
-function Ring({ pct, tone, size = 16 }) {
+function Ring({ pct, tone, title, size = 22 }) {
   const R = 7.5;
   const CIRC = 2 * Math.PI * R;
   const state = tone === "skip" ? "skip" : pct > 100 ? "over" : pct > 80 ? "tight" : "";
   return (
-    <span className="ring-wrap">
+    // Each ring explains ITSELF on hover. One tooltip over both left you guessing which
+    // of the two numbers it was talking about.
+    <span className="ring-wrap" title={title}>
       <svg className={`load-ring ${state}`} width={size} height={size} viewBox="0 0 20 20" aria-hidden>
         <circle className="track" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5" />
         <circle className="fill" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5"
@@ -1238,8 +1240,9 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               // Two rings, not two pills: the corner has no width to give, and both
               // numbers are fractions. Left is what the game costs the device, right is
               // what the idle skip already took off that cost.
-              <em className="idle-tag gauge"
-                title={[
+              <em className="idle-tag gauge">
+                <Ring pct={gba.load} title={[
+                  t("CPU — what the game costs the real device"),
                   gba.load > 100
                     ? t("Too heavy for the real device: {pct}% of the CPU budget it has per frame.", { pct: gba.load })
                     : t("CPU load on the real device: {pct}% of its per-frame budget", { pct: gba.load }),
@@ -1250,19 +1253,20 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     : rom.idle_hunted
                       ? t("No wait loop exists — we ran the game and looked. The frame goes into real work.")
                       : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
-                  // What the skip bought, where it bought anything. A BIOS-halt game idles
-                  // most of its frame too, and crediting our table for that would be a lie.
-                  gba.skip != null
-                    ? t("The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.", { pct: gba.skip })
-                    : "",
                   gba.load > 100
                     ? t("Frameskip may still get it there — that frees the PPU's share, not the CPU's.")
                     : "",
                   t("A cycle-budget estimate — never checked on real hardware."),
-                ].filter(Boolean).join("\n")}>
-                <Gauge size={10} strokeWidth={2.5} aria-hidden />
-                <Ring pct={gba.load} />
-                {gba.skip != null && <Ring pct={gba.skip} tone="skip" />}
+                ].filter(Boolean).join("\n")} />
+                {/* Only where the skip earned it. A BIOS-halt game idles most of its
+                    frame too, and crediting our table for that would be a lie. */}
+                {gba.skip != null && (
+                  <Ring pct={gba.skip} tone="skip" title={[
+                    t("Idle skip — how much of the frame it takes back"),
+                    t("The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.", { pct: gba.skip }),
+                    t("Measured by running the game twice: once with the address, once without."),
+                  ].join("\n")} />
+                )}
               </em>
             )}
           </>

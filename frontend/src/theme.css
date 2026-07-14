@@ -609,14 +609,13 @@ body::before {
   padding: 2px 4px;
   box-shadow: 0 1px 3px #00000059;
 }
-.idle-tag.gauge { display: inline-flex; align-items: center; gap: 2px; }
-.idle-tag.gauge > svg { flex: 0 0 auto; opacity: 0.5; }
+.idle-tag.gauge { display: inline-flex; align-items: center; gap: 3px; }
 .ring-wrap { position: relative; display: inline-flex; }
 /* inset:0 with its own centring — an absolutely-positioned child does not inherit the
    parent's, and without it the number sits off to one side of its ring. */
 .ring-wrap b {
   position: absolute; inset: 0; display: grid; place-items: center;
-  font-size: 6.5px; font-weight: 800; letter-spacing: -0.3px;
+  font-size: 8px; font-weight: 800; letter-spacing: -0.3px;
 }
 .load-ring .track { stroke: #ffffff24; }
 .load-ring .fill { stroke: #35c46a; }
