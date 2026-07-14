@@ -303,10 +303,13 @@ def test_build_progress_reports_full_completion_on_a_real_build(env):
     _write(storage.roms_dir(sid, "nes") / "Game.nes", b"x" * 100)
 
     calls = []
-    packaging.build_sd_zip_cached(sid, on_progress=lambda d, t: calls.append((d, t)))
+    packaging.build_sd_zip_cached(sid, on_progress=lambda d, t, n="": calls.append((d, t, n)))
 
-    assert calls[0] == (0, calls[0][1])
-    assert calls[-1][0] == calls[-1][1]  # done == total at the end
+    assert calls[0][:2] == (0, calls[0][1])
+    assert calls[-1][0] == calls[-1][1]        # done == total at the end
+    # …and it says WHICH file it just wrote. Compressing a library takes minutes, and a bar
+    # with no words cannot be told apart from a hang — the name is the proof of life.
+    assert calls[-1][2] == "Game.nes"
 
 
 # ---------------------------------------------------------------------------
