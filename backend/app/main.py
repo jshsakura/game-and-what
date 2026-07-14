@@ -66,6 +66,17 @@ app.include_router(events.router)
 @app.on_event("startup")
 def _startup() -> None:
     db.init_db()
+    # A Korean deploy starts WITH the dictionary instead of with nothing — 1,900 names
+    # are the one thing a fresh install cannot work out for itself, and without them the
+    # Korean-name resolve this mode exists for has nothing to resolve against. Gated on
+    # KOREAN_MODE for the same reason that resolve is: the international image stays free
+    # of 한글 features. Only when the table is empty — after that the local database is
+    # the authority, and a seed arriving with a release must not walk over a name the
+    # user has fixed by hand.
+    from .services import dataset as dataset_svc
+    seeded, _ = dataset_svc.seed_if_empty()
+    if seeded:
+        print(f"[startup] seeded {seeded} Korean name(s) from data/names.ko.json")
     # Reclaim disk from orphaned upload temps (.src_*) left by an encode that was
     # killed mid-run (crash/OOM/stop) before its finally-cleanup could fire.
     from .services import storage

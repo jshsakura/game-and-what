@@ -15,6 +15,11 @@ venv
 # local library/backups into a published image.
 backend/data
 data
+# …except the SHIPPED dataset, which is the opposite kind of thing: not my library but
+# the name dictionary every install starts from. Two directories called data, and only
+# one of them is personal — backend/data (the volume) is; this is not.
+!data/names.ko.json
+!data/README.md
 
 # Secrets — never bake .env into the image (matches nested too, e.g. backend/.env)
 **/.env

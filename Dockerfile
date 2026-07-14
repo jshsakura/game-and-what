@@ -80,6 +80,12 @@ COPY backend/ ./backend/
 COPY --from=gba-probe-builder /build/idlefind-bin /usr/local/bin/idlefind
 COPY scripts/gba_idle_loop_db.json ./scripts/gba_idle_loop_db.json
 
+# The Korean name dictionary — hash -> name, 1,900-odd of them. A Korean deploy
+# (GNW_KOREAN_MODE) seeds an empty database from this at startup, so a fresh install can
+# name a rom it has never seen. /app/data is the SHIPPED dataset; /app/backend/data
+# (GNW_DATA_DIR, a volume) is the user's library. Different things.
+COPY data/names.ko.json ./data/names.ko.json
+
 # Copy the built frontend into the location the app checks at startup.
 COPY --from=frontend-builder /build/frontend/dist /app/frontend_dist
 
