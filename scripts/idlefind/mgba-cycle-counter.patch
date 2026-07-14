@@ -1,8 +1,8 @@
 diff --git a/src/arm/arm.c b/src/arm/arm.c
-index 0b92d7f..f51c75a 100644
+index 0b92d7f..fccfa45 100644
 --- a/src/arm/arm.c
 +++ b/src/arm/arm.c
-@@ -240,14 +240,24 @@ void ARMRun(struct ARMCore* cpu) {
+@@ -240,14 +240,71 @@ void ARMRun(struct ARMCore* cpu) {
  	}
  }
  
@@ -12,18 +12,65 @@ index 0b92d7f..f51c75a 100644
 +// to weigh against the hardware's budget. (idlefind instrumentation.)
 +uint64_t gIdleFindExecCycles = 0;
 +
++// WHERE the frame's cycles go, per ROM address. mGBA's detector proves a loop is an
++// idle loop by re-walking it; when it refuses (the loop touches something, or the game
++// never reaches it), we still have this: a wait loop is, by construction, where a game
++// that is waiting spends its frame. Off unless the harness allocates the table.
++// Indexed by (pc - 0x08000000) >> 1; halfword granularity covers Thumb and ARM alike.
++uint32_t* gIdleFindPcHist = NULL;
++uint32_t gIdleFindPcHistLen = 0;
++// ROM is not the only place a game runs from. The Classic NES / Famicom Mini carts are
++// NES emulators: they copy their core into RAM and execute it there, so a ROM-only
++// histogram sees 0.1% of the frame and the wait loop is invisible. gpSP does not care
++// which region the loop is in — cpu.cc:3063 is a bare PC compare — so neither do we.
++uint32_t* gIdleFindEwramHist = NULL;   // 0x02000000, 256 KB
++uint32_t* gIdleFindIwramHist = NULL;   // 0x03000000, 32 KB
++
++#define IDLEFIND_ROM_BASE   0x08000000
++#define IDLEFIND_EWRAM_BASE 0x02000000
++#define IDLEFIND_EWRAM_LEN  (256 * 1024)
++#define IDLEFIND_IWRAM_BASE 0x03000000
++#define IDLEFIND_IWRAM_LEN  (32 * 1024)
++
++static inline void idlefind_charge(uint32_t pc, uint32_t spent) {
++	if (pc >= IDLEFIND_ROM_BASE) {
++		uint32_t idx = (pc - IDLEFIND_ROM_BASE) >> 1;
++		if (gIdleFindPcHist && idx < gIdleFindPcHistLen) {
++			gIdleFindPcHist[idx] += spent;
++		}
++	} else if (pc >= IDLEFIND_IWRAM_BASE) {
++		uint32_t idx = (pc - IDLEFIND_IWRAM_BASE) >> 1;
++		if (gIdleFindIwramHist && idx < (IDLEFIND_IWRAM_LEN >> 1)) {
++			gIdleFindIwramHist[idx] += spent;
++		}
++	} else if (pc >= IDLEFIND_EWRAM_BASE) {
++		uint32_t idx = (pc - IDLEFIND_EWRAM_BASE) >> 1;
++		if (gIdleFindEwramHist && idx < (IDLEFIND_EWRAM_LEN >> 1)) {
++			gIdleFindEwramHist[idx] += spent;
++		}
++	}
++}
++
  void ARMRunLoop(struct ARMCore* cpu) {
  	if (cpu->executionMode == MODE_THUMB) {
  		while (cpu->cycles < cpu->nextEvent) {
 +			int32_t before = cpu->cycles;
++			// On entry gprs[ARM_PC] already reads as the executing instruction + 2
++			// (ARM's pipeline); ThumbStep bumps it again before the handler runs.
++			uint32_t pc = cpu->gprs[ARM_PC] - WORD_SIZE_THUMB;
  			ThumbStep(cpu);
-+			gIdleFindExecCycles += (uint32_t) (cpu->cycles - before);
++			uint32_t spent = (uint32_t) (cpu->cycles - before);
++			gIdleFindExecCycles += spent;
++			idlefind_charge(pc, spent);
  		}
  	} else {
  		while (cpu->cycles < cpu->nextEvent) {
 +			int32_t before = cpu->cycles;
++			uint32_t pc = cpu->gprs[ARM_PC] - WORD_SIZE_ARM;
  			ARMStep(cpu);
-+			gIdleFindExecCycles += (uint32_t) (cpu->cycles - before);
++			uint32_t spent = (uint32_t) (cpu->cycles - before);
++			gIdleFindExecCycles += spent;
++			idlefind_charge(pc, spent);
  		}
  	}
  	cpu->irqh.processEvents(cpu);

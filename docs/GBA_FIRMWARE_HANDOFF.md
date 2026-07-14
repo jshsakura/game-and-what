@@ -96,10 +96,28 @@ has no shoulder buttons to draw.)
 
 ## 3. The data, and how to regenerate it
 
-**89 addresses**, each one measured. **515 game codes** carry a frame cost — of those,
-**426 need no entry at all** (they wait via the BIOS, which gpSP already skips).
+**121 addresses**, each one measured. **515 game codes** carry a frame cost — of those,
+**340 need no entry at all** (they wait via the BIOS, which gpSP already skips), **48 have
+no wait loop to skip** (they really are that heavy — see below), and 6 do not boot.
 
 Files you copy: `firmware/gba/gba_idle_loop.{c,h}`.
+
+> **Two things changed shape in this table.** Both are fine for gpSP's interpreter, and
+> both would look like corruption if you were not told:
+>
+> - **Three addresses are not in ROM.** `ZMDE` is in EWRAM (`0x20314a6`), `AYPE`/`AYPP` in
+>   IWRAM (`0x3005d18`). An emulator-cart copies its core into RAM and waits there.
+>   `cpu.cc:3063` compares `reg[REG_PC]` after *every* instruction and does not care which
+>   region it is in, and the game links its RAM code at a fixed address, so the pc is
+>   stable across boots.
+> - **Not every pc is a backward branch.** Where a wait loop hops rather than branching
+>   straight back (Super Mario Advance takes three hops), the pc is a landing point inside
+>   the loop. Same reason it works: the loop executes it every iteration.
+>
+> The 48 "no wait loop" games are a verdict, not a gap. The clearest case is the Classic
+> NES / Famicom Mini / Hudson carts: they are 6502 interpreters, their hot code is a
+> jump-table dispatch in IWRAM, and they spend the whole frame emulating a NES. No address
+> exists that would make them lighter.
 
 ```bash
 # in game-and-what
@@ -244,13 +262,19 @@ full — it *works*, it just gets slower.
 ## 5. What is NOT verified — read before trusting the numbers
 
 - **Nothing here ran on real hardware.** All cycle counts come from mGBA on a PC.
-- **The 160,000-cycle CPU budget is the project's own estimate**, not something measured:
-  it assumes ~28 host instructions per GBA cycle at a 340 MHz OC, minus the PPU/audio/DMA
-  share. If that figure is off, every "within budget" verdict moves with it.
-- **The measurements describe what a button-masher reached.** The harness presses START/A
-  and gets through intros and early play — not a Pokémon battle, not a late-game boss. The
-  p90 column is the honest warning: several games already touch a full frame in the window
-  we sampled.
+- **The 160,000-cycle budget is the project's own estimate, and the device says it is too
+  generous.** The port's own DWT timings (`gnw-gba`, `1eec5c72` and `f08cfd6c`) split the
+  16.67 ms frame as `Emulate 12.3 / Draw 4.1` and, after the renderer moved,
+  `Emulate 7.58 / Draw 9.08`. Ruby measures 73,266 cycles here, so the M7 is spending
+  ~103–168 ns per emulated GBA cycle — and whatever Draw leaves is what the CPU gets. Back
+  out the arithmetic and the real budget is **roughly 73k–121k cycles, not 160k**, and it
+  moves with the player's scaling/filter setting because that is what Draw costs. Every
+  "within budget" verdict in this repo is optimistic by something like 1.3–2.2×. Pin the
+  number by timing ONE known game on the device before trusting any of them.
+- **The measurements describe what the bot reached.** It presses START/A/B, the d-pad and
+  the shoulders, and gets through intros and early play — not a Pokémon battle, not a
+  late-game boss. The p90 column is the honest warning: several games already touch a full
+  frame in the window we sampled.
 - **The RAM figures in §4 are static arithmetic**, not a link. The linker's `ASSERT` is the
   only authority.
 - **`verify_tier: B` entries are guesses.** They are addresses found by rescanning near a

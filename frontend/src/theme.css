@@ -597,6 +597,35 @@ body::before {
 /* Not measured — its idle loop was never found, so the wait got counted as work. Grey,
    deliberately: red would say "heavy game", and that is exactly what this is NOT. */
 .cover-corner:has(.idle-tag.unknown) { background: #4a4a55e6; color: #e6e6ee; }
+/* The measured card: two small rings — CPU load, and what the idle skip took back.
+   MUST sit after the .cover-corner:has(.idle-tag) rules above, which paint the corner a
+   solid green/amber/red pill. Here the colour belongs to the rings, over a translucent
+   backdrop that lets the cover through; same specificity, so the order is what decides.
+   (theme.css has bitten us on exactly this before.) */
+.cover-corner:has(.idle-tag.gauge) {
+  background: #101018b3;
+  backdrop-filter: blur(4px);
+  color: #d6d6e2;
+  padding: 2px 4px;
+  box-shadow: 0 1px 3px #00000059;
+}
+.idle-tag.gauge { display: inline-flex; align-items: center; gap: 2px; }
+.idle-tag.gauge > svg { flex: 0 0 auto; opacity: 0.5; }
+.ring-wrap { position: relative; display: inline-flex; }
+/* inset:0 with its own centring — an absolutely-positioned child does not inherit the
+   parent's, and without it the number sits off to one side of its ring. */
+.ring-wrap b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 6.5px; font-weight: 800; letter-spacing: -0.3px;
+}
+.load-ring .track { stroke: #ffffff24; }
+.load-ring .fill { stroke: #35c46a; }
+.load-ring.tight .fill { stroke: #e0a72c; }
+/* Over budget the ring closes solid red: by how much stops mattering — it does not fit. */
+.load-ring.over .fill { stroke: #d94b3f; }
+.load-ring.over .track { stroke: #d94b3f47; }
+.load-ring.skip .fill { stroke: #62c8f5; }
+
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
   line-height: 1; letter-spacing: 0.2px; white-space: nowrap;

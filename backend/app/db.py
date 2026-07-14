@@ -236,6 +236,26 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # against), not the loop's start.
         conn.execute("ALTER TABLE roms ADD COLUMN idle_pc TEXT")
 
+    if "idle_drop" not in cols:
+        # What the skip actually BOUGHT, as measured: the share of the frame's work that
+        # disappears when gpSP is given the address (the A/B drop, 0.0–1.0). exec_cycles
+        # is the game's load with the skip on; this is the part the skip took back — and
+        # it is the difference between ~34fps and 60fps, not a tuning knob. Measured, not
+        # derived: for a game that already halts, most of the frame is idle too, and none
+        # of that idleness is the skip's doing. NULL = no address, so nothing to buy.
+        conn.execute("ALTER TABLE roms ADD COLUMN idle_drop REAL")
+
+    if "idle_hunted" not in cols:
+        # We RAN the game and looked for a wait loop. 1 = looked; the answer, address or
+        # not, is the game's and not the probe's.
+        #
+        # Without this a rom with no address and a full frame of work is ambiguous, and
+        # the UI has to assume the kinder reading ("not measured") — which is right for a
+        # rom we never chased and WRONG for one we did: the Classic NES carts have no wait
+        # loop because they spend the frame emulating a NES. They are simply that heavy,
+        # and saying "not measured" forever would hide it.
+        conn.execute("ALTER TABLE roms ADD COLUMN idle_hunted INTEGER NOT NULL DEFAULT 0")
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by

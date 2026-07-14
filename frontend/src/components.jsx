@@ -74,14 +74,46 @@ const GBA_FRAME_CYCLES = 280896;
 // LOOKS like the heaviest game in the library and actually means "not measured". Say
 // so, rather than libelling a game that is probably fine: Kirby's Japanese release
 // lands here at 176% while the US release of the SAME game measures 45%.
+//
+// `idle_hunted` is what ends that excuse. Once a game has been run and searched, a full
+// frame of work is the GAME's answer, not the probe's — the Classic NES carts have no
+// wait loop because they spend the frame emulating a NES, and calling them "not
+// measured" forever would be hiding a real verdict behind a kinder one.
 function gbaReading(rom) {
   if (rom.system_key !== "gba" || !rom.exec_cycles) return null;
-  const unknown = !rom.idle_pc && rom.exec_cycles >= 0.97 * GBA_FRAME_CYCLES;
+  const unknown = !rom.idle_pc && !rom.idle_hunted
+    && rom.exec_cycles >= 0.97 * GBA_FRAME_CYCLES;
   return {
     unknown,
     load: Math.round((rom.exec_cycles / GBA_CPU_BUDGET) * 100),
     cycles: rom.exec_cycles,
+    // What the idle skip took back, as measured by running the game twice (with the
+    // address and without). Null for a game that has no address: a BIOS-halt game idles
+    // most of its frame too, and none of that idleness is the skip's doing.
+    skip: rom.idle_drop != null ? Math.round(rom.idle_drop * 100) : null,
   };
+}
+
+// A ring, because the number it carries is a fraction and a bar long enough to read
+// would eat the card's width. Fills clockwise from the top. `tone` picks which fraction
+// it is: the CPU load against the device's budget (green → amber → red once it cannot
+// fit), or what the idle skip took back (blue, and always a good thing).
+function Ring({ pct, tone, size = 16 }) {
+  const R = 7.5;
+  const CIRC = 2 * Math.PI * R;
+  const state = tone === "skip" ? "skip" : pct > 100 ? "over" : pct > 80 ? "tight" : "";
+  return (
+    <span className="ring-wrap">
+      <svg className={`load-ring ${state}`} width={size} height={size} viewBox="0 0 20 20" aria-hidden>
+        <circle className="track" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5" />
+        <circle className="fill" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeDasharray={`${(Math.min(pct, 100) / 100) * CIRC} ${CIRC}`}
+          transform="rotate(-90 10 10)" />
+      </svg>
+      <b>{pct}</b>
+    </span>
+  );
 }
 
 export function systemColor(key) {
@@ -1203,7 +1235,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               </em>
             )}
             {gba && !gba.unknown && (
-              <em className={`idle-tag ${gba.load > 100 ? "over" : gba.load > 80 ? "tight" : ""}`}
+              // Two rings, not two pills: the corner has no width to give, and both
+              // numbers are fractions. Left is what the game costs the device, right is
+              // what the idle skip already took off that cost.
+              <em className="idle-tag gauge"
                 title={[
                   gba.load > 100
                     ? t("Too heavy for the real device: {pct}% of the CPU budget it has per frame.", { pct: gba.load })
@@ -1212,13 +1247,22 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     { cycles: gba.cycles.toLocaleString(), frame: "280,896" }),
                   rom.idle_pc
                     ? t("gpSP skips this game's VBlank wait at {pc}.", { pc: rom.idle_pc })
-                    : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
+                    : rom.idle_hunted
+                      ? t("No wait loop exists — we ran the game and looked. The frame goes into real work.")
+                      : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
+                  // What the skip bought, where it bought anything. A BIOS-halt game idles
+                  // most of its frame too, and crediting our table for that would be a lie.
+                  gba.skip != null
+                    ? t("The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.", { pct: gba.skip })
+                    : "",
                   gba.load > 100
                     ? t("Frameskip may still get it there — that frees the PPU's share, not the CPU's.")
                     : "",
                   t("A cycle-budget estimate — never checked on real hardware."),
                 ].filter(Boolean).join("\n")}>
-                {t("CPU {pct}%", { pct: gba.load })}
+                <Gauge size={10} strokeWidth={2.5} aria-hidden />
+                <Ring pct={gba.load} />
+                {gba.skip != null && <Ring pct={gba.skip} tone="skip" />}
               </em>
             )}
           </>

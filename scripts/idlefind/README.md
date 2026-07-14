@@ -62,6 +62,65 @@ Keep the address only if `exec_median` **measurably drops** (we require ≥15%).
 the address is not the wait loop, and gpSP fed it would be cutting the frame short somewhere
 arbitrary.
 
+## When the detector has no answer: ask the frame where its cycles went
+
+mGBA only records a loop it can **prove** is idle — it re-walks the body and gives up if
+anything in there has a side effect, and it wants the same jump target twice in a row
+(`memory.c:263`). Plenty of real wait loops fail that. Super Mario Advance's hops three
+times before it comes back:
+
+```
+0x8001cde  poll the flag the VBlank IRQ sets
+0x8001cf2  beq  #0x8001cfc      <- the PC libretro and ReGBA both ship
+0x8001cfc  b    #0x8001cbc
+0x8001cbc  b    #0x8001cde
+```
+
+The detector never sees it, so the game spins, and the probe reports a full frame and
+calls a perfectly fine game heavy. **97 roms sat in that hole.** gpSP would have skipped
+it happily — `cpu.cc:3063` is a bare PC compare, run after *every* instruction.
+
+So `idlefind3` stops asking the detector and asks the frame instead. `gIdleFindPcHist`
+(patched into `src/arm/arm.c`) charges every executed cycle to the PC that spent it. A
+game that is waiting spends the frame in the wait — that is what waiting *is* — so the
+loop is at the top of that list, and `hunt.py` forces each of the hottest 20 addresses in
+turn. If it is a landing point of the wait, mGBA halts there and the work collapses; if
+not, nothing happens. The A/B answers, not the ranking.
+
+Three things this had to learn the hard way:
+
+- **The loop is not always in ROM.** The Classic NES / Famicom Mini / Hudson carts are
+  emulators: they copy their core into RAM and run it there, and a ROM-only histogram
+  sees 0.1% of the frame. The histogram covers EWRAM and IWRAM, and `idlefind3` dumps the
+  bytes at each hot pc from the emulated bus — the disassembler cannot read RAM code off
+  the rom file. Three shipped addresses are RAM addresses.
+- **Do not guess the loop's shape.** Reading a "body + backward branch" out of the hot run
+  missed Super Mario Advance twice: the lowest hot address was the jump that *enters* the
+  loop, and starting a Thumb disassembly there put the decoder out of phase so the rest
+  read as garbage. Forcing each hot address needs no shape at all.
+- **A hot loop is not always a wait.** Skipping a blit loop also "drops" the cycles — by
+  strangling the game. See below.
+
+## What proves a forced address is safe
+
+The detector used to be the safety net: it only handed us loops it had proven had no side
+effects. Force an address yourself and you get no such promise, so take the proof from the
+emulator instead. mGBA is deterministic — same rom, same input, same frames — and an idle
+skip only removes *waiting*. So a correct address must leave the game drawing what it drew
+before. Four outcomes, and only the first two ship:
+
+| | drop | 화면 | |
+|---|---|---|---|
+| Kurukuru Kururin (알던 답) | 74% | 프레임 시퀀스 100% 동일 | ship |
+| Final Fight One | 73% | 화면 집합 99.6% 공유 | ship |
+| Bomberman Max 2 | 60% | 화면의 **절반이 다른 화면** | reject |
+| Gunstar Super Heroes (`0x300041c`) | 99.6% | distinct 855 → **1** (얼어붙음) | reject |
+
+Frame-for-frame equality alone was **too strict** and threw Final Fight One away: it
+differs on a couple of frames out of 1200 because the halt lands on the event boundary a
+touch differently. The test that holds is the **set of screens the game reached** (≥97%
+shared). Bomberman does not shift — it diverges — and Gunstar simply dies.
+
 ## Other things that bit us
 
 - **Match roms on the cart HEADER, never the filename.** The library renames files, so a name
@@ -99,7 +158,8 @@ call:
 F=build/CMakeFiles/mgba.dir/flags.make
 grep '^C_DEFINES'  "$F" | sed 's/^C_DEFINES *= *//'  > defs.rsp
 grep '^C_INCLUDES' "$F" | sed 's/^C_INCLUDES *= *//' > incs.rsp
-gcc -O2 @defs.rsp @incs.rsp -o idlefind idlefind.c build/libmgba.a -lz -lpng -lm -lpthread -ldl
+gcc -O2 @defs.rsp @incs.rsp -o idlefind  idlefind.c  build/libmgba.a -lz -lpng -lm -lpthread -ldl
+gcc -O2 @defs.rsp @incs.rsp -o idlefind3 idlefind3.c build/libmgba.a -lz -lpng -lm -lpthread -ldl
 gcc -O2 @defs.rsp @incs.rsp -o shot     shot.c     build/libmgba.a -lz -lpng -lm -lpthread -ldl
 ```
 
@@ -118,6 +178,26 @@ python3 idlefind.py ./idlefind /path/to/roms 1800 > out.json
 # render a frame — the only way to tell a Korean patch from the original
 ./shot rom.gba 900 out.png
 ```
+
+When the detector comes back empty, hunt (`idlefind3` + `hunt.py`):
+
+```bash
+# where did the frame's cycles go? (skip disabled, so the spin is included)
+./idlefind3 rom.gba 1500 0x8FFFFFE        # -> exec, seq, hot[], mem{}
+
+# force a candidate and compare: the drop AND the screens
+IDLEFIND_HASHES=1 ./idlefind3 rom.gba 1500 0x8001cde
+
+# the whole job: force the hottest addresses in turn, keep the one that proves itself.
+# TODO takes [{"code": "AMZE"}, ...] — the CART HEADER, never the filename.
+python3 hunt.py ./idlefind3 /path/to/roms todo.json out.json
+```
+
+One caution the numbers hide: a game can look light only because **mGBA's own detector**
+found and skipped a loop we cannot hand to gpSP. On the device that game spins. Guilty
+Gear X measured 16k that way and was really 280k until its address was found — so a rom
+with no shippable address must be re-measured with the skip OFF (`0x8FFFFFE`), which is
+what it will actually cost.
 
 mGBA records the loop's **start**; gpSP's `gba_over.h` keys on the **backward branch** that
 closes it (that is the PC `cpu.cc` compares against). `idlefind.py` disassembles forward from

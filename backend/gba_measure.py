@@ -33,6 +33,10 @@ def game_code(path: Path) -> str | None:
 
 
 def main() -> None:
+    # The schema is migrated on app startup, and this script does not go through it — so
+    # a run right after a new column is added would fail on a column the app would have
+    # created. Ask for it here; init_db is idempotent.
+    db.init_db()
     table = {r["game_code"]: r for r in json.loads(DB_PATH.read_text(encoding="utf-8"))}
     root = storage.session_root(SESSION)
 
@@ -59,9 +63,12 @@ def main() -> None:
             idle = 1 if entry.get("verify_tier") == "R" else 0
             conn.execute(
                 "UPDATE roms SET idle_loop = ?, idle_pc = ?, exec_cycles = ?, "
-                "probe_status = 'ok' WHERE id = ?",
+                "idle_drop = ?, idle_hunted = ?, probe_status = 'ok' WHERE id = ?",
                 (idle, entry.get("idle_verified") if idle else None,
-                 entry["exec_median"], row["id"]),
+                 entry["exec_median"],
+                 entry.get("idle_drop") if idle else None,
+                 1 if entry.get("idle_hunted") else 0,
+                 row["id"]),
             )
             updated += 1
 

@@ -74,8 +74,11 @@ def verdict(row: dict) -> str:
 
 def emit_h(rows: list[dict]) -> None:
     print("/* gpSP idle-loop entries, measured by RUNNING each rom (scripts/idlefind).")
-    print(" * idle_loop_target_pc is the backward BRANCH — the PC gpSP compares against")
-    print(" * in cpu.cc — not the loop's start, which is what mGBA reports.")
+    print(" * idle_loop_target_pc is the PC gpSP ends the frame slice at: the backward")
+    print(" * branch that closes the wait loop, or — where the loop hops rather than")
+    print(" * branching straight back — a landing point inside it. cpu.cc:3063 compares")
+    print(" * reg[REG_PC] after every instruction, so either does the job, and so does an")
+    print(" * address in IWRAM/EWRAM (an emulator-cart runs its wait from RAM).")
     print(" *")
     print(f" * exec = real CPU work per frame with the skip active, out of {FRAME_CYCLES:,}.")
     print(f" * The M7 leaves the CPU roughly {CPU_BUDGET:,} cycles at a 340MHz OC.")
@@ -86,8 +89,19 @@ def emit_h(rows: list[dict]) -> None:
         idle_pct = round(100 * (1 - med / FRAME_CYCLES))
         if not pc:
             print(f"   /* {row['game_code']}  {title_of(row)}")
-            print(f"    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP")
-            print(f"    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.")
+            if med <= CPU_BUDGET:
+                print( "    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP")
+                print( "    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.")
+            elif row.get("idle_hunted"):
+                # Hunted and came up empty. Saying "no entry needed" here would read as
+                # "it is fine", and it is not: there is no wait to skip because the game
+                # is working the whole frame. An emulator-cart (Classic NES, Hudson) is
+                # the clearest case — it spends the frame emulating a NES.
+                print( "    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes")
+                print( "    * into real work, so no address would make this lighter — it is this heavy.")
+            else:
+                print( "    * NOT MEASURED — its wait loop was never found, so the spin got counted as")
+                print( "    * work. The number below is the probe's failure, not the game's weight.")
             print(f"    * exec {med:,}/{FRAME_CYCLES:,} ({idle_pct}% idle) — {verdict(row)}")
             print("    */")
             print()
@@ -129,7 +143,14 @@ def emit_c(rows: list[dict]) -> None:
     print()
     print("typedef struct {")
     print("    char code[5];      // the 4 chars at rom[0xAC]")
-    print("    uint32_t pc;       // the backward branch that closes the wait loop")
+    print("    // The PC gpSP ends the frame slice at. Usually the backward branch that")
+    print("    // closes the wait loop; where the loop hops instead of branching straight")
+    print("    // back (Super Mario Advance takes three hops), a landing point inside it.")
+    print("    // Either works: cpu.cc:3063 compares reg[REG_PC] after EVERY instruction,")
+    print("    // so any address the loop runs on every iteration ends the slice. That is")
+    print("    // also why a few of these are in IWRAM/EWRAM (0x02.../0x03...) rather than")
+    print("    // ROM — an emulator-cart copies its core into RAM and waits there.")
+    print("    uint32_t pc;")
     print("    uint32_t exec;     // measured CPU cycles/frame, of 280896, with the skip on")
     print("} gba_idle_entry_t;")
     print()

@@ -10,11 +10,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "아토믹스F (Atomix)",
-  "exec_median": 280644,
-  "exec_p90": 280668,
-  "verify_how": "sweep",
+  "exec_median": 280646,
+  "exec_p90": 280669,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "2G0P",
@@ -85,11 +86,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "미키와 미니의 매지컬퀘스트2",
-  "exec_median": 280682,
-  "exec_p90": 280691,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 67600,
+  "exec_p90": 95154,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8006a9e",
+  "idle_drop": 0.759
  },
  {
   "game_code": "A2CJ",
@@ -119,11 +123,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "다리우스 R",
-  "exec_median": 279944,
-  "exec_p90": 280346,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 21668,
+  "exec_p90": 168737,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8001b0e",
+  "idle_drop": 0.922
  },
  {
   "game_code": "A2GE",
@@ -255,7 +262,8 @@
   "verify_how": "A/B: 72% less work with the address",
   "idle_verified": "0x801601e",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.721
  },
  {
   "game_code": "A3AE",
@@ -285,7 +293,8 @@
   "exec_median": 173660,
   "exec_p90": 205773,
   "verify_how": "A/B: 38% less work with the address",
-  "lib_name": "슈퍼마리오 요시아일랜드 (Super Mario Advance 3 - Yoshi's Island + Mario Brothers)"
+  "lib_name": "슈퍼마리오 요시아일랜드 (Super Mario Advance 3 - Yoshi's Island + Mario Brothers)",
+  "idle_drop": 0.38
  },
  {
   "game_code": "A3AP",
@@ -315,7 +324,8 @@
   "verify_how": "A/B: 94% less work with the address",
   "idle_verified": "0x8016234",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.939
  },
  {
   "game_code": "A3GJ",
@@ -328,11 +338,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "역전재판 2 (Gyakuten Saiban 2)",
-  "exec_median": 271470,
-  "exec_p90": 277619,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 47884,
+  "exec_p90": 60449,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000262",
+  "idle_drop": 0.824
  },
  {
   "game_code": "A3KE",
@@ -510,7 +523,8 @@
   "verify_how": "A/B: 63% less work with the address",
   "idle_verified": "0x8000434",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.629
  },
  {
   "game_code": "A5NE",
@@ -591,7 +605,8 @@
   "exec_median": 124222,
   "exec_p90": 201290,
   "verify_how": "A/B: 55% less work with the address",
-  "lib_name": "록맨 제로 2 (Megaman Zero 2)"
+  "lib_name": "록맨 제로 2 (Megaman Zero 2)",
+  "idle_drop": 0.546
  },
  {
   "game_code": "A62P",
@@ -645,7 +660,8 @@
   "verify_how": "A/B: 56% less work with the address",
   "idle_verified": "0x8000424",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.565
  },
  {
   "game_code": "A6DP",
@@ -663,7 +679,8 @@
   "verify_how": "A/B: 57% less work with the address",
   "idle_verified": "0x8000424",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.567
  },
  {
   "game_code": "A6OJ",
@@ -693,11 +710,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (4)",
-  "exec_median": 182190,
-  "exec_p90": 280899,
-  "verify_how": "sweep",
+  "exec_median": 170321,
+  "exec_p90": 280898,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "A7AJ",
@@ -732,7 +750,8 @@
   "exec_median": 70574,
   "exec_p90": 95396,
   "verify_how": "A/B: 75% less work with the address",
-  "lib_name": "별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land)"
+  "lib_name": "별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land)",
+  "idle_drop": 0.748
  },
  {
   "game_code": "A7KJ",
@@ -1045,7 +1064,8 @@
   "verify_how": "A/B: 76% less work with the address",
   "idle_verified": "0x8000234",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.757
  },
  {
   "game_code": "A9TJ",
@@ -1058,11 +1078,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "메탈맥스 2 카이 (Metal Max 2 Kai)",
-  "exec_median": 279363,
-  "exec_p90": 280756,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 131741,
+  "exec_p90": 280310,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80671e0",
+  "idle_drop": 0.528
  },
  {
   "game_code": "AA2C",
@@ -1080,7 +1103,8 @@
   "exec_median": 137516,
   "exec_p90": 280695,
   "verify_how": "A/B: 51% less work with the address",
-  "lib_name": "슈퍼마리오월드"
+  "lib_name": "슈퍼마리오월드",
+  "idle_drop": 0.51
  },
  {
   "game_code": "AA2E",
@@ -1151,7 +1175,8 @@
   "exec_median": 76369,
   "exec_p90": 153710,
   "verify_how": "A/B: 73% less work with the address",
-  "lib_name": "캐슬바니아 - 서클 오브 더 문"
+  "lib_name": "캐슬바니아 - 서클 오브 더 문",
+  "idle_drop": 0.727
  },
  {
   "game_code": "AAMP",
@@ -1426,7 +1451,8 @@
   "verify_how": "A/B: 78% less work with the address",
   "idle_verified": "0x8047038",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.778
  },
  {
   "game_code": "ABSE",
@@ -1456,7 +1482,8 @@
   "verify_how": "A/B: 90% less work with the address",
   "idle_verified": "0x80596ce",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.903
  },
  {
   "game_code": "ABUE",
@@ -1474,7 +1501,8 @@
   "verify_how": "A/B: 66% less work with the address",
   "idle_verified": "0x8004cbe",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.664
  },
  {
   "game_code": "AC2J",
@@ -1572,7 +1600,8 @@
   "verify_how": "A/B: 78% less work with the address",
   "idle_verified": "0x8000522",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.779
  },
  {
   "game_code": "ACQE",
@@ -1602,11 +1631,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "츄츄로켓",
-  "exec_median": 280894,
+  "exec_median": 280719,
   "exec_p90": 280894,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "ACVE",
@@ -1711,11 +1741,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "듀크 뉴켐 어드밴스 (Duke Nukem Advance)",
-  "exec_median": 279641,
-  "exec_p90": 280844,
-  "verify_how": "sweep",
+  "exec_median": 70082,
+  "exec_p90": 280589,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "ADEJ",
@@ -1820,7 +1851,8 @@
   "exec_median": 6134,
   "exec_p90": 279984,
   "verify_how": "A/B: 98% less work with the address",
-  "lib_name": "도날드덕 어드밴스"
+  "lib_name": "도날드덕 어드밴스",
+  "idle_drop": 0.978
  },
  {
   "game_code": "ADME",
@@ -1855,7 +1887,8 @@
   "verify_how": "A/B: 70% less work with the address",
   "idle_verified": "0x8000470",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.697
  },
  {
   "game_code": "ADZE",
@@ -1948,7 +1981,8 @@
   "verify_how": "A/B: 52% less work with the address",
   "idle_verified": "0x8002df2",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.515
  },
  {
   "game_code": "AEMP",
@@ -1966,7 +2000,8 @@
   "verify_how": "A/B: 51% less work with the address",
   "idle_verified": "0x80031b6",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.512
  },
  {
   "game_code": "AEWJ",
@@ -1979,11 +2014,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "위닝일레븐",
-  "exec_median": 280317,
-  "exec_p90": 280326,
-  "verify_how": "sweep",
+  "exec_median": 280325,
+  "exec_p90": 280904,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AEXE",
@@ -2093,11 +2129,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "파이널 파이트 원 (Final Fight One)",
-  "exec_median": 280642,
-  "exec_p90": 280647,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 76363,
+  "exec_p90": 121430,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8005e08",
+  "idle_drop": 0.728
  },
  {
   "game_code": "AFFP",
@@ -2156,7 +2195,8 @@
   "exec_median": 116375,
   "exec_p90": 280289,
   "verify_how": "A/B: 58% less work with the address",
-  "lib_name": "파이널 판타지 택틱스 어드밴스 (Final Fantasy Tactics Advance)"
+  "lib_name": "파이널 판타지 택틱스 어드밴스 (Final Fantasy Tactics Advance)",
+  "idle_drop": 0.584
  },
  {
   "game_code": "AFXP",
@@ -2186,7 +2226,8 @@
   "lib_name": "지쑤 F-ZERO 웨이라이 사이체 (Jisu F-Zero Weilai Saiche)",
   "exec_median": 73351,
   "exec_p90": 280896,
-  "verify_how": "A/B: 74% less work with the address"
+  "verify_how": "A/B: 74% less work with the address",
+  "idle_drop": 0.737
  },
  {
   "game_code": "AFZE",
@@ -2204,7 +2245,8 @@
   "exec_median": 59738,
   "exec_p90": 71577,
   "verify_how": "A/B: 78% less work with the address",
-  "lib_name": "F-제로 맥시멈 벨로시티 (F-Zero - Maximum Velocity)"
+  "lib_name": "F-제로 맥시멈 벨로시티 (F-Zero - Maximum Velocity)",
+  "idle_drop": 0.785
  },
  {
   "game_code": "AFZJ",
@@ -2222,7 +2264,8 @@
   "lib_name": "에프제로 (F-Zero for Game Boy Advance)",
   "exec_median": 59709,
   "exec_p90": 70289,
-  "verify_how": "A/B: 78% less work with the address"
+  "verify_how": "A/B: 78% less work with the address",
+  "idle_drop": 0.785
  },
  {
   "game_code": "AG4E",
@@ -2291,7 +2334,8 @@
   "verify_how": "A/B: 70% less work with the address",
   "idle_verified": "0x8064694",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.704
  },
  {
   "game_code": "AGAE",
@@ -2309,7 +2353,8 @@
   "exec_median": 94167,
   "exec_p90": 277889,
   "verify_how": "A/B: 66% less work with the address",
-  "lib_name": "그라디우스 갤럭시즈 (Gradius Galaxies)"
+  "lib_name": "그라디우스 갤럭시즈 (Gradius Galaxies)",
+  "idle_drop": 0.661
  },
  {
   "game_code": "AGAJ",
@@ -2324,9 +2369,10 @@
   "has_idle": false,
   "verify_tier": null,
   "lib_name": "그라디우스 제네레이션 (Gradius Generation)",
-  "exec_median": 277753,
-  "exec_p90": 277887,
-  "verify_how": "sweep"
+  "exec_median": 277880,
+  "exec_p90": 277889,
+  "verify_how": "hunt: no wait loop exists",
+  "idle_hunted": true
  },
  {
   "game_code": "AGAP",
@@ -2341,9 +2387,10 @@
   "conflict": false,
   "verify_tier": null,
   "lib_name": "그라디우스 제네레이션",
-  "exec_median": 277756,
-  "exec_p90": 277891,
-  "verify_how": "sweep"
+  "exec_median": 277885,
+  "exec_p90": 277893,
+  "verify_how": "hunt: no wait loop exists",
+  "idle_hunted": true
  },
  {
   "game_code": "AGBJ",
@@ -2424,7 +2471,8 @@
   "exec_median": 90148,
   "exec_p90": 216073,
   "verify_how": "A/B: 67% less work with the address",
-  "lib_name": "황금의 태양 2 - 잃어버린 시대 (Ougon no Taiyou - Ushinawareshi Toki)"
+  "lib_name": "황금의 태양 2 - 잃어버린 시대 (Ougon no Taiyou - Ushinawareshi Toki)",
+  "idle_drop": 0.671
  },
  {
   "game_code": "AGFS",
@@ -2471,7 +2519,8 @@
   "verify_how": "A/B: 96% less work with the address",
   "idle_verified": "0x8072f52",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.962
  },
  {
   "game_code": "AGNJ",
@@ -2506,7 +2555,8 @@
   "verify_how": "A/B: 57% less work with the address",
   "idle_verified": "0x802a7da",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.568
  },
  {
   "game_code": "AGSA",
@@ -2633,11 +2683,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "길티 기어 X 어드밴스 에디션 (Guilty Gear X - Advance Edition)",
-  "exec_median": 280778,
-  "exec_p90": 280789,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 16497,
+  "exec_p90": 280786,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000332",
+  "idle_drop": 0.941
  },
  {
   "game_code": "AGXJ",
@@ -2650,11 +2703,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "길티기어X - 어드밴스 에디션t1]",
-  "exec_median": 280782,
-  "exec_p90": 280790,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 61423,
+  "exec_p90": 280789,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000332",
+  "idle_drop": 0.781
  },
  {
   "game_code": "AHKJ",
@@ -2776,11 +2832,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "이리디온II",
-  "exec_median": 280454,
+  "exec_median": 280670,
   "exec_p90": 280674,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AI3E",
@@ -2793,11 +2850,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "이리디온3D",
-  "exec_median": 280263,
+  "exec_median": 280264,
   "exec_p90": 280896,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AIDE",
@@ -2832,7 +2890,8 @@
   "verify_how": "A/B: 16% less work with the address",
   "idle_verified": "0x802cea4",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.164
  },
  {
   "game_code": "AIFE",
@@ -2864,9 +2923,10 @@
   "lib_name": "인터네셔날 가라데 어드밴스",
   "exec_median": 280896,
   "exec_p90": 280905,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AINJ",
@@ -2879,11 +2939,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "이니셜D 어나더 스테이지 (Initial D - Another Stage)",
-  "exec_median": 280688,
-  "exec_p90": 280701,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 10204,
+  "exec_p90": 13527,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000400",
+  "idle_drop": 0.964
  },
  {
   "game_code": "AIOE",
@@ -3083,11 +3146,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "타잔 - 정글로 돌아오다",
-  "exec_median": 275714,
-  "exec_p90": 280567,
-  "verify_how": "sweep",
+  "exec_median": 278607,
+  "exec_p90": 280565,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AJKJ",
@@ -3105,7 +3169,8 @@
   "verify_how": "A/B: 78% less work with the address",
   "idle_verified": "0x80003d8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.784
  },
  {
   "game_code": "AJOJ",
@@ -3135,7 +3200,8 @@
   "verify_how": "A/B: 74% less work with the address",
   "idle_verified": "0x8002226",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.742
  },
  {
   "game_code": "AK2E",
@@ -3323,7 +3389,8 @@
   "verify_how": "A/B: 80% less work with the address",
   "idle_verified": "0x8000422",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.805
  },
  {
   "game_code": "AKRP",
@@ -3341,7 +3408,8 @@
   "verify_how": "A/B: 80% less work with the address",
   "idle_verified": "0x8000422",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.804
  },
  {
   "game_code": "AKUJ",
@@ -3393,7 +3461,8 @@
   "verify_how": "A/B: 60% less work with the address",
   "idle_verified": "0x8000422",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.603
  },
  {
   "game_code": "AKWJ",
@@ -3411,7 +3480,8 @@
   "verify_how": "A/B: 60% less work with the address",
   "idle_verified": "0x8000422",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.595
  },
  {
   "game_code": "AKYJ",
@@ -3429,7 +3499,8 @@
   "verify_how": "A/B: 75% less work with the address",
   "idle_verified": "0x80042dc",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.752
  },
  {
   "game_code": "AKZJ",
@@ -3552,10 +3623,11 @@
   "conflict": false,
   "lib_name": "디즈니 헌티드 맨션 (Haunted Mansion, The)",
   "exec_median": 244034,
-  "exec_p90": 280349,
-  "verify_how": "sweep",
+  "exec_p90": 280340,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "ALNE",
@@ -3602,11 +3674,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "모토GP (MotoGP)",
-  "exec_median": 186593,
+  "exec_median": 69764,
   "exec_p90": 280895,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AM4P",
@@ -3641,7 +3714,8 @@
   "verify_how": "A/B: 94% less work with the address",
   "idle_verified": "0x8000598",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.942
  },
  {
   "game_code": "AM8E",
@@ -3719,11 +3793,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "봄버맨MAX2",
-  "exec_median": 271668,
-  "exec_p90": 279985,
-  "verify_how": "sweep",
+  "exec_median": 271677,
+  "exec_p90": 279986,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AMKE",
@@ -3775,7 +3850,8 @@
   "verify_how": "A/B: 78% less work with the address",
   "idle_verified": "0x80052a2",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.778
  },
  {
   "game_code": "AMRE",
@@ -3856,11 +3932,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "머펫 핀볼 메이헴 (Muppet Pinball Mayhem)",
-  "exec_median": 280432,
+  "exec_median": 280431,
   "exec_p90": 280440,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AMXD",
@@ -3905,13 +3982,16 @@
   "idle_regba": "0x8001cf2",
   "flags": "0",
   "iwram_opt": "",
-  "has_idle": false,
+  "has_idle": true,
   "conflict": false,
   "lib_name": "슈퍼마리오USA",
-  "exec_median": 279959,
-  "exec_p90": 280199,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 89918,
+  "exec_p90": 105557,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "idle_hunted": true,
+  "idle_verified": "0x8001cfc",
+  "idle_drop": 0.679
  },
  {
   "game_code": "AN5J",
@@ -4050,7 +4130,8 @@
   "verify_how": "A/B: 62% less work with the address",
   "idle_verified": "0x8007ee8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.617
  },
  {
   "game_code": "ANME",
@@ -4172,11 +4253,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "원피스 - 일곱섬의 대보물 (One Piece - Ilgop Seomui Debomool)",
-  "exec_median": 240477,
-  "exec_p90": 241153,
-  "verify_how": "sweep",
+  "exec_median": 213831,
+  "exec_p90": 280689,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AOEE",
@@ -4296,7 +4378,8 @@
   "exec_median": 25802,
   "exec_p90": 106378,
   "verify_how": "A/B: 91% less work with the address",
-  "lib_name": "핀볼 오브 데드 (Pinball of the Dead, The)"
+  "lib_name": "핀볼 오브 데드 (Pinball of the Dead, The)",
+  "idle_drop": 0.907
  },
  {
   "game_code": "APDP",
@@ -4326,7 +4409,8 @@
   "verify_how": "A/B: 89% less work with the address",
   "idle_verified": "0x801e40e",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.889
  },
  {
   "game_code": "APLP",
@@ -4344,7 +4428,8 @@
   "exec_median": 68413,
   "exec_p90": 127128,
   "verify_how": "A/B: 76% less work with the address",
-  "lib_name": "핀볼 챌린지 디럭스 (Pinball Challenge Deluxe)"
+  "lib_name": "핀볼 챌린지 디럭스 (Pinball Challenge Deluxe)",
+  "idle_drop": 0.755
  },
  {
   "game_code": "APRE",
@@ -4425,11 +4510,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "핀볼 어드밴스 (Pinball Advance)",
-  "exec_median": 271077,
-  "exec_p90": 271105,
-  "verify_how": "sweep",
+  "exec_median": 271091,
+  "exec_p90": 279614,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AQ2J",
@@ -4447,7 +4533,8 @@
   "verify_how": "A/B: 87% less work with the address",
   "idle_verified": "0x8000c14",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.867
  },
  {
   "game_code": "AQAE",
@@ -4540,7 +4627,8 @@
   "verify_how": "A/B: 77% less work with the address",
   "idle_verified": "0x8005b36",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.766
  },
  {
   "game_code": "AR7J",
@@ -4553,11 +4641,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "어드밴스랠리 (Advance Rally)",
-  "exec_median": 190399,
-  "exec_p90": 227815,
-  "verify_how": "sweep",
+  "exec_median": 88018,
+  "exec_p90": 115823,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AR8E",
@@ -4604,7 +4693,8 @@
   "exec_median": 106473,
   "exec_p90": 112014,
   "verify_how": "A/B: 60% less work with the address",
-  "lib_name": "록맨 에그제"
+  "lib_name": "록맨 에그제",
+  "idle_drop": 0.604
  },
  {
   "game_code": "AREP",
@@ -4709,7 +4799,8 @@
   "exec_median": 94981,
   "exec_p90": 138224,
   "verify_how": "A/B: 65% less work with the address",
-  "lib_name": "록맨 제로 1 (Megaman Zero 1)"
+  "lib_name": "록맨 제로 1 (Megaman Zero 1)",
+  "idle_drop": 0.653
  },
  {
   "game_code": "AS8E",
@@ -4722,11 +4813,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "스타X",
-  "exec_median": 194855,
-  "exec_p90": 279619,
-  "verify_how": "sweep",
+  "exec_median": 173816,
+  "exec_p90": 279620,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "ASBJ",
@@ -4739,11 +4831,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "역전재판",
-  "exec_median": 271376,
-  "exec_p90": 277521,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 24249,
+  "exec_p90": 44271,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000252",
+  "idle_drop": 0.911
  },
  {
   "game_code": "ASHJ",
@@ -4761,7 +4856,8 @@
   "verify_how": "A/B: 96% less work with the address",
   "idle_verified": "0x80130a8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.963
  },
  {
   "game_code": "ASMJ",
@@ -4808,7 +4904,8 @@
   "verify_how": "A/B: 54% less work with the address",
   "idle_verified": "0x80003ec",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.541
  },
  {
   "game_code": "ASTJ",
@@ -4821,11 +4918,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "전설의 스타피 (Densetsu no Stafy)",
-  "exec_median": 202888,
-  "exec_p90": 243742,
-  "verify_how": "sweep",
+  "exec_median": 191020,
+  "exec_p90": 239026,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "ASWE",
@@ -4843,7 +4941,8 @@
   "verify_how": "A/B: 87% less work with the address",
   "idle_verified": "0x80001da",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.871
  },
  {
   "game_code": "ASXJ",
@@ -4963,7 +5062,8 @@
   "verify_how": "A/B: 51% less work with the address",
   "idle_verified": "0x800074a",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.511
  },
  {
   "game_code": "ATKJ",
@@ -4981,7 +5081,8 @@
   "verify_how": "A/B: 55% less work with the address",
   "idle_verified": "0x800074a",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.549
  },
  {
   "game_code": "ATOJ",
@@ -4994,11 +5095,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "택틱스 오우거 외전 - 로디스의 기사",
-  "exec_median": 274887,
-  "exec_p90": 277158,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 63938,
+  "exec_p90": 201041,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000590",
+  "idle_drop": 0.769
  },
  {
   "game_code": "ATTP",
@@ -5074,7 +5178,8 @@
   "verify_how": "A/B: 85% less work with the address",
   "idle_verified": "0x800f272",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.85
  },
  {
   "game_code": "AUYJ",
@@ -5104,11 +5209,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "콜벳 50주년",
-  "exec_median": 268909,
-  "exec_p90": 280890,
-  "verify_how": "sweep",
+  "exec_median": 216091,
+  "exec_p90": 280676,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AVDJ",
@@ -5121,11 +5227,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "다이나믹 전설 호성전 붕괴의 론도 (Legend of Dynamic - Goushouden - Houkai no Rondo)",
-  "exec_median": 267059,
-  "exec_p90": 280410,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 86052,
+  "exec_p90": 273394,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x800097e",
+  "idle_drop": 0.677
  },
  {
   "game_code": "AVEE",
@@ -5172,11 +5281,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "전설의 스타피2",
-  "exec_median": 163189,
-  "exec_p90": 244657,
-  "verify_how": "sweep",
+  "exec_median": 150996,
+  "exec_p90": 236618,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AVKE",
@@ -5218,7 +5328,8 @@
   "verify_how": "A/B: 79% less work with the address",
   "idle_verified": "0x80065a8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.791
  },
  {
   "game_code": "AVPP",
@@ -5248,11 +5359,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "V랠리3 (V-Rally 3)",
-  "exec_median": 280564,
-  "exec_p90": 280576,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 90801,
+  "exec_p90": 280573,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80abc64",
+  "idle_drop": 0.676
  },
  {
   "game_code": "AVRP",
@@ -5311,11 +5425,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼 버블 팝 (Super Bubble Pop)",
-  "exec_median": 280173,
-  "exec_p90": 280682,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 148559,
+  "exec_p90": 174761,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8013cb4",
+  "idle_drop": 0.47
  },
  {
   "game_code": "AW2E",
@@ -5386,11 +5503,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "웨이크보딩 (Wakeboarding Unleashed Featuring Shaun Murray)",
-  "exec_median": 280564,
+  "exec_median": 280565,
   "exec_p90": 280897,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AWIJ",
@@ -5437,11 +5555,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "울펜슈타인3D",
-  "exec_median": 254944,
+  "exec_median": 264456,
   "exec_p90": 280430,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AWRE",
@@ -5483,7 +5602,8 @@
   "verify_how": "A/B: 87% less work with the address",
   "idle_verified": "0x80027f4",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.873
  },
  {
   "game_code": "AWVE",
@@ -5547,7 +5667,8 @@
   "exec_median": 139692,
   "exec_p90": 280894,
   "verify_how": "A/B: 50% less work with the address",
-  "lib_name": "슈퍼마리오 브라더스3 (Super Mario Advance 4 - Super Mario 3 + Mario Brothers)"
+  "lib_name": "슈퍼마리오 브라더스3 (Super Mario Advance 4 - Super Mario 3 + Mario Brothers)",
+  "idle_drop": 0.502
  },
  {
   "game_code": "AX4P",
@@ -5572,11 +5693,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "블랙 매트리스 제로",
-  "exec_median": 280578,
-  "exec_p90": 280607,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 96870,
+  "exec_p90": 280085,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000372",
+  "idle_drop": 0.655
  },
  {
   "game_code": "AXHJ",
@@ -5606,11 +5730,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "엑스맨 - Reign of Apocalypse",
-  "exec_median": 280886,
-  "exec_p90": 280897,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 9734,
+  "exec_p90": 280896,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8007f74",
+  "idle_drop": 0.965
  },
  {
   "game_code": "AXPD",
@@ -5714,11 +5841,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼 스트리트 파이터 2X 리바이벌 (Super Street Fighter II Turbo - Revival)",
-  "exec_median": 178986,
-  "exec_p90": 245459,
-  "verify_how": "sweep",
+  "exec_median": 111228,
+  "exec_p90": 204849,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AXRJ",
@@ -5731,11 +5859,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼 스트리트파이터IIX - 리바이벌",
-  "exec_median": 183030,
-  "exec_p90": 269270,
-  "verify_how": "sweep",
+  "exec_median": 145339,
+  "exec_p90": 272696,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AXVD",
@@ -5839,11 +5968,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "SSX 트리키 (SSX Tricky)",
-  "exec_median": 203460,
-  "exec_p90": 280892,
-  "verify_how": "sweep",
+  "exec_median": 27945,
+  "exec_p90": 280254,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AY5E",
@@ -5892,11 +6022,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "판타지 스타 컬렉션 (Phantasy Star Collection)",
-  "exec_median": 160084,
-  "exec_p90": 277335,
-  "verify_how": "sweep",
+  "exec_median": 99215,
+  "exec_p90": 279236,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AYDE",
@@ -5967,11 +6098,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "세가 아케이드 갤러리 (SEGA Arcade Gallery)",
-  "exec_median": 280784,
-  "exec_p90": 280785,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 19150,
+  "exec_p90": 56112,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x3005d18",
+  "idle_drop": 0.932
  },
  {
   "game_code": "AYPP",
@@ -5984,11 +6118,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "세가 아케이드 갤러리",
-  "exec_median": 280784,
-  "exec_p90": 280786,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 5679,
+  "exec_p90": 56740,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x3005d18",
+  "idle_drop": 0.98
  },
  {
   "game_code": "AYWE",
@@ -6030,7 +6167,8 @@
   "verify_how": "A/B: 71% less work with the address",
   "idle_verified": "0x8060834",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.71
  },
  {
   "game_code": "AZ8E",
@@ -6048,7 +6186,8 @@
   "exec_median": 148774,
   "exec_p90": 187719,
   "verify_how": "A/B: 47% less work with the address",
-  "lib_name": "슈퍼 퍼즐파이터II Turbo터보"
+  "lib_name": "슈퍼 퍼즐파이터II Turbo터보",
+  "idle_drop": 0.469
  },
  {
   "game_code": "AZ8P",
@@ -6153,11 +6292,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "Legend of Zelda, The - A Link To The Past Four Swords (U) [!]",
-  "exec_median": 161099,
-  "exec_p90": 280698,
-  "verify_how": "sweep",
+  "exec_median": 101402,
+  "exec_p90": 136060,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "AZLJ",
@@ -6238,7 +6378,8 @@
   "exec_median": 140911,
   "exec_p90": 162699,
   "verify_how": "A/B: 49% less work with the address",
-  "lib_name": "메이드 인 와리오 (WarioWare, Inc - Minigame Mania)"
+  "lib_name": "메이드 인 와리오 (WarioWare, Inc - Minigame Mania)",
+  "idle_drop": 0.486
  },
  {
   "game_code": "AZWP",
@@ -6321,7 +6462,8 @@
   "verify_how": "A/B: 75% less work with the address",
   "idle_verified": "0x80003d4",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.75
  },
  {
   "game_code": "B2DJ",
@@ -6339,7 +6481,8 @@
   "verify_how": "A/B: 75% less work with the address",
   "idle_verified": "0x80003d4",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.75
  },
  {
   "game_code": "B2RJ",
@@ -6410,11 +6553,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "전설의 스타피3",
-  "exec_median": 171375,
-  "exec_p90": 255544,
-  "verify_how": "sweep",
+  "exec_median": 152189,
+  "exec_p90": 218589,
+  "verify_how": "hunt: BIOS halt, no loop needed",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "B3EJ",
@@ -6466,7 +6610,8 @@
   "verify_how": "A/B: 52% less work with the address",
   "idle_verified": "0x8000a20",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.517
  },
  {
   "game_code": "B3QJ",
@@ -6513,11 +6658,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "건담시드 데스티니 (Kidou Senshi Gundam SEED Destiny)",
-  "exec_median": 161089,
-  "exec_p90": 201722,
-  "verify_how": "sweep",
+  "exec_median": 180897,
+  "exec_p90": 201319,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "B4BE",
@@ -6670,7 +6816,8 @@
   "exec_median": 119971,
   "exec_p90": 165681,
   "verify_how": "A/B: 56% less work with the address",
-  "lib_name": "록맨 제로 4 (Megaman Zero 4)"
+  "lib_name": "록맨 제로 4 (Megaman Zero 4)",
+  "idle_drop": 0.562
  },
  {
   "game_code": "B4ZP",
@@ -6713,10 +6860,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.2 (Hudson Best Collection Vol. 2 - Lode Runner Collection)",
-  "exec_median": 277913,
+  "exec_median": 94336,
   "exec_p90": 277918,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B73J",
@@ -6730,10 +6878,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.3 (Hudson Best Collection Vol. 3 - Action Collection)",
-  "exec_median": 265734,
-  "exec_p90": 277914,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 252884,
+  "exec_p90": 277913,
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B74J",
@@ -6747,10 +6896,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.4 수수께끼 콜렉션",
-  "exec_median": 251032,
-  "exec_p90": 272749,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 251179,
+  "exec_p90": 272686,
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B75J",
@@ -6764,10 +6914,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.5 슈팅 콜렉션 (Hudson Best Collection Vol. 5 - Shooting Collection)",
-  "exec_median": 259154,
-  "exec_p90": 261715,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 258513,
+  "exec_p90": 267704,
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B76J",
@@ -6781,10 +6932,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.6 (Hudson Best Collection Vol. 6 - Bouken-jima Collection)",
-  "exec_median": 252745,
-  "exec_p90": 258827,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 252710,
+  "exec_p90": 258790,
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B7IJ",
@@ -6798,10 +6950,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "허드슨 베스트 콜렉션 Vol.1 (Hudson Best Collection Vol. 1 - Bomberman Collection)",
-  "exec_median": 273844,
+  "exec_median": 253497,
   "exec_p90": 277917,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "B85A",
@@ -6838,11 +6991,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "킹덤 하츠 - 체인 오브 메모리즈 (Kingdom Hearts Chain of Memories)",
-  "exec_median": 279964,
-  "exec_p90": 280249,
-  "verify_how": "sweep",
+  "exec_median": 228560,
+  "exec_p90": 280200,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "B8KE",
@@ -6925,11 +7079,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "쿠니오군 열혈 컬렉션 1 (Kunio-kun Nekketsu Collection 1)",
-  "exec_median": 277915,
-  "exec_p90": 277919,
-  "verify_how": "sweep",
+  "exec_median": 249556,
+  "exec_p90": 280695,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "B9BJ",
@@ -6942,11 +7097,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "쿠니오군 열혈 컬렉션 2 (Kunio-kun Nekketsu Collection 2)",
-  "exec_median": 271662,
-  "exec_p90": 277916,
-  "verify_how": "sweep",
+  "exec_median": 275515,
+  "exec_p90": 280695,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "B9CJ",
@@ -6959,11 +7115,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "쿠니오군 열혈 컬렉션 3 (Kunio-kun Nekketsu Collection 3)",
-  "exec_median": 277915,
-  "exec_p90": 277919,
-  "verify_how": "sweep",
+  "exec_median": 277916,
+  "exec_p90": 280695,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BABJ",
@@ -7107,11 +7264,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "배트맨 - 라이즈 오브 신 츠",
-  "exec_median": 279886,
-  "exec_p90": 279989,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 65403,
+  "exec_p90": 95324,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80879f8",
+  "idle_drop": 0.766
  },
  {
   "game_code": "BAXJ",
@@ -7192,7 +7352,8 @@
   "verify_how": "A/B: 68% less work with the address",
   "idle_verified": "0x8000934",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.683
  },
  {
   "game_code": "BC2S",
@@ -7210,7 +7371,8 @@
   "verify_how": "A/B: 75% less work with the address",
   "idle_verified": "0x8000934",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.752
  },
  {
   "game_code": "BC3P",
@@ -7291,7 +7453,8 @@
   "verify_how": "A/B: 97% less work with the address",
   "idle_verified": "0x80a0922",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.969
  },
  {
   "game_code": "BD3J",
@@ -7343,7 +7506,8 @@
   "exec_p90": 246198,
   "verify_how": "A/B: 72% less work with the address",
   "idle_verified": "0x814cf8e",
-  "verify_tier": "R"
+  "verify_tier": "R",
+  "idle_drop": 0.715
  },
  {
   "game_code": "BDBP",
@@ -7415,10 +7579,11 @@
   "conflict": false,
   "lib_name": "강아지와 함께 애정 이야기 (Koinu to Issho - Aijou Monogatari)",
   "exec_median": 279668,
-  "exec_p90": 279685,
-  "verify_how": "sweep",
+  "exec_p90": 279682,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BDKJ",
@@ -7448,7 +7613,8 @@
   "verify_how": "A/B: 36% less work with the address",
   "idle_verified": "0x80003a8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.36
  },
  {
   "game_code": "BDQJ",
@@ -7466,7 +7632,8 @@
   "verify_how": "A/B: 36% less work with the address",
   "idle_verified": "0x80003a8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.359
  },
  {
   "game_code": "BDSE",
@@ -7508,7 +7675,8 @@
   "exec_median": 55917,
   "exec_p90": 276959,
   "verify_how": "A/B: 80% less work with the address",
-  "lib_name": "다운타운 열혈물어EX"
+  "lib_name": "다운타운 열혈물어EX",
+  "idle_drop": 0.799
  },
  {
   "game_code": "BDTJ",
@@ -7589,7 +7757,8 @@
   "verify_how": "A/B: 85% less work with the address",
   "idle_verified": "0x803b188",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.853
  },
  {
   "game_code": "BFCJ",
@@ -7602,11 +7771,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "판타직 칠드런",
-  "exec_median": 271931,
-  "exec_p90": 271940,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 95128,
+  "exec_p90": 111129,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80006b4",
+  "idle_drop": 0.65
  },
  {
   "game_code": "BFFJ",
@@ -7658,7 +7830,8 @@
   "verify_how": "A/B: 77% less work with the address",
   "idle_verified": "0x8000c32",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.769
  },
  {
   "game_code": "BFZJ",
@@ -7676,7 +7849,8 @@
   "verify_how": "A/B: 77% less work with the address",
   "idle_verified": "0x8000c32",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.769
  },
  {
   "game_code": "BG2J",
@@ -7905,11 +8079,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "건스타 슈퍼 히어로즈 (Gunstar Super Heroes)",
-  "exec_median": 279156,
-  "exec_p90": 280255,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 109232,
+  "exec_p90": 232214,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8000852",
+  "idle_drop": 0.608
  },
  {
   "game_code": "BH2J",
@@ -7922,11 +8099,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "강철의 연금술사 - 추억의 주명곡 (Hagane no Renkinjutsushi - Omoide no Sonata)",
-  "exec_median": 279566,
-  "exec_p90": 279584,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 123434,
+  "exec_p90": 149274,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x801d84c",
+  "idle_drop": 0.558
  },
  {
   "game_code": "BH6J",
@@ -7973,11 +8153,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "강철의 연금술사 - 미주의 윤무곡 (Hagane no Renkinjutsushi - Meisou no Rondo)",
-  "exec_median": 279568,
-  "exec_p90": 279583,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 72938,
+  "exec_p90": 123470,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8013f60",
+  "idle_drop": 0.739
  },
  {
   "game_code": "BHVE",
@@ -8058,11 +8241,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "아이언 키드 (Iron Kid)",
-  "exec_median": 274200,
-  "exec_p90": 280384,
-  "verify_how": "sweep",
+  "exec_median": 267289,
+  "exec_p90": 280381,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BISJ",
@@ -8184,11 +8368,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "짱구는 못말려 - 폭풍을 부르는 시네마랜드의 대모험 (Crayon Shin-chan - Arashi o Yobu Cinemaland no Daibouken!)",
-  "exec_median": 271103,
-  "exec_p90": 271937,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 97481,
+  "exec_p90": 159297,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80006b8",
+  "idle_drop": 0.641
  },
  {
   "game_code": "BKCS",
@@ -8201,11 +8388,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "짱구는 못말려 - 시네랜드의 모험 (Shin chan - Aventuras en Cineland)",
-  "exec_median": 271174,
-  "exec_p90": 271941,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 46940,
+  "exec_p90": 98598,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80006b8",
+  "idle_drop": 0.827
  },
  {
   "game_code": "BKDJ",
@@ -8496,11 +8686,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "미키와 도날드의 매지컬 퀘스트3",
-  "exec_median": 278931,
-  "exec_p90": 280691,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 87392,
+  "exec_p90": 116137,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x80028fc",
+  "idle_drop": 0.689
  },
  {
   "game_code": "BM5E",
@@ -8518,7 +8711,8 @@
   "exec_median": 85587,
   "exec_p90": 192916,
   "verify_how": "A/B: 69% less work with the address",
-  "lib_name": "마리오 vs. 동키콩 (Mario vs. Donkey Kong)"
+  "lib_name": "마리오 vs. 동키콩 (Mario vs. Donkey Kong)",
+  "idle_drop": 0.694
  },
  {
   "game_code": "BM5J",
@@ -8536,7 +8730,8 @@
   "verify_how": "A/B: 73% less work with the address",
   "idle_verified": "0x80355b8",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.734
  },
  {
   "game_code": "BM5P",
@@ -8583,7 +8778,8 @@
   "verify_how": "A/B: 41% less work with the address",
   "idle_verified": "0x80007fc",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.413
  },
  {
   "game_code": "BMGD",
@@ -8613,7 +8809,8 @@
   "exec_median": 65567,
   "exec_p90": 92130,
   "verify_how": "A/B: 76% less work with the address",
-  "lib_name": "마리오 골프 어드밴스 투어 (Mario Golf - Advance Tour)"
+  "lib_name": "마리오 골프 어드밴스 투어 (Mario Golf - Advance Tour)",
+  "idle_drop": 0.763
  },
  {
   "game_code": "BMGF",
@@ -8699,10 +8896,11 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "메달 오브 아너 어드밴스",
-  "exec_median": 278858,
-  "exec_p90": 280658,
-  "verify_how": "sweep",
-  "verify_tier": null
+  "exec_median": 280650,
+  "exec_p90": 280662,
+  "verify_how": "hunt: no wait loop exists",
+  "verify_tier": null,
+  "idle_hunted": true
  },
  {
   "game_code": "BMOJ",
@@ -8892,11 +9090,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "쟈쟈마루 쥬니어 전승기",
-  "exec_median": 275356,
-  "exec_p90": 275361,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 89634,
+  "exec_p90": 269279,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x803622c",
+  "idle_drop": 0.674
  },
  {
   "game_code": "BNSE",
@@ -9168,7 +9369,8 @@
   "exec_median": 78294,
   "exec_p90": 120515,
   "verify_how": "A/B: 72% less work with the address",
-  "lib_name": "포켓몬스터 - 에메랄드 (Pokemon - Emerald Version)"
+  "lib_name": "포켓몬스터 - 에메랄드 (Pokemon - Emerald Version)",
+  "idle_drop": 0.719
  },
  {
   "game_code": "BPES",
@@ -9227,7 +9429,8 @@
   "exec_median": 74872,
   "exec_p90": 115306,
   "verify_how": "A/B: 73% less work with the address",
-  "lib_name": "포켓몬스터 리프그린1.1"
+  "lib_name": "포켓몬스터 리프그린1.1",
+  "idle_drop": 0.731
  },
  {
   "game_code": "BPGF",
@@ -9368,7 +9571,8 @@
   "exec_median": 76509,
   "exec_p90": 132138,
   "verify_how": "A/B: 72% less work with the address",
-  "lib_name": "포켓몬스터 파이어레드1.1"
+  "lib_name": "포켓몬스터 파이어레드1.1",
+  "idle_drop": 0.725
  },
  {
   "game_code": "BPRF",
@@ -9463,7 +9667,8 @@
   "exec_median": 61756,
   "exec_p90": 280297,
   "verify_how": "A/B: 78% less work with the address",
-  "lib_name": "페르시아의 왕자 - 시간의 모래"
+  "lib_name": "페르시아의 왕자 - 시간의 모래",
+  "idle_drop": 0.779
  },
  {
   "game_code": "BPZJ",
@@ -9706,7 +9911,8 @@
   "exec_median": 78061,
   "exec_p90": 121983,
   "verify_how": "A/B: 72% less work with the address",
-  "lib_name": "리듬세상 어드밴스1.3"
+  "lib_name": "리듬세상 어드밴스1.3",
+  "idle_drop": 0.719
  },
  {
   "game_code": "BRKE",
@@ -9784,11 +9990,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼 차이니즈 1+2 어드밴스 (Super Chinese 1, 2 Advance)",
-  "exec_median": 279618,
-  "exec_p90": 279625,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 171663,
+  "exec_p90": 220272,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8003540",
+  "idle_drop": 0.386
  },
  {
   "game_code": "BSGJ",
@@ -9847,7 +10056,8 @@
   "exec_median": 96147,
   "exec_p90": 267526,
   "verify_how": "A/B: 66% less work with the address",
-  "lib_name": "메탈슬러그 어드밴스 (Metal Slug Advance)"
+  "lib_name": "메탈슬러그 어드밴스 (Metal Slug Advance)",
+  "idle_drop": 0.657
  },
  {
   "game_code": "BSMJ",
@@ -9865,7 +10075,8 @@
   "lib_name": "메탈슬러그 어드밴스 (Metal Slug Advance) (2)",
   "exec_median": 129199,
   "exec_p90": 267535,
-  "verify_how": "A/B: 54% less work with the address"
+  "verify_how": "A/B: 54% less work with the address",
+  "idle_drop": 0.539
  },
  {
   "game_code": "BSMP",
@@ -9907,11 +10118,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "스타워즈 - 플라이트 오브 더 팔콘 (Star Wars - Flight of the Falcon)",
-  "exec_median": 245746,
-  "exec_p90": 280277,
-  "verify_how": "sweep",
+  "exec_median": 245753,
+  "exec_p90": 280268,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BSXE",
@@ -10069,9 +10281,10 @@
   "lib_name": "미나노 소프트 시리즈 해피 트럼프 20 (Minna no Soft Series - Happy Trump 20)",
   "exec_median": 280588,
   "exec_p90": 280605,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BTME",
@@ -10089,7 +10302,8 @@
   "lib_name": "마리오 테니스 파워 투어 (Mario Tennis - Power Tour)",
   "exec_median": 26988,
   "exec_p90": 27456,
-  "verify_how": "A/B: 90% less work with the address"
+  "verify_how": "A/B: 90% less work with the address",
+  "idle_drop": 0.903
  },
  {
   "game_code": "BTMJ",
@@ -10107,7 +10321,8 @@
   "exec_median": 71646,
   "exec_p90": 136456,
   "verify_how": "A/B: 74% less work with the address",
-  "lib_name": "마리오 테니스 어드밴스 (Mario Tennis Advance)"
+  "lib_name": "마리오 테니스 어드밴스 (Mario Tennis Advance)",
+  "idle_drop": 0.742
  },
  {
   "game_code": "BTMP",
@@ -10132,11 +10347,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "대결! 울트라 히어로 (Taiketsu! Ultra Hero)",
-  "exec_median": 278884,
-  "exec_p90": 279139,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 84542,
+  "exec_p90": 120982,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x801da38",
+  "idle_drop": 0.697
  },
  {
   "game_code": "BUCE",
@@ -10149,11 +10367,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "얼티밋 카드 게임즈 (Ultimate Card Games)",
-  "exec_median": 279766,
-  "exec_p90": 280286,
-  "verify_how": "sweep",
+  "exec_median": 280248,
+  "exec_p90": 280335,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BUFE",
@@ -10268,11 +10487,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "얼티밋 윈터 게임즈 (Ultimate Winter Games)",
-  "exec_median": 280890,
-  "exec_p90": 280901,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 203757,
+  "exec_p90": 280894,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8003afc",
+  "idle_drop": 0.275
  },
  {
   "game_code": "BUZE",
@@ -10285,11 +10507,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "얼티밋 아케이드 게임즈 (Ultimate Arcade Games)",
-  "exec_median": 280608,
-  "exec_p90": 280625,
-  "verify_how": "sweep",
+  "exec_median": 279227,
+  "exec_p90": 280601,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "BVEJ",
@@ -10341,7 +10564,8 @@
   "verify_how": "A/B: 62% less work with the address",
   "idle_verified": "0x80831da",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.619
  },
  {
   "game_code": "BYIJ",
@@ -10359,7 +10583,8 @@
   "verify_how": "A/B: 59% less work with the address",
   "idle_verified": "0x8118882",
   "verify_tier": "R",
-  "has_idle": true
+  "has_idle": true,
+  "idle_drop": 0.586
  },
  {
   "game_code": "BYUJ",
@@ -10447,7 +10672,8 @@
   "exec_median": 142669,
   "exec_p90": 176478,
   "verify_how": "A/B: 48% less work with the address",
-  "lib_name": "록맨 제로 3 (Megaman Zero 3)"
+  "lib_name": "록맨 제로 3 (Megaman Zero 3)",
+  "idle_drop": 0.478
  },
  {
   "game_code": "BZ3P",
@@ -10547,11 +10773,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "클래식 NES 시리즈 - 동키콩 (Classic NES Series - Donkey Kong)",
-  "exec_median": 227785,
-  "exec_p90": 233546,
-  "verify_how": "sweep",
+  "exec_median": 227722,
+  "exec_p90": 234314,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FDKJ",
@@ -10564,11 +10791,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 02 - 동키콩 (Famicom Mini 02 - Donkey Kong)",
-  "exec_median": 227780,
-  "exec_p90": 234159,
-  "verify_how": "sweep",
+  "exec_median": 227736,
+  "exec_p90": 234587,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FM2J",
@@ -10598,11 +10826,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 11 - 마리오 브라더스 (Famicom Mini 11 - Mario Bros.)",
-  "exec_median": 245796,
-  "exec_p90": 251169,
-  "verify_how": "sweep",
+  "exec_median": 241609,
+  "exec_p90": 250092,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FMKJ",
@@ -10615,11 +10844,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 18 - 마계촌 (Famicom Mini 18 - Makaimura)",
-  "exec_median": 258927,
-  "exec_p90": 270349,
-  "verify_how": "sweep",
+  "exec_median": 257771,
+  "exec_p90": 270053,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FMPJ",
@@ -10632,11 +10862,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 08 - 마피 (Famicom Mini 08 - Mappy)",
-  "exec_median": 250672,
-  "exec_p90": 259090,
-  "verify_how": "sweep",
+  "exec_median": 250540,
+  "exec_p90": 259238,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FMRE",
@@ -10649,11 +10880,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "클래식 NES 시리즈 - 메트로이드 (Classic NES Series - Metroid)",
-  "exec_median": 251996,
-  "exec_p90": 261868,
-  "verify_how": "sweep",
+  "exec_median": 251690,
+  "exec_p90": 260675,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FMRJ",
@@ -10666,11 +10898,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 23 - 메트로이드",
-  "exec_median": 258493,
-  "exec_p90": 265313,
-  "verify_how": "sweep",
+  "exec_median": 258496,
+  "exec_p90": 265309,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FPTJ",
@@ -10683,11 +10916,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 24 - 빛의 신화 - 팔루테나의 거울",
-  "exec_median": 247101,
-  "exec_p90": 252296,
-  "verify_how": "sweep",
+  "exec_median": 247080,
+  "exec_p90": 252216,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "FSME",
@@ -10734,11 +10968,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "패미콤 미니 - Vol. 17 - 타카하시 명인의 모험섬 (Famicom Mini 17 - Takahashi Meijin no Bouken-jima)",
-  "exec_median": 251918,
-  "exec_p90": 265207,
-  "verify_how": "sweep",
+  "exec_median": 248182,
+  "exec_p90": 266504,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "GBAP",
@@ -10785,11 +11020,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "어나더 월드 (Another World)",
-  "exec_median": 279330,
+  "exec_median": 279325,
   "exec_p90": 279376,
-  "verify_how": "sweep",
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "MB2G",
@@ -11042,11 +11278,12 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "트레인 엑스",
-  "exec_median": 279459,
-  "exec_p90": 279480,
-  "verify_how": "sweep",
+  "exec_median": 279461,
+  "exec_p90": 279479,
+  "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "idle_hunted": true
  },
  {
   "game_code": "U32J",
@@ -11059,11 +11296,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "우리들의 태양2 - 속 우리들의 태양",
-  "exec_median": 270114,
-  "exec_p90": 274846,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 88333,
+  "exec_p90": 280204,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x8229e94",
+  "idle_drop": 0.673
  },
  {
   "game_code": "U33J",
@@ -11122,7 +11362,8 @@
   "exec_median": 64359,
   "exec_p90": 142381,
   "verify_how": "A/B: 77% less work with the address",
-  "lib_name": "스크류 브레이커"
+  "lib_name": "스크류 브레이커",
+  "idle_drop": 0.769
  },
  {
   "game_code": "ZMDE",
@@ -11135,11 +11376,14 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "닌텐도 MP3 플레이어",
-  "exec_median": 279913,
-  "exec_p90": 279931,
-  "verify_how": "sweep",
-  "verify_tier": null,
-  "has_idle": false
+  "exec_median": 16155,
+  "exec_p90": 17081,
+  "verify_how": "hunt: pc histogram + A/B",
+  "verify_tier": "R",
+  "has_idle": true,
+  "idle_hunted": true,
+  "idle_verified": "0x20314a6",
+  "idle_drop": 0.942
  },
  {
   "game_code": "ZMPJ",
