@@ -413,6 +413,12 @@ export default {
   "CPU on the device would be about {pct}%, not {now}%.":
     "실기 CPU는 {now}%가 아니라 약 {pct}%가 됩니다.",
   "Code size — how full the cart is": "코드 크기 (카트가 얼마나 찼는지)",
+  "The upload stopped making progress — it may have been blocked before reaching the server (a proxy/CDN body-size limit does this). Try fewer files at once.":
+    "업로드가 더 이상 진행되지 않습니다. 서버에 닿기 전에 막혔을 수 있습니다 (프록시/CDN의 요청 크기 제한이 이런 증상을 냅니다). 한 번에 올리는 개수를 줄여보세요.",
+  "The server stopped responding after the files were sent. Try fewer files at once.":
+    "파일은 다 보냈는데 서버가 응답하지 않습니다. 한 번에 올리는 개수를 줄여보세요.",
+  "The request was too large for the server or its proxy. Try fewer files at once.":
+    "요청이 서버(또는 프록시)가 허용하는 크기를 넘었습니다. 한 번에 올리는 개수를 줄여보세요.",
   "CPU load filter": "CPU 부하 필터",
   "Fits": "여유",
   "Tight": "아슬",

@@ -15,23 +15,53 @@ async function withSession(makeRequest) {
 
 // POST a FormData via XHR so we get real UPLOAD progress (fetch can't report it).
 // onProgress(loaded, total) fires as bytes go up. Resolves the parsed JSON body.
+// How long an upload may make NO progress before we call it dead.
+//
+// Not a total timeout — a real upload legitimately takes minutes, and killing it on a clock
+// would break the thing we are trying to protect. This watches for a STALL: a request the
+// edge has quietly swallowed sits at "(pending)" forever, sending nothing and receiving
+// nothing, and the UI used to sit there with it. A failure has to look like a failure.
+const UPLOAD_STALL_MS = 60_000;
+
 function xhrUpload(url, form, onProgress) {
   if (DEMO) return Promise.reject(new Error("Demo mode — install via Docker to enable uploads."));
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url);
-    if (onProgress) {
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) onProgress(e.loaded, e.total);
-      };
-    }
+
+    let lastMove = Date.now();
+    let sentAll = false;
+    const watchdog = setInterval(() => {
+      if (Date.now() - lastMove < UPLOAD_STALL_MS) return;
+      clearInterval(watchdog);
+      xhr.abort();
+      // Two different silences, and the difference tells you where to look.
+      reject(new Error(sentAll
+        ? "The server stopped responding after the files were sent. Try fewer files at once."
+        : "The upload stopped making progress — it may have been blocked before reaching the server (a proxy/CDN body-size limit does this). Try fewer files at once."));
+    }, 5_000);
+    const settle = () => clearInterval(watchdog);
+
+    xhr.upload.onprogress = (e) => {
+      lastMove = Date.now();
+      if (e.lengthComputable) {
+        sentAll = e.loaded >= e.total;
+        onProgress?.(e.loaded, e.total);
+      }
+    };
+    xhr.onprogress = () => { lastMove = Date.now(); };   // the response is coming back
+
     xhr.onload = () => {
+      settle();
       let body = {};
       try { body = JSON.parse(xhr.responseText || "{}"); } catch (_) { /* keep {} */ }
       if (xhr.status >= 200 && xhr.status < 300) resolve(body);
-      else reject(new Error(body.detail || `Upload failed (${xhr.status})`));
+      else if (xhr.status === 413) {
+        reject(new Error("The request was too large for the server or its proxy. Try fewer files at once."));
+      } else reject(new Error(body.detail || `Upload failed (${xhr.status})`));
     };
-    xhr.onerror = () => reject(new Error("Upload failed due to a network error"));
+    xhr.onerror = () => { settle(); reject(new Error("Upload failed due to a network error")); };
+    xhr.onabort = () => settle();
     xhr.send(form);
   });
 }
