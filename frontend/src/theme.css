@@ -1417,19 +1417,27 @@ body::before {
 /* icon filters: same height, square-ish width */
 .scope-btn.icon-only { min-width: 0; width: 38px; padding: 0; gap: 0; }
 
-/* PICO-8 / GBA compat filters — own row above the grid, same slot, same shape.
-   Constrained to the container so neither widens the page; wraps on desktop, scrolls
-   sideways on mobile. The base .search-scope is `flex: 0 0 auto` (the inline 이 기종/전체
-   toggle must not shrink), so without this the GBA strip — four buttons, counts, and the
-   "N not yet run" note — ran straight past the container edge. */
+/* PICO-8 / GBA compat filters — own row above the grid, same slot. Both are boxed to the
+   container so neither widens the page. The base .search-scope is `flex: 0 0 auto` (the
+   inline 이 기종/전체 toggle must not shrink), so without this the GBA strip — four buttons,
+   counts, and the "N not yet run" note — ran straight past the container edge. */
 .lib-compat-filter { display: flex; max-width: 100%; }
 .search-scope.p8-filter,
 .search-scope.gba-filter {
   flex: 1 1 auto; min-width: 0; max-width: 100%; box-sizing: border-box;
-  flex-wrap: wrap;
 }
-/* The note is a bare flex child (not a .scope-btn), so pin it against shrink — in the
-   mobile scroll strip a shrinking span would collapse its text instead of scrolling. */
+/* PICO-8 wraps to more rows on desktop. GBA is ALWAYS one horizontal strip that scrolls
+   inside its box — wrapping four load buttons plus the note looked broken, and letting them
+   sit on one line overflowed the page. nowrap + overflow-x pins it: it never grows the row,
+   and what does not fit scrolls. */
+.search-scope.p8-filter { flex-wrap: wrap; }
+.search-scope.gba-filter {
+  flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+}
+/* In a nowrap strip a flex child shrinks by default — pin buttons AND the note so their
+   text never collapses; the strip scrolls instead. */
+.gba-filter .scope-btn,
 .gba-filter .gba-filter-note { flex: 0 0 auto; }
 .p8-filter .scope-btn { flex: 0 0 auto; gap: 4px; }
 .p8-filter .scope-btn .p8compat { margin-right: 0; padding: 0; }
@@ -1439,9 +1447,8 @@ body::before {
 }
 .p8-filter .scope-btn.on .scope-count { background: #ffffff33; opacity: 0.95; }
 @media (max-width: 640px) {
-  /* one scrollable strip instead of wrapping — keeps the page from stretching */
-  .search-scope.p8-filter,
-  .search-scope.gba-filter { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* PICO-8 also collapses to one scrollable strip here (GBA already is one, above). */
+  .search-scope.p8-filter { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   /* Video "Screen fit": 3 long-labelled buttons — let them wrap and share the row
      width instead of overflowing the screen. */
   .row > .search-scope.fit-scope { flex: 1 1 100%; flex-wrap: wrap; }
