@@ -669,15 +669,15 @@ def test_package_size_system_filter_shrinks_the_estimate(client, make_rom, sessi
     assert 0 < nes_only < full
 
 
-def test_package_size_korean_filter_drops_non_korean_roms(client, make_rom, session_id):
+def test_package_size_flag_filter_drops_the_other_flags(client, make_rom, session_id):
     make_rom(system_key="nes", name="Korean.nes", content=b"k" * 100, cover_flag="ko")
     make_rom(system_key="nes", name="Other.nes", content=b"o" * 100)
 
     full = client.get(f"/api/sessions/{session_id}/package/size").json()["bytes"]
-    korean_only = client.get(f"/api/sessions/{session_id}/package/size",
-                             params={"korean": "1"}).json()["bytes"]
+    ko_only = client.get(f"/api/sessions/{session_id}/package/size",
+                         params={"flags": "ko"}).json()["bytes"]
 
-    assert 0 < korean_only < full
+    assert 0 < ko_only < full
 
 
 def test_package_size_drops_broken_pico8_cart(client, make_rom, session_id):
@@ -769,31 +769,117 @@ def test_download_package_multi_system_selection(client, make_rom, session_id):
     assert "-selected" in resp.headers["content-disposition"]
 
 
-def test_download_package_korean_filter_and_filename_suffix(client, make_rom, session_id):
+def test_download_package_flag_filter_and_filename_suffix(client, make_rom, session_id):
     ko = make_rom(system_key="nes", name="Korean.nes", cover_flag="ko")
     other = make_rom(system_key="nes", name="Other.nes")
 
-    resp = client.get(f"/api/sessions/{session_id}/package", params={"korean": "1"})
+    resp = client.get(f"/api/sessions/{session_id}/package", params={"flags": "ko"})
 
     names = _zip_names(resp.content)
     assert ko["rom_path"] in names
     assert other["rom_path"] not in names
-    assert "-korean" in resp.headers["content-disposition"]
+    assert "-filtered" in resp.headers["content-disposition"]
 
 
-def test_korean_only_still_ships_homebrew(client, make_rom, session_id):
-    """Homebrew is not a game with a language: the .dat / .smc on the card are what the
-    firmware's built-in apps need to boot. Dropping them from a Korean card because
-    they carry no ko flag would kill those menu entries, so they ship regardless."""
+def test_flag_filter_takes_several_flags_and_can_ask_for_unflagged(client, make_rom, session_id):
+    """The flags are a multi-select, and "none" is a category of its own — an unflagged
+    ROM is a real thing to want, not a missing value."""
+    ko = make_rom(system_key="nes", name="Korean.nes", cover_flag="ko")
+    ja = make_rom(system_key="nes", name="Japanese.nes", cover_flag="ja")
+    plain = make_rom(system_key="nes", name="Plain.nes")
+
+    both = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                 params={"flags": "ko,ja"}).content)
+    unflagged = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                      params={"flags": "none"}).content)
+
+    assert {ko["rom_path"], ja["rom_path"]} <= both
+    assert plain["rom_path"] not in both
+    assert plain["rom_path"] in unflagged
+    assert ko["rom_path"] not in unflagged
+
+
+def test_size_cap_drops_the_roms_that_are_too_big(client, make_rom, session_id):
+    small = make_rom(system_key="nes", name="Small.nes", content=b"s" * 1024)
+    big = make_rom(system_key="nes", name="Big.nes", content=b"b" * (3 * 1024 * 1024))
+
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                  params={"max_mb": 2}).content)
+
+    assert small["rom_path"] in names
+    assert big["rom_path"] not in names
+
+
+def test_rating_floor_drops_low_and_unrated_roms(client, make_rom, session_id):
+    """An unrated ROM has no score, so it cannot clear a floor — otherwise a rating
+    filter would quietly ship the very ROMs it was meant to weed out."""
+    good = make_rom(system_key="nes", name="Good.nes", igdb_score=88)
+    weak = make_rom(system_key="nes", name="Weak.nes", igdb_score=42)
+    unrated = make_rom(system_key="nes", name="Unrated.nes", igdb_score=-1)
+    never = make_rom(system_key="nes", name="Never.nes")          # NULL score
+
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                  params={"min_score": 70}).content)
+
+    assert good["rom_path"] in names
+    for rom in (weak, unrated, never):
+        assert rom["rom_path"] not in names
+
+
+def test_favorite_and_patched_conditions_are_anded(client, make_rom, session_id):
+    both = make_rom(system_key="nes", name="Both.nes", favorite=1, is_korean_patched=1)
+    fav_only = make_rom(system_key="nes", name="Fav.nes", favorite=1)
+    patched_only = make_rom(system_key="nes", name="Patched.nes", is_korean_patched=1)
+
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                  params={"favorite": "1", "patched": "1"}).content)
+
+    assert both["rom_path"] in names
+    assert fav_only["rom_path"] not in names
+    assert patched_only["rom_path"] not in names
+
+
+def test_no_conditions_ships_everything(client, make_rom, session_id):
+    """Blank/zero params mean "no constraint", not "exclude everything"."""
+    rom = make_rom(system_key="nes", name="Game.nes")
+
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package",
+                                  params={"flags": "", "max_mb": 0, "min_score": -1}).content)
+
+    assert rom["rom_path"] in names
+
+
+def test_excluding_a_cd_game_takes_its_track_sidecars_with_it(client, make_rom, session_id):
+    """A CD game is a FOLDER: the .cue is the DB row, the tracks beside it are not.
+    Excluding the row used to drop the .cue alone and ship the tracks — gigabytes of
+    audio for a game that isn't on the card — and that hole was in sd_exclude too."""
+    folder = storage.roms_dir(session_id, "pcecd") / "Game"
+    folder.mkdir(parents=True, exist_ok=True)
+    cue = make_rom(system_key="pcecd", name="Game/Game.cue")
+    (folder / "Game (Track 2).bin").write_bytes(b"audio" * 100)
+    make_rom(system_key="nes", name="Keep.nes")          # so there is still a zip
+
+    client.patch(f"/api/sessions/{session_id}/roms/{cue['id']}/sd-exclude",
+                 json={"exclude": True})
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package").content)
+
+    assert not [n for n in names if n.startswith("roms/pcecd/")]
+
+
+def test_conditions_never_drop_homebrew(client, make_rom, session_id):
+    """Homebrew is not a release with a flag, a rating or a patch: the .dat / .smc on
+    the card are what the firmware's built-in apps need to boot. Any condition that
+    dropped them would kill those menu entries, so they are exempt from all of them."""
     ko = make_rom(system_key="nes", name="Korean.nes", cover_flag="ko")
     plain = make_rom(system_key="nes", name="Other.nes")
     assets = make_rom(system_key="homebrew", name="smw_assets.dat")   # no flag, ever
 
-    names = _zip_names(client.get(
-        f"/api/sessions/{session_id}/package", params={"korean": "1"}).content)
+    names = _zip_names(client.get(f"/api/sessions/{session_id}/package", params={
+        "flags": "ko", "favorite": "1", "min_score": 90, "max_mb": 1,
+    }).content)
 
     assert assets["rom_path"] in names
-    assert ko["rom_path"] in names
+    assert ko["rom_path"] not in names       # it fails the other conditions
     assert plain["rom_path"] not in names
 
 

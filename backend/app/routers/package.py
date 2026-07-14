@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import asyncio
 import uuid
+from dataclasses import dataclass
 
 from fastapi import APIRouter, Body, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from starlette.concurrency import run_in_threadpool
 
 from .. import db
-from ..services import events, jobs, packaging
+from ..services import events, jobs, packaging, storage
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["package"])
@@ -133,52 +134,130 @@ def _homebrew_roms(conn, session_id: str) -> "set[str]":
 
 
 def _rom_and_cover_paths(rows) -> "set[str]":
-    """Flatten (rom_path, cover_path) rows into one set of SD-relative paths."""
+    """Flatten (rom_path, cover_path) rows into one set of SD-relative paths.
+
+    A folder-per-game entry (CD: roms/<sys>/<game>/<file>.cue) contributes its GAME
+    FOLDER as well: the track sidecars beside the .cue are files on the card but not
+    rows in the DB, so excluding only the .cue would ship the tracks without the game.
+    """
     out: set[str] = set()
     for r in rows:
-        if r["rom_path"]:
-            out.add(r["rom_path"])
+        rom_path = r["rom_path"]
+        if rom_path:
+            out.add(rom_path)
+            parts = rom_path.split("/")
+            if len(parts) >= 4:
+                out.add("/".join(parts[:3]))
         if r["cover_path"]:
             out.add(r["cover_path"])
     return out
 
 
-def _excluded_roms(conn, session_id: str, korean_only: bool = False) -> "set[str]":
+@dataclass(frozen=True)
+class SdFilter:
+    """The user's "상세 조건" for what lands on the card. Every field is optional;
+    all of them are ANDed, and a ROM has to pass all of them to ship.
+
+    flags: cover-flag codes to keep ("ko", "ja", …, plus "none" for an unflagged
+      ROM). The flag is the user-facing "which release is this" mark, and it covers
+      a fan patch AND an official Korean/Japanese release alike — which
+      is_korean_patched alone would miss. Empty/None = no constraint.
+    max_bytes: drop ROMs bigger than this (curate a card down to size).
+    patched: keep only ROMs marked as carrying a user patch.
+    favorite: keep only favorites.
+    min_score: keep only ROMs whose IGDB score reaches this (an unrated ROM has
+      NULL or -1, so it never passes a score floor).
+    """
+    flags: "frozenset[str] | None" = None
+    max_bytes: int | None = None
+    patched: bool = False
+    favorite: bool = False
+    min_score: int | None = None
+
+    @property
+    def active(self) -> bool:
+        return bool(self.flags) or self.max_bytes is not None or self.patched \
+            or self.favorite or self.min_score is not None
+
+
+def parse_filter(flags: str | None, max_mb: int | None, patched: bool,
+                 favorite: bool, min_score: int | None) -> SdFilter:
+    """Query params → SdFilter. Junk (a blank flag list, max_mb=0, a negative score)
+    means "no constraint" rather than "exclude everything"."""
+    picked = frozenset(f.strip().lower() for f in (flags or "").split(",") if f.strip())
+    return SdFilter(
+        flags=picked or None,
+        max_bytes=max_mb * 1024 * 1024 if max_mb and max_mb > 0 else None,
+        patched=bool(patched),
+        favorite=bool(favorite),
+        min_score=min_score if min_score is not None and min_score >= 0 else None,
+    )
+
+
+def _excluded_roms(conn, session_id: str, sd_filter: SdFilter | None = None) -> "set[str]":
     """Relative paths (ROM file + its cover) dropped from the SD card while kept
-    in the library. Sources:
+    in the library:
       • sd_exclude=1 — the user opted this ROM out manually.
       • pico8_compat='broken' — a PICO-8 cart that doesn't run on the real G&W
         (구동불가); never worth shipping, so it's auto-excluded.
-      • korean_only — a Korean-only card: every ROM WITHOUT the Korean flag
-        (cover_flag='ko') is dropped, its cover with it. The flag is the user-
-        facing "이건 한글판" mark and covers BOTH fan 한글패치 AND Korean official/
-        made releases (정식발매·국산), which is_korean_patched alone would miss.
-        A system with no 국기 ROMs contributes nothing → it drops out entirely.
+      • anything the user's SdFilter rejects.
 
-        Homebrew is the exception: those apps live IN the firmware and what the card
-        carries is the data they cannot boot without (an assets .dat, Super Metroid's
-        ROM). Dropping them because they carry no Korean flag would leave the
-        firmware's own menu entries dead on a Korean card, so they always ship."""
+    Homebrew is exempt from the filter: those apps live IN the firmware and what the
+    card carries is the data they cannot boot without (an assets .dat, Super
+    Metroid's ROM). They are not releases with a flag, a rating or a patch, so
+    filtering them out would only leave the firmware's own menu entries dead.
+    """
     excluded = _rom_and_cover_paths(conn.execute(
         "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
         "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
         (session_id,)).fetchall())
-    if korean_only:
-        excluded |= _rom_and_cover_paths(conn.execute(
-            "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
-            "AND IFNULL(cover_flag, '') != 'ko' AND system_key != 'homebrew'",
-            (session_id,)).fetchall())
-    return excluded
+    if not sd_filter or not sd_filter.active:
+        return excluded
+
+    rows = conn.execute(
+        "SELECT rom_path, cover_path, cover_flag, is_korean_patched, favorite, igdb_score "
+        "FROM roms WHERE session_id = ? AND system_key != 'homebrew'",
+        (session_id,)).fetchall()
+    root = storage.session_root(session_id)
+    rejected = []
+    for r in rows:
+        if sd_filter.flags is not None:
+            flag = (r["cover_flag"] or "").lower() or "none"
+            if flag not in sd_filter.flags:
+                rejected.append(r)
+                continue
+        if sd_filter.patched and not r["is_korean_patched"]:
+            rejected.append(r)
+            continue
+        if sd_filter.favorite and not r["favorite"]:
+            rejected.append(r)
+            continue
+        if sd_filter.min_score is not None:
+            score = r["igdb_score"]
+            if score is None or score < sd_filter.min_score:
+                rejected.append(r)
+                continue
+        if sd_filter.max_bytes is not None:
+            try:
+                if (root / r["rom_path"]).stat().st_size > sd_filter.max_bytes:
+                    rejected.append(r)
+                    continue
+            except OSError:
+                pass          # can't measure it → don't drop it on a stat failure
+    return excluded | _rom_and_cover_paths(rejected)
 
 
 @router.get("/sessions/{session_id}/package/size")
 def package_size(session_id: str, video: bool = False, system: str | None = None,
-                 korean: bool = False) -> dict:
+                 flags: str | None = None, max_mb: int | None = None,
+                 patched: bool = False, favorite: bool = False,
+                 min_score: int | None = None) -> dict:
     """Estimated on-SD byte size for the (optionally filtered) package."""
+    sd_filter = parse_filter(flags, max_mb, patched, favorite, min_score)
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id, korean_only=korean)
+        excluded = _excluded_roms(conn, session_id, sd_filter)
     systems = _parse_systems(system)
     return {"bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
                                                homebrew_roms=homebrew, excluded_roms=excluded)}
@@ -186,17 +265,20 @@ def package_size(session_id: str, video: bool = False, system: str | None = None
 
 @router.post("/sessions/{session_id}/package/build")
 async def start_package_build(session_id: str, video: bool = False, system: str | None = None,
-                              korean: bool = False) -> dict:
+                              flags: str | None = None, max_mb: int | None = None,
+                              patched: bool = False, favorite: bool = False,
+                              min_score: int | None = None) -> dict:
     """Start (or reuse) the SD-zip build. Returns immediately:
       {ready: true,  job_id: null}  — already cached, download straight away, or
       {ready: false, job_id: "..."} — building; poll GET /jobs/{id} for progress
                                        and POST /jobs/{id}/cancel to stop it.
     The zip is built in a worker thread so the request loop stays responsive and
     the browser sees live progress instead of a frozen 'Preparing…' for minutes."""
+    sd_filter = parse_filter(flags, max_mb, patched, favorite, min_score)
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id, korean_only=korean)
+        excluded = _excluded_roms(conn, session_id, sd_filter)
     systems = _parse_systems(system)
     if not packaging.session_has_content(session_id, include_video=video, systems=systems,
                                          homebrew_roms=homebrew, excluded_roms=excluded):
@@ -220,18 +302,23 @@ async def start_package_build(session_id: str, video: bool = False, system: str 
 
 @router.get("/sessions/{session_id}/package")
 def download_package(request: Request, session_id: str, video: bool = False,
-                     system: str | None = None, korean: bool = False) -> Response:
+                     system: str | None = None, flags: str | None = None,
+                     max_mb: int | None = None, patched: bool = False,
+                     favorite: bool = False, min_score: int | None = None) -> Response:
     """ZIP mirroring the SD card (/roms, /covers). Video (/media) is excluded by
     default — pass ?video=1 to include it. Pass ?system=<dirname> (or a
-    comma-separated list) to package only those systems. Pass ?korean=1 to ship
-    only 한글패치 ROMs (non-Korean roms + their covers are dropped).
+    comma-separated list) to package only those systems. The "상세 조건" filter —
+    ?flags=ko,ja (cover flags; "none" = unflagged), ?max_mb=, ?patched=1, ?favorite=1,
+    ?min_score= — drops the ROMs it rejects, their covers with them. Homebrew is
+    exempt (see _excluded_roms).
 
     Cached & ETagged: the zip is built to disk only when the library/params change
     (not on every download), and an unchanged client gets a 304."""
+    sd_filter = parse_filter(flags, max_mb, patched, favorite, min_score)
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
-        excluded = _excluded_roms(conn, session_id, korean_only=korean)
+        excluded = _excluded_roms(conn, session_id, sd_filter)
     systems = _parse_systems(system)
     if not packaging.session_has_content(session_id, include_video=video, systems=systems,
                                          homebrew_roms=homebrew, excluded_roms=excluded):
@@ -254,8 +341,8 @@ def download_package(request: Request, session_id: str, video: bool = False,
         suffix = "-selected"
     else:
         suffix = ""
-    if korean:
-        suffix += "-korean"
+    if sd_filter.active:
+        suffix += "-filtered"
     return FileResponse(
         zip_path,
         media_type="application/zip",

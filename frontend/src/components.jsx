@@ -701,7 +701,7 @@ export function langFlagUrl(code) {
 }
 
 // Cover-flag (corner country icon) options for the rom edit modal. "" = no flag.
-const FLAG_OPTIONS = [
+export const FLAG_OPTIONS = [
   { code: "", label: "No flag" },
   { code: "ko", label: "Korea" },
   { code: "ja", label: "Japan" },

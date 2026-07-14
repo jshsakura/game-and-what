@@ -668,36 +668,51 @@ export async function autoresolve(system) {
 
 // Build the query string shared by the package endpoints: optional system
 // filter + optional Korean-patched-only flag.
-function packageQuery(system, korean) {
+// The SD-ZIP "상세 조건" (see SdFilter on the server): which cover flags to keep, a
+// size cap, patched-only, favorites-only, a score floor. An empty object = no
+// conditions, which is the default card.
+export const EMPTY_SD_FILTER = { flags: [], maxMb: null, patched: false, favorite: false, minScore: null };
+
+export function sdFilterCount(f) {
+  if (!f) return 0;
+  return (f.flags?.length ? 1 : 0) + (f.maxMb ? 1 : 0) + (f.patched ? 1 : 0)
+    + (f.favorite ? 1 : 0) + (f.minScore != null ? 1 : 0);
+}
+
+function packageQuery(system, filter) {
   const p = new URLSearchParams();
   if (system) p.set("system", system);
-  if (korean) p.set("korean", "1");
+  if (filter?.flags?.length) p.set("flags", filter.flags.join(","));
+  if (filter?.maxMb) p.set("max_mb", String(filter.maxMb));
+  if (filter?.patched) p.set("patched", "1");
+  if (filter?.favorite) p.set("favorite", "1");
+  if (filter?.minScore != null) p.set("min_score", String(filter.minScore));
   const s = p.toString();
   return s ? `?${s}` : "";
 }
 
-export function packageUrl(system, korean = false) {
+export function packageUrl(system, filter) {
   const sid = getSessionId();
   if (!sid) return null;
-  return `/api/sessions/${sid}/package${packageQuery(system, korean)}`;
+  return `/api/sessions/${sid}/package${packageQuery(system, filter)}`;
 }
 
 // Kick off (or reuse) the server-side SD-zip build. Returns {ready, job_id}:
 // ready → download immediately; else poll jobUrl(job_id) for build progress.
-export function packageBuildUrl(system, korean = false) {
+export function packageBuildUrl(system, filter) {
   const sid = getSessionId();
   if (!sid) return null;
-  return `/api/sessions/${sid}/package/build${packageQuery(system, korean)}`;
+  return `/api/sessions/${sid}/package/build${packageQuery(system, filter)}`;
 }
 
 export const jobUrl = (id) => `/api/jobs/${id}`;
 export const jobCancelUrl = (id) => `/api/jobs/${id}/cancel`;
 
 // Estimated on-SD byte size of the (optional single-system, optional Korean-only) package.
-export async function packageSize(system, korean = false) {
+export async function packageSize(system, filter) {
   const sid = getSessionId();
   if (!sid) return null;
-  const res = await fetch(`/api/sessions/${sid}/package/size${packageQuery(system, korean)}`);
+  const res = await fetch(`/api/sessions/${sid}/package/size${packageQuery(system, filter)}`);
   if (!res.ok) return null;
   return (await res.json()).bytes;
 }

@@ -61,7 +61,9 @@ def _enrich_rom(r: dict, session_id: str) -> dict:
       the `region` column now, not the shown name.
     - display_region: the region you actually PLAY in. A Japanese dump with a
       Korean patch reads as 'Korea' (play_lang ko), never 'Japan'.
-    - cover_ver: cache-bust token for the cover URL (see _cover_ver)."""
+    - cover_ver: cache-bust token for the cover URL (see _cover_ver).
+    - size_bytes: the ROM file's size, so the UI can count/preview what a size-capped
+      SD selection would actually contain without asking the server per keystroke."""
     if r.get("korean_name"):
         display = r["korean_name"]
     else:
@@ -71,6 +73,10 @@ def _enrich_rom(r: dict, session_id: str) -> dict:
     r["display_name"] = display
     r["display_region"] = "Korea" if r.get("is_korean_patched") else r.get("region")
     r["cover_ver"] = _cover_ver(session_id, r)
+    try:
+        r["size_bytes"] = (storage.session_root(session_id) / r["rom_path"]).stat().st_size
+    except OSError:
+        r["size_bytes"] = None
     return r
 
 

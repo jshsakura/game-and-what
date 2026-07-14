@@ -86,21 +86,21 @@ function usePageSize() {
   return size;
 }
 
-// koOnly/koKeys come from the SD-ZIP scope control: in Korean-only scope a platform
-// with no ko-flagged rom would ship nothing, so its chip is not selectable and says
-// so, instead of taking a check that silently produces an empty folder.
-export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel, koOnly = false, koKeys, alwaysKeys }) {
+// passes/keepKeys/filtered come from the SD-ZIP conditions (상세 조건): a platform the
+// conditions empty out is not selectable and says so, instead of taking a check that
+// silently produces an empty folder. `passes(rom)` mirrors the server's SdFilter.
+export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel,
+                                     passes, keepKeys, filtered = false, alwaysKeys }) {
   const toast = useToast();
   const { t, lang } = useI18n();
   const koreanMode = useKoreanMode();
   const experimental = useExperimentalMode();
   // 한글명-누락 filter/badge: Korean deploy AND Korean UI only (hidden in English).
   const koFeature = koreanMode && lang === "ko";
-  // Not selectable while the zip scope is Korean-only: this platform has no rom
-  // carrying the ko flag, so it would contribute an empty folder.
-  const noKo = (key) => koOnly && !!koKeys && !koKeys.has(key);
-  // Ships regardless of the scope (homebrew: the firmware's apps need these files).
-  const always = (key) => koOnly && !!alwaysKeys && alwaysKeys.has(key);
+  // Nothing left to ship from this platform once the conditions are applied.
+  const dropped = (key) => filtered && !!keepKeys && !keepKeys.has(key);
+  // Ships whatever the conditions say (homebrew: the firmware's apps need these files).
+  const always = (key) => filtered && !!alwaysKeys && alwaysKeys.has(key);
   const [lib, setLib] = useState({ roms: [], videos: [], music: [] });
   // Seed from the last-known systems (cached) so the loading skeleton renders the
   // RIGHT number of platform chips on first paint — otherwise it starts at the
@@ -213,14 +213,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   // Count only ROMs that actually ship — excluded ones (manual opt-out or PICO-8
   // 구동불가) stay in the library but won't be in the SD ZIP, so they shouldn't
   // inflate the selection.
-  // …and it must answer the CURRENT scope: in Korean-only the zip carries just the
-  // ko-flagged roms (plus homebrew), so counting every rom on the checked platforms
-  // would promise a card several times the one you'd actually get.
-  const goesOnCard = (rom) => shipsToSd(rom)
-    && (!koOnly || rom.cover_flag === "ko" || !!alwaysKeys?.has(rom.system_key));
+  // …and it must answer the CURRENT conditions: counting every rom on the checked
+  // platforms would promise a card several times the one you'd actually get.
+  const goesOnCard = passes || shipsToSd;
   const selectedFileCount = useMemo(
     () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter(goesOnCard).length || 0), 0),
-    [selected, bySystem, koOnly, alwaysKeys]
+    [selected, bySystem, goesOnCard]
   );
 
   // ALL supported systems show as chips (don't omit any) — empty ones are dimmed
@@ -380,7 +378,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
             return (
             <button
               key={g.key}
-              className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"} ${noKo(g.key) ? "no-ko" : ""}`}
+              className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"} ${dropped(g.key) ? "no-ko" : ""}`}
               style={{ "--sys": systemColor(g.key) }}
               onClick={() => setActive(g.key)}
             >
@@ -390,7 +388,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
                 <span className="lib-chip-count">{incl.length}</span>
                 {always(g.key) && (
                   <span className="lib-chip-always"
-                    title={t("Always on the card — the firmware's built-in apps need these files, Korean or not")}>!</span>
+                    title={t("Always on the card — the firmware's built-in apps need these files, whatever the conditions")}>!</span>
                 )}
                 {miss > 0
                   ? <span className="lib-chip-miss" title={t("{n} missing covers", { n: miss })}>{miss}</span>
@@ -398,12 +396,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               </span>
               {g.roms.length > 0 && (
                 <span
-                  className={`lib-chip-check ${selected.has(g.key) ? "on" : ""} ${noKo(g.key) ? "off" : ""}`}
-                  role="checkbox" aria-checked={selected.has(g.key)} aria-disabled={noKo(g.key)}
-                  title={noKo(g.key) ? t("No Korean ROMs on this platform — nothing to put in a Korean-only SD ZIP") : t("Select for download")}
-                  onClick={(e) => { e.stopPropagation(); if (!noKo(g.key)) onToggleSel(g.key); }}
+                  className={`lib-chip-check ${selected.has(g.key) ? "on" : ""} ${dropped(g.key) ? "off" : ""}`}
+                  role="checkbox" aria-checked={selected.has(g.key)} aria-disabled={dropped(g.key)}
+                  title={dropped(g.key) ? t("Nothing on this platform matches the SD conditions") : t("Select for download")}
+                  onClick={(e) => { e.stopPropagation(); if (!dropped(g.key)) onToggleSel(g.key); }}
                 >
-                  {noKo(g.key)
+                  {dropped(g.key)
                     ? <X size={14} strokeWidth={4} aria-hidden />
                     : selected.has(g.key) && <Check size={16} strokeWidth={4} aria-hidden />}
                 </span>

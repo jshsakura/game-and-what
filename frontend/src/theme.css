@@ -1543,25 +1543,68 @@ body::before {
 /* match the tab labels (라이브러리 등) — 11px, not the default .btn 12px */
 .tab-dl, .tab-selall { white-space: nowrap; font-size: 11px; }
 
-/* SD-ZIP scope: 전체 | 한글판만. One choice, two segments — the selected one is
-   filled with the accent so it reads at a glance, and it stays filled on hover
-   (a plain .btn.on loses to .btn:hover, which is exactly how the old toggle
-   managed to look unpressed the whole time the pointer was on it). */
-.scope-seg {
-  display: inline-flex; align-items: stretch; flex: 0 0 auto;
-  border: 2px solid #1c2027; border-radius: 8px; overflow: hidden;
-  background: #2a2d28;
+/* SD-ZIP 상세 조건 — one button, one panel. The trigger carries a count so the
+   conditions are visible without opening it. */
+.sdf { position: relative; flex: 0 0 auto; }
+.sdf-trigger { white-space: nowrap; font-size: 11px; }
+.sdf-trigger.on, .sdf-trigger.on:hover:not(:disabled) {
+  background: var(--accent); color: var(--accent-ink); border-color: #00000077;
 }
-.scope-seg .seg {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 11px 12px; border: 0; cursor: pointer;
+.sdf-count {
+  margin-left: 5px; min-width: 15px; padding: 1px 4px; border-radius: 999px;
+  background: #00000059; color: inherit;
+  font-family: var(--pixel); font-size: 7px; line-height: 1.5;
+}
+.sdf-panel {
+  position: absolute; z-index: 40; top: calc(100% + 6px); right: 0;
+  width: 300px; max-width: 92vw; padding: 12px;
+  background: var(--card-bg); color: var(--card-ink);
+  border: 2px solid #1c2027; border-radius: 10px;
+  box-shadow: 0 10px 26px #00000073;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.sdf-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--body-font); font-size: 12px; font-weight: 700;
+}
+.sdf-reset {
+  display: inline-flex; align-items: center; gap: 3px; cursor: pointer;
+  padding: 3px 7px; border-radius: 6px; border: 1px solid #ffffff26;
+  background: transparent; color: var(--card-dim);
+  font-family: var(--body-font); font-size: 10px;
+}
+.sdf-reset:hover { color: var(--card-ink); border-color: #ffffff59; }
+.sdf-block { display: flex; flex-direction: column; gap: 6px; }
+.sdf-label {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--body-font); font-size: 11px; font-weight: 700; color: var(--card-dim);
+}
+.sdf-hint { font-family: var(--body-font); font-size: 10px; color: var(--card-dim); }
+.sdf-flags { display: flex; flex-wrap: wrap; gap: 5px; }
+.sdf-flag {
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  padding: 4px 6px; border-radius: 7px;
+  background: #00000040; border: 2px solid #ffffff1f; color: var(--card-ink);
+}
+.sdf-flag img { width: 17px; height: 12px; border-radius: 2px; display: block; }
+.sdf-flag-n { font-family: var(--pixel); font-size: 7px; line-height: 1; color: var(--card-dim); }
+.sdf-flag:hover { border-color: #ffffff59; }
+.sdf-flag.on { background: var(--accent); border-color: #fff; }
+.sdf-flag.on .sdf-flag-n { color: var(--accent-ink); }
+.sdf-flag.zero { opacity: 0.42; }
+.sdf-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.sdf-chip {
+  cursor: pointer; padding: 5px 9px; border-radius: 7px;
+  background: #00000040; border: 2px solid #ffffff1f; color: var(--card-ink);
   font-family: var(--body-font); font-size: 11px; font-weight: 700;
-  white-space: nowrap; background: transparent; color: var(--card-dim);
 }
-.scope-seg .seg + .seg { border-left: 2px solid #1c2027; }
-.scope-seg .seg:hover { color: var(--card-ink); background: #ffffff12; }
-.scope-seg .seg.on,
-.scope-seg .seg.on:hover { background: var(--accent); color: var(--accent-ink); }
+.sdf-chip:hover { border-color: #ffffff59; }
+.sdf-chip.on { background: var(--accent); border-color: #fff; color: var(--accent-ink); }
+.sdf-switches { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+.sdf-switch {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  font-family: var(--body-font); font-size: 11px; color: var(--card-ink);
+}
 /* Loading skeletons for the fixed top-right button set (전체 / SD ZIP) — same box
    as the real .btn so they swap in with no layout shift. */
 .btn-skel { display: inline-block; height: 43px; border-radius: 8px; border: 2px solid #1c2027; pointer-events: none; vertical-align: middle; }
@@ -1959,13 +2002,15 @@ body::before {
      아래 줄에 받는 것(SD ZIP, 전체너비). Choices first, then the action they feed. */
   .tabbar .tabs { flex: 1 0 100%; }
   .tabbar-dl { flex: 1 0 100%; flex-wrap: wrap; }
-  .tabbar-dl .tab-selall { flex: 1 1 40%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .scope-seg { flex: 1 1 50%; }
-  .tabbar-dl .scope-seg .seg { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  /* Top row: the two choosers (which platforms, on what conditions).
+     Bottom row: the download, full width. */
+  .tabbar-dl .tab-selall { flex: 1 1 44%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  .tabbar-dl .sdf { flex: 1 1 44%; display: flex; }
+  .tabbar-dl .sdf-trigger { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  .tabbar-dl .sdf-panel { right: auto; left: 0; }
   .tabbar-dl .tab-dl { flex: 1 0 100%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  /* skeletons mirror the same two rows */
   .tabbar-dl .btn-skel { width: auto; height: 48px; }
-  .tabbar-dl .btn-skel.sel { flex: 1 1 40%; }
+  .tabbar-dl .btn-skel.sel { flex: 1 1 44%; }
   .tabbar-dl .btn-skel.dl { flex: 1 0 100%; }
   /* Localized tab labels may be longer — slightly smaller font on phones */
   .tab { font-size: 10px; padding: 12px 9px; }

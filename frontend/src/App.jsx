@@ -7,7 +7,8 @@ import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
 import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages, Loader2 } from "lucide-react";
-import { getLibrary, packageSize, formatBytes } from "./api.js";
+import { getLibrary, packageSize, formatBytes, EMPTY_SD_FILTER, sdFilterCount } from "./api.js";
+import SdFilterPanel from "./SdFilterPanel.jsx";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
 import { useExperimentalMode, useKoreanMode } from "./config.jsx";
@@ -208,8 +209,8 @@ export default function App() {
   const [libKeys, setLibKeys] = useState([]);        // system keys that have roms (selectable)
   const [selected, setSelected] = useState(() => new Set()); // checked systems for download
   const [selSize, setSelSize] = useState(null);
-  const [koOnly, setKoOnly] = useState(false);   // SD ZIP scope: only ko-flagged roms
-  const [koKeys, setKoKeys] = useState(() => new Set());  // platforms that HAVE ko-flagged roms
+  const [roms, setRoms] = useState([]);           // the library, for counting what a filter would ship
+  const [sdFilter, setSdFilter] = useState(EMPTY_SD_FILTER);   // SD ZIP 상세 조건
   const dl = useDownload();
 
   useEffect(() => {
@@ -222,37 +223,60 @@ export default function App() {
       .then((l) => {
         setCount(l.roms.length + l.videos.length + (l.music?.length || 0));
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
-        // Platforms that would survive a Korean-only zip. The filter goes by the
-        // cover FLAG, not the 한글패치 mark — an official Korean release counts too.
-        // Homebrew rides along whatever the scope: its files are what the firmware's
-        // built-in apps need to boot, not games with a language (see ALWAYS_SHIPPED).
-        const ko = new Set(l.roms.filter((r) => r.cover_flag === "ko").map((r) => r.system_key));
-        setKoKeys(new Set([...ko, ...l.roms.map((r) => r.system_key).filter((k) => ALWAYS_SHIPPED.has(k))]));
+        setRoms(l.roms);
       })
-      .catch(() => { setCount(0); setLibKeys([]); setKoKeys(new Set()); })
+      .catch(() => { setCount(0); setLibKeys([]); setRoms([]); })
       .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
   }, [reloadKey]);
 
-  // Full-library size. Cleared BEFORE the refetch: changing the scope changes the
-  // answer, and leaving the old number up until the new one lands reads as "the
-  // toggle did nothing" — the exact complaint. null == recalculating.
+  // Does this ROM survive the conditions? The server decides for real (SdFilter in
+  // routers/package.py); this mirror exists so the UI can grey out a platform that
+  // would ship nothing, and count what a selection actually contains, without a
+  // round-trip per keystroke. Homebrew is exempt there and here.
+  const passes = useMemo(() => (rom) => {
+    if (ALWAYS_SHIPPED.has(rom.system_key)) return true;
+    if (rom.sd_exclude || rom.pico8_compat === "broken") return false;
+    if (sdFilter.flags.length && !sdFilter.flags.includes(rom.cover_flag || "none")) return false;
+    if (sdFilter.patched && !rom.is_korean_patched) return false;
+    if (sdFilter.favorite && !rom.favorite) return false;
+    if (sdFilter.minScore != null && !(rom.igdb_score >= sdFilter.minScore)) return false;
+    if (sdFilter.maxMb && rom.size_bytes != null
+        && rom.size_bytes > sdFilter.maxMb * 1024 * 1024) return false;
+    return true;
+  }, [sdFilter]);
+
+  // Per-flag ROM counts for the panel — so a condition that would ship nothing reads
+  // as zero before you pick it.
+  const flagCounts = useMemo(() => {
+    const out = {};
+    for (const r of roms) {
+      const code = r.cover_flag || "none";
+      out[code] = (out[code] || 0) + 1;
+    }
+    return out;
+  }, [roms]);
+
+  // Platforms that still have something to ship under the conditions.
+  const keepKeys = useMemo(
+    () => new Set(roms.filter(passes).map((r) => r.system_key)), [roms, passes]);
+
+  // Full-library size. Cleared BEFORE the refetch: changing a condition changes the
+  // answer, and leaving the old number up until the new one lands reads as "nothing
+  // happened". null == recalculating.
   useEffect(() => {
     let alive = true;
     setSdSize(null);
-    packageSize(undefined, koOnly)
+    packageSize(undefined, sdFilter)
       .then((b) => alive && setSdSize(b))
       .catch(() => alive && setSdSize(null));
     return () => { alive = false; };
-  }, [reloadKey, koOnly]);
+  }, [reloadKey, sdFilter]);
 
   // Download selection (system key == dirname). 전체 선택 + 다운로드 live together top-right.
-  // In Korean-only scope a platform with no ko-flagged rom would contribute nothing
-  // to the zip, so it isn't selectable at all — the choice narrows the board rather
-  // than letting you check a platform that then silently ships nothing.
+  // A platform the conditions empty out isn't selectable: checking it would ship an
+  // empty folder, so the choice narrows the board instead of lying about it.
   const pickableKeys = useMemo(
-    () => (koOnly ? libKeys.filter((k) => koKeys.has(k)) : libKeys),
-    [koOnly, libKeys, koKeys],
-  );
+    () => libKeys.filter((k) => keepKeys.has(k)), [libKeys, keepKeys]);
   const toggleSel = (key) => setSelected((s) => {
     const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n;
   });
@@ -263,18 +287,19 @@ export default function App() {
   const selKey = selectedDirs.join(",");
   const hasSel = selectedDirs.length > 0;
 
-  // Switching TO Korean-only checks exactly the platforms that have Korean ROMs —
-  // the useful selection, without making the user hunt for which ones those are.
+  // Setting a condition re-checks exactly the platforms that still have something to
+  // ship, so you don't have to hunt for which ones those are.
+  const filterCount = sdFilterCount(sdFilter);
   useEffect(() => {
-    if (koOnly) setSelected(new Set(libKeys.filter((k) => koKeys.has(k))));
-  }, [koOnly, libKeys, koKeys]);
+    if (filterCount) setSelected(new Set(libKeys.filter((k) => keepKeys.has(k))));
+  }, [filterCount, sdFilter, libKeys, keepKeys]);
 
   // Size of the checked-systems selection (for the top-right download button).
   useEffect(() => {
     let alive = true; setSelSize(null);
-    if (selKey) packageSize(selKey, koOnly).then((b) => alive && setSelSize(b)).catch(() => {});
+    if (selKey) packageSize(selKey, sdFilter).then((b) => alive && setSelSize(b)).catch(() => {});
     return () => { alive = false; };
-  }, [selKey, reloadKey, koOnly]);
+  }, [selKey, reloadKey, sdFilter]);
 
   // The size shown on the SD ZIP button. null while the server recomputes it — a
   // scope/selection change makes the old number wrong, so it is not left standing.
@@ -337,7 +362,11 @@ export default function App() {
         {tab !== "library" ? null : (loading || count > 0) ? (
           // While the library loads, the REAL controls render shimmered in place
           // (is-skel). Fixed-width skeleton boxes can't track a localized label or
-          // the scope segment, so they always swapped in at the wrong size.
+          // the conditions button, so they always swapped in at the wrong size.
+          //
+          // Three controls: which platforms, on what conditions, then get it. On a
+          // phone the first two share the top row and the download takes the width
+          // below (see .tabbar-dl in theme.css).
           <div className="tabbar-dl">
             <button
               className={`btn tab-selall ${allSelected ? "on" : ""} ${loading ? "is-skel" : ""}`}
@@ -349,41 +378,17 @@ export default function App() {
                 ? <><X size={14} strokeWidth={3} aria-hidden /> {t("All platforms")}</>
                 : <><Check size={14} strokeWidth={3} aria-hidden /> {t("All platforms")}</>}
             </button>
-            {/* What goes IN the zip — a different question from which platforms are
-                checked, so it reads as a choice between two, not as a second toggle
-                sitting next to the platform one. Korean-only is a Korean-deploy
-                feature (the flag it filters on is only ever set there), so on any
-                other deploy there is no choice to make and the control is absent. */}
-            {koreanMode && (
-              <div className={`scope-seg ${loading ? "is-skel" : ""}`} role="group"
-                   aria-label={t("What goes in the SD ZIP")}>
-                <button
-                  type="button"
-                  className={`seg ${koOnly ? "" : "on"}`}
-                  onClick={() => setKoOnly(false)}
-                  aria-pressed={!koOnly}
-                  title={t("SD ZIP: every ROM in the library")}
-                >
-                  {t("All ROMs")}
-                </button>
-                <button
-                  type="button"
-                  className={`seg ${koOnly ? "on" : ""}`}
-                  onClick={() => setKoOnly(true)}
-                  aria-pressed={koOnly}
-                  title={t("SD ZIP: only ROMs flagged Korean (the size updates to match)")}
-                >
-                  <Languages size={13} strokeWidth={2.5} aria-hidden /> {t("Korean only")}
-                </button>
-              </div>
-            )}
+            {/* Every condition on what lands on the card lives in one panel — flags,
+                size cap, rating floor, favorites, patched. Not a toggle per idea. */}
+            <SdFilterPanel filter={sdFilter} onChange={setSdFilter}
+              flagCounts={flagCounts} disabled={loading} />
             <button className={`btn tab-dl has-size ${loading ? "is-skel" : ""}`}
               disabled={loading || !hasSel || dl.busy}
               onClick={() => dl.downloadPackage(
                 allSelected ? undefined : selKey,
-                `gnw-sd${allSelected ? "" : "-selected"}${koOnly ? "-korean" : ""}.zip`,
+                `gnw-sd${allSelected ? "" : "-selected"}${filterCount ? "-filtered" : ""}.zip`,
                 shownSize || 0,
-                koOnly,
+                sdFilter,
               )}
               title={hasSel ? (allSelected ? t("Download the full SD (incl. firmware & BIOS) as ZIP") : t("Download the checked platforms as an SD ZIP")) : t("Check a platform (or select all) to download")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> SD ZIP
@@ -406,7 +411,8 @@ export default function App() {
           {tab === "extra" && <ExtraTab onChanged={bumpLibrary} />}
           {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
           {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected}
-            onToggleSel={toggleSel} koOnly={koOnly} koKeys={koKeys} alwaysKeys={ALWAYS_SHIPPED} />}
+            onToggleSel={toggleSel} passes={passes} keepKeys={keepKeys}
+            filtered={filterCount > 0} alwaysKeys={ALWAYS_SHIPPED} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
           {tab === "help" && <HelpTab />}
         </div>

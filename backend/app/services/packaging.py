@@ -24,8 +24,16 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
     of the SD (sd_exclude=1) — kept in the library but dropped from the card."""
     parts = path.relative_to(root).parts
     rel = "/".join(parts)
-    if excluded_roms and rel in excluded_roms:
-        return True
+    if excluded_roms:
+        if rel in excluded_roms:
+            return True
+        # Folder-per-game (CD): only the .cue/.chd is a DB row — its track sidecars
+        # are not. Excluding the entry therefore has to take the whole folder, or the
+        # tracks sail past every filter on their own (2 GB of PC Engine CD audio was
+        # doing exactly that, sd_exclude included). Callers put the game folder in the
+        # set; anything under it goes with it.
+        if any("/".join(parts[:i]) in excluded_roms for i in range(1, len(parts))):
+            return True
     # An underscore-prefixed FOLDER is ours, not the card's: _trash, _data,
     # _previews, _firmware, _extra — and the _orig_backup of pre-encode source
     # videos. The device reads none of them, so none of them ship. (_firmware and
