@@ -1243,7 +1243,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 next to them was just crowding a narrow space (and everything in this
                 corner is a GBA anyway). A favourited rom still shows its star; to favourite
                 one that is not, use the star in the card's detail panel. */}
-            {(gba == null || gba.unknown || rom.favorite) && (
+            {/* Boolean(), not the raw value: rom.favorite comes back from sqlite as 0/1,
+                and `a || b || 0` evaluates to 0 — which React dutifully renders as a "0"
+                sitting next to the rings. */}
+            {Boolean(gba == null || gba.unknown || rom.favorite) && (
               <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
                 onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
                 {rom.favorite
@@ -1291,7 +1294,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   gba.load > 100
                     ? t("Frameskip may still get it there — that frees the PPU's share, not the CPU's.")
                     : "",
-                  t("A cycle-budget estimate — never checked on real hardware."),
+                  t("The budget was timed on the device — but a heavier game pays more per cycle, so read it as a model."),
                 ].filter(Boolean).join("\n")} />
                 {/* Only where the skip earned it. A BIOS-halt game idles most of its
                     frame too, and crediting our table for that would be a lie. */}

@@ -418,6 +418,8 @@ export default {
     "gpSP가 이 게임의 VBlank 대기 루프를 알고 있어 건너뜁니다.",
   "No busy-wait loop: it waits via the BIOS, which gpSP already skips.":
     "busy-wait 루프 없음 — BIOS로 대기하며, gpSP가 이미 건너뜁니다.",
+  "The budget was timed on the device — but a heavier game pays more per cycle, so read it as a model.":
+    "예산은 실기에서 잰 값입니다 — 다만 무거운 게임일수록 사이클당 단가가 오르니 모델로 읽으세요.",
   "A cycle-budget estimate — never checked on real hardware.":
     "사이클 예산 기반 추정치입니다 — 실기에서 확인한 적 없습니다.",
   "SELECT (TIME)": "SELECT (TIME)",
