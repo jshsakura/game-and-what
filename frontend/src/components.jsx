@@ -893,6 +893,60 @@ const P8_FILTER_OPTS = [
   { v: "broken", ...P8_COMPAT.broken },
   { v: "untested", ...P8_UNTESTED },
 ];
+// GBA: the same shape as the PICO-8 compat filter, because it answers the same question —
+// "which of these will actually run on the device?" — and the answer is already on every
+// card as a ring. This just lets you ask the library for one colour at a time.
+//
+// The buckets ARE the ring's colours, so nothing new has to be learned; `unknown` is kept
+// separate and last because it is not a verdict at all. A rom whose wait loop was never
+// found spins, the spin is counted as work, and it comes back at a full frame — which reads
+// as the heaviest game in the library and means "we could not measure it".
+export const GBA_LOAD_FILTERS = [
+  { v: "all", short: "All" },
+  { v: "fits", short: "Fits", cls: "ok", label: "Runs with room to spare (CPU 80% or less)" },
+  { v: "tight", short: "Tight", cls: "tight", label: "Close to the limit (CPU 80–100%)" },
+  { v: "over", short: "Over", cls: "over", label: "Too heavy for the device (CPU over 100%)" },
+  { v: "unknown", short: "Not measured", cls: "unknown", label: "Its wait loop was never found — not a heavy game, an unmeasured one" },
+];
+
+/** Which bucket a rom falls in. null = not a measured GBA rom, so it has no verdict. */
+export function gbaBucket(rom) {
+  const g = gbaReading(rom);
+  if (!g) return null;
+  if (g.unknown) return "unknown";
+  return g.load > 100 ? "over" : g.load > 80 ? "tight" : "fits";
+}
+
+export function GbaLoadFilter({ value, onChange, roms = [] }) {
+  const t = useT();
+  const counts = roms.reduce((acc, r) => {
+    const k = gbaBucket(r);
+    if (k) acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {});
+  const measured = roms.filter((r) => gbaBucket(r)).length;
+  return (
+    <span className="search-scope gba-filter" role="group" aria-label={t("CPU load filter")}>
+      {GBA_LOAD_FILTERS.map((o) => {
+        const n = o.v === "all" ? roms.length : counts[o.v] || 0;
+        const on = value === o.v;
+        return (
+          <button key={o.v} className={`scope-btn ${on ? "on" : ""}`} aria-pressed={on}
+            onClick={() => onChange(o.v)} title={t(o.label || o.short)}>
+            {o.cls && <span className={`gba-dot ${o.cls === "ok" ? "" : o.cls}`} aria-hidden />}
+            {t(o.short)} <span className="scope-count">{n}</span>
+          </button>
+        );
+      })}
+      {measured < roms.length && (
+        <span className="gba-filter-note" title={t("A rom is measured by running it — a fresh upload takes a moment.")}>
+          {t("{n} not yet run", { n: roms.length - measured })}
+        </span>
+      )}
+    </span>
+  );
+}
+
 export function Pico8CompatFilter({ value, onChange, roms = [] }) {
   const t = useT();
   const counts = roms.reduce((acc, r) => {

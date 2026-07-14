@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, X, HardDriveDownload, StarOff } from "lucide-react";
 import { getLibrary, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
-import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, SortSelect } from "../components.jsx";
+import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, GbaLoadFilter, gbaBucket, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useExperimentalMode, useKoreanMode } from "../config.jsx";
 import { useI18n } from "../i18n.jsx";
@@ -120,6 +120,9 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   const [sortMode, setSortMode] = useState("recent"); // recent | name | oldest
   const sortCmp = SORTS[sortMode] || SORTS.recent;
   const [compatFilter, setCompatFilter] = useState("all"); // PICO-8 호환 상태 필터
+  // GBA: the same question PICO-8's filter asks — will it run on the device? The verdict
+  // is already on every card as a ring; this asks the library for one colour at a time.
+  const [gbaFilter, setGbaFilter] = useState("all");
   const pageSize = usePageSize();
 
   const [busy, setBusy] = useState(false);
@@ -260,12 +263,17 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
   if (current === "pico8" && compatFilter !== "all") {
     items = items.filter((r) => (r.pico8_compat || "untested") === compatFilter);
   }
+  // GBA CPU-load 필터 (gba 보기에서만). A rom still being measured has no verdict yet and
+  // belongs in no bucket — it must not silently vanish into one.
+  if (current === "gba" && gbaFilter !== "all") {
+    items = items.filter((r) => gbaBucket(r) === gbaFilter);
+  }
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const pageItems = items.slice((safePage - 1) * pageSize, safePage * pageSize);
   useEffect(() => { setPage(1); }, [q]);
   useEffect(() => { setPage(1); }, [pageSize]);
-  useEffect(() => { setPage(1); }, [missingOnly, nonKoOnly, unratedOnly, compatFilter]);
+  useEffect(() => { setPage(1); }, [missingOnly, nonKoOnly, unratedOnly, compatFilter, gbaFilter]);
 
   return (
     <div className="stack">
@@ -274,7 +282,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       <div className="muted">
         <Library size={13} aria-hidden />{" "}
         <span className={`lib-summary ${loading ? "is-skel" : ""}`}>
-          {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+          {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all") || (current === "gba" && gbaFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
         </span>
       </div>
 
@@ -361,6 +369,14 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       {!empty && current === "pico8" && !(searching && searchAll) && (
         <div className="lib-compat-filter">
           <Pico8CompatFilter value={compatFilter} onChange={setCompatFilter}
+            roms={activeGroup?.roms ?? []} />
+        </div>
+      )}
+
+      {/* GBA 전용: 같은 자리, 같은 모양 — 실기에서 돌아가느냐로 거른다. */}
+      {!empty && current === "gba" && !(searching && searchAll) && (
+        <div className="lib-compat-filter">
+          <GbaLoadFilter value={gbaFilter} onChange={setGbaFilter}
             roms={activeGroup?.roms ?? []} />
         </div>
       )}

@@ -403,6 +403,18 @@ export default {
     "이 게임은 스핀 대신 BIOS로 기다리고, gpSP는 그건 이미 건너뜁니다. 찾아줄 게 없습니다.",
   "Without that address the wait is emulated instruction by instruction and fills the frame — the game cannot reach full speed however light it really is.":
     "그 주소가 없으면 기다림이 명령어 하나하나 흉내내지면서 프레임을 다 채웁니다. 실제로는 아무리 가벼운 게임이라도 풀스피드에 못 닿습니다.",
+  "CPU load filter": "CPU 부하 필터",
+  "Fits": "여유",
+  "Tight": "아슬",
+  "Over": "초과",
+  "Runs with room to spare (CPU 80% or less)": "여유 있게 돌아갑니다 (CPU 80% 이하)",
+  "Close to the limit (CPU 80–100%)": "한계에 가깝습니다 (CPU 80~100%)",
+  "Too heavy for the device (CPU over 100%)": "실기에 너무 무겁습니다 (CPU 100% 초과)",
+  "Its wait loop was never found — not a heavy game, an unmeasured one":
+    "대기 루프를 못 찾았습니다. 무거운 게임이 아니라, 측정하지 못한 게임입니다",
+  "{n} not yet run": "아직 안 돌려본 롬 {n}개",
+  "A rom is measured by running it — a fresh upload takes a moment.":
+    "롬은 실제로 돌려서 측정합니다. 방금 올린 롬은 잠시 걸립니다.",
   "CPU — what the game costs the real device": "CPU (이 게임이 실기에 지우는 부담)",
   "Idle skip — how much of the frame it takes back": "아이들 스킵 (프레임을 얼마나 되찾아 주는지)",
   "The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.":

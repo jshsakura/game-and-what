@@ -577,9 +577,19 @@ body::before {
   flex: 0 0 auto; width: 8px; height: 8px; margin-top: 3px;
   border-radius: 50%; background: #35c46a;
 }
+/* The same dot in the library's GBA filter, where it sits inline in a button rather than
+   at the head of a paragraph — so no top margin, and it lines up with the label. */
+.gba-filter .gba-dot { margin: 0 1px 0 0; width: 7px; height: 7px; }
+.gba-filter-note {
+  font-family: var(--body-font); font-size: 10px; color: var(--card-dim);
+  align-self: center; padding-left: 6px; white-space: nowrap;
+}
 .gba-dot.tight { background: #e0a72c; }
 .gba-dot.over { background: #d94b3f; }
 .gba-dot.skip { background: #62c8f5; }
+/* Grey, deliberately, and never red: red says "heavy game", and an unmeasured rom is
+   exactly what that is NOT. Its wait loop was not found, so the wait got counted as work. */
+.gba-dot.unknown { background: #6b7280; }
 
 .hash-section { margin: 8px 0 2px; }
 .hash-row { display: flex; align-items: stretch; gap: 8px; }
