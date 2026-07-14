@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -12,8 +13,10 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import covers, covers_pico8, events, gamelist, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
+from ..services import covers, covers_pico8, events, gamelist, gba_probe, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
 from .sessions import require_session, require_system_enabled
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["roms"])
 
@@ -51,6 +54,7 @@ async def upload_roms(
 
     results = []
     pending_cover: list[dict] = []   # roms still without a cover → background autofill
+    pending_probe: list[dict] = []   # GBA roms whose idle loop/frame cost must be measured
     for upload in files:
         # NFC at the very entry boundary so every derived name (metadata, stored,
         # cover) is composed — NFD uploads (macOS) would otherwise show broken jamo.
@@ -139,21 +143,27 @@ async def upload_roms(
         if needs_cover:
             cover_status = "pending"
 
+        # A GBA rom's fate on the real device turns on a number its header does not
+        # carry: whether gpSP knows its VBlank idle loop, and how much work it actually
+        # does per frame. Finding that out means RUNNING the game (~15s), so it cannot
+        # happen inside the upload — the rom lands 'pending' and _probe_gba fills it in.
+        probe_status = "pending" if sys_obj.key == "gba" else None
+
         rom_id = storage.new_id()
         with db.connect() as conn:
             conn.execute(
                 """INSERT INTO roms (id, session_id, system_key, original_name,
                        stored_name, korean_name, rom_path, cover_path, cover_status,
                        orig_lang, play_lang, is_korean_patched, lang_source, region, cover_flag,
-                       content_hash, pico8_compat, pico8_mem_hint, patch_ver)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                       content_hash, pico8_compat, pico8_mem_hint, patch_ver, probe_status)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (rom_id, session_id, sys_obj.key, storage.nfc(meta.original_name), stored_name,
                  storage.nfc(meta.korean_name), storage.relative_to_session(session_id, rom_path),
                  cover_rel, cover_status,
                  li.orig_lang, li.play_lang, int(ko_patched), li.source, region, cover_flag,
                  chash, pico8_compat.lookup(stored_name) if sys_obj.pico8 else None,
                  pico8_memhint.estimate(rom_path) if sys_obj.pico8 else None,
-                 patchver.parse(original)),
+                 patchver.parse(original), probe_status),
             )
             events.log(conn, session_id, "rom_upload", rom_id=rom_id,
                        rom_name=stored_name, system_key=sys_obj.key)
@@ -168,6 +178,8 @@ async def upload_roms(
                 # shows no 🇰🇷 until something re-bakes it.
                 "cover_flag": cover_flag,
             })
+        if probe_status == "pending":
+            pending_probe.append({"id": rom_id, "rom_path": rom_path})
         results.append({
             "id": rom_id,
             "name": original,
@@ -178,6 +190,7 @@ async def upload_roms(
             "korean_name": meta.korean_name,
             "screenshot_url": meta.screenshot_url,
             "cover_status": cover_status,
+            "probe_status": probe_status,
             "warning": header_warning,
         })
 
@@ -185,9 +198,42 @@ async def upload_roms(
     # covers appear as the library refreshes (no manual '자동 채우기' needed).
     if pending_cover:
         asyncio.create_task(_autofill_covers(session_id, pending_cover))
+    if pending_probe:
+        asyncio.create_task(_probe_gba(session_id, pending_probe))
 
     stored = sum(1 for r in results if r.get("ok"))
     return {"session_id": session_id, "stored": stored, "results": results}
+
+
+async def _probe_gba(session_id: str, roms: list[dict]) -> None:
+    """Background: work out whether each freshly-uploaded GBA rom can run on the device.
+
+    A rom the database already knows is settled instantly; anything new is RUN for ~15s
+    (see services/gba_probe). Serialised there, so a bulk upload measures one at a time
+    instead of burying the box.
+
+    Every rom here was stored probe_status='pending' and MUST leave it — 'ok' or
+    'failed'. One left 'pending' would spin in the UI forever.
+    """
+    for rom in roms:
+        status, idle_pc, cycles = "failed", None, None
+        try:
+            result = await gba_probe.probe(Path(rom["rom_path"]))
+            if result:
+                status = "ok"
+                idle_pc, cycles = result.idle_pc, result.exec_cycles
+        except Exception:                                    # noqa: BLE001 — never wedge the queue
+            log.exception("gba probe crashed for %s", rom["id"])
+
+        try:
+            with db.connect() as conn:
+                conn.execute(
+                    "UPDATE roms SET probe_status = ?, idle_loop = ?, idle_pc = ?, "
+                    "exec_cycles = ? WHERE id = ? AND session_id = ?",
+                    (status, int(bool(idle_pc)), idle_pc, cycles, rom["id"], session_id),
+                )
+        except Exception:                                    # noqa: BLE001
+            log.exception("could not store the gba probe for %s", rom["id"])
 
 
 async def _autofill_covers(session_id: str, roms: list[dict]) -> None:

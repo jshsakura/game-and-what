@@ -1170,6 +1170,11 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
             </button>
             {/* Takes the system-icon corner: it has to be readable at a glance across
                 the grid, and in the title row a long name pushed it out of sight. */}
+            {gbaLoad == null && rom.probe_status === "pending" && (
+              <em className="idle-tag measuring" title={t("Running the game to measure its CPU load…")}>
+                <Loader size={10} className="spin" aria-hidden /> {t("Measuring")}
+              </em>
+            )}
             {gbaLoad != null && (
               <em className={`idle-tag ${gbaLoad > 100 ? "over" : gbaLoad > 80 ? "tight" : ""}`}
                 title={[

@@ -220,6 +220,22 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # NULL = not measured.
         conn.execute("ALTER TABLE roms ADD COLUMN exec_cycles INTEGER")
 
+    if "probe_status" not in cols:
+        # GBA only. Measuring a rom means RUNNING it for ~15s, so an upload cannot wait
+        # for it: the rom lands as 'pending' and a background task fills in idle_loop /
+        # exec_cycles. NULL = nothing to measure (not GBA, or no probe binary in this
+        # build). 'pending' | 'ok' | 'failed' — a rom left 'pending' would spin in the
+        # UI forever, so every probe MUST resolve to one of the other two.
+        conn.execute("ALTER TABLE roms ADD COLUMN probe_status TEXT")
+
+    if "idle_pc" not in cols:
+        # The address itself, not just "there is one". Without it a measurement is only
+        # good for the badge — the firmware needs the actual PC to hand gpSP, and losing
+        # it would mean re-running the game to get it back. Hex string, e.g. "0x80008ce".
+        # It is the backward BRANCH that closes the wait loop (what gpSP compares the PC
+        # against), not the loop's start.
+        conn.execute("ALTER TABLE roms ADD COLUMN idle_pc TEXT")
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by

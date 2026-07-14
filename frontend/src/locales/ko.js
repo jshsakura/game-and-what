@@ -372,6 +372,8 @@ export default {
   "Copy": "복사",
   "Copied": "복사됨",
   "Duplicate": "중복",
+  "Measuring": "측정 중",
+  "Running the game to measure its CPU load…": "게임을 실제로 돌려 CPU 부하를 재는 중입니다…",
   "CPU {pct}%": "CPU {pct}%",
   "CPU load on the real device: {pct}% of its per-frame budget":
     "실기 CPU 부하: 프레임 예산의 {pct}%",

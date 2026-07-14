@@ -45,22 +45,27 @@ def main() -> None:
 
         for row in rows:
             code = game_code(root / row["rom_path"])
-            entry = table.get(code or "", {})
-            cycles = entry.get("exec_median")
-            # Only a RUN-verified address counts as an idle loop here. A guess that was
-            # never executed is worse than nothing: gpSP would jump out of the frame at
-            # an address that isn't the wait loop.
-            idle = 1 if entry.get("verify_tier") == "R" else 0
-
-            if cycles is None:
+            entry = table.get(code or "")
+            if not entry or not entry.get("exec_median"):
+                # Not in the table. Leave the row ALONE — the upload prober may have
+                # measured it live, and blanking that here would throw the measurement
+                # away and make the game look unknown again.
                 unmeasured += 1
+                continue
+
+            # Only a RUN-verified address counts as an idle loop. A guess that was never
+            # executed is worse than nothing: gpSP would jump out of the frame at an
+            # address that isn't the wait loop.
+            idle = 1 if entry.get("verify_tier") == "R" else 0
             conn.execute(
-                "UPDATE roms SET idle_loop = ?, exec_cycles = ? WHERE id = ?",
-                (idle, cycles, row["id"]),
+                "UPDATE roms SET idle_loop = ?, idle_pc = ?, exec_cycles = ?, "
+                "probe_status = 'ok' WHERE id = ?",
+                (idle, entry.get("idle_verified") if idle else None,
+                 entry["exec_median"], row["id"]),
             )
             updated += 1
 
-    print(f"{updated} rom(s) updated, {unmeasured} not measured")
+    print(f"{updated} rom(s) updated from the table, {unmeasured} left as-is")
 
 
 if __name__ == "__main__":

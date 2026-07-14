@@ -590,6 +590,11 @@ body::before {
   box-shadow: 0 1px 3px #00000059;
 }
 .cover-corner:has(.idle-tag.tight) { background: color-mix(in srgb, #e0a72c 90%, #2a1d05); color: #241a02; }
+/* Measuring means literally running the game for ~15s, so this can sit here a while
+   on a bulk upload — the probe is serialised on purpose. Neutral, not alarming. */
+.cover-corner:has(.idle-tag.measuring) { background: #2a2a30e6; color: #d8d8e0; }
+.idle-tag.measuring { display: inline-flex; align-items: center; gap: 3px; }
+.idle-tag.measuring svg { flex: 0 0 auto; }
 .cover-corner:has(.idle-tag.over)  { background: color-mix(in srgb, #d94b3f 90%, #2a0d0a); color: #fff1ef; }
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
