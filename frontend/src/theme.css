@@ -1955,23 +1955,18 @@ body::before {
   .pad-cap { gap: 10px; }
   .pad-cap em { font-size: 9px; }
   .topbar h1 { font-size: 13px; }
-  /* 탭바: 탭들은 한 줄, 전체선택+한글판만+다운로드는 그 아래 한 줄 전체너비로 분할 */
+  /* 탭바: 탭들은 한 줄. 그 아래로 — 위 줄에 고르는 것(플랫폼 전체 + 전체/한글판만),
+     아래 줄에 받는 것(SD ZIP, 전체너비). Choices first, then the action they feed. */
   .tabbar .tabs { flex: 1 0 100%; }
-  .tabbar-dl { flex: 1 0 100%; }
-  .tabbar-dl { flex-wrap: wrap; }
-  .tabbar-dl .tab-selall { flex: 3; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  /* the scope choice takes its own full-width row on a phone rather than being
-     squeezed to two unreadable slivers next to the download button */
-  /* The scope decides WHAT the download contains, so it comes first — its own
-     full-width row above the platform/download pair, not stranded under the button
-     it is supposed to qualify. */
-  .tabbar-dl .scope-seg { flex: 1 0 100%; order: -1; }
+  .tabbar-dl { flex: 1 0 100%; flex-wrap: wrap; }
+  .tabbar-dl .tab-selall { flex: 1 1 40%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  .tabbar-dl .scope-seg { flex: 1 1 50%; }
   .tabbar-dl .scope-seg .seg { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .tab-dl { flex: 6; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  /* skeletons mirror the real 3:7 split + height on phones */
+  .tabbar-dl .tab-dl { flex: 1 0 100%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
+  /* skeletons mirror the same two rows */
   .tabbar-dl .btn-skel { width: auto; height: 48px; }
-  .tabbar-dl .btn-skel.sel { flex: 3; }
-  .tabbar-dl .btn-skel.dl { flex: 7; }
+  .tabbar-dl .btn-skel.sel { flex: 1 1 40%; }
+  .tabbar-dl .btn-skel.dl { flex: 1 0 100%; }
   /* Localized tab labels may be longer — slightly smaller font on phones */
   .tab { font-size: 10px; padding: 12px 9px; }
   .device {
