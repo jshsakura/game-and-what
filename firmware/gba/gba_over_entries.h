@@ -218,16 +218,16 @@
     * exec 12,624/280,896 (96% idle) — CPU 14% of budget
     */
 
-   /* ABFE  브레스 오브 파이어
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 12,931/280,896 (95% idle) — CPU 14% of budget
-    */
-
    /* ANME  남코 뮤지엄 (Namco Museum)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 13,096/280,896 (95% idle) — CPU 15% of budget
+    */
+
+   /* ABFE  브레스 오브 파이어
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 13,517/280,896 (95% idle) — CPU 15% of budget
     */
 
    /* A2GE  GT 어드밴스 3 - 프로 콘셉트 레이싱 (GT Advance 3 - Pro Concept Racing)
@@ -246,6 +246,12 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 14,612/280,896 (95% idle) — CPU 16% of budget
+    */
+
+   /* AB2E  브레스 오브 파이어2
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 15,010/280,896 (95% idle) — CPU 17% of budget
     */
 
    /* DEMO  퍼즐보블
@@ -321,12 +327,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* AB2E  브레스 오브 파이어2
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 17,684/280,896 (94% idle) — CPU 20% of budget
-    */
-
    /* BRGE  유유백서 - 토너먼트 택틱스 (Yu Yu Hakusho - Ghostfiles - Tournament Tactics)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -384,6 +384,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* AD2J  미스터 드릴러 2 (Mr. Driller 2)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 20,212/280,896 (93% idle) — CPU 22% of budget
+    */
 
    /* B2CE  팩맨 월드 2 (Pac-Man World 2)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -444,6 +450,12 @@
     * exec 22,976/280,896 (92% idle) — CPU 26% of budget
     */
 
+   /* AHZJ  피안화 (Higanbana)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 23,190/280,896 (92% idle) — CPU 26% of budget
+    */
+
    /* A5UE  스페이스채널5 (Space Channel 5 - Ulala's Cosmic Attack)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -456,6 +468,17 @@
       "ASBJ",                      /* gamepak_code         */
       0,                           /* flags (gpSP auto-detects the save type) */
       0x8000252,                   /* idle_loop_target_pc  */
+      0,                           /* translation_gate_target_1 */
+      0,                           /* translation_gate_target_2 */
+      0,                           /* translation_gate_target_3 */
+   },
+
+   {
+      // 킹 오브 파이터즈 EX 네오 블러드 + 33 NES
+      //   exec 25,949/280,896 cy/frame (91% idle) — CPU 29% of budget
+      "AKOJ",                      /* gamepak_code         */
+      0,                           /* flags (gpSP auto-detects the save type) */
+      0x8000332,                   /* idle_loop_target_pc  */
       0,                           /* translation_gate_target_1 */
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
@@ -535,12 +558,6 @@
     * exec 28,491/280,896 (90% idle) — CPU 32% of budget
     */
 
-   /* AD5J  미스터 드릴러 에이스
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 28,840/280,896 (90% idle) — CPU 32% of budget
-    */
-
    /* BNFE  니드 포 스피드 언더그라운드 2 (Need for Speed - Underground 2)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -565,12 +582,6 @@
     * exec 30,241/280,896 (89% idle) — CPU 34% of budget
     */
 
-   /* AD2J  미스터 드릴러 2 (Mr. Driller 2)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 30,950/280,896 (89% idle) — CPU 34% of budget
-    */
-
    {
       // 고인돌
       //   exec 30,968/280,896 cy/frame (89% idle) — CPU 34% of budget
@@ -581,6 +592,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* AD5J  미스터 드릴러 에이스
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 30,990/280,896 (89% idle) — CPU 34% of budget
+    */
 
    /* BPFJ  뿌요뿌요 피버 (Puyo Puyo Fever)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -604,12 +621,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 31,672/280,896 (89% idle) — CPU 35% of budget
-    */
-
-   /* BIXJ  칼쵸비트 (Calciobit)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 31,936/280,896 (89% idle) — CPU 35% of budget
     */
 
    /* BN4J  강의 낚시3,4 (Kawa no Nushi Tsuri 3 & 4)
@@ -670,6 +681,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* AJ9J  슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (2)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 35,625/280,896 (87% idle) — CPU 40% of budget
+    */
 
    /* AKLE  클로노아 제국의 환상 (Klonoa - Empire of Dreams)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -746,12 +763,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* A2UJ  마더 1+2 (Mother 1+2)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 41,441/280,896 (85% idle) — CPU 46% of budget
-    */
-
    /* ABMJ  슈퍼 퍼즐보블 어드밴스 (Super Puzzle Bobble Advance)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -793,12 +804,6 @@
     * exec 43,058/280,896 (85% idle) — CPU 48% of budget
     */
 
-   /* AMKJ  마리오 카트 어드밴스 + 49 NES
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 43,463/280,896 (85% idle) — CPU 48% of budget
-    */
-
    /* A3KE  인터내셔널 가라테 플러스 (IK+)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -817,12 +822,6 @@
     * exec 44,684/280,896 (84% idle) — CPU 50% of budget
     */
 
-   /* ATIJ  테니스의 왕자 - 천재소년 아카데미
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 45,410/280,896 (84% idle) — CPU 50% of budget
-    */
-
    /* AWIJ  하이퍼스포츠 2002 동계 (Hyper Sports 2002 Winter)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -836,6 +835,23 @@
     */
 
    {
+      // 닌텐도 클라이언트 바이너리
+      //   exec 46,573/280,896 cy/frame (83% idle) — CPU 52% of budget
+      "AGBJ",                      /* gamepak_code         */
+      0,                           /* flags (gpSP auto-detects the save type) */
+      0x8001d2e,                   /* idle_loop_target_pc  */
+      0,                           /* translation_gate_target_1 */
+      0,                           /* translation_gate_target_2 */
+      0,                           /* translation_gate_target_3 */
+   },
+
+   /* AMKJ  마리오 카트 어드밴스 + 49 NES
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 47,060/280,896 (83% idle) — CPU 52% of budget
+    */
+
+   {
       // 역전재판 2 (Gyakuten Saiban 2)
       //   exec 47,188/280,896 cy/frame (83% idle) — CPU 52% of budget
       "A3GJ",                      /* gamepak_code         */
@@ -846,11 +862,16 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* BSGJ  모두의 소프트 시리즈 - 모두의 쇼기
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 47,711/280,896 (83% idle) — CPU 53% of budget
-    */
+   {
+      // 별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land) (2)
+      //   exec 47,491/280,896 cy/frame (83% idle) — CPU 53% of budget
+      "A7KJ",                      /* gamepak_code         */
+      0,                           /* flags (gpSP auto-detects the save type) */
+      0x8000f92,                   /* idle_loop_target_pc  */
+      0,                           /* translation_gate_target_1 */
+      0,                           /* translation_gate_target_2 */
+      0,                           /* translation_gate_target_3 */
+   },
 
    /* 2SME  심볼머지드
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -874,12 +895,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 49,154/280,896 (83% idle) — CPU 55% of budget
-    */
-
-   /* BO8K  원피스 - 고잉 베이스볼 (One Piece - Going Baseball - Haejeok Yaku)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 49,228/280,896 (82% idle) — CPU 55% of budget
     */
 
    /* BITJ  음양대전기 제로식 (Onmyou Taisenki - Zeroshiki)
@@ -911,22 +926,28 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* BO8K  원피스 - 고잉 베이스볼 (One Piece - Going Baseball - Haejeok Yaku)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 50,506/280,896 (82% idle) — CPU 56% of budget
+    */
+
    /* AQAE  가제트 레이서스 (Gadget Racers)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 50,826/280,896 (82% idle) — CPU 56% of budget
     */
 
+   /* BSGJ  모두의 소프트 시리즈 - 모두의 쇼기
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 50,832/280,896 (82% idle) — CPU 56% of budget
+    */
+
    /* A9CP  CT 스페셜 포스 2 - 백 투 헬 (CT Special Forces - Back to Hell)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 50,836/280,896 (82% idle) — CPU 56% of budget
-    */
-
-   /* AGSJ  황금의 태양
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 50,863/280,896 (82% idle) — CPU 57% of budget
     */
 
    /* BKTP  스틸 엠파이어 (Steel Empire)
@@ -971,10 +992,10 @@
     * exec 52,571/280,896 (81% idle) — CPU 58% of budget
     */
 
-   /* AHKJ  히카루의 바둑
+   /* AGSJ  황금의 태양
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 53,043/280,896 (81% idle) — CPU 59% of budget
+    * exec 53,028/280,896 (81% idle) — CPU 59% of budget
     */
 
    {
@@ -988,16 +1009,16 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* AHKJ  히카루의 바둑
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 53,267/280,896 (81% idle) — CPU 59% of budget
+    */
+
    /* ASYE  스파이로 - 시즌 오브 아이스
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 53,336/280,896 (81% idle) — CPU 59% of budget
-    */
-
-   /* U3IJ  우리들의 태양
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 53,497/280,896 (81% idle) — CPU 59% of budget
     */
 
    {
@@ -1010,6 +1031,18 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* U3IJ  우리들의 태양
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 53,562/280,896 (81% idle) — CPU 60% of budget
+    */
+
+   /* B2RJ  슈퍼로봇대전 OG2 (Super Robot Taisen - Original Generation 2)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 54,074/280,896 (81% idle) — CPU 60% of budget
+    */
 
    /* AEGE  익스트림 고스트 버스터즈 - 코드 에크토-1 (Extreme Ghostbusters - Code Ecto-1)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -1109,6 +1142,18 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* BDDJ  더블 드래곤 어드밴스 (Double Dragon Advance)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 56,882/280,896 (80% idle) — CPU 63% of budget
+    */
+
+   /* A2UJ  마더 1+2 (Mother 1+2)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 56,945/280,896 (80% idle) — CPU 63% of budget
+    */
+
    /* AQAJ  쵸로Q 어드밴스 (Choro Q Advance)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -1157,18 +1202,6 @@
     * exec 58,389/280,896 (79% idle) — CPU 65% of budget
     */
 
-   /* A4NJ  목장이야기 - 미네랄타운의 친구들
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 58,613/280,896 (79% idle) — CPU 65% of budget
-    */
-
-   /* AHZJ  피안화 (Higanbana)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 58,614/280,896 (79% idle) — CPU 65% of budget
-    */
-
    {
       // 데어데블
       //   exec 58,617/280,896 cy/frame (79% idle) — CPU 65% of budget
@@ -1196,12 +1229,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 59,496/280,896 (79% idle) — CPU 66% of budget
-    */
-
-   /* BDDJ  더블 드래곤 어드밴스 (Double Dragon Advance)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 59,584/280,896 (79% idle) — CPU 66% of budget
     */
 
    /* ATCE  탑 기어 GT 챔피언십 (Top Gear GT Championship)
@@ -1296,6 +1323,24 @@
     * exec 60,753/280,896 (78% idle) — CPU 68% of budget
     */
 
+   /* AMTJ  메트로이드 - 퓨전 (Metroid Fusion)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 60,972/280,896 (78% idle) — CPU 68% of budget
+    */
+
+   /* A4NJ  목장이야기 - 미네랄타운의 친구들
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 61,093/280,896 (78% idle) — CPU 68% of budget
+    */
+
+   /* AT2J  톨네코의 대모험2 어드밴스
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 61,274/280,896 (78% idle) — CPU 68% of budget
+    */
+
    {
       // 택틱스 오우거 외전 - 로디스의 기사
       //   exec 61,394/280,896 cy/frame (78% idle) — CPU 68% of budget
@@ -1324,16 +1369,16 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* BAGJ  어드밴스 가디언 히어로즈 (Advance Guardian Heroes)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 61,800/280,896 (78% idle) — CPU 69% of budget
+    */
+
    /* AZJK  드래곤볼Z - 무공투극 (Dragon Ball Z - Moogongtoogeuk)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 61,863/280,896 (78% idle) — CPU 69% of budget
-    */
-
-   /* AT2J  톨네코의 대모험2 어드밴스
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 61,886/280,896 (78% idle) — CPU 69% of budget
     */
 
    /* AMRP  매니악 레이서즈 어드밴스 (Maniac Racers Advance)
@@ -1352,12 +1397,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 62,200/280,896 (78% idle) — CPU 69% of budget
-    */
-
-   /* AMTJ  메트로이드 - 퓨전 (Metroid Fusion)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 62,335/280,896 (78% idle) — CPU 69% of budget
     */
 
    /* AWAE  와리오 랜드 4 (Wario Land 4)
@@ -1381,24 +1420,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 62,602/280,896 (78% idle) — CPU 70% of budget
-    */
-
-   /* BAGJ  어드밴스 가디언 히어로즈 (Advance Guardian Heroes)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 62,743/280,896 (78% idle) — CPU 70% of budget
-    */
-
-   /* AXPK  포켓몬스터 사파이어 (정식 한국판)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 62,828/280,896 (78% idle) — CPU 70% of budget
-    */
-
-   /* AXVK  포켓몬스터 루비 (정식 한국판)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 62,828/280,896 (78% idle) — CPU 70% of budget
     */
 
    /* BMOJ  미나노 오지사마 (Minna no Ouji-sama)
@@ -1503,6 +1524,12 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* A88J  마리오와 루이지RPG
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 66,277/280,896 (76% idle) — CPU 74% of budget
+    */
+
    /* BKDJ  크래쉬밴디쿳 어드밴스 - 두근두근 친구대작전 (Crash Bandicoot Advance - Wakuwaku Tomodachi Daisakusen!)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -1564,6 +1591,18 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 67,824/280,896 (76% idle) — CPU 75% of budget
+    */
+
+   /* AVSJ  신약 성검전설 (Shinyaku Seiken Densetsu)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 67,934/280,896 (76% idle) — CPU 75% of budget
+    */
+
+   /* BIXJ  칼쵸비트 (Calciobit)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 67,957/280,896 (76% idle) — CPU 76% of budget
     */
 
    /* BPPP  Pokemon Pinball - Ruby & Sapphire (E) (M5)
@@ -1663,12 +1702,6 @@
     * exec 69,764/280,896 (75% idle) — CPU 78% of budget
     */
 
-   /* BTAJ  아스트로보이 철완아톰
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 69,781/280,896 (75% idle) — CPU 78% of budget
-    */
-
    /* AD9E  듀크 뉴켐 어드밴스 (Duke Nukem Advance)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -1686,16 +1719,22 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* AOGJ  슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (5)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 70,434/280,896 (75% idle) — CPU 78% of budget
-    */
-
    /* BPPJ  포켓몬스터 핀볼 - 루비 & 사파이어 (Pokemon Pinball - Ruby & Sapphire)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 70,513/280,896 (75% idle) — CPU 78% of budget
+    */
+
+   /* AXVK  포켓몬스터 루비 (정식 한국판)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 70,673/280,896 (75% idle) — CPU 79% of budget
+    */
+
+   /* AXPK  포켓몬스터 사파이어 (정식 한국판)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 70,702/280,896 (75% idle) — CPU 79% of budget
     */
 
    /* MB2G  파이널 판타지 크리스탈 크로니클즈 - 로더
@@ -1731,6 +1770,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* AKZJ  카마이타치의 밤 어드밴스 (Kamaitachi no Yoru Advance)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 72,083/280,896 (74% idle) — CPU 80% of budget
+    */
 
    /* AR8E  로키 (Rocky)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -1772,22 +1817,10 @@
     * exec 72,753/280,896 (74% idle) — CPU 81% of budget
     */
 
-   /* AEXJ  더 킹 오브 파이터즈 EX2 - 하울링 블러드 (The King of Fighters EX2 - Howling Blood)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 72,868/280,896 (74% idle) — CPU 81% of budget
-    */
-
    /* ACZP  코믹스 존 (Comix Zone)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 72,930/280,896 (74% idle) — CPU 81% of budget
-    */
-
-   /* AKZJ  카마이타치의 밤 어드밴스 (Kamaitachi no Yoru Advance)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 73,098/280,896 (74% idle) — CPU 81% of budget
     */
 
    {
@@ -1819,6 +1852,12 @@
     * exec 73,846/280,896 (74% idle) — CPU 82% of budget
     */
 
+   /* BTAJ  아스트로보이 철완아톰
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 73,930/280,896 (74% idle) — CPU 82% of budget
+    */
+
    {
       // F-제로 맥시멈 벨로시티 (F-Zero - Maximum Velocity)
       //   exec 74,001/280,896 cy/frame (74% idle) — CPU 82% of budget
@@ -1836,6 +1875,12 @@
     * exec 74,123/280,896 (74% idle) — CPU 82% of budget
     */
 
+   /* ACHJ  캐슬바니아 - 백야의 협주곡
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 74,159/280,896 (74% idle) — CPU 82% of budget
+    */
+
    {
       // 마리오 vs. 동키콩 (Mario vs. Donkey Kong)
       //   exec 74,248/280,896 cy/frame (74% idle) — CPU 82% of budget
@@ -1847,22 +1892,10 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* ACHJ  캐슬바니아 - 백야의 협주곡
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 74,439/280,896 (73% idle) — CPU 83% of budget
-    */
-
    /* BIIJ  통근일필 (Tsuukin Hitofude)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 74,621/280,896 (73% idle) — CPU 83% of budget
-    */
-
-   /* A6OJ  귀무자 택틱스 (Onimusha Tactics)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 74,782/280,896 (73% idle) — CPU 83% of budget
     */
 
    /* BNTE  돌연변이 특공대 닌자거북이 (Teenage Mutant Ninja Turtles)
@@ -1871,16 +1904,16 @@
     * exec 75,413/280,896 (73% idle) — CPU 84% of budget
     */
 
-   /* ANSJ  마리, 에리 &amp; 아니스의 아틀리에 - 산들 바람의 전언 (Marie, Elie &amp; Anis no Atelier - Soyokaze kara no Dengon)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 75,434/280,896 (73% idle) — CPU 84% of budget
-    */
-
    /* BGKJ  게게게의 귀태랑 - 위기일발! 요괴열도 (Gegege no Kitarou - Kikiippatsu! Youkai Rettou)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 75,498/280,896 (73% idle) — CPU 84% of budget
+    */
+
+   /* AEXJ  더 킹 오브 파이터즈 EX2 - 하울링 블러드 (The King of Fighters EX2 - Howling Blood)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 75,520/280,896 (73% idle) — CPU 84% of budget
     */
 
    /* BMVE  마리오 핀볼 랜드 (Mario Pinball Land)
@@ -1912,6 +1945,12 @@
     * exec 76,516/280,896 (73% idle) — CPU 85% of budget
     */
 
+   /* A9LJ  테니스의 왕자 2003 - 쿨 블루 (Tennis no Ouji-sama 2003 - Cool Blue)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 76,610/280,896 (73% idle) — CPU 85% of budget
+    */
+
    {
       // Digimon - Battle Spirit 2 (Korea-patch J-K v20090901 v0.92)
       //   exec 76,765/280,896 cy/frame (73% idle) — CPU 85% of budget
@@ -1926,7 +1965,7 @@
    /* AHUE  샤이닝소울
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 77,225/280,896 (73% idle) — CPU 86% of budget
+    * exec 77,008/280,896 (73% idle) — CPU 86% of budget
     */
 
    /* A7AJ  나루토
@@ -1950,6 +1989,12 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 77,415/280,896 (72% idle) — CPU 86% of budget
+    */
+
+   /* BMXJ  메트로이드 - 제로 미션 (Metroid Zero Mission)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 77,536/280,896 (72% idle) — CPU 86% of budget
     */
 
    /* BMVP  슈퍼 마리오 볼 (Super Mario Ball)
@@ -1991,12 +2036,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 78,277/280,896 (72% idle) — CPU 87% of budget
-    */
-
-   /* BMXJ  메트로이드 - 제로 미션 (Metroid Zero Mission)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 78,324/280,896 (72% idle) — CPU 87% of budget
     */
 
    {
@@ -2045,12 +2084,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* A9LJ  테니스의 왕자 2003 - 쿨 블루 (Tennis no Ouji-sama 2003 - Cool Blue)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 79,614/280,896 (72% idle) — CPU 88% of budget
-    */
-
    {
       // 드래곤볼 Z - 무공투극 (Dragon Ball Z - Taiketsu)
       //   exec 79,640/280,896 cy/frame (72% idle) — CPU 88% of budget
@@ -2072,12 +2105,6 @@
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 80,200/280,896 (71% idle) — CPU 89% of budget
-    */
-
-   /* A3UJ  마더 3 (Mother 3)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 80,290/280,896 (71% idle) — CPU 89% of budget
     */
 
    {
@@ -2138,10 +2165,10 @@
     * exec 81,621/280,896 (71% idle) — CPU 91% of budget
     */
 
-   /* AU2J  샤이닝 소울 2 (Shining Soul II)
+   /* AOGJ  슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (5)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 82,008/280,896 (71% idle) — CPU 91% of budget
+    * exec 81,884/280,896 (71% idle) — CPU 91% of budget
     */
 
    {
@@ -2161,6 +2188,12 @@
     * exec 82,365/280,896 (71% idle) — CPU 92% of budget
     */
 
+   /* A6OJ  귀무자 택틱스 (Onimusha Tactics)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 82,422/280,896 (71% idle) — CPU 92% of budget
+    */
+
    /* BBSJ  보우캬쿠노 센리츠 (Boukyaku no Senritsu)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -2173,10 +2206,22 @@
     * exec 82,737/280,896 (71% idle) — CPU 92% of budget
     */
 
+   /* ANSJ  마리, 에리 &amp; 아니스의 아틀리에 - 산들 바람의 전언 (Marie, Elie &amp; Anis no Atelier - Soyokaze kara no Dengon)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 82,906/280,896 (70% idle) — CPU 92% of budget
+    */
+
    /* AE7J  파이어 엠블렘 - 열화의 검 (Fire Emblem - Rekka no Ken)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
     * exec 82,919/280,896 (70% idle) — CPU 92% of budget
+    */
+
+   /* A3UJ  마더 3 (Mother 3)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 82,964/280,896 (70% idle) — CPU 92% of budget
     */
 
    {
@@ -2202,6 +2247,12 @@
     * exec 83,248/280,896 (70% idle) — CPU 92% of budget
     */
 
+   /* AZAJ  아즈망가대왕 어드밴스
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 83,318/280,896 (70% idle) — CPU 93% of budget
+    */
+
    /* B3IJ  미라클 팬더 - 7개별의 우주해적 (Mirakuru! Panzou - 7-tsu no Hoshi no Uchuu Kaizoku)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -2214,6 +2265,12 @@
     * exec 83,425/280,896 (70% idle) — CPU 93% of budget
     */
 
+   /* AU2J  샤이닝 소울 2 (Shining Soul II)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 83,512/280,896 (70% idle) — CPU 93% of budget
+    */
+
    {
       // 록맨 제로 1 (Megaman Zero 1)
       //   exec 83,684/280,896 cy/frame (70% idle) — CPU 93% of budget
@@ -2224,12 +2281,6 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
-
-   /* AZAJ  아즈망가대왕 어드밴스
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 83,786/280,896 (70% idle) — CPU 93% of budget
-    */
 
    /* BG3E  드래곤볼 Z - 부우의 분노 (Dragon Ball Z - Buu's Fury)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -2266,6 +2317,12 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* ASXJ  삼국지0.75
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 85,019/280,896 (70% idle) — CPU 94% of budget
+    */
+
    /* BT4E  드래곤볼 GT - 트랜스포메이션 (Dragon Ball GT - Transformation)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -2288,12 +2345,6 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
-
-   /* B2RJ  슈퍼로봇대전 OG2 (Super Robot Taisen - Original Generation 2)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 85,687/280,896 (69% idle) — CPU 95% of budget
-    */
 
    {
       // 다이나믹 전설 호성전 붕괴의 론도 (Legend of Dynamic - Goushouden - Houkai no Rondo)
@@ -2347,12 +2398,6 @@
     * exec 87,759/280,896 (69% idle) — CPU 98% of budget
     */
 
-   /* ASOJ  소닉 어드밴스 1 (Sonic Advance)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 87,917/280,896 (69% idle) — CPU 98% of budget
-    */
-
    {
       // 미키와 도날드의 매지컬 퀘스트3
       //   exec 87,977/280,896 cy/frame (69% idle) — CPU 98% of budget
@@ -2375,10 +2420,10 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* ASXJ  삼국지0.75
+   /* ASOJ  소닉 어드밴스 1 (Sonic Advance)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 88,824/280,896 (68% idle) — CPU 99% of budget
+    * exec 88,377/280,896 (69% idle) — CPU 98% of budget
     */
 
    /* BD3J  드래곤 퀘스트 캐릭터즈 - 토네코의 대모험 3 어드밴스
@@ -2443,6 +2488,12 @@
     * exec 90,283/280,896 (68% idle) — CPU 100% of budget
     */
 
+   /* A2CJ  캐슬바니아 - 효월의 원무곡
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 90,464/280,896 (68% idle) — CPU 101% of budget
+    */
+
    /* BLWE  LEGO Star Wars - The Video Game (UE) (M7)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2466,12 +2517,6 @@
     * exec 91,625/280,896 (67% idle) — CPU 102% of budget
     */
 
-   /* BKKJ  모두의 사육 시리즈3 - 나의 장수풍뎅이 사슴벌레
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 92,241/280,896 (67% idle) — CPU 102% of budget
-    */
-
    {
       // 메탈슬러그 어드밴스 (Metal Slug Advance)
       //   exec 92,782/280,896 cy/frame (67% idle) — CPU 103% of budget
@@ -2482,12 +2527,6 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
-
-   /* A2HJ  시작의 일보 - 더 파이팅 (Hajime no Ippo - The Fighting!)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 92,811/280,896 (67% idle) — CPU 103% of budget
-    */
 
    /* APXJ  파랑스 - The Enforce Fighter A-144
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
@@ -2518,12 +2557,6 @@
     * exec 94,336/280,896 (66% idle) — CPU 105% of budget
     */
 
-   /* AVSJ  신약 성검전설 (Shinyaku Seiken Densetsu)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 94,542/280,896 (66% idle) — CPU 105% of budget
-    */
-
    /* BANE  반 헬싱 (Van Helsing)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2552,6 +2585,12 @@
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 96,278/280,896 (66% idle) — CPU 107% of budget
+    */
+
+   /* A2HJ  시작의 일보 - 더 파이팅 (Hajime no Ippo - The Fighting!)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 96,720/280,896 (66% idle) — CPU 107% of budget
     */
 
    /* AF8E  F1 2002 (F1 2002)
@@ -2612,12 +2651,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* AJ9J  슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (2)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 99,448/280,896 (65% idle) — CPU 110% of budget
-    */
-
    /* BR9J  리락쿠마한 매일 (Relaxuma na Mainichi)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2648,12 +2681,6 @@
     * exec 99,845/280,896 (64% idle) — CPU 111% of budget
     */
 
-   /* B3SJ  소닉 어드밴스 3 (Sonic Advance 3)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 100,219/280,896 (64% idle) — CPU 111% of budget
-    */
-
    /* BLWJ  레고 스타 워즈 더 비디오 게임 (LEGO Star Wars - The Video Game)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2678,16 +2705,16 @@
     * exec 101,322/280,896 (64% idle) — CPU 113% of budget
     */
 
+   /* BKKJ  모두의 사육 시리즈3 - 나의 장수풍뎅이 사슴벌레
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 101,671/280,896 (64% idle) — CPU 113% of budget
+    */
+
    /* B4ME  마블 얼티밋 얼라이언스 (Marvel - Ultimate Alliance)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 101,903/280,896 (64% idle) — CPU 113% of budget
-    */
-
-   /* A2CJ  캐슬바니아 - 효월의 원무곡
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 101,945/280,896 (64% idle) — CPU 113% of budget
     */
 
    /* 2G0P  굿보이 갤럭시 데모
@@ -2702,10 +2729,10 @@
     * exec 102,077/280,896 (64% idle) — CPU 113% of budget
     */
 
-   /* BZMJ  젤다의 전설 - 이상한 모자0.3(종료방지)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 102,196/280,896 (64% idle) — CPU 114% of budget
+   /* AZLJ  젤다의 전설 신들의 트라이포스 & 포 소드 (Zelda no Densetsu - Kamigami no Triforce & 4tsu no Tsurugi)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 102,564/280,896 (63% idle) — CPU 114% of budget
     */
 
    /* BONE  원피스 소년점프 (One Piece)
@@ -2725,6 +2752,18 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* BYUJ  유그드라 유니온 (Yggdra Union)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 103,984/280,896 (63% idle) — CPU 116% of budget
+    */
+
+   /* BZMJ  젤다의 전설 - 이상한 모자0.3(종료방지)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 104,251/280,896 (63% idle) — CPU 116% of budget
+    */
+
    /* AC8E  크래쉬밴디쿳 어드밴스2
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2743,10 +2782,10 @@
     * exec 104,777/280,896 (63% idle) — CPU 116% of budget
     */
 
-   /* AZLJ  젤다의 전설 신들의 트라이포스 & 포 소드 (Zelda no Densetsu - Kamigami no Triforce & 4tsu no Tsurugi)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 104,861/280,896 (63% idle) — CPU 117% of budget
+   /* BUHJ  우에키의 법칙 - 신기작렬! 능력자 배틀 (Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 105,938/280,896 (62% idle) — CPU 118% of budget
     */
 
    /* ARNJ  머나먼 시공속에서 (Neoromance Game - Harukanaru Toki no Naka de)
@@ -2765,12 +2804,6 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
-
-   /* BYUJ  유그드라 유니온 (Yggdra Union)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 106,431/280,896 (62% idle) — CPU 118% of budget
-    */
 
    /* AZLE  Legend of Zelda, The - A Link To The Past Four Swords (U) [!]
     * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
@@ -2817,16 +2850,16 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* ATIJ  테니스의 왕자 - 천재소년 아카데미
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 107,699/280,896 (62% idle) — CPU 120% of budget
+    */
+
    /* BDAJ  꽃놀이 퍼즐 어드밴스 (Don-chan Puzzle - Hanabi de Doon! Advance)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 108,163/280,896 (61% idle) — CPU 120% of budget
-    */
-
-   /* AN9J  테일즈 오브 월드 - 나리키리던젼2
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 108,554/280,896 (61% idle) — CPU 121% of budget
     */
 
    /* FM2J  패미콤 미니 - Vol. 21 - 슈퍼 마리오 브라더스 2 (Famicom Mini 21 - Super Mario Bros. 2)
@@ -2841,10 +2874,10 @@
     * exec 108,704/280,896 (61% idle) — CPU 121% of budget
     */
 
-   /* BDVK  드래곤볼 어드밴스 어드밴쳐 (Dragon Ball - Advance Adventure)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 108,803/280,896 (61% idle) — CPU 121% of budget
+   /* AN9J  테일즈 오브 월드 - 나리키리던젼2
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 108,981/280,896 (61% idle) — CPU 121% of budget
     */
 
    {
@@ -2864,6 +2897,12 @@
     * exec 109,336/280,896 (61% idle) — CPU 121% of budget
     */
 
+   /* BDVK  드래곤볼 어드밴스 어드밴쳐 (Dragon Ball - Advance Adventure)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 109,910/280,896 (61% idle) — CPU 122% of budget
+    */
+
    /* AHWJ  핫휠 어드밴스 (Hot Wheels Advance)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -2880,12 +2919,6 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
-
-   /* BUHJ  우에키의 법칙 - 신기작렬! 능력자 배틀 (Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 111,197/280,896 (60% idle) — CPU 124% of budget
-    */
 
    {
       // 코나미 와이와이 레이싱 (Konami Wai Wai Racing Advance)
@@ -2904,16 +2937,16 @@
     * exec 112,853/280,896 (60% idle) — CPU 125% of budget
     */
 
+   /* B3SJ  소닉 어드밴스 3 (Sonic Advance 3)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 112,976/280,896 (60% idle) — CPU 126% of budget
+    */
+
    /* BGJJ  환성신 저스티라이더 - 지구의 전사들 (Genseishin Justirisers - Souchaku! Hoshi no Senshi-tachi)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 113,628/280,896 (60% idle) — CPU 126% of budget
-    */
-
-   /* BREJ  리비에라 - 약속의 땅 리비에라
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 114,145/280,896 (59% idle) — CPU 127% of budget
     */
 
    /* AMKE  마리오 카트 어드밴스 (Mario Kart - Super Circuit)
@@ -2990,6 +3023,12 @@
       0,                           /* translation_gate_target_3 */
    },
 
+   /* BREJ  리비에라 - 약속의 땅 리비에라
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 120,429/280,896 (57% idle) — CPU 134% of budget
+    */
+
    /* BM8J  인어멜로디 - 피치피치피치 - 피치피치파티 (Mermaid Melody - Pichi Pichi Pitch - Pichi Pichi Party)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -3059,22 +3098,16 @@
     * exec 123,194/280,896 (56% idle) — CPU 137% of budget
     */
 
-   /* AAUJ  진 여신전생
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 123,457/280,896 (56% idle) — CPU 137% of budget
-    */
-
    /* B3QJ  삼국지 공명전 (Sangokushi - Koumeiden)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 123,467/280,896 (56% idle) — CPU 137% of budget
     */
 
-   /* AFEK  파이어 엠블렘 - 봉인의 검 (Fire Emblem Sealed Sword)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 123,869/280,896 (56% idle) — CPU 138% of budget
+   /* AAUJ  진 여신전생
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 124,113/280,896 (56% idle) — CPU 138% of budget
     */
 
    /* A5BJ  초코보 랜드 - 게임데 다이스
@@ -3089,10 +3122,10 @@
     * exec 124,508/280,896 (56% idle) — CPU 138% of budget
     */
 
-   /* A88J  마리오와 루이지RPG
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 124,915/280,896 (56% idle) — CPU 139% of budget
+   /* AFEK  파이어 엠블렘 - 봉인의 검 (Fire Emblem Sealed Sword)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 124,782/280,896 (56% idle) — CPU 139% of budget
     */
 
    {
@@ -3119,8 +3152,8 @@
     */
 
    /* BT3J  탐정 진구지 사부로 - 하얀 그림자의 소녀 (Tantei Jinguuji Saburou - Shiroi Kage no Shoujo)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
     * exec 128,200/280,896 (54% idle) — CPU 142% of budget
     */
 
@@ -3170,6 +3203,12 @@
     * exec 130,248/280,896 (54% idle) — CPU 145% of budget
     */
 
+   /* BFFJ  파이널판타지I&II어드밴스0.5
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 130,579/280,896 (54% idle) — CPU 145% of budget
+    */
+
    /* AFUJ  요괴도 (Youkaidou)
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
@@ -3180,12 +3219,6 @@
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 131,508/280,896 (53% idle) — CPU 146% of budget
-    */
-
-   /* BFFJ  파이널판타지I&II어드밴스0.5
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 131,812/280,896 (53% idle) — CPU 146% of budget
     */
 
    {
@@ -3222,9 +3255,9 @@
    },
 
    /* BN2J  나루토 - 최강닌자 대결집!2
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 134,027/280,896 (52% idle) — CPU 149% of budget
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 134,870/280,896 (52% idle) — CPU 150% of budget
     */
 
    {
@@ -3251,9 +3284,9 @@
     */
 
    /* B8KJ  별의 카비 - 거울속의 대미궁
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 136,315/280,896 (51% idle) — CPU 151% of budget
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 136,309/280,896 (51% idle) — CPU 151% of budget
     */
 
    /* A2NJ  Sonic Advance 2 (Korea-patch J-K v20201008 v0.2)
@@ -3811,28 +3844,10 @@
     * exec 280,670/280,896 (0% idle) — CPU 312% of budget
     */
 
-   /* AKOJ  킹 오브 파이터즈 EX 네오 블러드 + 33 NES
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 280,834/280,896 (0% idle) — CPU 312% of budget
-    */
-
    /* tvap  GBA TV 튜너
     * NOT MEASURED — its wait loop was never found, so the spin got counted as
     * work. The number below is the probe's failure, not the game's weight.
     * exec 280,890/280,896 (0% idle) — CPU 312% of budget
-    */
-
-   /* A7KJ  별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land) (2)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 280,896/280,896 (0% idle) — CPU 312% of budget
-    */
-
-   /* AGBJ  닌텐도 클라이언트 바이너리
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 280,896/280,896 (0% idle) — CPU 312% of budget
     */
 
    /* AGSA  플레이얀 AV 플레이어
