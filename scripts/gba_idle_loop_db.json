@@ -6095,7 +6095,15 @@
   "flags": "FLAGS_FLASH_128KB | FLAGS_RTC | FLAGS_SERIAL | FLAGS_SERIAL_POKE",
   "iwram_opt": "",
   "has_idle": false,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "포켓몬스터 - 사파이어 (Pokemon Sapphire)",
+  "exec_median": 75264,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "2520703b4098",
+  "audio_name": "stereo",
+  "audio_cycles": 25471
  },
  {
   "game_code": "AXPF",
@@ -6235,7 +6243,15 @@
   "flags": "FLAGS_FLASH_128KB | FLAGS_RTC | FLAGS_SERIAL | FLAGS_SERIAL_POKE",
   "iwram_opt": "",
   "has_idle": false,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "포켓몬스터 - 루비 (Pokemon Ruby)",
+  "exec_median": 75264,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "2520703b4098",
+  "audio_name": "stereo",
+  "audio_cycles": 25471
  },
  {
   "game_code": "AXVF",
@@ -9879,7 +9895,18 @@
   "flags": "FLAGS_FLASH_128KB | FLAGS_RTC | FLAGS_SERIAL | FLAGS_RFU",
   "iwram_opt": "",
   "has_idle": true,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "포켓몬스터 - 에메랄드 (Pokemon - Emerald Version)",
+  "exec_median": 75792,
+  "idle_hunted": true,
+  "verify_how": "hunt: detector + A/B",
+  "idle_verified": "0x80008ce",
+  "idle_drop": 0.726,
+  "verify_tier": "R",
+  "audio_engine": "m4a",
+  "audio_variant": "2520703b4098",
+  "audio_name": "stereo",
+  "audio_cycles": 20750
  },
  {
   "game_code": "BPEF",
