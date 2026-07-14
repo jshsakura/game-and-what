@@ -584,14 +584,17 @@ body::before {
 .hash-section { margin: 8px 0 2px; }
 .hash-row { display: flex; align-items: stretch; gap: 8px; }
 .hash-value {
-  flex: 1; min-width: 0; display: block;
+  /* The row stretches both boxes to the button's height, so a one-line hash inside a
+     block box sat pinned to the TOP of it while the button's label sat centred — the two
+     read as misaligned even though the boxes line up exactly. Centre the text in its box. */
+  flex: 1; min-width: 0; display: flex; align-items: center;
   font-family: ui-monospace, "SFMono-Regular", "Menlo", monospace;
   font-size: 10px; line-height: 1.5; letter-spacing: 0.2px;
   color: var(--card-dim); background: #00000040;
   border: 1px solid #ffffff14; border-radius: 6px;
   padding: 6px 9px; word-break: break-all; user-select: all;
 }
-.hash-copy { flex: 0 0 auto; align-self: flex-start; white-space: nowrap; }
+.hash-copy { flex: 0 0 auto; white-space: nowrap; }
 .hash-dups {
   display: flex; align-items: center; gap: 6px; margin-top: 6px;
   font-size: 10px; line-height: 1.4; color: var(--gold);
