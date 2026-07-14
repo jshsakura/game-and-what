@@ -59,6 +59,10 @@ def normalize(title: str) -> str:
 
 
 def game_code(path: Path) -> str | None:
+    # A row whose file is gone is a DB desync, not a cover problem. Say so and move
+    # on rather than dying on the open() and taking the whole run down with it.
+    if not path.exists():
+        return None
     header = path.open("rb").read(HEADER_LENGTH)
     if len(header) < HEADER_LENGTH or header[FIXED_BYTE_OFFSET] != FIXED_BYTE_VALUE:
         return None

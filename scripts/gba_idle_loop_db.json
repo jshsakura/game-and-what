@@ -44,7 +44,12 @@
   "flags": "FLAGS_RUMBLE",
   "iwram_opt": "",
   "has_idle": false,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "GoodBoy Galaxy",
+  "exec_median": 59496,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": null
  },
  {
   "game_code": "2SME",
@@ -110,11 +115,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "캐슬바니아 - 효월의 원무곡",
-  "exec_median": 84524,
+  "exec_median": 101945,
   "exec_p90": 146889,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 22567
  },
  {
   "game_code": "A2DJ",
@@ -185,11 +194,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "시작의 일보 - 더 파이팅 (Hajime no Ippo - The Fighting!)",
-  "exec_median": 72673,
+  "exec_median": 92811,
   "exec_p90": 135233,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "121ad9cf183a",
+  "audio_name": "stereo3",
+  "audio_cycles": 29625
  },
  {
   "game_code": "A2NP",
@@ -248,11 +261,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "마더 1+2 (Mother 1+2)",
-  "exec_median": 6037,
+  "exec_median": 41441,
   "exec_p90": 25574,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 22499
  },
  {
   "game_code": "A2WE",
@@ -302,7 +319,8 @@
   "exec_p90": 205773,
   "verify_how": "A/B: 38% less work with the address",
   "lib_name": "슈퍼마리오 요시아일랜드 (Super Mario Advance 3 - Yoshi's Island + Mario Brothers)",
-  "idle_drop": 0.38
+  "idle_drop": 0.38,
+  "audio_engine": null
  },
  {
   "game_code": "A3AP",
@@ -404,11 +422,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "마더 3 (Mother 3)",
-  "exec_median": 87667,
+  "exec_median": 80290,
   "exec_p90": 118471,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 30724
  },
  {
   "game_code": "A3VJ",
@@ -479,11 +501,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "목장이야기 - 미네랄타운의 친구들",
-  "exec_median": 62670,
+  "exec_median": 58613,
   "exec_p90": 81757,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 16147
  },
  {
   "game_code": "A4RE",
@@ -709,11 +735,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "귀무자 택틱스 (Onimusha Tactics)",
-  "exec_median": 139956,
+  "exec_median": 74782,
   "exec_p90": 154916,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 41689
  },
  {
   "game_code": "A6SJ",
@@ -731,7 +761,8 @@
   "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
   "has_idle": false,
-  "idle_hunted": true
+  "idle_hunted": true,
+  "audio_engine": null
  },
  {
   "game_code": "A7AJ",
@@ -845,7 +876,10 @@
   "exec_median": 124915,
   "exec_p90": 211630,
   "verify_how": "sweep",
-  "verify_tier": null
+  "verify_tier": null,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2"
  },
  {
   "game_code": "A88P",
@@ -1058,7 +1092,8 @@
   "exec_p90": 136440,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "A9MP",
@@ -1083,13 +1118,17 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "댄싱스워드 - 섬광",
-  "exec_median": 67766,
+  "exec_median": 66746,
   "exec_p90": 86817,
   "verify_how": "A/B: 76% less work with the address",
   "idle_verified": "0x8000234",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.757
+  "idle_drop": 0.757,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 53497
  },
  {
   "game_code": "A9TJ",
@@ -1132,7 +1171,8 @@
   "exec_p90": 280695,
   "verify_how": "A/B: 51% less work with the address",
   "lib_name": "슈퍼마리오월드",
-  "idle_drop": 0.51
+  "idle_drop": 0.51,
+  "audio_engine": null
  },
  {
   "game_code": "AA2E",
@@ -1267,11 +1307,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "진 여신전생",
-  "exec_median": 128628,
+  "exec_median": 123457,
   "exec_p90": 194842,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 34799
  },
  {
   "game_code": "AAWE",
@@ -1335,11 +1379,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "브레스 오브 파이어2",
-  "exec_median": 27389,
+  "exec_median": 17684,
   "exec_p90": 69637,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 4907
  },
  {
   "game_code": "AB9E",
@@ -1403,11 +1451,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "브레스 오브 파이어",
-  "exec_median": 6674,
+  "exec_median": 12931,
   "exec_p90": 280897,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 2587
  },
  {
   "game_code": "ABJE",
@@ -1610,11 +1662,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "캐슬바니아 - 백야의 협주곡",
-  "exec_median": 74519,
+  "exec_median": 74439,
   "exec_p90": 81013,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 13745
  },
  {
   "game_code": "ACJJ",
@@ -1730,7 +1786,10 @@
   "exec_p90": 199181,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "7e6900d51f8d",
+  "audio_name": null
  },
  {
   "game_code": "AD4E",
@@ -1760,11 +1819,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "미스터 드릴러 에이스",
-  "exec_median": 34701,
+  "exec_median": 28840,
   "exec_p90": 67837,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 8750
  },
  {
   "game_code": "AD9E",
@@ -2093,11 +2156,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "더 킹 오브 파이터즈 EX2 - 하울링 블러드 (The King of Fighters EX2 - Howling Blood)",
-  "exec_median": 78738,
+  "exec_median": 72868,
   "exec_p90": 280898,
   "verify_how": "A/B: the address did no work — rejected",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 9700
  },
  {
   "game_code": "AF3J",
@@ -2144,11 +2211,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "파이어 엠블렘 - 봉인의 검 (Fire Emblem Sealed Sword)",
-  "exec_median": 107691,
+  "exec_median": 123869,
   "exec_p90": 193717,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 42980
  },
  {
   "game_code": "AFFE",
@@ -2475,7 +2546,8 @@
   "exec_p90": 280896,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "AGEE",
@@ -2674,7 +2746,10 @@
   "exec_p90": 90937,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2"
  },
  {
   "game_code": "AGTJ",
@@ -2807,7 +2882,8 @@
   "exec_p90": 72819,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "AHQJ",
@@ -2838,10 +2914,14 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "샤이닝소울",
-  "exec_median": 59298,
+  "exec_median": 77225,
   "exec_p90": 151885,
   "verify_how": "sweep",
-  "verify_tier": null
+  "verify_tier": null,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 28878
  },
  {
   "game_code": "AHUJ",
@@ -2895,11 +2975,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "피안화 (Higanbana)",
-  "exec_median": 15992,
+  "exec_median": 58614,
   "exec_p90": 97641,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 35117
  },
  {
   "game_code": "AI2E",
@@ -3157,7 +3241,8 @@
   "exec_p90": 280341,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "AJCE",
@@ -3463,11 +3548,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "킹 오브 파이터즈 EX 네오 블러드 + 33 NES",
-  "exec_median": 29808,
+  "exec_median": 280834,
   "exec_p90": 280835,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 4348
  },
  {
   "game_code": "AKRJ",
@@ -3609,11 +3698,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "카마이타치의 밤 어드밴스 (Kamaitachi no Yoru Advance)",
-  "exec_median": 68901,
+  "exec_median": 73098,
   "exec_p90": 101300,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 36823
  },
  {
   "game_code": "ALEE",
@@ -3928,11 +4021,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "마리오 카트 어드밴스 + 49 NES",
-  "exec_median": 110764,
+  "exec_median": 43463,
   "exec_p90": 149977,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 12114
  },
  {
   "game_code": "AMQE",
@@ -4019,7 +4116,8 @@
   "exec_p90": 75193,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "AMWE",
@@ -4187,7 +4285,15 @@
   "flags": "0",
   "iwram_opt": "no",
   "has_idle": false,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "Tales of Phantasia (Korea-patch J-K v20120905)",
+  "exec_median": 57514,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 5891
  },
  {
   "game_code": "AN8P",
@@ -4212,11 +4318,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "테일즈 오브 월드 - 나리키리던젼2",
-  "exec_median": 108240,
+  "exec_median": 108554,
   "exec_p90": 122348,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 68891
  },
  {
   "game_code": "ANCJ",
@@ -4265,11 +4375,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "마리, 에리 &amp; 아니스의 아틀리에 - 산들 바람의 전언 (Marie, Elie &amp; Anis no Atelier - Soyokaze kara no Dengon)",
-  "exec_median": 89881,
+  "exec_median": 75434,
   "exec_p90": 112979,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 66232
  },
  {
   "game_code": "ANXE",
@@ -4396,11 +4510,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼로봇대전 OG (Super Robot Taisen - Original Generation) (5)",
-  "exec_median": 19751,
+  "exec_median": 70434,
   "exec_p90": 110941,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 39895
  },
  {
   "game_code": "AOMJ",
@@ -4541,7 +4659,8 @@
   "exec_p90": 127128,
   "verify_how": "A/B: 76% less work with the address",
   "lib_name": "핀볼 챌린지 디럭스 (Pinball Challenge Deluxe)",
-  "idle_drop": 0.755
+  "idle_drop": 0.755,
+  "audio_engine": null
  },
  {
   "game_code": "APRE",
@@ -5010,11 +5129,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "소닉 어드밴스 1 (Sonic Advance)",
-  "exec_median": 89177,
+  "exec_median": 87917,
   "exec_p90": 129789,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 310
  },
  {
   "game_code": "ASRJ",
@@ -5033,7 +5156,8 @@
   "idle_verified": "0x80003ec",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.541
+  "idle_drop": 0.541,
+  "audio_engine": null
  },
  {
   "game_code": "ASTJ",
@@ -5087,11 +5211,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "삼국지0.75",
-  "exec_median": 87625,
+  "exec_median": 88824,
   "exec_p90": 277638,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 74678
  },
  {
   "game_code": "ASYE",
@@ -5121,11 +5249,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "톨네코의 대모험2 어드밴스",
-  "exec_median": 62585,
+  "exec_median": 61886,
   "exec_p90": 127784,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 12926
  },
  {
   "game_code": "ATCE",
@@ -5176,7 +5308,8 @@
   "exec_p90": 123096,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "ATKE",
@@ -5281,10 +5414,14 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "샤이닝 소울 2 (Shining Soul II)",
-  "exec_median": 87558,
+  "exec_median": 82008,
   "exec_p90": 135355,
   "verify_how": "sweep",
-  "verify_tier": null
+  "verify_tier": null,
+  "audio_engine": "m4a",
+  "audio_variant": "121ad9cf183a",
+  "audio_name": "stereo3",
+  "audio_cycles": 37138
  },
  {
   "game_code": "AU2P",
@@ -5315,7 +5452,8 @@
   "idle_verified": "0x800f272",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.85
+  "idle_drop": 0.85,
+  "audio_engine": null
  },
  {
   "game_code": "AUYJ",
@@ -5539,7 +5677,8 @@
   "exec_p90": 124451,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "AVTE",
@@ -5816,7 +5955,8 @@
   "exec_p90": 280894,
   "verify_how": "A/B: 50% less work with the address",
   "lib_name": "슈퍼마리오 브라더스3 (Super Mario Advance 4 - Super Mario 3 + Mario Brothers)",
-  "idle_drop": 0.502
+  "idle_drop": 0.502,
+  "audio_engine": null
  },
  {
   "game_code": "AX4P",
@@ -6334,13 +6474,17 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "조이드 사가 2 (Zoids Saga II)",
-  "exec_median": 81163,
+  "exec_median": 80974,
   "exec_p90": 222324,
   "verify_how": "A/B: 71% less work with the address",
   "idle_verified": "0x8060834",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.71
+  "idle_drop": 0.71,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 24575
  },
  {
   "game_code": "AZ8E",
@@ -6359,7 +6503,8 @@
   "exec_p90": 187719,
   "verify_how": "A/B: 47% less work with the address",
   "lib_name": "슈퍼 퍼즐파이터II Turbo터보",
-  "idle_drop": 0.469
+  "idle_drop": 0.469,
+  "audio_engine": null
  },
  {
   "game_code": "AZ8P",
@@ -6384,11 +6529,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "아즈망가대왕 어드밴스",
-  "exec_median": 135606,
+  "exec_median": 83786,
   "exec_p90": 279617,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 26324
  },
  {
   "game_code": "AZBJ",
@@ -6430,11 +6579,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "드래곤볼Z - 무공투극 (Dragon Ball Z - Moogongtoogeuk)",
-  "exec_median": 72872,
+  "exec_median": 61863,
   "exec_p90": 168255,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 18984
  },
  {
   "game_code": "AZKJ",
@@ -6486,11 +6639,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "젤다의 전설 신들의 트라이포스 & 포 소드 (Zelda no Densetsu - Kamigami no Triforce & 4tsu no Tsurugi)",
-  "exec_median": 159820,
+  "exec_median": 104861,
   "exec_p90": 280698,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 40283
  },
  {
   "game_code": "AZUE",
@@ -6555,7 +6712,8 @@
   "exec_p90": 162699,
   "verify_how": "A/B: 49% less work with the address",
   "lib_name": "메이드 인 와리오 (WarioWare, Inc - Minigame Mania)",
-  "idle_drop": 0.486
+  "idle_drop": 0.486,
+  "audio_engine": null
  },
  {
   "game_code": "AZWP",
@@ -6671,11 +6829,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "슈퍼로봇대전 OG2 (Super Robot Taisen - Original Generation 2)",
-  "exec_median": 97385,
+  "exec_median": 85687,
   "exec_p90": 108334,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 6359
  },
  {
   "game_code": "B2WE",
@@ -6821,11 +6983,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "소닉 어드밴스 3 (Sonic Advance 3)",
-  "exec_median": 111600,
+  "exec_median": 100219,
   "exec_p90": 111610,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 24011
  },
  {
   "game_code": "B42J",
@@ -7238,11 +7404,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "별의 카비 - 거울속의 대미궁",
-  "exec_median": 136289,
+  "exec_median": 136315,
   "exec_p90": 185306,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 32636
  },
  {
   "game_code": "B8ME",
@@ -7403,11 +7573,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "어드밴스 가디언 히어로즈 (Advance Guardian Heroes)",
-  "exec_median": 98498,
+  "exec_median": 62743,
   "exec_p90": 280898,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 7876
  },
  {
   "game_code": "BAHP",
@@ -7760,11 +7934,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "더블 드래곤 어드밴스 (Double Dragon Advance)",
-  "exec_median": 57778,
+  "exec_median": 59584,
   "exec_p90": 84671,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "121ad9cf183a",
+  "audio_name": "stereo3",
+  "audio_cycles": 2651
  },
  {
   "game_code": "BDGE",
@@ -7877,7 +8055,18 @@
   "flags": "0",
   "iwram_opt": "",
   "has_idle": true,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "Digimon - Battle Spirit 2 (Korea-patch J-K v20090901 v0.92)",
+  "exec_median": 76765,
+  "idle_hunted": true,
+  "verify_how": "hunt: histogram + A/B",
+  "idle_verified": "0x8010eb0",
+  "idle_drop": 0.75,
+  "verify_tier": "R",
+  "audio_engine": "m4a",
+  "audio_variant": "121ad9cf183a",
+  "audio_name": "stereo3",
+  "audio_cycles": 3976
  },
  {
   "game_code": "BDSP",
@@ -7937,11 +8126,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "드래곤볼 어드밴스 어드밴쳐 (Dragon Ball - Advance Adventure)",
-  "exec_median": 106997,
+  "exec_median": 108803,
   "exec_p90": 134956,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 45746
  },
  {
   "game_code": "BE4J",
@@ -8031,11 +8224,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "파이널판타지I&II어드밴스0.5",
-  "exec_median": 128792,
+  "exec_median": 131812,
   "exec_p90": 186569,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 91047
  },
  {
   "game_code": "BFTJ",
@@ -8154,11 +8351,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "SD 건담 G 제네레이션 어드밴스 (SD Gundam G Generation Advance)",
-  "exec_median": 146285,
+  "exec_median": 140092,
   "exec_p90": 278164,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 34886
  },
  {
   "game_code": "BGEE",
@@ -8545,10 +8746,14 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "칼쵸비트 (Calciobit)",
-  "exec_median": 74535,
+  "exec_median": 31936,
   "exec_p90": 154753,
   "verify_how": "sweep",
-  "verify_tier": null
+  "verify_tier": null,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 35102
  },
  {
   "game_code": "BJHE",
@@ -8689,11 +8894,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "모두의 사육 시리즈3 - 나의 장수풍뎅이 사슴벌레",
-  "exec_median": 107291,
+  "exec_median": 92241,
   "exec_p90": 142686,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 43992
  },
  {
   "game_code": "BKME",
@@ -8867,7 +9076,15 @@
   "flags": "FLAGS_RTC",
   "iwram_opt": "",
   "has_idle": false,
-  "conflict": false
+  "conflict": false,
+  "lib_name": "Legendz - Buhwarhaneun Siryeonyi Seom",
+  "exec_median": 278246,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 28018
  },
  {
   "game_code": "BLVJ",
@@ -8980,7 +9197,8 @@
   "exec_p90": 192916,
   "verify_how": "A/B: 69% less work with the address",
   "lib_name": "마리오 vs. 동키콩 (Mario vs. Donkey Kong)",
-  "idle_drop": 0.694
+  "idle_drop": 0.694,
+  "audio_engine": null
  },
  {
   "game_code": "BM5J",
@@ -9172,7 +9390,8 @@
   "exec_p90": 280662,
   "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "idle_hunted": true
+  "idle_hunted": true,
+  "audio_engine": null
  },
  {
   "game_code": "BMOJ",
@@ -9281,7 +9500,8 @@
   "exec_p90": 280898,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": null
  },
  {
   "game_code": "BMZP",
@@ -9311,11 +9531,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "나루토 - 최강닌자 대결집!2",
-  "exec_median": 135327,
+  "exec_median": 134027,
   "exec_p90": 158598,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 3520
  },
  {
   "game_code": "BN4J",
@@ -9437,11 +9661,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "원피스 - 고잉 베이스볼 (One Piece - Going Baseball - Haejeok Yaku)",
-  "exec_median": 51174,
+  "exec_median": 49228,
   "exec_p90": 73350,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 13813
  },
  {
   "game_code": "BOAE",
@@ -10164,11 +10392,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "리비에라 - 약속의 땅 리비에라",
-  "exec_median": 129812,
+  "exec_median": 114145,
   "exec_p90": 212476,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 5505
  },
  {
   "game_code": "BRGE",
@@ -10204,7 +10436,8 @@
   "exec_p90": 121983,
   "verify_how": "A/B: 72% less work with the address",
   "lib_name": "리듬세상 어드밴스1.3",
-  "idle_drop": 0.719
+  "idle_drop": 0.719,
+  "audio_engine": null
  },
  {
   "game_code": "BRKE",
@@ -10306,11 +10539,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "모두의 소프트 시리즈 - 모두의 쇼기",
-  "exec_median": 41232,
+  "exec_median": 47711,
   "exec_p90": 57290,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 26128
  },
  {
   "game_code": "BSLE",
@@ -10373,10 +10610,14 @@
   "idle_verified": "0x8000298",
   "verify_tier": "R",
   "lib_name": "메탈슬러그 어드밴스 (Metal Slug Advance) (2)",
-  "exec_median": 129199,
+  "exec_median": 133714,
   "exec_p90": 267535,
   "verify_how": "A/B: 54% less work with the address",
-  "idle_drop": 0.539
+  "idle_drop": 0.539,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 43268
  },
  {
   "game_code": "BSMP",
@@ -10470,11 +10711,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "탐정 진구지 사부로 - 하얀 그림자의 소녀 (Tantei Jinguuji Saburou - Shiroi Kage no Shoujo)",
-  "exec_median": 92117,
+  "exec_median": 128200,
   "exec_p90": 107390,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 201
  },
  {
   "game_code": "BT4E",
@@ -10538,11 +10783,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "아스트로보이 철완아톰",
-  "exec_median": 112034,
+  "exec_median": 69781,
   "exec_p90": 277562,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "121ad9cf183a",
+  "audio_name": "stereo3",
+  "audio_cycles": 10440
  },
  {
   "game_code": "BTJE",
@@ -10711,10 +10960,14 @@
   "has_idle": false,
   "conflict": false,
   "lib_name": "우에키의 법칙 - 신기작렬! 능력자 배틀 (Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle)",
-  "exec_median": 64902,
+  "exec_median": 111197,
   "exec_p90": 134072,
   "verify_how": "sweep",
-  "verify_tier": null
+  "verify_tier": null,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 18046
  },
  {
   "game_code": "BULE",
@@ -10873,7 +11126,8 @@
   "idle_verified": "0x80831da",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.619
+  "idle_drop": 0.619,
+  "audio_engine": null
  },
  {
   "game_code": "BYIJ",
@@ -10892,7 +11146,8 @@
   "idle_verified": "0x8118882",
   "verify_tier": "R",
   "has_idle": true,
-  "idle_drop": 0.586
+  "idle_drop": 0.586,
+  "audio_engine": null
  },
  {
   "game_code": "BYUJ",
@@ -10905,11 +11160,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "유그드라 유니온 (Yggdra Union)",
-  "exec_median": 103883,
+  "exec_median": 106431,
   "exec_p90": 126898,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 33978
  },
  {
   "game_code": "BYWE",
@@ -11051,11 +11310,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "젤다의 전설 - 이상한 모자0.3(종료방지)",
-  "exec_median": 88962,
+  "exec_median": 102196,
   "exec_p90": 276704,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 35573
  },
  {
   "game_code": "DEMO",
@@ -11644,11 +11907,15 @@
   "iwram_opt": "",
   "conflict": false,
   "lib_name": "우리들의 태양",
-  "exec_median": 53548,
+  "exec_median": 53497,
   "exec_p90": 192701,
   "verify_how": "sweep",
   "verify_tier": null,
-  "has_idle": false
+  "has_idle": false,
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 23337
  },
  {
   "game_code": "V49E",
@@ -11738,5 +12005,197 @@
   "verify_how": "sweep",
   "verify_tier": null,
   "has_idle": false
+ },
+ {
+  "game_code": "A2BJ",
+  "lib_name": "Bubble Bobble - Old & New (Korea-patch J-K v20120421)",
+  "exec_median": 19332,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 1397
+ },
+ {
+  "game_code": "ADSJ",
+  "lib_name": "Daisenryaku for Game Boy Advance (Korea-patch J-K v20141222 v.01)",
+  "exec_median": 19697,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: detector + A/B",
+  "idle_verified": "0x80006c4",
+  "idle_drop": 0.93,
+  "verify_tier": "R",
+  "audio_engine": "m4a",
+  "audio_variant": "572b3042cb43",
+  "audio_name": "mono",
+  "audio_cycles": 29962
+ },
+ {
+  "game_code": "AE7K",
+  "lib_name": "Fire Emblem - Rekka no Ken (Korea-patch J-K v20221231 v0.1)",
+  "exec_median": 52231,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 7479
+ },
+ {
+  "game_code": "BE8K",
+  "lib_name": "Fire Emblem - Seima no Kouseki (Korea-patch J-K v20210905 v0.5)",
+  "exec_median": 75707,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 21703
+ },
+ {
+  "game_code": "A3JJ",
+  "lib_name": "Gyakuten Saiban 3 (Korea-patch J-K v0.5)",
+  "exec_median": 28089,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: histogram + A/B",
+  "idle_verified": "0x80003f0",
+  "idle_drop": 0.89,
+  "verify_tier": "R",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 4877
+ },
+ {
+  "game_code": "AODJ",
+  "lib_name": "Minami no Umi no Odyssey (Korea-patch J-K ver.Proto)",
+  "exec_median": 78856,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 51767
+ },
+ {
+  "game_code": "B8PJ",
+  "lib_name": "Power Pro Kun Pocket 1, 2 (Korea-patch J-K v20150802 v0.4.4beta)",
+  "exec_median": 81041,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 27092
+ },
+ {
+  "game_code": "A5PJ",
+  "lib_name": "Power Pro Kun Pocket 5 (Korea-patch J-K ver.Proto)",
+  "exec_median": 94981,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 48524
+ },
+ {
+  "game_code": "BRIK",
+  "lib_name": "Rhythm Tengoku (Korea-patch J-K v20200417 v1.32)",
+  "exec_median": 79335,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: histogram + A/B",
+  "idle_verified": "0x8001964",
+  "idle_drop": 0.715,
+  "verify_tier": "R",
+  "audio_engine": null
+ },
+ {
+  "game_code": "A2NJ",
+  "lib_name": "Sonic Advance 2 (Korea-patch J-K v20201008 v0.2)",
+  "exec_median": 136352,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 13836
+ },
+ {
+  "game_code": "B6JJ",
+  "lib_name": "Super Robot Taisen J (Korea-patch J-K ver.Proto)",
+  "exec_median": 163699,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": null
+ },
+ {
+  "game_code": "A8RJ",
+  "lib_name": "Tennis no Ouji-sama 2003 - Passion Red (Korea-patch J-K v20071031 v.Beta)",
+  "exec_median": 84859,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": null
+ },
+ {
+  "game_code": "BTRJ",
+  "lib_name": "Tower SP, The (Korea-patch J-K v20140218)",
+  "exec_median": 42870,
+  "has_idle": false,
+  "idle_hunted": true,
+  "verify_how": "hunt: no wait loop exists",
+  "audio_engine": "m4a",
+  "audio_variant": "1b020ff71edf",
+  "audio_name": "stereo2",
+  "audio_cycles": 12496
+ },
+ {
+  "game_code": "AY6J",
+  "lib_name": "Yu-Gi-Oh! Duel Monsters 6 Expert 2 (Korea-patch J-K v0.65)",
+  "exec_median": 56353,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: detector + A/B",
+  "idle_verified": "0x807928e",
+  "idle_drop": 0.799,
+  "verify_tier": "R",
+  "audio_engine": null
+ },
+ {
+  "game_code": "BY6J",
+  "lib_name": "Yu-Gi-Oh! Duel Monsters Expert 2006 (Korea-patch J-K v20110731 v0.93)",
+  "exec_median": 106537,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: detector + A/B",
+  "idle_verified": "0x80f4c4e",
+  "idle_drop": 0.617,
+  "verify_tier": "R",
+  "audio_engine": null
+ },
+ {
+  "game_code": "AYWJ",
+  "lib_name": "Yu-Gi-Oh! Duel Monsters International - Worldwide Edition (Korea-patch J-K v0.76)",
+  "exec_median": 55395,
+  "has_idle": true,
+  "idle_hunted": true,
+  "verify_how": "hunt: detector + A/B",
+  "idle_verified": "0x80896f2",
+  "idle_drop": 0.802,
+  "verify_tier": "R",
+  "audio_engine": null
  }
 ]

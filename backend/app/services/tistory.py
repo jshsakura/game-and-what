@@ -29,6 +29,7 @@ SYSMAP = {
     "col": "col", "msx": "msx", "gg": "gg", "sms": "sms", "nes": "nes",
     "fc": "nes", "famicom": "nes", "md": "md", "pce": "pce", "pce-cd": "pce",
     "gb": "gb", "gbc": "gbc", "gamegear": "gg", "sg": "sg", "sg-1000": "sg",
+    "gba": "gba",
 }
 
 _ANCHOR = re.compile(r'<a[^>]+href="(/\d+)"[^>]*>(.*?)</a>', re.S)

@@ -124,12 +124,16 @@ def test_a_hunted_rom_with_no_loop_is_reported_as_hunted(tmp_path, monkeypatch):
     assert result.exec_cycles == 227722
 
 
-def test_the_measure_queue_survives_a_restart(tmp_path, monkeypatch):
+def test_the_measure_queue_survives_a_restart(client, tmp_path, monkeypatch):
     """A hundred fresh roms is a queue that runs for hours (one at a time, by design), and
     the queue lives only in memory. A restart used to strand every rom still waiting on
     probe_status='pending' — a "측정 중" spinner on a card that would never be measured.
 
     Covers already had this recovery. The prober did not.
+
+    Takes `client` so it runs against the fixture's throwaway data dir. Without it this test
+    wrote its dummy row into the REAL database — and gba_measure.py then tried to open a rom
+    called x.gba that has never existed.
     """
     import asyncio as _asyncio
 
