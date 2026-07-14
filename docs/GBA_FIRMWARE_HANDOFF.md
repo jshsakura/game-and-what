@@ -95,11 +95,16 @@ solved it with a runtime reassign menu — `s_md_keydefine`, 6 combos
 
 ## 3. The data, and how to regenerate it
 
-### Generate
+**89 addresses**, each one measured. **515 game codes** carry a frame cost — of those,
+**426 need no entry at all** (they wait via the BIOS, which gpSP already skips).
+
+Files you copy: `firmware/gba/gba_idle_loop.{c,h}`.
 
 ```bash
 # in game-and-what
-python3 scripts/gen_gba_over.py            # paste-ready gba_over.h entries
+python3 scripts/gen_gba_over.py --c > firmware/gba/gba_idle_loop.c   # the C table
+python3 scripts/gen_gba_over.py                                      # gba_over.h entries
+python3 scripts/gen_gba_over.py --korean                             # just the Korean games
 ```
 
 `scripts/gba_idle_loop_db.json` is the source of truth. Fields that matter:
@@ -107,8 +112,37 @@ python3 scripts/gen_gba_over.py            # paste-ready gba_over.h entries
 | field | meaning |
 |---|---|
 | `idle_verified` | the **backward BRANCH** pc — what gpSP compares against |
-| `verify_tier` | `R` = confirmed by RUNNING the rom · `A` = the DB address held a real loop · `B` = found by rescanning nearby, **unconfirmed** |
+| `verify_tier` | `R` = the game was RUN and demonstrably does less work with this address. **The only tier that ships.** Anything else is a guess. |
 | `exec_median` / `exec_p90` | cycles of real CPU work per frame with the skip active, out of 280,896 |
+| `verify_how` | how it was settled, e.g. `A/B: 48% less work with the address` |
+
+### How an address earns its place
+
+Three filters, and each one killed addresses that the previous one let through:
+
+1. **The detector finds a backward branch.** 111 of them, across 633 roms.
+2. **Does gpSP actually skip on it?** Run the game with that address and watch the
+   cycle count. **17 died here** — the loop is real, the skip does nothing, the frame
+   stays full. mGBA's detector is not an oracle.
+3. **Does the address do any WORK?** This is the one that matters, and the obvious
+   check misses it. "exec is below a full frame" proves nothing: a game that already
+   waits via the BIOS sits far below a full frame *no matter what address you hand it*,
+   so a bogus one sails straight through. The only honest test is the **difference** —
+   run with the skip off, run with the address, keep it only if the game measurably
+   does less. **5 more died here**, all at a 0% drop: KOF EX2 (×2), Ghost Trap, Space
+   Invaders, F-Zero Climax.
+
+89 survive. Every one has a measured drop behind it.
+
+> One of those five only surfaced after fixing a bug in the harness itself: it looked
+> roms up **by filename**, and this library renames files, so F-Zero Climax's address
+> was being A/B'd against a different game entirely — and passed. **Match on the cart
+> header. Never the name.** It is the same lesson the Korean patches teach (§ below),
+> and it was walked into twice.
+
+### The 13 Korean games — measured
+
+`exec` = real CPU work per frame with the skip **active**, out of a 280,896-cycle frame.
 
 ### The 13 Korean games — measured
 
@@ -136,11 +170,11 @@ All 13 sit inside the CPU budget at the median. Several have a **p90 at or near 
 frame** — those games have scenes that peak at 100% CPU, so expect drops there even though
 the median is comfortable.
 
-**Every rom in the library (all 32, not just these) is now run-verified**: 30 have an
-address that measurably skips, 2 (Ruby/Sapphire) have no busy-wait loop at all. One
-address that had only been *guessed* turned out to be wrong when finally executed —
-Prince of Persia (`BPYP`) was `0x808fff6` in our own table and is really `0x80900f2`.
-That is why `verify_tier` matters: only `R` has been run.
+Note this is only the Korean subset. The table ships **89 addresses in total**, from
+sweeping all 633 roms of the source library — see "How an address earns its place"
+above. Nothing in it was guessed: an address that had only been *inferred* turned out
+to be wrong the moment it was finally executed (Prince of Persia, `BPYP`: our own table
+said `0x808fff6`, the game says `0x80900f2`).
 
 ### gpSP's own table is wrong in three places
 
@@ -262,4 +296,17 @@ loop is never found reports ~280,896 — a full frame — which reads as "heavy 
 | `scripts/idlefind/shot.c` | render a frame headless — the only way to spot a Korean patch |
 | `scripts/idlefind/mgba-cycle-counter.patch` | the `ARMRunLoop` instrumentation |
 | `backend/korean_gba.py` | which 13 roms are Korean, and the on-screen evidence for each |
-| `backend/import_gba.py` | ROM import; sets `roms.idle_loop` from the header code |
+| `backend/import_gba.py` | rom import; sets `roms.idle_loop` from the header code |
+| `backend/app/services/gba_probe.py` | the upload path: look the header up, run the game only if it is new |
+| `backend/gba_measure.py` | push the table's numbers onto the library's rows |
+| `backend/gba_export.py` | pull roms measured live by the upload prober back INTO the table |
+| `firmware/gba/gba_idle_loop.{c,h}` | **what the firmware copies.** Generated — never hand-edit |
+| `Dockerfile` (`gba-probe-builder`) | builds `idlefind` into the image, mGBA pinned |
+
+### It measures on upload, too
+
+A GBA rom uploaded to the library resolves itself: the header is looked up in the table
+(instant, and a rename cannot fool it), and only a game we have never seen is actually
+run — in the background, one at a time, with the card showing `측정 중` until it lands.
+Anything measured that way can be folded back into the shared table with
+`backend/gba_export.py --write`, and then into the firmware with `gen_gba_over.py --c`.
