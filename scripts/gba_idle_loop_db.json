@@ -59,7 +59,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8002ba4",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 175310,
+  "exec_p90": 205773,
+  "verify_how": "detect"
  },
  {
   "game_code": "A3AP",
@@ -121,7 +124,10 @@
   "conflict": false,
   "has_idle": true,
   "idle_verified": "0x800066c",
-  "verify_tier": "B"
+  "verify_tier": "R",
+  "exec_median": 121001,
+  "exec_p90": 201290,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "A62P",
@@ -171,7 +177,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8000fae",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 71428,
+  "exec_p90": 95396,
+  "verify_how": "detect"
  },
  {
   "game_code": "A7KJ",
@@ -332,8 +341,9 @@
   "has_idle": true,
   "idle_verified": "0x80005ec",
   "verify_tier": "R",
-  "exec_median": 137185,
-  "exec_p90": 280692
+  "exec_median": 137673,
+  "exec_p90": 280695,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "AA2E",
@@ -384,8 +394,9 @@
   "has_idle": true,
   "idle_verified": "0x80003ce",
   "verify_tier": "R",
-  "exec_median": 76204,
-  "exec_p90": 122728
+  "exec_median": 76293,
+  "exec_p90": 153710,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "AAMP",
@@ -519,7 +530,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8002f30",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 16664,
+  "exec_p90": 279984,
+  "verify_how": "detect"
  },
  {
   "game_code": "AE2E",
@@ -594,8 +608,9 @@
   "has_idle": true,
   "idle_verified": "0x8000428",
   "verify_tier": "R",
-  "exec_median": 140189,
-  "exec_p90": 280260
+  "exec_median": 117713,
+  "exec_p90": 280289,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "AFXP",
@@ -635,7 +650,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8000c2e",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 61334,
+  "exec_p90": 71577,
+  "verify_how": "detect"
  },
  {
   "game_code": "AFZJ",
@@ -663,7 +681,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8013844",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 93880,
+  "exec_p90": 277889,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "AGAJ",
@@ -717,7 +738,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8013542",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 102002,
+  "exec_p90": 216073,
+  "verify_how": "detect"
  },
  {
   "game_code": "AGFS",
@@ -1019,7 +1043,10 @@
   "has_idle": true,
   "conflict": true,
   "idle_verified": "0x8000300",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 63154,
+  "exec_p90": 106378,
+  "verify_how": "detect"
  },
  {
   "game_code": "APDP",
@@ -1045,7 +1072,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x80075a6",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 68473,
+  "exec_p90": 127128,
+  "verify_how": "detect"
  },
  {
   "game_code": "AQME",
@@ -1095,7 +1125,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8000338",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 106477,
+  "exec_p90": 112014,
+  "verify_how": "detect"
  },
  {
   "game_code": "AREP",
@@ -1145,7 +1178,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x80004f6",
-  "verify_tier": "B"
+  "verify_tier": "R",
+  "exec_median": 98249,
+  "exec_p90": 138224,
+  "verify_how": "detect"
  },
  {
   "game_code": "ASMJ",
@@ -1303,7 +1339,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8000732",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 81845,
+  "exec_p90": 280894,
+  "verify_how": "detect"
  },
  {
   "game_code": "AX4P",
@@ -1390,8 +1429,10 @@
   "has_idle": false,
   "halts": true,
   "note": "BIOS halt (SWI 2/5) — no busy loop to skip",
-  "exec_median": 73907,
-  "exec_p90": 90102
+  "exec_median": 72648,
+  "exec_p90": 90930,
+  "verify_tier": null,
+  "verify_how": "none (BIOS halt)"
  },
  {
   "game_code": "AXPS",
@@ -1478,8 +1519,10 @@
   "has_idle": false,
   "halts": true,
   "note": "BIOS halt (SWI 2/5) — no busy loop to skip",
-  "exec_median": 74244,
-  "exec_p90": 90538
+  "exec_median": 73266,
+  "exec_p90": 91087,
+  "verify_tier": null,
+  "verify_how": "none (BIOS halt)"
  },
  {
   "game_code": "AXVS",
@@ -1589,7 +1632,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8002b5e",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 152070,
+  "exec_p90": 187719,
+  "verify_how": "detect"
  },
  {
   "game_code": "AZ8P",
@@ -1640,8 +1686,9 @@
   "has_idle": true,
   "idle_verified": "0x8000f5e",
   "verify_tier": "R",
-  "exec_median": 143508,
-  "exec_p90": 163270
+  "exec_median": 142521,
+  "exec_p90": 162699,
+  "verify_how": "detect"
  },
  {
   "game_code": "AZWP",
@@ -1812,8 +1859,9 @@
   "has_idle": true,
   "idle_verified": "0x8000914",
   "verify_tier": "R",
-  "exec_median": 115390,
-  "exec_p90": 151763
+  "exec_median": 115793,
+  "exec_p90": 165681,
+  "verify_how": "detect"
  },
  {
   "game_code": "B4ZP",
@@ -2104,8 +2152,9 @@
   "conflict": false,
   "idle_verified": "0x800065a",
   "verify_tier": "R",
-  "exec_median": 79848,
-  "exec_p90": 276477
+  "exec_median": 65065,
+  "exec_p90": 276959,
+  "verify_how": "detect"
  },
  {
   "game_code": "BDTJ",
@@ -2323,7 +2372,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8033eec",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 87371,
+  "exec_p90": 192916,
+  "verify_how": "detect"
  },
  {
   "game_code": "BM5P",
@@ -2361,7 +2413,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8014e0a",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 71769,
+  "exec_p90": 92130,
+  "verify_how": "detect"
  },
  {
   "game_code": "BMGF",
@@ -2568,8 +2623,9 @@
   "has_idle": true,
   "idle_verified": "0x80008ce",
   "verify_tier": "R",
-  "exec_median": 78982,
-  "exec_p90": 109725
+  "exec_median": 78796,
+  "exec_p90": 120515,
+  "verify_how": "detect"
  },
  {
   "game_code": "BPES",
@@ -2608,8 +2664,9 @@
   "conflict": false,
   "idle_verified": "0x80008c6",
   "verify_tier": "R",
-  "exec_median": 78956,
-  "exec_p90": 113599
+  "exec_median": 77946,
+  "exec_p90": 115306,
+  "verify_how": "detect"
  },
  {
   "game_code": "BPGF",
@@ -2720,8 +2777,9 @@
   "conflict": true,
   "idle_verified": "0x80008c6",
   "verify_tier": "R",
-  "exec_median": 79779,
-  "exec_p90": 127099
+  "exec_median": 78916,
+  "exec_p90": 132138,
+  "verify_how": "detect"
  },
  {
   "game_code": "BPRF",
@@ -2794,8 +2852,11 @@
   "iwram_opt": "",
   "has_idle": true,
   "conflict": false,
-  "idle_verified": "0x808fff6",
-  "verify_tier": "B"
+  "idle_verified": "0x80900f2",
+  "verify_tier": "R",
+  "exec_median": 68058,
+  "exec_p90": 280297,
+  "verify_how": "detect"
  },
  {
   "game_code": "BR4J",
@@ -2882,8 +2943,9 @@
   "conflict": false,
   "idle_verified": "0x80013d4",
   "verify_tier": "R",
-  "exec_median": 74288,
-  "exec_p90": 116770
+  "exec_median": 75039,
+  "exec_p90": 121983,
+  "verify_how": "forced-known"
  },
  {
   "game_code": "BRKE",
@@ -2969,7 +3031,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8000298",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 111771,
+  "exec_p90": 267526,
+  "verify_how": "detect"
  },
  {
   "game_code": "BSMJ",
@@ -3047,7 +3112,10 @@
   "has_idle": true,
   "conflict": false,
   "idle_verified": "0x8013888",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 70699,
+  "exec_p90": 136456,
+  "verify_how": "detect"
  },
  {
   "game_code": "BTMP",
@@ -3122,8 +3190,9 @@
   "has_idle": true,
   "idle_verified": "0x80019c4",
   "verify_tier": "R",
-  "exec_median": 139326,
-  "exec_p90": 174920
+  "exec_median": 137998,
+  "exec_p90": 176478,
+  "verify_how": "detect"
  },
  {
   "game_code": "BZ3P",
@@ -3233,6 +3302,9 @@
   "conflict": false,
   "has_idle": true,
   "idle_verified": "0x80006c2",
-  "verify_tier": "A"
+  "verify_tier": "R",
+  "exec_median": 66296,
+  "exec_p90": 142381,
+  "verify_how": "detect"
  }
 ]

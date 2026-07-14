@@ -118,23 +118,29 @@ project's own estimate — see §5).
 
 | game | code | `idle_loop_target_pc` | exec (median) | p90 | idle |
 |---|---|---|---|---|---|
-| 포켓몬 사파이어 | `AXPK` | **none needed** (BIOS halt) | 73,907 | 90,102 | 74% |
-| 포켓몬 루비 | `AXVK` | **none needed** (BIOS halt) | 74,244 | 90,538 | 74% |
-| 리듬세상 | `BRIJ` | `0x80013d4` | 74,288 | 116,770 | 74% |
-| 캐슬바니아 - 서클 오브 더 문 | `AAMJ` | `0x80003ce` | 76,204 | 122,728 | 73% |
-| 포켓몬 리프그린 | `BPGE` | `0x80008c6` | 78,956 | 113,599 | 72% |
-| 포켓몬 에메랄드 | `BPEK` | `0x80008ce` | 78,982 | 109,725 | 72% |
-| 포켓몬 파이어레드 | `BPRE` | `0x80008c6` | 79,779 | 127,099 | 72% |
-| 다운타운 열혈물어EX | `BDTE` | `0x800065a` | 79,848 | 276,477 | 72% |
-| 록맨 제로 4 | `B4ZJ` | `0x8000914` | 115,390 | 151,763 | 59% |
-| 슈퍼마리오월드 | `AA2C` | `0x80005ec` | 137,185 | 280,692 | 51% |
-| 록맨 제로 3 | `BZ3J` | `0x80019c4` | 139,326 | 174,920 | 50% |
-| 파이널 판타지 택틱스 어드밴스 | `AFXJ` | `0x8000428` | 140,189 | 280,260 | 50% |
-| 메이드 인 와리오 | `AZWJ` | `0x8000f5e` | 143,508 | 163,270 | 49% |
+| 다운타운 열혈물어EX | `BDTE` | `0x800065a` | 65,065 | 276,959 | 77% |
+| 포켓몬 사파이어 | `AXPK` | **none needed** (BIOS halt) | 72,648 | 90,930 | 74% |
+| 포켓몬 루비 | `AXVK` | **none needed** (BIOS halt) | 73,266 | 91,087 | 74% |
+| 리듬세상 | `BRIJ` | `0x80013d4` | 75,039 | 121,983 | 73% |
+| 캐슬바니아 - 서클 오브 더 문 | `AAMJ` | `0x80003ce` | 76,293 | 153,710 | 73% |
+| 포켓몬 리프그린 | `BPGE` | `0x80008c6` | 77,946 | 115,306 | 72% |
+| 포켓몬 에메랄드 | `BPEK` | `0x80008ce` | 78,796 | 120,515 | 72% |
+| 포켓몬 파이어레드 | `BPRE` | `0x80008c6` | 78,916 | 132,138 | 72% |
+| 록맨 제로 4 | `B4ZJ` | `0x8000914` | 115,793 | 165,681 | 59% |
+| 파이널 판타지 택틱스 어드밴스 | `AFXJ` | `0x8000428` | 117,713 | 280,289 | 58% |
+| 슈퍼마리오월드 | `AA2C` | `0x80005ec` | 137,673 | 280,695 | 51% |
+| 록맨 제로 3 | `BZ3J` | `0x80019c4` | 137,998 | 176,478 | 51% |
+| 메이드 인 와리오 | `AZWJ` | `0x8000f5e` | 142,521 | 162,699 | 49% |
 
-All 13 sit inside the CPU budget at the median. Four have a **p90 at or near a full frame**
-(`BDTE`, `AA2C`, `AFXJ` and to a lesser degree `AZWJ`) — those games have scenes that peak
-at 100% CPU, so expect drops there even though the median is comfortable.
+All 13 sit inside the CPU budget at the median. Several have a **p90 at or near a full
+frame** — those games have scenes that peak at 100% CPU, so expect drops there even though
+the median is comfortable.
+
+**Every rom in the library (all 32, not just these) is now run-verified**: 30 have an
+address that measurably skips, 2 (Ruby/Sapphire) have no busy-wait loop at all. One
+address that had only been *guessed* turned out to be wrong when finally executed —
+Prince of Persia (`BPYP`) was `0x808fff6` in our own table and is really `0x80900f2`.
+That is why `verify_tier` matters: only `R` has been run.
 
 ### gpSP's own table is wrong in three places
 

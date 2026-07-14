@@ -99,7 +99,10 @@ int main(int argc, char** argv) {
 	uint32_t* samples = calloc(frames, sizeof(uint32_t));
 	int nsamples = 0;
 	int found_at = forced_loop ? 0 : -1;
-	uint32_t idle_loop = forced_loop;
+	// GBA_IDLE_LOOP_NONE is 0xFFFFFFFF, not 0 — seeding this with a bare `forced_loop`
+	// (i.e. 0 when nothing was forced) made an UNDETECTED rom report a loop at
+	// 0x00000000, which then read as an IWRAM loop downstream.
+	uint32_t idle_loop = forced_loop ? forced_loop : GBA_IDLE_LOOP_NONE;
 
 	for (int i = 0; i < frames; ++i) {
 		int phase = i % 40;

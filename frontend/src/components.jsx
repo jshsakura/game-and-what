@@ -61,6 +61,13 @@ const SYS_PALETTE = {
   lynx: "#588c2a", videopac: "#8c3f82", zxs: "#b0e645", c64: "#3e2a8c", gamecom: "#1f9e8c",
   vb: "#a01730", gba: "#5b45c9",
 };
+
+// What the Game & Watch's M7 leaves the GBA core per frame, in GBA cycles, once the
+// PPU/audio/DMA have taken their share (~160k of a 280,896-cycle frame at a 340MHz OC).
+// A game measured above this cannot hold 60fps no matter how well its idle loop is
+// skipped. NOTE: this is a cycle-budget estimate, not a hardware measurement.
+const GBA_CPU_BUDGET = 160000;
+
 export function systemColor(key) {
   return SYS_PALETTE[key] || `hsl(${hueFor(key || "x")} 62% 52%)`;
 }
@@ -881,9 +888,16 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   try { extraFiles = JSON.parse(rom.extra_files || "[]"); } catch { extraFiles = []; }
   const dataFileCount = [rom.stored_name, ...extraFiles.map((f) => f.name)]
     .filter((n) => n && (!n.toLowerCase().endsWith(".bin") || rom.sd_include)).length;
-  // GBA only: gpSP knows where this game's VBlank wait loop is and can skip it —
-  // the precondition for full speed on the real M7. A candidate, not a promise.
-  const idleSkip = rom.system_key === "gba" && !!rom.idle_loop;
+  // GBA only. `idle_loop` says gpSP can skip this game's VBlank wait — the
+  // precondition for full speed on the M7, but on its own it says nothing about
+  // whether the game is light enough to keep up. `exec_cycles` is that half: the
+  // cycles the CPU really spends working per frame, measured by running the rom with
+  // the skip active (scripts/idlefind). Shown as a load against the budget the
+  // hardware leaves the CPU — a number, not a promise: it is a cycle model, and it
+  // has never been checked on a real device.
+  const gbaLoad = rom.system_key === "gba" && rom.exec_cycles
+    ? Math.round((rom.exec_cycles / GBA_CPU_BUDGET) * 100)
+    : null;
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
@@ -1150,17 +1164,24 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
               {rom.favorite
                 ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
-                : idleSkip
+                : gbaLoad != null
                   ? <Gauge size={14} strokeWidth={2.5} aria-hidden />
                   : (rom.system_key ? <SystemIcon dirname={rom.system_key} size={14} /> : <Star size={14} strokeWidth={2.5} aria-hidden />)}
             </button>
-            {/* The idle-skip banner takes the system-icon corner: it has to be
-                readable at a glance across the grid, and in the title row it was
-                being pushed out of sight by any long name. */}
-            {idleSkip && (
-              <em className="idle-tag"
-                title={t("gpSP can skip this game's VBlank wait — full-speed candidate on the real device (not a guarantee)")}>
-                {t("Idle skip")}
+            {/* Takes the system-icon corner: it has to be readable at a glance across
+                the grid, and in the title row a long name pushed it out of sight. */}
+            {gbaLoad != null && (
+              <em className={`idle-tag ${gbaLoad > 100 ? "over" : gbaLoad > 80 ? "tight" : ""}`}
+                title={[
+                  t("CPU load on the real device: {pct}% of its per-frame budget", { pct: gbaLoad }),
+                  t("Measured {cycles} cycles/frame of {frame}, running the game with the idle-loop skip active.",
+                    { cycles: rom.exec_cycles.toLocaleString(), frame: "280,896" }),
+                  rom.idle_loop
+                    ? t("gpSP knows this game's VBlank wait loop and can skip it.")
+                    : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
+                  t("A cycle-budget estimate — never checked on real hardware."),
+                ].join("\n")}>
+                {t("CPU {pct}%", { pct: gbaLoad })}
               </em>
             )}
           </>

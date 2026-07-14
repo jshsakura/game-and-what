@@ -372,9 +372,17 @@ export default {
   "Copy": "복사",
   "Copied": "복사됨",
   "Duplicate": "중복",
-  "Idle skip": "아이들 스킵",
-  "gpSP can skip this game's VBlank wait — full-speed candidate on the real device (not a guarantee)":
-    "gpSP가 이 게임의 VBlank 대기 루프를 건너뛸 수 있습니다 — 실기 풀스피드 후보 (보장은 아님)",
+  "CPU {pct}%": "CPU {pct}%",
+  "CPU load on the real device: {pct}% of its per-frame budget":
+    "실기 CPU 부하: 프레임 예산의 {pct}%",
+  "Measured {cycles} cycles/frame of {frame}, running the game with the idle-loop skip active.":
+    "게임을 실제로 돌려 측정: 프레임당 {cycles} 사이클 / {frame} (아이들 루프 스킵 적용 상태)",
+  "gpSP knows this game's VBlank wait loop and can skip it.":
+    "gpSP가 이 게임의 VBlank 대기 루프를 알고 있어 건너뜁니다.",
+  "No busy-wait loop: it waits via the BIOS, which gpSP already skips.":
+    "busy-wait 루프 없음 — BIOS로 대기하며, gpSP가 이미 건너뜁니다.",
+  "A cycle-budget estimate — never checked on real hardware.":
+    "사이클 예산 기반 추정치입니다 — 실기에서 확인한 적 없습니다.",
   "SELECT (TIME)": "SELECT (TIME)",
   "START (GAME)": "START (GAME)",
   "PAUSE/SET (pause)": "PAUSE/SET (일시정지)",

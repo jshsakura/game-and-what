@@ -580,15 +580,17 @@ body::before {
 }
 .dup-badge svg { flex: 0 0 auto; }
 
-/* "아이들 스킵" — a GBA game whose VBlank wait loop gpSP knows how to skip, which is
-   what full speed on the real M7 depends on. It takes over the cover's top-left chip
-   (normally the system icon): that corner is always visible, whereas in the title row
-   a long name pushed the badge out of sight. Green = a green light, not a warning. */
+/* GBA: the game's measured CPU load against what the real device's budget leaves it.
+   It takes over the cover's top-left chip (normally the system icon) — that corner is
+   always visible, whereas in the title row a long name pushed the badge out of sight.
+   Green under 80%, amber as it gets tight, red once the game cannot fit at all. */
 .cover-corner:has(.idle-tag) {
   background: color-mix(in srgb, #35c46a 88%, #0b2a16);
   color: #06240f;
   box-shadow: 0 1px 3px #00000059;
 }
+.cover-corner:has(.idle-tag.tight) { background: color-mix(in srgb, #e0a72c 90%, #2a1d05); color: #241a02; }
+.cover-corner:has(.idle-tag.over)  { background: color-mix(in srgb, #d94b3f 90%, #2a0d0a); color: #fff1ef; }
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
   line-height: 1; letter-spacing: 0.2px; white-space: nowrap;

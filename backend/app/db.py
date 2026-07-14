@@ -210,6 +210,16 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # pays off if the game actually idles for a good part of the frame.
         conn.execute("ALTER TABLE roms ADD COLUMN idle_loop INTEGER NOT NULL DEFAULT 0")
 
+    if "exec_cycles" not in cols:
+        # GBA only. The idle_loop flag says the VBlank wait CAN be skipped; it says
+        # nothing about whether the game is light enough to keep up once it is. This
+        # is the missing half: the cycles the CPU actually spends executing per frame,
+        # out of a 280,896-cycle frame, measured by running the rom with the skip
+        # active (scripts/idlefind). Weigh it against what the M7 leaves the CPU
+        # (~160,000 cycles at a 340MHz OC) for a verdict instead of a guess.
+        # NULL = not measured.
+        conn.execute("ALTER TABLE roms ADD COLUMN exec_cycles INTEGER")
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by
