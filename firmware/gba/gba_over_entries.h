@@ -862,17 +862,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   {
-      // 별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land) (2)
-      //   exec 47,491/280,896 cy/frame (83% idle) — CPU 53% of budget
-      "A7KJ",                      /* gamepak_code         */
-      0,                           /* flags (gpSP auto-detects the save type) */
-      0x8000f92,                   /* idle_loop_target_pc  */
-      0,                           /* translation_gate_target_1 */
-      0,                           /* translation_gate_target_2 */
-      0,                           /* translation_gate_target_3 */
-   },
-
    /* 2SME  심볼머지드
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -1137,6 +1126,17 @@
       "AY6J",                      /* gamepak_code         */
       0,                           /* flags (gpSP auto-detects the save type) */
       0x807928e,                   /* idle_loop_target_pc  */
+      0,                           /* translation_gate_target_1 */
+      0,                           /* translation_gate_target_2 */
+      0,                           /* translation_gate_target_3 */
+   },
+
+   {
+      // 별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land) (2)
+      //   exec 56,392/280,896 cy/frame (80% idle) — CPU 63% of budget
+      "A7KJ",                      /* gamepak_code         */
+      0,                           /* flags (gpSP auto-detects the save type) */
+      0x8000f92,                   /* idle_loop_target_pc  */
       0,                           /* translation_gate_target_1 */
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */

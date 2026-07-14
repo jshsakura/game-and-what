@@ -76,22 +76,41 @@ class Driver:
         return f"{self.engine}:{self.variant}{named}{where}"
 
 
-def find_m4a(data: bytes) -> Driver | None:
-    """Cut the M4A mixer out of the rom and name it by its hash.
+def find_m4a_all(data: bytes) -> list[Driver]:
+    """EVERY block in the rom shaped like the M4A mixer, not just the first.
 
-    The variant is what matters to the firmware: every cart carrying the same block gets the
-    same native implementation. 633 roms collapse into six.
+    The fingerprint — `str r8,[sp]` in, `ldr r8,[sp] / add r0,pc,#1 / bx r0` out — is the
+    shape of an ARM routine that saves r8 and returns to Thumb, and a big game has more than
+    one of those. Taking the first match got Golden Sun and Mario Golf a block that IS the
+    M4A mixer's bytes, sits in IWRAM exactly where it was copied… and never executes, while
+    the music plays out of a different routine entirely. The one that RUNS is the one that
+    costs, so hand the caller all the candidates and let the cycle histogram pick.
     """
-    start = data.find(M4A_START)
-    if start < 0:
-        return None
-    end = data.find(M4A_END, start)
-    if end < 0 or end - start > M4A_MAX:
-        return None
+    out: list[Driver] = []
+    pos = 0
+    while len(out) < 8:
+        start = data.find(M4A_START, pos)
+        if start < 0:
+            break
+        end = data.find(M4A_END, start)
+        if end < 0 or end - start > M4A_MAX:
+            pos = start + 4
+            continue
+        block = data[start:end + len(M4A_END)]
+        variant = hashlib.sha256(block).hexdigest()[:12]
+        out.append(Driver("m4a", variant, M4A_VARIANTS.get(variant, ""), block, start))
+        pos = end + len(M4A_END)
+    return out
 
-    block = data[start:end + len(M4A_END)]
-    variant = hashlib.sha256(block).hexdigest()[:12]
-    return Driver("m4a", variant, M4A_VARIANTS.get(variant, ""), block, start)
+
+def find_m4a(data: bytes) -> Driver | None:
+    """The first M4A-shaped block. Prefer a NAMED variant when the rom holds several — a
+    hash we recognise is the firmware's, and the firmware's is the one that runs."""
+    blocks = find_m4a_all(data)
+    if not blocks:
+        return None
+    named = [b for b in blocks if b.name]
+    return (named or blocks)[0]
 
 
 def find_gax(data: bytes) -> Driver | None:

@@ -823,12 +823,12 @@
   "conflict": false,
   "verify_tier": "R",
   "lib_name": "별의 커비 - 꿈의 샘 디럭스 (Kirby - Nightmare in Dream Land) (2)",
-  "exec_median": 47491,
+  "exec_median": 56392,
   "exec_p90": 280896,
   "verify_how": "hunt: detector + A/B",
   "audio_engine": "m4a",
   "audio_variant": "1b020ff71edf",
-  "audio_cycles": null,
+  "audio_cycles": 20743,
   "audio_name": "stereo2",
   "idle_hunted": true,
   "idle_verified": "0x8000f92",
@@ -886,9 +886,9 @@
   "exec_p90": 211630,
   "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
-  "audio_engine": "m4a",
-  "audio_variant": "1b020ff71edf",
-  "audio_name": "stereo2",
+  "audio_engine": null,
+  "audio_variant": null,
+  "audio_name": null,
   "idle_hunted": true
  },
  {
@@ -1802,8 +1802,8 @@
   "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
   "has_idle": false,
-  "audio_engine": "m4a",
-  "audio_variant": "7e6900d51f8d",
+  "audio_engine": null,
+  "audio_variant": null,
   "audio_name": null,
   "idle_hunted": true
  },
@@ -2635,9 +2635,9 @@
   "verify_how": "A/B: 67% less work with the address",
   "lib_name": "황금의 태양 2 - 잃어버린 시대 (Ougon no Taiyou - Ushinawareshi Toki)",
   "idle_drop": 0.671,
-  "audio_engine": "m4a",
-  "audio_variant": "1b020ff71edf",
-  "audio_name": "stereo2",
+  "audio_engine": null,
+  "audio_variant": null,
+  "audio_name": null,
   "audio_cycles": null
  },
  {
@@ -2769,9 +2769,9 @@
   "verify_how": "hunt: no wait loop exists",
   "verify_tier": null,
   "has_idle": false,
-  "audio_engine": "m4a",
-  "audio_variant": "1b020ff71edf",
-  "audio_name": "stereo2",
+  "audio_engine": null,
+  "audio_variant": null,
+  "audio_name": null,
   "idle_hunted": true
  },
  {
@@ -9354,9 +9354,9 @@
   "verify_how": "A/B: 76% less work with the address",
   "lib_name": "마리오 골프 어드밴스 투어 (Mario Golf - Advance Tour)",
   "idle_drop": 0.763,
-  "audio_engine": "m4a",
-  "audio_variant": "1b020ff71edf",
-  "audio_name": "stereo2",
+  "audio_engine": null,
+  "audio_variant": null,
+  "audio_name": null,
   "audio_cycles": null
  },
  {
@@ -10936,9 +10936,9 @@
   "verify_how": "A/B: 74% less work with the address",
   "lib_name": "마리오 테니스 어드밴스 (Mario Tennis Advance)",
   "idle_drop": 0.742,
-  "audio_engine": "m4a",
-  "audio_variant": "1b020ff71edf",
-  "audio_name": "stereo2",
+  "audio_engine": null,
+  "audio_variant": null,
+  "audio_name": null,
   "audio_cycles": null
  },
  {

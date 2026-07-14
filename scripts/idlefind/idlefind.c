@@ -291,14 +291,26 @@ int main(int argc, char** argv) {
 	// sum the cycles the histogram charged to it.
 	if (block_len > 0) {
 		uint32_t base = 0, cycles = 0;
+		// IWRAM first (that is where a sound driver is copied, for the speed), then EWRAM —
+		// and then ROM, because not every game copies it at all. Mario Golf, Golden Sun and
+		// Mario & Luigi run the mixer straight out of the cart, and a RAM-only search called
+		// their music free.
 		struct { uint32_t addr; uint32_t len; const uint32_t* hist; } regions[] = {
 			{ IWRAM_BASE, IWRAM_LEN, gIdleFindIwramHist },
 			{ EWRAM_BASE, EWRAM_LEN, gIdleFindEwramHist },
+			{ ROM_BASE, gIdleFindPcHistLen * 2, gIdleFindPcHist },
 		};
-		for (int r = 0; r < 2 && !base; ++r) {
+		// Match on a PREFIX, not the whole block. Several games (Mario Golf, Golden Sun,
+		// Mario & Luigi — Nintendo's own) copy the mixer into RAM and then patch a few
+		// bytes of it (relocating a pointer), so a byte-for-byte compare of 500 bytes never
+		// matches and the mixer reads as "never ran". The opening bytes are the routine's
+		// prologue and are not what gets patched; they are enough to say where it landed,
+		// and the cycles are then summed over the block's full length regardless.
+		const int probe_len = block_len < 32 ? block_len : 32;
+		for (int r = 0; r < 3; ++r) {
 			for (uint32_t off = 0; off + (uint32_t) block_len <= regions[r].len; off += 2) {
 				int same = 1;
-				for (int b = 0; b < block_len; ++b) {
+				for (int b = 0; b < probe_len; ++b) {
 					if ((core->busRead8(core, regions[r].addr + off + b) & 0xFF) != block[b]) {
 						same = 0;
 						break;
@@ -307,13 +319,22 @@ int main(int argc, char** argv) {
 				if (!same) {
 					continue;
 				}
-				base = regions[r].addr + off;
+				// EVERY copy, not the first. A game can leave more than one image of the
+				// driver in memory (the source it copied from, a scratch buffer), and the
+				// first one we stumble on is not necessarily the one being executed —
+				// Mario Golf's had zero cycles against it while its music played from
+				// another. Take the copy the frame actually spent time in.
+				uint32_t cy = 0;
 				for (int b = 0; b < block_len; b += 2) {
-					cycles += regions[r].hist[(off + b) >> 1];
+					cy += regions[r].hist[(off + b) >> 1];
 				}
-				break;
+				if (cy > cycles) {
+					cycles = cy;
+					base = regions[r].addr + off;
+				}
 			}
 		}
+
 		printf(", \"block_base\": \"0x%08x\", \"block_cycles\": %u",
 		       base, nsamples ? cycles / (uint32_t) nsamples : 0);
 	}
