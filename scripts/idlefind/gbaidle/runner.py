@@ -65,6 +65,22 @@ def run(rom: Path | str, *, forced_pc: str | None = None, frames: int = DEFAULT_
     return _reading(data)
 
 
+def raw(rom: Path | str, *, forced_pc: str | None = None, frames: int = DEFAULT_FRAMES,
+        env: dict[str, str] | None = None) -> dict | None:
+    """One run, returned as the binary's own JSON. For callers that want a field the
+    Reading does not carry — e.g. `block_cycles`, what a game's sound driver costs."""
+    if not available():
+        return None
+    cmd = [BINARY, str(rom), str(frames)] + ([forced_pc] if forced_pc else [])
+    try:
+        proc = subprocess.run(cmd, capture_output=True, timeout=TIMEOUT,
+                              env={**os.environ, **(env or {})})
+        return json.loads(proc.stdout.decode(errors="replace").strip().splitlines()[-1])
+    except (subprocess.TimeoutExpired, OSError, ValueError, IndexError) as exc:
+        log.warning("idlefind failed on %s: %s", rom, exc)
+        return None
+
+
 def run_off(rom: Path | str, **kw) -> Reading | None:
     """The baseline: the game with nothing skipped. Everything is measured against this."""
     return run(rom, forced_pc=NO_SKIP, want_frames=True, **kw)

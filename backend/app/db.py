@@ -245,6 +245,31 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # of that idleness is the skip's doing. NULL = no address, so nothing to buy.
         conn.execute("ALTER TABLE roms ADD COLUMN idle_drop REAL")
 
+    if "audio_cycles" not in cols:
+        # GBA only. What the game's SOUND DRIVER costs, per frame, in cycles — measured by
+        # running the rom (scripts/idlefind).
+        #
+        # A GBA game does not write its own mixer. It links in a library — Nintendo's M4A
+        # (Sappy) in most carts — which is copied into IWRAM at boot and then mixes every
+        # sample in guest ARM code, every frame. The firmware replaces that library with a
+        # native mixer, so ON THE DEVICE THE GUEST NEVER RUNS IT. exec_cycles includes it;
+        # the device will not pay it. On Zelda: A Link to the Past that is 40% of the frame,
+        # and it is the difference between 113% of budget and 68%.
+        #
+        # NULL = no driver found, or its block never ran.
+        conn.execute("ALTER TABLE roms ADD COLUMN audio_cycles INTEGER")
+
+    if "audio_variant" not in cols:
+        # Which build of that library. 633 roms collapse into six — M4A is Nintendo's own
+        # code and there are only a handful of SDK builds of it (mono, stereo, stereo2,
+        # stereo3…), which is exactly why implementing six natively retires the cost for the
+        # whole library. This is the hash of the block; `audio_name` is what the firmware
+        # calls it, and a name means the firmware HAS a native mixer for it.
+        conn.execute("ALTER TABLE roms ADD COLUMN audio_variant TEXT")
+
+    if "audio_name" not in cols:
+        conn.execute("ALTER TABLE roms ADD COLUMN audio_name TEXT")
+
     if "idle_hunted" not in cols:
         # We RAN the game and looked for a wait loop. 1 = looked; the answer, address or
         # not, is the game's and not the probe's.

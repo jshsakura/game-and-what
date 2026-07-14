@@ -59,6 +59,7 @@ extern uint32_t* gIdleFindIwramHist;
 #define IWRAM_LEN (32 * 1024)
 #define TOP_PCS 64
 #define MEM_WINDOW 64          // bytes dumped around each hot pc, for the disassembler
+#define MAX_BLOCK 4096         // the biggest code block we will look for at run time
 #define HASH_STRIDE 7
 #define MAX_DISTINCT 4096
 
@@ -168,6 +169,34 @@ int main(int argc, char** argv) {
 	uint32_t idle_loop = forced_loop ? forced_loop : GBA_IDLE_LOOP_NONE;
 	uint32_t seq = 2166136261u;
 
+	// IDLEFIND_BLOCK=<hex>: a block of code, cut out of the rom, that we want the cost of.
+	//
+	// A GBA game's sound driver (M4A/Sappy, GAX) is a library it links in and COPIES INTO
+	// IWRAM at boot, then runs there every frame. The firmware replaces that driver with a
+	// native one, so the guest never executes it — which means the work is real here and
+	// gone on the device, and a CPU figure that includes it is wrong by however much the
+	// game's music costs. On Zelda that is 60% of the frame.
+	//
+	// We do not model it. The block's bytes are in the rom, so: find where they landed in
+	// RAM, then add up the cycles the histogram already charged to that range. Measured,
+	// per game, in the same run as everything else.
+	uint8_t block[MAX_BLOCK];
+	int block_len = 0;
+	const char* block_hex = getenv("IDLEFIND_BLOCK");
+	if (block_hex) {
+		int n = (int) strlen(block_hex) / 2;
+		if (n > MAX_BLOCK) {
+			n = MAX_BLOCK;
+		}
+		for (int i = 0; i < n; ++i) {
+			unsigned byte = 0;
+			if (sscanf(block_hex + i * 2, "%2x", &byte) != 1) {
+				break;
+			}
+			block[block_len++] = (uint8_t) byte;
+		}
+	}
+
 	for (int i = 0; i < frames; ++i) {
 		core->setKeys(core, keys_for(i));
 		if (i == WARMUP_FRAMES) {
@@ -256,7 +285,39 @@ int main(int argc, char** argv) {
 		}
 		printf("\"");
 	}
-	printf("}");
+	printf("}");    // closes "mem"
+	// Where did the block land, and what did it cost? Search the regions a driver is
+	// copied into (IWRAM first — that is where a sound driver goes, for the speed), then
+	// sum the cycles the histogram charged to it.
+	if (block_len > 0) {
+		uint32_t base = 0, cycles = 0;
+		struct { uint32_t addr; uint32_t len; const uint32_t* hist; } regions[] = {
+			{ IWRAM_BASE, IWRAM_LEN, gIdleFindIwramHist },
+			{ EWRAM_BASE, EWRAM_LEN, gIdleFindEwramHist },
+		};
+		for (int r = 0; r < 2 && !base; ++r) {
+			for (uint32_t off = 0; off + (uint32_t) block_len <= regions[r].len; off += 2) {
+				int same = 1;
+				for (int b = 0; b < block_len; ++b) {
+					if ((core->busRead8(core, regions[r].addr + off + b) & 0xFF) != block[b]) {
+						same = 0;
+						break;
+					}
+				}
+				if (!same) {
+					continue;
+				}
+				base = regions[r].addr + off;
+				for (int b = 0; b < block_len; b += 2) {
+					cycles += regions[r].hist[(off + b) >> 1];
+				}
+				break;
+			}
+		}
+		printf(", \"block_base\": \"0x%08x\", \"block_cycles\": %u",
+		       base, nsamples ? cycles / (uint32_t) nsamples : 0);
+	}
+
 	if (dump_hashes) {
 		printf(", \"frames\": [");
 		for (int i = 0; i < nfh; ++i) {

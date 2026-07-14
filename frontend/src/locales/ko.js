@@ -403,6 +403,16 @@ export default {
     "이 게임은 스핀 대신 BIOS로 기다리고, gpSP는 그건 이미 건너뜁니다. 찾아줄 게 없습니다.",
   "Without that address the wait is emulated instruction by instruction and fills the frame — the game cannot reach full speed however light it really is.":
     "그 주소가 없으면 기다림이 명령어 하나하나 흉내내지면서 프레임을 다 채웁니다. 실제로는 아무리 가벼운 게임이라도 풀스피드에 못 닿습니다.",
+  "Sound driver — the share of the work above that is music": "사운드 드라이버 (위 작업 중 음악이 차지하는 몫)",
+  "{pct}% of this game's CPU work is its sound driver mixing samples ({cycles} cycles/frame).":
+    "이 게임 CPU 작업의 {pct}%가 사운드 드라이버의 샘플 믹싱입니다 (프레임당 {cycles} 사이클).",
+  "It links in Nintendo's M4A library ({name} build), which the firmware replaces with a native mixer — so on the device the game never runs it.":
+    "닌텐도 M4A 라이브러리({name} 빌드)를 링크해 씁니다. 펌웨어가 이걸 네이티브 믹서로 대체하므로, 실기에서는 게임이 이 코드를 아예 실행하지 않습니다.",
+  "Its sound driver has no native replacement yet, so the device still pays for this.":
+    "이 사운드 드라이버는 아직 네이티브 대체본이 없어서, 실기에서도 이 비용을 그대로 냅니다.",
+  "CPU on the device would be about {pct}%, not {now}%.":
+    "실기 CPU는 {now}%가 아니라 약 {pct}%가 됩니다.",
+  "Code size — how full the cart is": "코드 크기 (카트가 얼마나 찼는지)",
   "CPU load filter": "CPU 부하 필터",
   "Fits": "여유",
   "Tight": "아슬",

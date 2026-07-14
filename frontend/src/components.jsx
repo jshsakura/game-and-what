@@ -122,6 +122,17 @@ function gbaReading(rom) {
     // address and without). Null for a game that has no address: a BIOS-halt game idles
     // most of its frame too, and none of that idleness is the skip's doing.
     skip: rom.idle_drop != null ? Math.round(rom.idle_drop * 100) : null,
+    // What the game's SOUND DRIVER costs, as a share of the work above — measured in the
+    // same run, which is the only way one can be subtracted from the other.
+    //
+    // A GBA game does not write its own mixer: it links in Nintendo's M4A, which is copied
+    // into IWRAM and mixes every sample in guest code, every frame. The firmware replaces it
+    // with a native mixer, so the device never runs it. This share is therefore work that is
+    // real here and GONE there — on Zelda, most of the frame.
+    audio: rom.audio_cycles && rom.exec_cycles
+      ? Math.round((rom.audio_cycles / rom.exec_cycles) * 100) : null,
+    audioCycles: rom.audio_cycles || null,
+    audioName: rom.audio_name || null,
   };
 }
 
@@ -129,20 +140,41 @@ function gbaReading(rom) {
 // would eat the card's width. Fills clockwise from the top. `tone` picks which fraction
 // it is: the CPU load against the device's budget (green → amber → red once it cannot
 // fit), or what the idle skip took back (blue, and always a good thing).
-function Ring({ pct, tone, title, size = 27 }) {
-  const R = 7.5;
-  const CIRC = 2 * Math.PI * R;
-  const state = tone === "skip" ? "skip" : pct > 100 ? "over" : pct > 80 ? "tight" : "";
+// Segmented, like a speedometer rather than a hairline: 20 ticks round the circle, and the
+// ring lights the ones it has earned. A continuous arc at this size reads as a smudge —
+// ticks are countable, and a glance at "most of them are lit" is the whole point.
+const RING_TICKS = 20;
+
+// One segment of the rim: an arc from a to b degrees, at radius r. Segments, not spokes —
+// the marks belong ON the rim, running around the outside. Spokes point inwards and crowd
+// the number in the middle.
+function arcPath(cx, cy, r, a, b) {
+  const p = (deg) => {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+  };
+  const [x1, y1] = p(a);
+  const [x2, y2] = p(b);
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
+function Ring({ pct, tone, title, size = 24 }) {
+  const lit = Math.round((Math.min(pct, 100) / 100) * RING_TICKS);
+  const state = tone === "skip" ? "skip" : tone === "audio" ? "audio"
+    : pct > 100 ? "over" : pct > 80 ? "tight" : "";
+  const step = 360 / RING_TICKS;
+  const gap = 4;                                  // degrees of dark between segments
+  const R = 8.3;                                  // out at the rim, clear of the number
+  const ticks = Array.from({ length: RING_TICKS }, (_, i) => (
+    <path key={i} className={i < lit ? "tick on" : "tick"}
+      d={arcPath(10, 10, R, i * step, (i + 1) * step - gap)} fill="none" />
+  ));
   return (
-    // Each ring explains ITSELF on hover. One tooltip over both left you guessing which
-    // of the two numbers it was talking about.
+    // Each ring explains ITSELF on hover. One tooltip over all of them left you guessing
+    // which number it was talking about.
     <span className="ring-wrap" title={title}>
       <svg className={`load-ring ${state}`} width={size} height={size} viewBox="0 0 20 20" aria-hidden>
-        <circle className="track" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5" />
-        <circle className="fill" cx="10" cy="10" r={R} fill="none" strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray={`${(Math.min(pct, 100) / 100) * CIRC} ${CIRC}`}
-          transform="rotate(-90 10 10)" />
+        {ticks}
       </svg>
       <b>{pct}</b>
     </span>
@@ -386,7 +418,7 @@ export function Dropzone({ accept, multiple, label, folder, onFiles, busyLabel }
 
 // Cover slot — shows the cover (or a beautiful centered placeholder when
 // missing/broken) and is clickable to upload your own cover image directly.
-export function CoverSlot({ romId, src: initialSrc, bust, alt = "", aspect = 3 / 4, onActivate, badge = null, cornerBL = null, gauge = null, status = null, overlay = null }) {
+export function CoverSlot({ romId, src: initialSrc, bust, alt = "", aspect = 3 / 4, onActivate, badge = null, cornerBL = null, status = null, overlay = null }) {
   const t = useT();
   const [src, setSrc] = useState(initialSrc || null);
   const [err, setErr] = useState(false);
@@ -455,11 +487,6 @@ export function CoverSlot({ romId, src: initialSrc, bust, alt = "", aspect = 3 /
       {overlay && <span className="cover-corner">{overlay}</span>}
       {cornerBL && <span className="cover-badge bl">{cornerBL}</span>}
       {badge && <span className="cover-badge">{badge}</span>}
-      {gauge && (
-        <span className="cover-gauge" title={gauge.title} aria-hidden>
-          <i className={`g-${gauge.cls}`} style={{ width: `${Math.min(100, gauge.pct)}%` }} />
-        </span>
-      )}
     </div>
   );
 }
@@ -1286,10 +1313,6 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               <HardDriveDownload size={11} strokeWidth={2.5} aria-hidden /> {t("Not on SD")}
             </span>
           : rom.system_key === "pico8" ? <Pico8Compat status={rom.pico8_compat} /> : null}
-        gauge={rom.system_key === "pico8" && rom.pico8_mem_hint != null ? {
-          pct: rom.pico8_mem_hint, cls: p8memLevel(rom.pico8_mem_hint).cls,
-          title: `${t("Code size")}: ${t(p8memLevel(rom.pico8_mem_hint).label)} (${rom.pico8_mem_hint}%)`,
-        } : null}
         status={rom.cover_status}
         overlay={
           <>
@@ -1328,10 +1351,23 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 {t("Not measured")}
               </em>
             )}
+            {/* PICO-8: the same ring, the same corner. It used to be a hairline bar across
+                the bottom of the poster, which said "some amount of something" and could not
+                carry its own number. Code size is a fraction of a budget — the same shape of
+                fact the GBA rings carry — so it gets the same dial. */}
+            {rom.system_key === "pico8" && rom.pico8_mem_hint != null && (
+              <em className="idle-tag gauge">
+                <Ring pct={rom.pico8_mem_hint} tone={p8memLevel(rom.pico8_mem_hint).cls === "low" ? "" : p8memLevel(rom.pico8_mem_hint).cls === "mid" ? "tight" : "over"}
+                  title={[
+                    t("Code size — how full the cart is"),
+                    `${t("Code size")}: ${t(p8memLevel(rom.pico8_mem_hint).label)} (${rom.pico8_mem_hint}%)`,
+                  ].join("\n")} />
+              </em>
+            )}
             {gba && !gba.unknown && (
-              // Two rings, not two pills: the corner has no width to give, and both
-              // numbers are fractions. Left is what the game costs the device, right is
-              // what the idle skip already took off that cost.
+              // Three rings, not three pills: the corner has no width to give, and all three
+              // numbers are fractions. What the game costs the device, what the idle skip
+              // already took off that cost, and how much of what is left is only music.
               <em className="idle-tag gauge">
                 <Ring pct={gba.load} title={[
                   t("CPU — what the game costs the real device"),
@@ -1358,6 +1394,21 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     t("The idle-loop skip takes back {pct}% of this game's frame — without it, no game clears the budget.", { pct: gba.skip }),
                     t("Measured by running the game twice: once with the address, once without."),
                   ].join("\n")} />
+                )}
+                {/* The third: work that is real here and gone on the device. */}
+                {gba.audio != null && (
+                  <Ring pct={gba.audio} tone="audio" title={[
+                    t("Sound driver — the share of the work above that is music"),
+                    t("{pct}% of this game's CPU work is its sound driver mixing samples ({cycles} cycles/frame).",
+                      { pct: gba.audio, cycles: gba.audioCycles.toLocaleString() }),
+                    gba.audioName
+                      ? t("It links in Nintendo's M4A library ({name} build), which the firmware replaces with a native mixer — so on the device the game never runs it.", { name: gba.audioName })
+                      : t("Its sound driver has no native replacement yet, so the device still pays for this."),
+                    gba.audioName
+                      ? t("CPU on the device would be about {pct}%, not {now}%.",
+                        { pct: Math.round(((gba.cycles - gba.audioCycles) / GBA_CPU_BUDGET) * 100), now: gba.load })
+                      : "",
+                  ].filter(Boolean).join("\n")} />
                 )}
               </em>
             )}

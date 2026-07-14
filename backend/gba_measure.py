@@ -63,11 +63,15 @@ def main() -> None:
             idle = 1 if entry.get("verify_tier") == "R" else 0
             conn.execute(
                 "UPDATE roms SET idle_loop = ?, idle_pc = ?, exec_cycles = ?, "
-                "idle_drop = ?, idle_hunted = ?, probe_status = 'ok' WHERE id = ?",
+                "idle_drop = ?, idle_hunted = ?, audio_cycles = ?, audio_variant = ?, "
+                "audio_name = ?, probe_status = 'ok' WHERE id = ?",
                 (idle, entry.get("idle_verified") if idle else None,
                  entry["exec_median"],
                  entry.get("idle_drop") if idle else None,
                  1 if entry.get("idle_hunted") else 0,
+                 entry.get("audio_cycles"),
+                 entry.get("audio_variant"),
+                 entry.get("audio_name"),
                  row["id"]),
             )
             updated += 1

@@ -674,13 +674,18 @@ body::before {
   position: absolute; inset: 0; display: grid; place-items: center;
   font-size: 9px; font-weight: 800; letter-spacing: -0.3px;
 }
-.load-ring .track { stroke: #ffffff24; }
-.load-ring .fill { stroke: #35c46a; }
-.load-ring.tight .fill { stroke: #e0a72c; }
-/* Over budget the ring closes solid red: by how much stops mattering — it does not fit. */
-.load-ring.over .fill { stroke: #d94b3f; }
-.load-ring.over .track { stroke: #d94b3f47; }
-.load-ring.skip .fill { stroke: #62c8f5; }
+/* Speedometer ticks, not an arc. Unlit marks stay visible so the ring reads as a SCALE —
+   "8 of 20" — rather than as an arc of unknown length. */
+.load-ring .tick { stroke: #ffffff26; stroke-width: 2.2; stroke-linecap: butt; }
+.load-ring .tick.on { stroke: #35c46a; }
+.load-ring.tight .tick.on { stroke: #e0a72c; }
+/* Over budget: every tick lit and red. By how much stops mattering — it does not fit. */
+.load-ring.over .tick.on { stroke: #d94b3f; }
+.load-ring.over .tick { stroke: #d94b3f40; }
+.load-ring.skip .tick.on { stroke: #62c8f5; }
+/* The sound driver: work that is real in the emulator and gone on the device. Violet, so it
+   never reads as "cost" the way the CPU ring does — it is the opposite of a warning. */
+.load-ring.audio .tick.on { stroke: #b28bf0; }
 
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
@@ -2209,15 +2214,6 @@ body::before {
 }
 .cover-badge.bl .p8compat { margin-right: 0; padding: 0; }
 
-/* PICO-8 cart-complexity gauge — thin bar along the poster's bottom edge. */
-.cover-gauge {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 1;
-  background: #00000059; overflow: hidden;
-}
-.cover-gauge i { display: block; height: 100%; }
-.cover-gauge .g-low  { background: #4cc94c; }
-.cover-gauge .g-mid  { background: #e8b339; }
-.cover-gauge .g-high { background: #e2503b; }
 
 /* MEDIA tab — video converter + music store stacked, with a labelled divider. */
 .media-tab { gap: 14px; }
