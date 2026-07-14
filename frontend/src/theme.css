@@ -2062,7 +2062,15 @@ body::before {
   .tabbar-dl .tab-selall { flex: 1 1 44%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   .tabbar-dl .sdf { flex: 1 1 44%; display: flex; }
   .tabbar-dl .sdf-trigger { flex: 1; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
-  .tabbar-dl .sdf-panel { right: auto; left: 0; }
+  /* The panel used to hang off the TRIGGER's left edge, and on a phone the trigger sits
+     in the right half of the row — so a 300px panel started at x=199 on a 390px screen
+     and ran 109px past the edge, which the page then had to scroll sideways to reach.
+     Anchor it to the BAR instead: the bar is the content width, so the panel simply
+     cannot be wider than the screen. (.sdf goes static so the bar is what `absolute`
+     resolves against.) */
+  .tabbar-dl { position: relative; }
+  .tabbar-dl .sdf { position: static; }
+  .tabbar-dl .sdf-panel { left: 0; right: 0; width: auto; max-width: none; }
   .tabbar-dl .tab-dl { flex: 1 0 100%; justify-content: center; padding-top: 13px; padding-bottom: 13px; }
   .tabbar-dl .btn-skel { width: auto; height: 48px; }
   .tabbar-dl .btn-skel.sel { flex: 1 1 44%; }
