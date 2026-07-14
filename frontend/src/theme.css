@@ -686,6 +686,13 @@ body::before {
 /* The sound driver: work that is real in the emulator and gone on the device. Violet, so it
    never reads as "cost" the way the CPU ring does — it is the opposite of a warning. */
 .load-ring.audio .tick.on { stroke: #b28bf0; }
+/* Hover: the ring you are reading brightens and lifts, so a tooltip that takes a moment to
+   appear still has something pointing at what it is about to talk about. */
+.ring-wrap { transition: transform 0.12s ease, background 0.12s ease; }
+.ring-wrap:hover { transform: translateY(-1px); background: #1c1c28d9; }
+.ring-wrap:hover .load-ring .tick { stroke: #ffffff40; }
+.ring-wrap:hover .load-ring .tick.on { filter: brightness(1.35); }
+.ring-wrap:hover b { color: #fff; }
 
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
