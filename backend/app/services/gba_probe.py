@@ -74,6 +74,12 @@ class Probe:
     source: str            # "db" | "measured"
     idle_drop: float | None = None   # what the skip bought, measured
     hunted: bool = False             # we ran it and searched: a full frame is the GAME's answer
+    # The sound driver, from the shared table only — the live hunt does not time it. A game's
+    # M4A mixer is cost that is real here and GONE on the device (the firmware runs a native
+    # one), so it rides along with the lookup and never with a fresh measurement.
+    audio_cycles: int | None = None
+    audio_variant: str | None = None
+    audio_name: str | None = None
 
 
 def game_code(path: Path) -> str | None:
@@ -93,6 +99,9 @@ def lookup(code: str) -> Probe | None:
         source="db",
         idle_drop=row.get("idle_drop"),
         hunted=bool(row.get("idle_hunted")),
+        audio_cycles=row.get("audio_cycles"),
+        audio_variant=row.get("audio_variant"),
+        audio_name=row.get("audio_name"),
     )
 
 

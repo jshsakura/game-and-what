@@ -217,6 +217,7 @@ async def _probe_gba(session_id: str, roms: list[dict]) -> None:
     """
     for rom in roms:
         status, idle_pc, cycles, drop, hunted = "failed", None, None, None, False
+        audio_cycles = audio_variant = audio_name = None
         try:
             result = await gba_probe.probe(Path(rom["rom_path"]))
             if result:
@@ -228,6 +229,11 @@ async def _probe_gba(session_id: str, roms: list[dict]) -> None:
                 # game's own answer ("it is this heavy"), not the probe's failure to
                 # measure it, and the UI must stop calling it "not measured".
                 drop, hunted = result.idle_drop, result.hunted
+                # The sound driver — set only on a table lookup (a live hunt leaves it None).
+                # It is what makes the card's third ring, and the mixer HLE the device gets
+                # for free, so a fresh upload that the table already knows shows it at once.
+                audio_cycles = result.audio_cycles
+                audio_variant, audio_name = result.audio_variant, result.audio_name
         except Exception:                                    # noqa: BLE001 — never wedge the queue
             log.exception("gba probe crashed for %s", rom["id"])
 
@@ -235,9 +241,11 @@ async def _probe_gba(session_id: str, roms: list[dict]) -> None:
             with db.connect() as conn:
                 conn.execute(
                     "UPDATE roms SET probe_status = ?, idle_loop = ?, idle_pc = ?, "
-                    "exec_cycles = ?, idle_drop = ?, idle_hunted = ? "
+                    "exec_cycles = ?, idle_drop = ?, idle_hunted = ?, "
+                    "audio_cycles = ?, audio_variant = ?, audio_name = ? "
                     "WHERE id = ? AND session_id = ?",
                     (status, int(bool(idle_pc)), idle_pc, cycles, drop, int(hunted),
+                     audio_cycles, audio_variant, audio_name,
                      rom["id"], session_id),
                 )
         except Exception:                                    # noqa: BLE001

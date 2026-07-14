@@ -78,6 +78,16 @@ def _startup() -> None:
     seeded, _ = dataset_svc.seed_if_empty()
     if seeded:
         print(f"[startup] seeded {seeded} Korean name(s) from data/names.ko.json")
+    # The GBA measurements are a public good too: the idle addresses, per-frame cycles and
+    # sound-driver costs we hunted on real runs ship in the image, but until now only a
+    # hand-run of gba_measure.py put them on a rom's row. Stamp them onto every matching
+    # rom at boot, so a fresh Docker install shows the CPU/idle/mixer verdict instead of a
+    # spinner. Idempotent — a converged library changes nothing here on the next restart.
+    from .services import gba_seed
+    with db.connect() as conn:
+        measured = gba_seed.apply_table(conn)
+    if measured:
+        print(f"[startup] seeded {measured} GBA measurement(s) from scripts/gba_idle_loop_db.json")
     # Reclaim disk from orphaned upload temps (.src_*) left by an encode that was
     # killed mid-run (crash/OOM/stop) before its finally-cleanup could fire.
     from .services import storage
