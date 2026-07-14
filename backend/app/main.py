@@ -1,6 +1,7 @@
 """gnw-retro-manager API — FastAPI entry point."""
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 from fastapi import Depends, FastAPI
@@ -122,6 +123,39 @@ def _startup() -> None:
     pruned = packaging.prune_cache()
     if pruned:
         print(f"[startup] pruned {pruned} stale SD cache zip(s)")
+
+
+@app.on_event("startup")
+async def _resume_gba_probes() -> None:
+    """Pick the measurement queue back up where a restart dropped it.
+
+    Measuring a GBA rom means RUNNING it, one at a time (services/gba_probe holds a
+    semaphore), so a hundred fresh roms is a queue that takes a while — and the queue lives
+    only in memory. A restart in the middle of it left every rom still waiting stranded on
+    probe_status='pending': a "측정 중" spinner that never resolves, on a card that will
+    never be measured, forever. Covers already had this recovery; the prober did not.
+
+    Re-queue rather than clear: the answer is worth having, and a rom already in the shared
+    table costs nothing to resolve (lookup first, run only what we have never seen).
+    """
+    from .routers.roms import _probe_gba
+    from .services import storage
+
+    root = storage.session_root(config.SHARED_SESSION_ID)
+    with db.connect() as conn:
+        rows = [dict(r) for r in conn.execute(
+            "SELECT id, rom_path FROM roms WHERE session_id = ? AND system_key = 'gba' "
+            "AND probe_status = 'pending'", (config.SHARED_SESSION_ID,))]
+    # The upload path hands the prober an ABSOLUTE path; the database stores a
+    # session-relative one ("roms/gba/…"). Passing the stored value straight through would
+    # have the prober open a file that is not there and quietly fail — which looks exactly
+    # like the bug this is here to fix.
+    for row in rows:
+        row["rom_path"] = str(root / row["rom_path"])
+
+    if rows:
+        print(f"[startup] resuming {len(rows)} unfinished GBA measurement(s)")
+        asyncio.create_task(_probe_gba(config.SHARED_SESSION_ID, rows))
 
 
 @app.get("/api/health")

@@ -122,3 +122,44 @@ def test_a_hunted_rom_with_no_loop_is_reported_as_hunted(tmp_path, monkeypatch):
     assert result.idle_pc is None
     assert result.hunted is True
     assert result.exec_cycles == 227722
+
+
+def test_the_measure_queue_survives_a_restart(tmp_path, monkeypatch):
+    """A hundred fresh roms is a queue that runs for hours (one at a time, by design), and
+    the queue lives only in memory. A restart used to strand every rom still waiting on
+    probe_status='pending' — a "측정 중" spinner on a card that would never be measured.
+
+    Covers already had this recovery. The prober did not.
+    """
+    import asyncio as _asyncio
+
+    from app import config, db, main
+    from app.services import storage
+
+    seen: list[dict] = []
+
+    async def _fake_probe(_session, roms):
+        seen.extend(roms)
+
+    monkeypatch.setattr("app.routers.roms._probe_gba", _fake_probe)
+
+    root = storage.session_root(config.SHARED_SESSION_ID)
+    with db.connect() as conn:
+        conn.execute("DELETE FROM roms WHERE id = 'resume-me'")
+        conn.execute(
+            "INSERT INTO roms (id, session_id, system_key, original_name, stored_name, "
+            "rom_path, probe_status) VALUES ('resume-me', ?, 'gba', 'x.gba', 'x.gba', "
+            "'roms/gba/x.gba', 'pending')", (config.SHARED_SESSION_ID,))
+
+    async def run():
+        await main._resume_gba_probes()
+        await _asyncio.sleep(0)          # let the task it spawned run
+
+    _asyncio.run(run())
+
+    mine = [r for r in seen if r["id"] == "resume-me"]
+    assert mine, "a rom left 'pending' by a restart must be picked back up"
+    # ABSOLUTE, not the session-relative path the DB stores — the prober opens the file, and
+    # handing it "roms/gba/x.gba" would fail silently, which looks exactly like the bug this
+    # exists to fix.
+    assert mine[0]["rom_path"] == str(root / "roms/gba/x.gba")

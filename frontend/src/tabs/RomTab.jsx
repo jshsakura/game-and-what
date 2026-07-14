@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Gamepad2, Loader2, Upload } from "lucide-react";
+import { AlertTriangle, Gamepad2, Loader2, Upload } from "lucide-react";
 import { getSystems, getLibrary, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
 import { Dropzone, SystemSelect, RomCard } from "../components.jsx";
 import { useT } from "../i18n.jsx";
@@ -124,9 +124,16 @@ export default function RomTab({ onChanged }) {
         </div>
       )}
 
+      {/* A full-width verdict on what just happened, not a chip. It was borrowing the
+          10px `.badge` used for inline tags, which is unreadable at the width of a
+          sentence — and this is the one line that tells you which files did NOT land. */}
       {dups.length > 0 && (
-        <div className="badge failed">
-          ⚠ {t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}: {dups.map((f) => f.name).join(", ")}
+        <div className="upload-note warn">
+          <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />
+          <div>
+            <b>{t("Skipped {n} duplicate ROM(s) already in the library", { n: dups.length })}</b>
+            <ul>{dups.map((f) => <li key={f.name}>{f.name}</li>)}</ul>
+          </div>
         </div>
       )}
 

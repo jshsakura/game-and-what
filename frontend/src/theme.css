@@ -2039,8 +2039,10 @@ body::before {
   background: var(--accent); color: #fff; font-family: var(--pixel); font-size: 7px;
 }
 .badge {
-  display: inline-block; margin-top: 5px; padding: 3px 6px; border-radius: 4px;
-  font-family: var(--body-font); font-size: 10px; font-weight: 700; line-height: 1.5;
+  display: inline-block; margin-top: 5px; padding: 3px 7px; border-radius: 4px;
+  /* 10px was below the floor at which anyone actually reads a word — these carry real
+     verdicts ("failed", "no cover"), not decoration. */
+  font-family: var(--body-font); font-size: 11.5px; font-weight: 700; line-height: 1.5;
 }
 .badge.ok { background: #2e7d32; color: #fff; }
 .badge.none { background: #7d6b2e; color: #fff; }
@@ -2663,3 +2665,25 @@ body::before {
   font-size: 10px; cursor: pointer; user-select: all;
 }
 .demo-banner-tip code:hover { background: #00000055; }
+
+
+/* The verdict on an upload — which files did NOT land, and why. A full-width sentence, so
+   it gets a sentence's type size: it was borrowing the 10px inline-chip style and nobody
+   could read the one line that mattered. */
+.upload-note {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin-top: 10px; padding: 11px 13px; border-radius: 8px;
+  font-family: var(--body-font); font-size: 13.5px; line-height: 1.65;
+  border: 1px solid transparent;
+}
+.upload-note svg { flex: 0 0 auto; margin-top: 2px; }
+.upload-note b { display: block; font-weight: 800; font-size: 14px; letter-spacing: 0.2px; }
+.upload-note ul {
+  margin: 5px 0 0; padding-left: 16px;
+  font-size: 12.5px; line-height: 1.75; opacity: 0.92; word-break: break-all;
+}
+.upload-note.warn {
+  background: color-mix(in srgb, #9b2226 26%, #1a0e10);
+  border-color: color-mix(in srgb, #e0605f 45%, transparent);
+  color: #ffdedd;
+}
