@@ -529,3 +529,61 @@ def test_session_has_content_true_once_a_rom_exists(env):
 def test_session_has_content_false_when_root_missing(env):
     # session_root() is never created for this session id -> early-return path
     assert packaging.session_has_content("never-used-session") is False
+
+
+class TestSdCacheBudgetYieldsToDisk:
+    """A cache that fills the disk has stopped being an optimisation.
+
+    The budget was a flat 12 GB, which is a fine trade on an empty disk and a bad one on a
+    full one: at 99% used, the pruner was dutifully DEFENDING 2.7 GB of zips that rebuild in
+    a minute — while uploads and the database had nowhere left to write.
+    """
+
+    def _cache(self, tmp_path, sizes_mb):
+        from app.services import packaging
+        cache = tmp_path / "_cache"
+        cache.mkdir()
+        for i, mb in enumerate(sizes_mb):
+            (cache / f"sd-{i:040x}.zip").write_bytes(b"\0" * (mb * 1024 * 1024))
+        return packaging, cache
+
+    def _disk(self, monkeypatch, packaging, free_gb):
+        import collections
+        usage = collections.namedtuple("usage", "total used free")
+        monkeypatch.setattr(packaging.shutil, "disk_usage",
+                            lambda _p: usage(200 << 30, (200 - free_gb) << 30, free_gb << 30))
+
+    def test_a_roomy_disk_keeps_the_full_budget(self, tmp_path, monkeypatch):
+        packaging, cache = self._cache(tmp_path, [1, 1])
+        self._disk(monkeypatch, packaging, free_gb=100)
+
+        assert packaging._cache_budget(cache) == packaging._SD_CACHE_MAX_BYTES
+
+    def test_a_tight_disk_shrinks_the_budget_to_nothing(self, tmp_path, monkeypatch):
+        packaging, cache = self._cache(tmp_path, [1, 1])
+        self._disk(monkeypatch, packaging, free_gb=2)      # 2 GB free, reserve is 20
+
+        assert packaging._cache_budget(cache) == 0
+
+    def test_a_tight_disk_evicts_everything_but_the_newest(self, tmp_path, monkeypatch):
+        # The newest is always kept: it is the zip just built or being served, and its path
+        # has already been handed to the caller.
+        packaging, cache = self._cache(tmp_path, [200, 200, 200])
+        self._disk(monkeypatch, packaging, free_gb=1)
+
+        packaging._prune_sd_cache(cache)
+
+        assert len(list(cache.glob("sd-*.zip"))) == 1
+
+    def test_the_cache_may_spend_what_it_is_already_holding(self, tmp_path, monkeypatch):
+        """Its own bytes count as 'used' on the disk, so they are part of what it can
+        afford — otherwise a cache would evict itself the moment it grew."""
+        held = 1024 * 1024 * 1024                              # 1 GiB of zips
+        packaging, cache = self._cache(tmp_path, [1024])
+        free = 25 << 30
+        self._disk(monkeypatch, packaging, free_gb=25)
+
+        budget = packaging._cache_budget(cache)
+
+        # free + held - reserve: the zips it holds are not spent, they are spendable.
+        assert budget == free + held - packaging._SD_CACHE_DISK_RESERVE

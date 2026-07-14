@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -76,6 +77,26 @@ _SD_CACHE_KEEP = 4                    # max cached zips to retain (LRU)
 # the full zip and forces a 1–2 min rebuild every time. A retro SD library is a
 # few GB; 12 GB of cache is a cheap trade for never rebuilding the common ones.
 _SD_CACHE_MAX_BYTES = 12_000_000_000
+# …but only while the disk can afford it. This cache is an optimisation, and an
+# optimisation that fills the disk has stopped being one: a full disk breaks uploads,
+# the database and the app itself, and rebuilding a zip only costs a minute. So the
+# budget yields to free space — keep this much headroom clear no matter what.
+_SD_CACHE_DISK_RESERVE = 20_000_000_000
+
+
+def _cache_budget(cache_dir: Path) -> int:
+    """What the cache may occupy right now: the fixed cap, or whatever the disk can spare
+    above the reserve — whichever is smaller. Zero when the disk is already tight, which
+    empties the cache rather than defending it."""
+    try:
+        usage = shutil.disk_usage(cache_dir)
+    except OSError:
+        return _SD_CACHE_MAX_BYTES
+    # The cache's own bytes are already counted as "used", so they are part of what it may
+    # spend: free + what it is holding, minus the headroom we insist on keeping.
+    held = sum(z.stat().st_size for z in cache_dir.glob("sd-*.zip") if z.exists())
+    spare = usage.free + held - _SD_CACHE_DISK_RESERVE
+    return max(0, min(_SD_CACHE_MAX_BYTES, spare))
 
 
 def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None",
@@ -266,10 +287,18 @@ def prune_cache() -> int:
 
 
 def _prune_sd_cache(cache_dir: Path) -> None:
-    """Keep the SD-zip cache from piling up: most-recently-used first, bounded by
-    BOTH a count cap AND a total-size budget, so it can never balloon (these zips
-    are ~hundreds of MB each). The newest zip — the one just built/served — is
-    always kept so its returned path stays valid."""
+    """Keep the SD-zip cache from piling up: most-recently-used first, bounded by a count
+    cap AND a size budget — and the budget yields to free disk (`_cache_budget`).
+
+    A full-library zip is ~2.4 GB, so four of them is a cache that can eat a disk. It had a
+    flat 12 GB budget, which was a fine trade when the disk was empty and a bad one when it
+    was not: at 99% full, the pruner was dutifully *defending* 2.7 GB of zips that rebuild
+    in a minute.
+
+    The newest zip is always kept — it is the one just built or being served, and its path
+    has already been handed out.
+    """
+    budget = _cache_budget(cache_dir)
     zips = sorted(cache_dir.glob("sd-*.zip"), key=lambda p: p.stat().st_mtime, reverse=True)
     total = 0
     for i, z in enumerate(zips):
@@ -277,7 +306,7 @@ def _prune_sd_cache(cache_dir: Path) -> None:
             size = z.stat().st_size
         except OSError:
             size = 0
-        keep = i == 0 or (i < _SD_CACHE_KEEP and total + size <= _SD_CACHE_MAX_BYTES)
+        keep = i == 0 or (i < _SD_CACHE_KEEP and total + size <= budget)
         if keep:
             total += size
             continue
