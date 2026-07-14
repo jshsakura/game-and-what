@@ -910,6 +910,8 @@ body::before {
   color: var(--card-ink); background: #4c535e;
 }
 .size-tag.sizing .spin { animation: spin 0.9s linear infinite; }
+/* which of the two sizes this is — SD (on the card) or ZIP (the download) */
+.size-kind { margin-right: 3px; opacity: 0.72; }
 
 /* Subtle "no cover" hint on a card (replaces the old COVER OK/NO COVER badge —
    the image itself shows the state, so we only flag a MISSING cover). */

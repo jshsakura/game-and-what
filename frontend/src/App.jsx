@@ -301,10 +301,18 @@ export default function App() {
     return () => { alive = false; };
   }, [selKey, reloadKey, sdFilter]);
 
-  // The size shown on the SD ZIP button. null while the server recomputes it — a
-  // scope/selection change makes the old number wrong, so it is not left standing.
+  // Two sizes, and they are not the same number: `bytes` is what lands ON THE CARD
+  // (uncompressed — the one that decides whether it fits), `zipBytes` is what you
+  // download. The button shows the card size, since fitting the card is the point;
+  // the zip size joins the tooltip once that build exists. null == recalculating.
   const shownSize = allSelected ? sdSize : selSize;
   const sizing = hasSel && shownSize == null;
+  const cardBytes = shownSize?.bytes ?? null;
+  const zipBytes = shownSize?.zipBytes ?? null;
+  const sizeTitle = cardBytes == null ? undefined
+    : zipBytes != null
+      ? t("On the card: {card} · download (ZIP): {zip}", { card: formatBytes(cardBytes), zip: formatBytes(zipBytes) })
+      : t("On the card: {card} · the ZIP is smaller; its exact size is known once it's built", { card: formatBytes(cardBytes) });
 
   const bumpLibrary = () => setReloadKey((k) => k + 1);
 
@@ -387,17 +395,22 @@ export default function App() {
               onClick={() => dl.downloadPackage(
                 allSelected ? undefined : selKey,
                 `gnw-sd${allSelected ? "" : "-selected"}${filterCount ? "-filtered" : ""}.zip`,
-                shownSize || 0,
+                zipBytes || cardBytes || 0,
                 sdFilter,
               )}
               title={hasSel ? (allSelected ? t("Download the full SD (incl. firmware & BIOS) as ZIP") : t("Download the checked platforms as an SD ZIP")) : t("Check a platform (or select all) to download")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> SD ZIP
               {hasSel && (
                 <span className={`size-tag ${sizing ? "sizing" : ""}`}
-                  title={sizing ? t("Recalculating the size for this selection…") : undefined}>
+                  title={sizing ? t("Recalculating the size for this selection…") : sizeTitle}>
                   {sizing
                     ? <><Loader2 size={10} strokeWidth={3} className="spin" aria-hidden /> {t("Sizing…")}</>
-                    : formatBytes(shownSize)}
+                    : <>
+                        {/* Say WHICH size this is. "SD" = what it takes on the card
+                            (uncompressed); "ZIP" = the actual download, once built. */}
+                        <span className="size-kind">{zipBytes != null ? "ZIP" : "SD"}</span>
+                        {formatBytes(zipBytes != null ? zipBytes : cardBytes)}
+                      </>}
                 </span>
               )}
             </button>

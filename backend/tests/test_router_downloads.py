@@ -669,6 +669,24 @@ def test_package_size_system_filter_shrinks_the_estimate(client, make_rom, sessi
     assert 0 < nes_only < full
 
 
+def test_package_size_reports_the_zip_size_only_once_that_zip_exists(client, make_rom, session_id):
+    """Two different questions: `bytes` is what the files take ON THE CARD, `zip_bytes`
+    is what you download. How well a selection compresses depends on what's in it, so
+    the zip size is reported from the built file — never guessed. Before the build it
+    is null; the build fills it in."""
+    make_rom(system_key="nes", name="Game.nes", content=b"compress me " * 500)
+
+    first = client.get(f"/api/sessions/{session_id}/package/size").json()
+    assert first["bytes"] > 0
+    assert first["zip_bytes"] is None          # nothing built yet — no guess offered
+
+    client.get(f"/api/sessions/{session_id}/package")          # builds + caches the zip
+    after = client.get(f"/api/sessions/{session_id}/package/size").json()
+
+    assert after["bytes"] == first["bytes"]                    # the card size didn't move
+    assert 0 < after["zip_bytes"] < after["bytes"]             # …and the zip is smaller
+
+
 def test_package_size_flag_filter_drops_the_other_flags(client, make_rom, session_id):
     make_rom(system_key="nes", name="Korean.nes", content=b"k" * 100, cover_flag="ko")
     make_rom(system_key="nes", name="Other.nes", content=b"o" * 100)

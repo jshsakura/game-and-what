@@ -425,6 +425,8 @@ export default {
   "Nothing on this platform matches the SD conditions": "이 플랫폼에는 조건에 맞는 롬이 없습니다",
   "Always on the card — the firmware's built-in apps need these files, whatever the conditions": "조건과 무관하게 항상 담깁니다 — 펌웨어 내장 앱이 이 파일들 없이는 실행되지 않습니다",
   "Sizing…": "재계산 중…",
+  "On the card: {card} · download (ZIP): {zip}": "카드에서 차지: {card} · 실제 다운로드(ZIP): {zip}",
+  "On the card: {card} · the ZIP is smaller; its exact size is known once it's built": "카드에서 차지: {card} · ZIP은 이보다 작으며, 정확한 용량은 압축이 끝나야 확정됩니다",
   "Recalculating the size for this selection…": "이 선택에 맞춰 용량을 다시 계산하고 있습니다…",
   "Not on SD": "SD 제외",
   "Excluded from the SD download (kept in library)": "SD 다운로드에서 제외됨 (라이브러리엔 유지)",

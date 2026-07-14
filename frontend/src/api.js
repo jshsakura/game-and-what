@@ -709,12 +709,17 @@ export const jobUrl = (id) => `/api/jobs/${id}`;
 export const jobCancelUrl = (id) => `/api/jobs/${id}/cancel`;
 
 // Estimated on-SD byte size of the (optional single-system, optional Korean-only) package.
+// {bytes, zipBytes} — the card size (uncompressed, what has to FIT) and the download
+// size (the built zip). zipBytes is null until that exact zip has been built: how well
+// a selection compresses depends entirely on what's in it (a .nes halves, a .chd or an
+// .avi barely moves), so it is reported, never guessed.
 export async function packageSize(system, filter) {
   const sid = getSessionId();
   if (!sid) return null;
   const res = await fetch(`/api/sessions/${sid}/package/size${packageQuery(system, filter)}`);
   if (!res.ok) return null;
-  return (await res.json()).bytes;
+  const j = await res.json();
+  return { bytes: j.bytes, zipBytes: j.zip_bytes ?? null };
 }
 
 // Human-readable byte size (KB/MB/GB/TB).

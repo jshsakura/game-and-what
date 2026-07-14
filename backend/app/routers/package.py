@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import uuid
 from dataclasses import dataclass
 
@@ -252,15 +253,35 @@ def package_size(session_id: str, video: bool = False, system: str | None = None
                  flags: str | None = None, max_mb: int | None = None,
                  patched: bool = False, favorite: bool = False,
                  min_score: int | None = None) -> dict:
-    """Estimated on-SD byte size for the (optionally filtered) package."""
+    """Two different sizes, because they answer two different questions:
+
+      bytes     — what the files take ON THE CARD (uncompressed). This is the one
+                  that decides whether the selection fits your SD card.
+      zip_bytes — what you actually DOWNLOAD. Only known once that exact zip has been
+                  built (it is cached and reused), so it is null until then rather
+                  than a guess: compression varies wildly by system (a .nes halves,
+                  a .chd or an .avi barely moves).
+    """
     sd_filter = parse_filter(flags, max_mb, patched, favorite, min_score)
     with db.connect() as conn:
         require_session(conn, session_id)
         homebrew = _homebrew_roms(conn, session_id)
         excluded = _excluded_roms(conn, session_id, sd_filter)
     systems = _parse_systems(system)
-    return {"bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
-                                               homebrew_roms=homebrew, excluded_roms=excluded)}
+    zip_path, _, exists = packaging.cached_zip_path(session_id, include_video=video,
+                                                    systems=systems, homebrew_roms=homebrew,
+                                                    excluded_roms=excluded)
+    zip_bytes = None
+    if exists:
+        try:
+            zip_bytes = os.path.getsize(zip_path)
+        except OSError:
+            zip_bytes = None
+    return {
+        "bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
+                                           homebrew_roms=homebrew, excluded_roms=excluded),
+        "zip_bytes": zip_bytes,
+    }
 
 
 @router.post("/sessions/{session_id}/package/build")
