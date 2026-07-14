@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
-  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload,
+  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import { useDownload } from "./download.jsx";
@@ -40,6 +40,7 @@ const SYS_ABBREV = {
   pce: "PCE", pcecd: "PCD", col: "COL", msx: "MSX", a2600: "A26", a7800: "A78", amstrad: "CPC",
   wsv: "WSV", tama: "TAM", mini: "MIN", gw: "GW", homebrew: "HB", pico8: "P8",
   lynx: "LNX", videopac: "ODY", zxs: "ZX", c64: "C64", gamecom: "GCM", vb: "VB",
+  gba: "GBA",
 };
 
 function hueFor(key) {
@@ -58,7 +59,7 @@ const SYS_PALETTE = {
   a2600: "#cb22e6", a7800: "#e6ab67", amstrad: "#3f8c6d", wsv: "#45e67a",
   tama: "#22cbe6", mini: "#e622a4", gw: "#e6be22", homebrew: "#6b7280", pico8: "#e67067",
   lynx: "#588c2a", videopac: "#8c3f82", zxs: "#b0e645", c64: "#3e2a8c", gamecom: "#1f9e8c",
-  vb: "#a01730",
+  vb: "#a01730", gba: "#5b45c9",
 };
 export function systemColor(key) {
   return SYS_PALETTE[key] || `hsl(${hueFor(key || "x")} 62% 52%)`;
@@ -880,6 +881,9 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   try { extraFiles = JSON.parse(rom.extra_files || "[]"); } catch { extraFiles = []; }
   const dataFileCount = [rom.stored_name, ...extraFiles.map((f) => f.name)]
     .filter((n) => n && (!n.toLowerCase().endsWith(".bin") || rom.sd_include)).length;
+  // GBA only: gpSP knows where this game's VBlank wait loop is and can skip it —
+  // the precondition for full speed on the real M7. A candidate, not a promise.
+  const idleSkip = rom.system_key === "gba" && !!rom.idle_loop;
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
@@ -1141,12 +1145,25 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
         } : null}
         status={rom.cover_status}
         overlay={
-          <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
-            onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
-            {rom.favorite
-              ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
-              : (rom.system_key ? <SystemIcon dirname={rom.system_key} size={14} /> : <Star size={14} strokeWidth={2.5} aria-hidden />)}
-          </button>
+          <>
+            <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
+              onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
+              {rom.favorite
+                ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
+                : idleSkip
+                  ? <Gauge size={14} strokeWidth={2.5} aria-hidden />
+                  : (rom.system_key ? <SystemIcon dirname={rom.system_key} size={14} /> : <Star size={14} strokeWidth={2.5} aria-hidden />)}
+            </button>
+            {/* The idle-skip banner takes the system-icon corner: it has to be
+                readable at a glance across the grid, and in the title row it was
+                being pushed out of sight by any long name. */}
+            {idleSkip && (
+              <em className="idle-tag"
+                title={t("gpSP can skip this game's VBlank wait — full-speed candidate on the real device (not a guarantee)")}>
+                {t("Idle skip")}
+              </em>
+            )}
+          </>
         } />
       <div className="name">
         {isNewRom(rom) && (

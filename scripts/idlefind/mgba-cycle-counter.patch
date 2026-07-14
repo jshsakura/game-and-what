@@ -1,0 +1,29 @@
+diff --git a/src/arm/arm.c b/src/arm/arm.c
+index 0b92d7f..f51c75a 100644
+--- a/src/arm/arm.c
++++ b/src/arm/arm.c
+@@ -240,14 +240,24 @@ void ARMRun(struct ARMCore* cpu) {
+ 	}
+ }
+ 
++// Cycles the CPU actually spent EXECUTING instructions. Idle-loop removal and
++// HALT jump the clock forward outside this loop, so those cycles never land here
++// — which is the point: what's left is the game's real per-frame work, the number
++// to weigh against the hardware's budget. (idlefind instrumentation.)
++uint64_t gIdleFindExecCycles = 0;
++
+ void ARMRunLoop(struct ARMCore* cpu) {
+ 	if (cpu->executionMode == MODE_THUMB) {
+ 		while (cpu->cycles < cpu->nextEvent) {
++			int32_t before = cpu->cycles;
+ 			ThumbStep(cpu);
++			gIdleFindExecCycles += (uint32_t) (cpu->cycles - before);
+ 		}
+ 	} else {
+ 		while (cpu->cycles < cpu->nextEvent) {
++			int32_t before = cpu->cycles;
+ 			ARMStep(cpu);
++			gIdleFindExecCycles += (uint32_t) (cpu->cycles - before);
+ 		}
+ 	}
+ 	cpu->irqh.processEvents(cpu);

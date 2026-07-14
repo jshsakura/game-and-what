@@ -89,6 +89,26 @@ def set_favorite(session_id: str, rom_id: str, payload: dict = Body(...)) -> dic
     return {"rom_id": rom_id, "favorite": favorite}
 
 
+@router.patch("/sessions/{session_id}/roms/{rom_id}/idle-loop")
+def set_idle_loop(session_id: str, rom_id: str, payload: dict = Body(...)) -> dict:
+    """Mark a GBA ROM as having a known VBlank idle loop gpSP can skip — the
+    precondition for full speed on the real hardware. Normally set at import from
+    the ROM's header code; this is the manual override for a ROM whose loop was
+    found by hand. Body: {"idle_loop": true|false}."""
+    idle_loop = bool(payload.get("idle_loop"))
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        row = conn.execute(
+            "SELECT system_key FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
+        ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+        if row["system_key"] != "gba":
+            raise HTTPException(status_code=400, detail="idle_loop은 GBA 전용입니다")
+        conn.execute("UPDATE roms SET idle_loop = ? WHERE id = ?", (int(idle_loop), rom_id))
+    return {"rom_id": rom_id, "idle_loop": idle_loop}
+
+
 PICO8_COMPAT_VALUES = {"good", "slow", "partial", "broken"}
 
 

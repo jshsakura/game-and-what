@@ -606,6 +606,16 @@ export async function setSdInclude(romId, include) {
 }
 
 // Opt a (non-homebrew) ROM OUT of the SD ZIP without deleting it.
+export async function setIdleLoop(romId, idleLoop) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/roms/${romId}/idle-loop`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idle_loop: !!idleLoop }),
+    }));
+  if (!res.ok) throw new Error((await res.json()).detail || "Failed to set idle loop");
+  return res.json();
+}
+
 export async function setSdExclude(romId, exclude) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}/sd-exclude`, {

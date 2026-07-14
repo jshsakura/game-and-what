@@ -27,6 +27,7 @@ _LIBRETRO_REPO = {
     "nes": "Nintendo - Nintendo Entertainment System",
     "gb": "Nintendo - Game Boy",
     "gbc": "Nintendo - Game Boy Color",
+    "gba": "Nintendo - Game Boy Advance",
     "gg": "Sega - Game Gear",
     "sms": "Sega - Master System - Mark III",
     "md": "Sega - Mega Drive - Genesis",

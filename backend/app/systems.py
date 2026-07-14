@@ -87,6 +87,14 @@ SYSTEMS: tuple[System, ...] = (
     # is ".vb". Browser play works via the mednafen_vb (beetle-vb) core; .vb files
     # are headerless but the core boots them HLE, so no BIOS is needed.
     System("vb", "Virtual Boy", "vb", ("vb",), experimental=True),
+    # Game Boy Advance — NOT in rg_emulators.c. The firmware would need a gpSP
+    # port, and gpSP only reaches full speed on a game whose VBlank busy-wait it
+    # can skip; that skip is driven by a hand-maintained table of loop addresses
+    # (gba_over.h), keyed on the 4-char code in the cart header. A game missing
+    # from that table never skips at all. scripts/gba_idle_match.py reads the
+    # header of each ROM and reports which ones the table covers — that is what
+    # the idle_loop flag records. Browser play uses mGBA (see emulator.jsx).
+    System("gba", "Game Boy Advance", "gba", ("gba",), experimental=True),
     # Magnavox Odyssey² / Philips Videopac (same hardware). The firmware has a
     # videopac core (main_videopac.c) but its add_emulator is commented out, so
     # it's library-collection only for now (TOSEC .bin names). dirname "videopac"

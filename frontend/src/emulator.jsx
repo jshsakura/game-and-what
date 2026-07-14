@@ -78,6 +78,11 @@ const CORE_MAP = {
   // same arianrhodsandlot/retroarch-emscripten-build (Nostalgist format, v1.22.2).
   // .vb files boot HLE, no BIOS needed.
   vb: "mednafen_vb",
+  // Game Boy Advance via mGBA. NOT the core the hardware runs: the G&W firmware
+  // needs gpSP (a JIT built for weak ARM), which has no WASM backend and would
+  // fall back to its interpreter in a browser. The browser has cycles to spare,
+  // so accuracy wins here — mGBA boots .gba HLE, no BIOS required.
+  gba: "mgba",
   // NOTE: Atari 2600/7800, Amstrad CPC, MSX, Pokémon Mini have no Nostalgist-compatible
   // core, so they run via a self-hosted JS engine in an iframe instead (see JS_ENGINE —
   // Amstrad uses CPCEC, MSX uses WebMSX, Poké Mini uses the webRcade PokeMini core).
@@ -145,6 +150,8 @@ const SCREEN_ASPECT = {
   ngp: "20 / 19", ws: "14 / 9", lynx: "80 / 51",
   // Virtual Boy renders a 384×224 monochrome (red) framebuffer.
   vb: "12 / 7",
+  // Game Boy Advance: 240×160, square pixels.
+  gba: "3 / 2",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -190,6 +197,9 @@ const KEY_HINTS = {
   lynx:  [DPAD, ...AB, { k: "Q", b: "OPTION 1" }, { k: "W", b: "OPTION 2" }, { k: "Enter", b: "PAUSE" }],
   // Virtual Boy: left D-pad + A/B and the L/R shoulder triggers, plus Select/Start.
   vb:    [DPAD, ...AB, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
+  // Game Boy Advance. The real G&W has no shoulder buttons — only A, B and the
+  // three grey system keys — so L/R exist on this pad but not on the device.
+  gba:   [DPAD, ...AB, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT (TIME)" }, { k: "Enter", b: "START (GAME)" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],
@@ -420,6 +430,19 @@ export function EmulatorOverlay({ rom, onClose }) {
   const hold = (btn) => sendPad(btn, true);
   const release = (btn) => sendPad(btn, false);
 
+  // PAUSE/SET. On the real device this opens retro-go's menu, which stops the
+  // game; here it just halts the core. The JS-engine systems run in an iframe
+  // and expose no pause hook, so the key is inert for them.
+  const [paused, setPaused] = useState(false);
+  const togglePause = () => {
+    const nost = nostRef.current;
+    if (!nost || jsEngineFor(rom.system_key)) return;
+    try {
+      paused ? nost.resume() : nost.pause();
+      setPaused(!paused);
+    } catch (_) {}
+  };
+
   const title = rom.korean_name || rom.stored_name;
 
   // Copy the on-device filename to the clipboard — handy for matching the cart on
@@ -501,7 +524,9 @@ export function EmulatorOverlay({ rom, onClose }) {
           )}
         </div>
 
-        {status === "running" && <VirtualPad onDown={hold} onUp={release} />}
+        {status === "running" && (
+          <VirtualPad onDown={hold} onUp={release} onPause={togglePause} systemKey={rom.system_key} />
+        )}
 
         {/* Control legend — detached panel pinned just below the device shell.
             Hidden for JS-engine (Javatari) systems: their keyboard map differs and
@@ -552,14 +577,53 @@ function PadButton({ btn, className, label, glyph, onDown, onUp }) {
   );
 }
 
-// Game & Watch control deck, mirroring the real Zelda/Mario layout: D-pad on the
-// left, and a right cluster with the grouped SELECT/START frame stacked ABOVE the
-// red A/B buttons.
-function VirtualPad({ onDown, onUp }) {
+// Consoles with shoulder buttons the Game & Watch physically does not have. The
+// web pad shows L/R anyway — it's a preview, and a GBA game that wants L is
+// unplayable without them. On the device the firmware has to reach them through
+// a combo instead (see KEY_HINTS), which is what the hint line spells out.
+const SHOULDER_SYSTEMS = new Set(["gba", "vb", "lynx"]);
+
+// Game & Watch control deck, mirroring the real Zelda/Mario face: D-pad on the
+// left, red A/B on the right, and the three grey system keys in a row down the
+// middle. Those three are the device's own buttons, and the SD firmware wires
+// them to the console like this (Core/Src/porting/odroid_input.c):
+//
+//     GAME → START      TIME → SELECT      PAUSE/SET → the menu key
+//
+// so the pad prints both names. On phones the row lifts out of the centre and
+// spans the top, where there's width for it.
+function VirtualPad({ onDown, onUp, onPause, systemKey }) {
   const t = useT();
   const p = { onDown, onUp };
+  const shoulders = SHOULDER_SYSTEMS.has(systemKey);
   return (
-    <div className="emu-pad">
+    <div className={`emu-pad ${shoulders ? "has-shoulders" : ""}`}>
+      <div className="pad-sysbar">
+        <div className="pad-ss-labels">
+          <em>SELECT<i>TIME</i></em>
+          <em>START<i>GAME</i></em>
+          <em>PAUSE<i>SET</i></em>
+        </div>
+        <div className="pad-mid">
+          <PadButton btn="select" label={t("SELECT (TIME)")} glyph="" className="pad-pill" {...p} />
+          <PadButton btn="start" label={t("START (GAME)")} glyph="" className="pad-pill" {...p} />
+          {/* PAUSE/SET is not a console button: on the device it opens retro-go's
+              menu, which halts the game. Here it just pauses the core. */}
+          <button
+            type="button"
+            className="pad-btn pad-pill"
+            aria-label={t("PAUSE/SET (pause)")}
+            onContextMenu={(e) => e.preventDefault()}
+            onClick={onPause}
+          />
+        </div>
+      </div>
+
+      {/* shoulders get their own grid row so L and R sit level, whatever the
+          heights of the cross and the face buttons below them */}
+      {shoulders && <PadButton btn="l" label="L" glyph="L" className="pad-shoulder l" {...p} />}
+      {shoulders && <PadButton btn="r" label="R" glyph="R" className="pad-shoulder r" {...p} />}
+
       <div className="pad-dpad">
         {/* trailing U+FE0E forces text (not colour-emoji) presentation — ◀ ▶ render
             as emoji on many platforms otherwise */}
@@ -569,24 +633,16 @@ function VirtualPad({ onDown, onUp }) {
         <PadButton btn="right" glyph="▶︎" label={t("Right")} className="dp dp-right" {...p} />
         <PadButton btn="down" glyph="▼︎" label={t("Down")} className="dp dp-down" {...p} />
       </div>
-      <div className="pad-right">
-        <div className="pad-ss">
-          <div className="pad-ss-labels"><em>SELECT</em><em>START</em></div>
-          <div className="pad-mid">
-            <PadButton btn="select" label="SELECT" glyph="" className="pad-pill" {...p} />
-            <PadButton btn="start" label="START" glyph="" className="pad-pill" {...p} />
-          </div>
-        </div>
-        <div className="pad-face">
-          <span className="pad-cap cap-bottom">
-            <PadButton btn="b" label="B" glyph="" className="pad-round b" {...p} />
-            <em>B</em>
-          </span>
-          <span className="pad-cap cap-bottom">
-            <PadButton btn="a" label="A" glyph="" className="pad-round a" {...p} />
-            <em>A</em>
-          </span>
-        </div>
+
+      <div className="pad-face">
+        <span className="pad-cap cap-bottom">
+          <PadButton btn="b" label="B" glyph="" className="pad-round b" {...p} />
+          <em>B</em>
+        </span>
+        <span className="pad-cap cap-bottom">
+          <PadButton btn="a" label="A" glyph="" className="pad-round a" {...p} />
+          <em>A</em>
+        </span>
       </div>
     </div>
   );

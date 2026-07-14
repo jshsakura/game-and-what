@@ -199,6 +199,17 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # NULL = no patch-version tag found. See services/patchver.py.
         conn.execute("ALTER TABLE roms ADD COLUMN patch_ver TEXT")
 
+    if "idle_loop" not in cols:
+        # GBA only. gpSP can only skip a game's VBlank busy-wait if that game's
+        # loop address is in its table (gba_over.h), keyed on the 4-char code in
+        # the cart header; a game absent from the table busy-waits through the
+        # whole frame and has no chance of full speed on the G&W's M7. 1 = the
+        # ROM's header code is covered. Set at import from the merged idle-loop
+        # database (scripts/gba_idle_loop_db.json, see scripts/gba_idle_match.py).
+        # It marks a game as a full-speed CANDIDATE — not a promise: the skip only
+        # pays off if the game actually idles for a good part of the frame.
+        conn.execute("ALTER TABLE roms ADD COLUMN idle_loop INTEGER NOT NULL DEFAULT 0")
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by

@@ -372,6 +372,12 @@ export default {
   "Copy": "복사",
   "Copied": "복사됨",
   "Duplicate": "중복",
+  "Idle skip": "아이들 스킵",
+  "gpSP can skip this game's VBlank wait — full-speed candidate on the real device (not a guarantee)":
+    "gpSP가 이 게임의 VBlank 대기 루프를 건너뛸 수 있습니다 — 실기 풀스피드 후보 (보장은 아님)",
+  "SELECT (TIME)": "SELECT (TIME)",
+  "START (GAME)": "START (GAME)",
+  "PAUSE/SET (pause)": "PAUSE/SET (일시정지)",
   "{n} more rom(s) with identical content (hash)": "내용(해시)이 같은 롬이 {n}개 더 있습니다",
   "{n} rom(s) with identical content": "내용이 동일한 롬 {n}개",
   "Byte-for-byte identical files — likely the same game with a different subtitle": "바이트가 완전히 같은 파일입니다 — 부제만 다른 중복일 수 있어요",
