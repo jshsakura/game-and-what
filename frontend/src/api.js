@@ -65,6 +65,63 @@ export async function getConfig() {
 // (files-completed, not just bytes-of-one-giant-body).
 const UPLOAD_BATCH = 100;
 
+// …and at most this many BYTES, which is the cap that actually bites. This app is served
+// through Cloudflare, and Cloudflare rejects a request body over 100 MB at the edge — the
+// server never sees it, so nothing in our logs explains it and the browser just sits at
+// "uploading" until it dies. A count cap does not help: 100 GBA roms is ~1.6 GB in ONE
+// request. Batch by size and every request stays comfortably under the edge's limit.
+const UPLOAD_BATCH_BYTES = 80 * 1024 * 1024;
+
+// A file this big cannot cross the edge in one request at all, so it goes up in chunks.
+// The backend has had a full resumable-upload API since forever (POST /uploads → PUT
+// /chunk → POST /complete) and nothing was calling it.
+const CHUNK_SIZE = 8 * 1024 * 1024;          // server caps a chunk at 10 MB
+
+async function uploadRomChunked(systemKey, file, onProgress) {
+  const sid = SESSION_ID;
+  const init = await fetch(`/api/sessions/${sid}/uploads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name, total_size: file.size, kind: "rom", system: systemKey }),
+  });
+  if (!init.ok) throw new Error((await init.json().catch(() => ({}))).detail || "Upload init failed");
+  const { upload_id: id } = await init.json();
+
+  for (let i = 0, sent = 0; sent < file.size; i++) {
+    const blob = file.slice(sent, Math.min(sent + CHUNK_SIZE, file.size));
+    const form = new FormData();
+    form.append("file", blob, file.name);
+    const res = await fetch(`/api/sessions/${sid}/uploads/${id}/chunk?index=${i}`,
+      { method: "PUT", body: form });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "Chunk failed");
+    sent += blob.size;
+    onProgress?.(sent, file.size);
+  }
+
+  const done = await fetch(`/api/sessions/${sid}/uploads/${id}/complete`, { method: "POST" });
+  if (!done.ok) throw new Error((await done.json().catch(() => ({}))).detail || "Upload failed");
+  return done.json();
+}
+
+// Batches that respect BOTH caps. A file bigger than the byte cap goes on its own — one
+// oversized request is a failure we can report, where bundling it guarantees one.
+function uploadBatches(files) {
+  const batches = [];
+  let batch = [];
+  let bytes = 0;
+  for (const f of files) {
+    if (batch.length && (batch.length >= UPLOAD_BATCH || bytes + f.size > UPLOAD_BATCH_BYTES)) {
+      batches.push(batch);
+      batch = [];
+      bytes = 0;
+    }
+    batch.push(f);
+    bytes += f.size;
+  }
+  if (batch.length) batches.push(batch);
+  return batches;
+}
+
 function postRomBatch(systemKey, files, onProgress) {
   const form = new FormData();
   form.append("system", systemKey);
@@ -74,7 +131,8 @@ function postRomBatch(systemKey, files, onProgress) {
 
 export async function uploadRoms(systemKey, files, onProgress) {
   const arr = Array.from(files);
-  if (arr.length <= UPLOAD_BATCH) {
+  const batches = uploadBatches(arr);
+  if (batches.length <= 1 && arr.every((f) => f.size <= UPLOAD_BATCH_BYTES)) {
     return postRomBatch(systemKey, arr, onProgress);
   }
   // Upload in sequential batches; progress = files completed / total.
@@ -82,8 +140,22 @@ export async function uploadRoms(systemKey, files, onProgress) {
   let done = 0;
   let stored = 0;
   const results = [];
-  for (let i = 0; i < total; i += UPLOAD_BATCH) {
-    const chunk = arr.slice(i, i + UPLOAD_BATCH);
+  for (const chunk of batches) {
+    // A single file too big for one request goes up in chunks instead.
+    if (chunk.length === 1 && chunk[0].size > UPLOAD_BATCH_BYTES) {
+      try {
+        const res = await uploadRomChunked(systemKey, chunk[0], (loaded, totalBytes) => {
+          onProgress?.(done + (totalBytes ? loaded / totalBytes : 0), total);
+        });
+        stored += res.stored || 0;
+        if (res.results) results.push(...res.results);
+      } catch (e) {
+        results.push({ name: chunk[0].name, ok: false, error: e.message });
+      }
+      done += 1;
+      onProgress?.(done, total);
+      continue;
+    }
     const res = await postRomBatch(systemKey, chunk, (loaded, totalBytes) => {
       const frac = totalBytes ? loaded / totalBytes : 0;
       onProgress?.(done + chunk.length * frac, total);   // smooth within a batch
