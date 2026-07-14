@@ -373,6 +373,18 @@ export default {
   "Copied": "복사됨",
   "Duplicate": "중복",
   "Measuring": "측정 중",
+  "Not measured": "측정 실패",
+  "Could not measure this game.": "이 게임은 측정하지 못했습니다.",
+  "Its VBlank wait loop was not found, so the time it spends waiting was counted as work. That is a failure to measure — NOT a heavy game.":
+    "VBlank 대기 루프를 못 찾아서, 기다리는 시간이 작업량으로 계산됐습니다. 측정 실패이지 무거운 게임이라는 뜻이 아닙니다.",
+  "It may well run fine. Finding the loop would settle it.":
+    "잘 돌아갈 수도 있습니다. 루프를 찾으면 판정됩니다.",
+  "Too heavy for the real device: {pct}% of the CPU budget it has per frame.":
+    "실기에 너무 무겁습니다: 프레임당 CPU 예산의 {pct}%",
+  "gpSP skips this game's VBlank wait at {pc}.":
+    "gpSP가 {pc}에서 이 게임의 VBlank 대기를 건너뜁니다.",
+  "Frameskip may still get it there — that frees the PPU's share, not the CPU's.":
+    "프레임스킵으로 넘길 여지는 있습니다 — 그건 PPU 몫을 비우지 CPU 몫을 줄이진 않습니다.",
   "Running the game to measure its CPU load…": "게임을 실제로 돌려 CPU 부하를 재는 중입니다…",
   "CPU {pct}%": "CPU {pct}%",
   "CPU load on the real device: {pct}% of its per-frame budget":

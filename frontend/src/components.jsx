@@ -67,6 +67,22 @@ const SYS_PALETTE = {
 // A game measured above this cannot hold 60fps no matter how well its idle loop is
 // skipped. NOTE: this is a cycle-budget estimate, not a hardware measurement.
 const GBA_CPU_BUDGET = 160000;
+const GBA_FRAME_CYCLES = 280896;
+
+// A rom whose idle loop we never found spins through the whole frame, and the probe
+// counts that spin as work — so it comes back at (or just under) a full frame. That
+// LOOKS like the heaviest game in the library and actually means "not measured". Say
+// so, rather than libelling a game that is probably fine: Kirby's Japanese release
+// lands here at 176% while the US release of the SAME game measures 45%.
+function gbaReading(rom) {
+  if (rom.system_key !== "gba" || !rom.exec_cycles) return null;
+  const unknown = !rom.idle_pc && rom.exec_cycles >= 0.97 * GBA_FRAME_CYCLES;
+  return {
+    unknown,
+    load: Math.round((rom.exec_cycles / GBA_CPU_BUDGET) * 100),
+    cycles: rom.exec_cycles,
+  };
+}
 
 export function systemColor(key) {
   return SYS_PALETTE[key] || `hsl(${hueFor(key || "x")} 62% 52%)`;
@@ -895,9 +911,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   // the skip active (scripts/idlefind). Shown as a load against the budget the
   // hardware leaves the CPU — a number, not a promise: it is a cycle model, and it
   // has never been checked on a real device.
-  const gbaLoad = rom.system_key === "gba" && rom.exec_cycles
-    ? Math.round((rom.exec_cycles / GBA_CPU_BUDGET) * 100)
-    : null;
+  const gba = gbaReading(rom);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
@@ -1164,29 +1178,47 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
               {rom.favorite
                 ? <Star size={14} strokeWidth={2.5} fill="currentColor" aria-hidden />
-                : gbaLoad != null
+                : gba != null
                   ? <Gauge size={14} strokeWidth={2.5} aria-hidden />
                   : (rom.system_key ? <SystemIcon dirname={rom.system_key} size={14} /> : <Star size={14} strokeWidth={2.5} aria-hidden />)}
             </button>
             {/* Takes the system-icon corner: it has to be readable at a glance across
                 the grid, and in the title row a long name pushed it out of sight. */}
-            {gbaLoad == null && rom.probe_status === "pending" && (
+            {gba == null && rom.probe_status === "pending" && (
               <em className="idle-tag measuring" title={t("Running the game to measure its CPU load…")}>
                 <Loader size={10} className="spin" aria-hidden /> {t("Measuring")}
               </em>
             )}
-            {gbaLoad != null && (
-              <em className={`idle-tag ${gbaLoad > 100 ? "over" : gbaLoad > 80 ? "tight" : ""}`}
+            {/* Never call an unmeasured rom heavy. Its idle loop was not found, so the
+                spin it does while waiting got counted as work — the number is the
+                probe's failure, not the game's weight. */}
+            {gba?.unknown && (
+              <em className="idle-tag unknown"
                 title={[
-                  t("CPU load on the real device: {pct}% of its per-frame budget", { pct: gbaLoad }),
-                  t("Measured {cycles} cycles/frame of {frame}, running the game with the idle-loop skip active.",
-                    { cycles: rom.exec_cycles.toLocaleString(), frame: "280,896" }),
-                  rom.idle_loop
-                    ? t("gpSP knows this game's VBlank wait loop and can skip it.")
-                    : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
-                  t("A cycle-budget estimate — never checked on real hardware."),
+                  t("Could not measure this game."),
+                  t("Its VBlank wait loop was not found, so the time it spends waiting was counted as work. That is a failure to measure — NOT a heavy game."),
+                  t("It may well run fine. Finding the loop would settle it."),
                 ].join("\n")}>
-                {t("CPU {pct}%", { pct: gbaLoad })}
+                {t("Not measured")}
+              </em>
+            )}
+            {gba && !gba.unknown && (
+              <em className={`idle-tag ${gba.load > 100 ? "over" : gba.load > 80 ? "tight" : ""}`}
+                title={[
+                  gba.load > 100
+                    ? t("Too heavy for the real device: {pct}% of the CPU budget it has per frame.", { pct: gba.load })
+                    : t("CPU load on the real device: {pct}% of its per-frame budget", { pct: gba.load }),
+                  t("Measured {cycles} cycles/frame of {frame}, running the game with the idle-loop skip active.",
+                    { cycles: gba.cycles.toLocaleString(), frame: "280,896" }),
+                  rom.idle_pc
+                    ? t("gpSP skips this game's VBlank wait at {pc}.", { pc: rom.idle_pc })
+                    : t("No busy-wait loop: it waits via the BIOS, which gpSP already skips."),
+                  gba.load > 100
+                    ? t("Frameskip may still get it there — that frees the PPU's share, not the CPU's.")
+                    : "",
+                  t("A cycle-budget estimate — never checked on real hardware."),
+                ].filter(Boolean).join("\n")}>
+                {t("CPU {pct}%", { pct: gba.load })}
               </em>
             )}
           </>

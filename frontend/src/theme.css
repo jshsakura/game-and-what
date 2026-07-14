@@ -594,6 +594,9 @@ body::before {
 /* Measuring means literally running the game for ~15s, so this can sit a while on a
    bulk upload — the probe is serialised on purpose. Neutral, not alarming. */
 .cover-corner:has(.idle-tag.measuring) { background: #2a2a30e6; color: #d8d8e0; }
+/* Not measured — its idle loop was never found, so the wait got counted as work. Grey,
+   deliberately: red would say "heavy game", and that is exactly what this is NOT. */
+.cover-corner:has(.idle-tag.unknown) { background: #4a4a55e6; color: #e6e6ee; }
 .idle-tag {
   font-family: var(--body-font); font-style: normal; font-size: 9px; font-weight: 800;
   line-height: 1; letter-spacing: 0.2px; white-space: nowrap;
