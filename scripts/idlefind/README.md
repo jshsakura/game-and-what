@@ -37,17 +37,45 @@ against a 280,896-cycle frame.
 Compare it to what the hardware leaves the CPU (~160,000 cycles at a 340MHz OC, once the
 PPU, audio and DMA have taken their share) and you get a verdict instead of a guess.
 
-## Careful
+## An address is not proven until it is A/B'd
 
-- **mGBA's first detection is not always the right loop.** Super Mario World (한글패치) was
-  detected at `0x80016d4`, and feeding gpSP that address skips nothing — the frame stays
-  pinned at 280,896 cycles. The real loop is at `0x80005ec`. **The cycle count is the
-  arbiter, not the detector**: if exec doesn't drop, the address is wrong.
-- A ROM whose loop is never detected reports ~280,896 cycles — a full frame. That reads as
-  "heavy game" but means "loop not found". Four games looked heavy for exactly this reason
-  and turned out to idle 73% of the frame once the address was supplied.
-- The harness mashes START/A. It reaches the intro and early play, not a Pokémon battle. The
-  numbers describe what it reached.
+**This is the part that matters.** Detecting a loop is easy; knowing it is *the* loop is not,
+and every shortcut here has already produced a wrong answer that looked right.
+
+**1. The detector is not an oracle.** Super Mario World (한글패치) is detected at `0x80016d4`.
+Hand gpSP that address and it skips nothing — the frame stays pinned at 280,896 cycles. The
+real loop is at `0x80005ec`. Across a 633-rom sweep, **17 of 111 detections were like this.**
+
+**2. "exec is below a full frame" proves nothing.** This is the trap. A game that already
+waits via the BIOS sits far below a full frame *no matter what address you give it* — so a
+bogus address sails straight through that check and ships. Five addresses passed it and were
+doing precisely nothing: KOF EX2 (×2), Ghost Trap, Space Invaders, F-Zero Climax.
+
+**3. Only the difference is evidence.** Run the game twice:
+
+```bash
+./idlefind rom.gba 1200 0x8FFFFFE     # a pc the game never executes -> nothing is skipped
+./idlefind rom.gba 1200 <loop start>  # the real thing
+```
+
+Keep the address only if `exec_median` **measurably drops** (we require ≥15%). If it doesn't,
+the address is not the wait loop, and gpSP fed it would be cutting the frame short somewhere
+arbitrary.
+
+## Other things that bit us
+
+- **Match roms on the cart HEADER, never the filename.** The library renames files, so a name
+  lookup can quietly hand you a different game. It A/B'd F-Zero Climax's address against
+  another rom entirely — and passed it. A Korean patch keeps the original header too, which
+  is why the header is the only key worth trusting.
+- **A rom whose loop is never found reports ~280,896 cycles.** That reads as "heavy game" but
+  means "loop not found". Four games looked heavy for exactly this reason and turned out to
+  idle 73% of the frame once given the right address.
+- **`GBA_IDLE_LOOP_NONE` is `0xFFFFFFFF`, not 0.** Seeding `idle_loop` with a bare 0 made an
+  undetected rom report a loop at `0x00000000`, which read downstream as an IWRAM loop.
+- **The harness mashes START/A.** It reaches the intro and early play, not a Pokémon battle.
+  The numbers describe what it reached — which is why `exec_p90` is reported alongside the
+  median, and why several games peak at a full frame in scenes the bot never got to.
 
 ## Build
 

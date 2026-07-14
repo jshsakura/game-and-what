@@ -88,8 +88,9 @@ The firmware's existing wiring (`Core/Src/porting/odroid_input.c:48-59`):
 Mario has A/B only. Zelda has a third button wired to X (`main_gwenesis.c:652-661`:
 `isZelda ? ODROID_INPUT_X : ODROID_INPUT_VOLUME`). Mega Drive hit the same shortage and
 solved it with a runtime reassign menu — `s_md_keydefine`, 6 combos
-(`main_gwenesis.c:112-120, 356-370`). **Copy that pattern for L/R.** The web pad in
-`game-and-what` already shows L/R and says so in its key hints.
+(`main_gwenesis.c:112-120, 356-370`). **Copy that pattern for L/R.** (The web player
+leaves L/R on the keyboard — its on-screen pad is a replica of the device face, which
+has no shoulder buttons to draw.)
 
 ---
 
@@ -143,32 +144,24 @@ Three filters, and each one killed addresses that the previous one let through:
 ### The 13 Korean games — measured
 
 `exec` = real CPU work per frame with the skip **active**, out of a 280,896-cycle frame.
-
-### The 13 Korean games — measured
-
-`exec` = real CPU work per frame with the skip **active**, out of a 280,896-cycle frame.
 The CPU budget on the M7 at a 340 MHz OC is roughly **160,000 cycles** (that figure is the
 project's own estimate — see §5).
 
 | game | code | `idle_loop_target_pc` | exec (median) | p90 | idle |
 |---|---|---|---|---|---|
-| 다운타운 열혈물어EX | `BDTE` | `0x800065a` | 65,065 | 276,959 | 77% |
+| 다운타운 열혈물어EX | `BDTE` | `0x800065a` | 55,917 | 276,959 | 80% |
 | 포켓몬 사파이어 | `AXPK` | **none needed** (BIOS halt) | 72,648 | 90,930 | 74% |
 | 포켓몬 루비 | `AXVK` | **none needed** (BIOS halt) | 73,266 | 91,087 | 74% |
-| 리듬세상 | `BRIJ` | `0x80013d4` | 75,039 | 121,983 | 73% |
-| 캐슬바니아 - 서클 오브 더 문 | `AAMJ` | `0x80003ce` | 76,293 | 153,710 | 73% |
-| 포켓몬 리프그린 | `BPGE` | `0x80008c6` | 77,946 | 115,306 | 72% |
-| 포켓몬 에메랄드 | `BPEK` | `0x80008ce` | 78,796 | 120,515 | 72% |
-| 포켓몬 파이어레드 | `BPRE` | `0x80008c6` | 78,916 | 132,138 | 72% |
-| 록맨 제로 4 | `B4ZJ` | `0x8000914` | 115,793 | 165,681 | 59% |
-| 파이널 판타지 택틱스 어드밴스 | `AFXJ` | `0x8000428` | 117,713 | 280,289 | 58% |
-| 슈퍼마리오월드 | `AA2C` | `0x80005ec` | 137,673 | 280,695 | 51% |
-| 록맨 제로 3 | `BZ3J` | `0x80019c4` | 137,998 | 176,478 | 51% |
-| 메이드 인 와리오 | `AZWJ` | `0x8000f5e` | 142,521 | 162,699 | 49% |
-
-All 13 sit inside the CPU budget at the median. Several have a **p90 at or near a full
-frame** — those games have scenes that peak at 100% CPU, so expect drops there even though
-the median is comfortable.
+| 포켓몬 리프그린 | `BPGE` | `0x80008c6` | 74,872 | 115,306 | 73% |
+| 캐슬바니아 - 서클 오브 더 문 | `AAMJ` | `0x80003ce` | 76,369 | 153,710 | 73% |
+| 포켓몬 파이어레드 | `BPRE` | `0x80008c6` | 76,509 | 132,138 | 73% |
+| 리듬세상 | `BRIJ` | `0x80013d4` | 78,061 | 121,983 | 72% |
+| 포켓몬 에메랄드 | `BPEK` | `0x80008ce` | 78,294 | 120,515 | 72% |
+| 파이널 판타지 택틱스 어드밴스 | `AFXJ` | `0x8000428` | 116,375 | 280,289 | 59% |
+| 록맨 제로 4 | `B4ZJ` | `0x8000914` | 119,971 | 165,681 | 57% |
+| 슈퍼마리오월드 | `AA2C` | `0x80005ec` | 137,516 | 280,695 | 51% |
+| 메이드 인 와리오 | `AZWJ` | `0x8000f5e` | 140,911 | 162,699 | 50% |
+| 록맨 제로 3 | `BZ3J` | `0x80019c4` | 142,669 | 176,478 | 49% |
 
 Note this is only the Korean subset. The table ships **89 addresses in total**, from
 sweeping all 633 roms of the source library — see "How an address earns its place"
