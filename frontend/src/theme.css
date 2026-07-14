@@ -587,6 +587,9 @@ body::before {
 .gba-dot.tight { background: #e0a72c; }
 .gba-dot.over { background: #d94b3f; }
 .gba-dot.skip { background: #62c8f5; }
+/* The sound-driver row, matching its ring (.load-ring.audio) — work that is real
+   here and gone on the device once the firmware's native mixer takes over. */
+.gba-dot.audio { background: #b28bf0; }
 /* Grey, deliberately, and never red: red says "heavy game", and an unmeasured rom is
    exactly what that is NOT. Its wait loop was not found, so the wait got counted as work. */
 .gba-dot.unknown { background: #6b7280; }

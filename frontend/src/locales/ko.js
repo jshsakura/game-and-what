@@ -412,6 +412,16 @@ export default {
     "이 사운드 드라이버는 아직 네이티브 대체본이 없어서, 실기에서도 이 비용을 그대로 냅니다.",
   "CPU on the device would be about {pct}%, not {now}%.":
     "실기 CPU는 {now}%가 아니라 약 {pct}%가 됩니다.",
+  "Sound driver: the device runs it at about {net}%, not {load}%":
+    "사운드 드라이버: 실기는 {load}%가 아니라 약 {net}%로 돌립니다",
+  "Sound driver is {pct}% of this game's work":
+    "사운드 드라이버가 이 게임 작업의 {pct}%를 차지합니다",
+  "A GBA game does not write its own mixer — it links in Nintendo's M4A ({name} build), copied into memory and mixing every sample in game code, every frame. Here that is {pct}% of the work ({cycles} cycles). The firmware has its own native mixer and runs that instead, so on the device the game never executes this code — the CPU drops from {load}% to about {net}%.":
+    "GBA 게임은 자기 믹서를 직접 짜지 않습니다. 닌텐도 M4A({name} 빌드)를 링크해, 메모리로 복사한 뒤 매 프레임 모든 샘플을 게임 코드에서 믹싱합니다. 여기서는 그게 작업의 {pct}%({cycles} 사이클)입니다. 펌웨어는 자체 네이티브 믹서를 갖고 있어 그걸 대신 돌리므로, 실기에서는 게임이 이 코드를 아예 실행하지 않습니다 — CPU가 {load}%에서 약 {net}%로 떨어집니다.",
+  "This game's sound driver mixes samples in game code — {pct}% of the frame ({cycles} cycles). The firmware has no native replacement for it yet, so the device still pays for all of it.":
+    "이 게임의 사운드 드라이버는 샘플을 게임 코드에서 믹싱합니다 — 프레임의 {pct}%({cycles} 사이클). 펌웨어에 아직 이걸 대체할 네이티브 믹서가 없어서, 실기도 이 비용을 전부 그대로 냅니다.",
+  "That improvement is only the sound driver; the rest of the game's work is unchanged, and the CPU figure above it is still a model.":
+    "이 개선은 사운드 드라이버에만 해당합니다. 게임의 나머지 작업은 그대로이고, 위의 CPU 수치도 여전히 모델입니다.",
   "Code size — how full the cart is": "코드 크기 (카트가 얼마나 찼는지)",
   "The upload stopped making progress — it may have been blocked before reaching the server (a proxy/CDN body-size limit does this). Try fewer files at once.":
     "업로드가 더 이상 진행되지 않습니다. 서버에 닿기 전에 막혔을 수 있습니다 (프록시/CDN의 요청 크기 제한이 이런 증상을 냅니다). 한 번에 올리는 개수를 줄여보세요.",

@@ -133,6 +133,12 @@ function gbaReading(rom) {
       ? Math.round((rom.audio_cycles / rom.exec_cycles) * 100) : null,
     audioCycles: rom.audio_cycles || null,
     audioName: rom.audio_name || null,
+    // What the CPU load drops TO once the firmware's native mixer takes the sound
+    // driver's place — the whole point of the HLE. Only meaningful when there IS a
+    // driver the firmware replaces (audio_name); a game whose driver has no native
+    // stand-in still pays for its mixing, so there is no improvement to state.
+    netLoad: rom.audio_cycles && rom.audio_name && rom.exec_cycles
+      ? Math.round(((rom.exec_cycles - rom.audio_cycles) / GBA_CPU_BUDGET) * 100) : null,
   };
 }
 
@@ -1406,7 +1412,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       : t("Its sound driver has no native replacement yet, so the device still pays for this."),
                     gba.audioName
                       ? t("CPU on the device would be about {pct}%, not {now}%.",
-                        { pct: Math.round(((gba.cycles - gba.audioCycles) / GBA_CPU_BUDGET) * 100), now: gba.load })
+                        { pct: gba.netLoad, now: gba.load })
                       : "",
                   ].filter(Boolean).join("\n")} />
                 )}
@@ -1571,6 +1577,31 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       )}
                     </div>
                   </div>
+                  {/* The third ring's story: work that is real here and gone on the device.
+                      The headline carries the improvement — the CPU figure the two rows
+                      above it just quoted, minus the mixer the firmware runs natively. */}
+                  {gba.audio != null && (
+                    <div className="gba-detail-row">
+                      <span className="gba-dot audio" aria-hidden />
+                      <div>
+                        <b>{gba.audioName
+                          ? t("Sound driver: the device runs it at about {net}%, not {load}%", { net: gba.netLoad, load: gba.load })
+                          : t("Sound driver is {pct}% of this game's work", { pct: gba.audio })}</b>
+                        <p>
+                          {gba.audioName
+                            ? t("A GBA game does not write its own mixer — it links in Nintendo's M4A ({name} build), copied into memory and mixing every sample in game code, every frame. Here that is {pct}% of the work ({cycles} cycles). The firmware has its own native mixer and runs that instead, so on the device the game never executes this code — the CPU drops from {load}% to about {net}%.",
+                              { name: gba.audioName, pct: gba.audio, cycles: gba.audioCycles.toLocaleString(), load: gba.load, net: gba.netLoad })
+                            : t("This game's sound driver mixes samples in game code — {pct}% of the frame ({cycles} cycles). The firmware has no native replacement for it yet, so the device still pays for all of it.",
+                              { pct: gba.audio, cycles: gba.audioCycles.toLocaleString() })}
+                        </p>
+                        {gba.audioName && (
+                          <p className="gba-caveat">
+                            {t("That improvement is only the sound driver; the rest of the game's work is unchanged, and the CPU figure above it is still a model.")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
