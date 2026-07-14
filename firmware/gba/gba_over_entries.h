@@ -1032,10 +1032,10 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* U3IJ  우리들의 태양
+   /* U3IJ  우리들의 태양 (Bokura no Taiyou - Taiyou Action RPG)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 53,562/280,896 (81% idle) — CPU 60% of budget
+    * exec 53,554/280,896 (81% idle) — CPU 60% of budget
     */
 
    /* B2RJ  슈퍼로봇대전 OG2 (Super Robot Taisen - Original Generation 2)
@@ -1375,12 +1375,6 @@
     * exec 61,800/280,896 (78% idle) — CPU 69% of budget
     */
 
-   /* AZJK  드래곤볼Z - 무공투극 (Dragon Ball Z - Moogongtoogeuk)
-    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
-    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
-    * exec 61,863/280,896 (78% idle) — CPU 69% of budget
-    */
-
    /* AMRP  매니악 레이서즈 어드밴스 (Maniac Racers Advance)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
     * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
@@ -1650,6 +1644,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* AZJK  드래곤볼 Z - 무공투극 (Dragon Ball Z - Moogongtoogeuk)
+    * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
+    * already fast-forwards (cpu.cc:1499). No entry needed; not slow.
+    * exec 68,465/280,896 (76% idle) — CPU 76% of budget
+    */
 
    /* BYYE  유유백서 - 영계 탐정 (Yu Yu Hakusho - Ghostfiles - Spirit Detective)
     * No busy-wait loop — it waits via the BIOS (SWI IntrWait/Halt), which gpSP
@@ -3351,12 +3351,6 @@
       0,                           /* translation_gate_target_3 */
    },
 
-   /* BGAJ  SD 건담 G 제네레이션 어드밴스 (SD Gundam G Generation Advance)
-    * NOT MEASURED — its wait loop was never found, so the spin got counted as
-    * work. The number below is the probe's failure, not the game's weight.
-    * exec 140,092/280,896 (50% idle) — CPU 156% of budget
-    */
-
    {
       // 록맨 제로 2 (Megaman Zero 2)
       //   exec 140,290/280,896 cy/frame (50% idle) — CPU 156% of budget
@@ -3367,6 +3361,12 @@
       0,                           /* translation_gate_target_2 */
       0,                           /* translation_gate_target_3 */
    },
+
+   /* BGAJ  SD건담 G제네레이션 어드밴스 (SD Gundam G Generation Advance)
+    * Hunted (pc histogram + A/B): there is NO wait loop to skip. The frame goes
+    * into real work, so no address would make this lighter — it is this heavy.
+    * exec 140,748/280,896 (50% idle) — CPU 156% of budget
+    */
 
    {
       // 메이드 인 와리오 (한글패치)
