@@ -686,12 +686,14 @@ body::before {
 /* The sound driver: work that is real in the emulator and gone on the device. Violet, so it
    never reads as "cost" the way the CPU ring does — it is the opposite of a warning. */
 .load-ring.audio .tick.on { stroke: #b28bf0; }
-/* Hover: the ring you are reading brightens and lifts, so a tooltip that takes a moment to
-   appear still has something pointing at what it is about to talk about. */
-.ring-wrap { transition: transform 0.12s ease, background 0.12s ease; }
-.ring-wrap:hover { transform: translateY(-1px); background: #1c1c28d9; }
-.ring-wrap:hover .load-ring .tick { stroke: #ffffff40; }
-.ring-wrap:hover .load-ring .tick.on { filter: brightness(1.35); }
+/* Hover: the ring you are reading brightens, and NOTHING MOVES — a dial that jumps under
+   the cursor is just noise. Only the UNLIT ticks pick up the extra grey: `.tick` matches the
+   lit ones too, and this rule sits after their colour rules at the same specificity, so
+   without :not(.on) it painted the whole ring grey the moment you pointed at it. */
+.ring-wrap { transition: background 0.12s ease; }
+.ring-wrap:hover { background: #1c1c28e6; }
+.ring-wrap:hover .load-ring .tick:not(.on) { stroke: #ffffff3d; }
+.ring-wrap:hover .load-ring .tick.on { filter: brightness(1.3); }
 .ring-wrap:hover b { color: #fff; }
 
 .idle-tag {
