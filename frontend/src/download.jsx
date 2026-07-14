@@ -24,10 +24,15 @@ function filenameFromHeader(cd, fallback) {
   }
 }
 
-// Build job reports message like "689/3281 MB"; pull the two numbers out.
+// Build job reports "689/3281 MB · Zelda....gba" — the numbers, and what it is packing.
 function parseMB(message) {
   const m = /(\d+)\s*\/\s*(\d+)\s*MB/i.exec(message || "");
   return m ? { doneMB: Number(m[1]), totalMB: Number(m[2]) } : null;
+}
+function parseFile(message) {
+  const i = (message || "").indexOf("·");
+  const name = i >= 0 ? message.slice(i + 1).trim() : "";
+  return name.replace(/\.[^.]+$/, "");          // drop the extension: the name is the point
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -127,6 +132,7 @@ export function DownloadProvider({ children }) {
             phase: "building", label: fallbackName,
             progress: jd.progress || 0,
             doneMB: mb ? mb.doneMB : 0, totalMB: mb ? mb.totalMB : 0,
+            file: parseFile(jd.message),
           });
           await sleep(500);
         }
@@ -164,15 +170,24 @@ export function DownloadProvider({ children }) {
     : (job && job.total ? Math.min(100, Math.round((job.received / job.total) * 100)) : 0);
   const indeterminate = building && !job.totalMB;   // before the first progress tick
 
+  // TWO steps, numbered, because they look like one download that runs twice: the first
+  // bar counts the library as it goes IN (4.6 GB of roms), the second counts the zip coming
+  // OUT (2.6 GB, compressed). Two different totals with no explanation reads as a bug.
   const title = phase === "error" ? t("● Failed")
-    : building ? t("Compressing…")
-    : t("Downloading…");
+    : building ? t("Step 1 of 2 · Packing the card")
+    : t("Step 2 of 2 · Downloading");
   const meta = phase === "error" ? job.error
     : building
       ? (job.totalMB ? `${pct}%  ·  ${job.doneMB} / ${job.totalMB} MB` : t("Preparing…"))
       : (job && job.total
           ? `${pct}%  ·  ${formatBytes(job.received)} / ${formatBytes(job.total)}`
           : t("Receiving {size}…", { size: formatBytes(job?.received || 0) }));
+  // What it is packing right now. A bar with no words is indistinguishable from a hang.
+  const sub = building
+    ? (job.file ? t("Packing {name}…", { name: job.file })
+                : t("The zip is smaller than the library — it is being compressed."))
+    : t("This is the compressed card ({size}) — smaller than the library it came from.",
+        { size: formatBytes(job?.total || 0) });
 
   return (
     <DownloadCtx.Provider value={{ download, downloadPackage, busy: !!job }}>
@@ -185,6 +200,7 @@ export function DownloadProvider({ children }) {
               <div className="dl-fill" style={indeterminate ? undefined : { width: `${pct}%` }} />
             </div>
             <div className="dl-meta">{meta}</div>
+            {phase !== "error" && <div className="dl-sub">{sub}</div>}
             {phase !== "error" && (
               <button type="button" className="dl-cancel" onClick={cancel}>{t("Cancel")}</button>
             )}

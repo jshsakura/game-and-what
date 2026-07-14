@@ -419,6 +419,13 @@ export default {
     "파일은 다 보냈는데 서버가 응답하지 않습니다. 한 번에 올리는 개수를 줄여보세요.",
   "The request was too large for the server or its proxy. Try fewer files at once.":
     "요청이 서버(또는 프록시)가 허용하는 크기를 넘었습니다. 한 번에 올리는 개수를 줄여보세요.",
+  "Step 1 of 2 · Packing the card": "1/2 단계 · 카드 굽는 중",
+  "Step 2 of 2 · Downloading": "2/2 단계 · 내려받는 중",
+  "Packing {name}…": "{name} 담는 중…",
+  "The zip is smaller than the library — it is being compressed.":
+    "ZIP은 라이브러리보다 작습니다 — 압축하는 중입니다.",
+  "This is the compressed card ({size}) — smaller than the library it came from.":
+    "압축된 카드({size})입니다 — 원본 라이브러리보다 작습니다.",
   "CPU load filter": "CPU 부하 필터",
   "Fits": "여유",
   "Tight": "아슬",

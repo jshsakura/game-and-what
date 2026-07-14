@@ -2687,3 +2687,14 @@ body::before {
   border-color: color-mix(in srgb, #e0605f 45%, transparent);
   color: #ffdedd;
 }
+
+
+/* The line under the download bar: what it is packing right now, and why the two steps show
+   two different sizes. A bar with no words is indistinguishable from a hang, and the SD zip
+   takes minutes. */
+.dl-sub {
+  margin-top: 6px; font-family: var(--body-font); font-size: 12px; line-height: 1.5;
+  color: var(--card-dim); opacity: 0.9;
+  max-width: 34ch; text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}

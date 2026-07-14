@@ -153,7 +153,7 @@ def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
             pass
     done = 0
     if on_progress:
-        on_progress(0, total)
+        on_progress(0, total, "")
     for abs_path, arcname in entries:
         if should_cancel and should_cancel():
             raise BuildCancelled()
@@ -163,7 +163,10 @@ def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
         except OSError:
             pass
         if on_progress:
-            on_progress(done, total)
+            # The name of what just went in. Compressing a 4.6 GB library takes minutes,
+            # and a bar with no words is indistinguishable from a hang — the one thing the
+            # server knows and the user does not is WHICH game it is packing right now.
+            on_progress(done, total, abs_path.name)
 
 
 def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
@@ -252,13 +255,16 @@ def run_sd_zip_build_job(job_id: str, session_id: str, include_video: bool = Fal
     # the registry once per file.
     state = {"last": -1.0}
 
-    def on_progress(done: int, total: int) -> None:
+    def on_progress(done: int, total: int, name: str = "") -> None:
         frac = (done / total) if total else 1.0
         if frac - state["last"] < 0.005 and frac < 1.0:
             return
         state["last"] = frac
+        # "689/3281 MB · 젤다의 전설 - 이상한 모자.gba" — the numbers say how long is left,
+        # the name says the thing is alive. The client splits on the separator.
+        head = f"{done // 1_000_000}/{max(total // 1_000_000, 1)} MB"
         jobs.update(job_id, status="running", progress=frac,
-                    message=f"{done // 1_000_000}/{max(total // 1_000_000, 1)} MB")
+                    message=f"{head} · {name}" if name else head)
 
     def should_cancel() -> bool:
         return jobs.is_cancelled(job_id)
