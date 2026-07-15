@@ -358,7 +358,11 @@ export function EmulatorOverlay({ rom, onClose }) {
         setLoadMsg(t("Loading ROM…"));
         const res = await fetch(romFileUrl(rom.id));
         if (!res.ok) throw new Error(t("Failed to load the ROM file."));
-        const fileContent = await res.blob();
+        // res.blob() throws "Failed to fetch" on some Chromium builds once the
+        // response passes ~300MB (reproduced on a 338MB Sega CD .chd) — but
+        // res.arrayBuffer() on the SAME response works fine at that size, so we
+        // go through that and wrap it, instead of blob() directly.
+        const fileContent = new Blob([await res.arrayBuffer()]);
         // MBC7 gate: this cartridge chip (Kirby Tilt 'n' Tumble / Korokoro Kirby,
         // Command Master) needs the GBC's built-in tilt sensor — gambatte here has
         // no tilt/pointer input wired up, so it can't be controlled in the browser.
@@ -380,7 +384,7 @@ export function EmulatorOverlay({ rom, onClose }) {
             setLoadMsg(t("Loading track {n}/{total}…", { n: i + 1, total: tracks.length }));
             const r = await fetch(cdTrackUrl(rom.id, tracks[i]));
             if (!r.ok) throw new Error(t("Failed to load the ROM file."));
-            romArg.push({ fileName: tracks[i], fileContent: await r.blob() });
+            romArg.push({ fileName: tracks[i], fileContent: new Blob([await r.arrayBuffer()]) });
             if (cancelled) return;
           }
         }
