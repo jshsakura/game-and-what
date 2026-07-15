@@ -83,6 +83,12 @@ const CORE_MAP = {
   // fall back to its interpreter in a browser. The browser has cycles to spare,
   // so accuracy wins here — mGBA boots .gba HLE, no BIOS required.
   gba: "mgba",
+  // Super Nintendo via snes9x, self-hosted from the same
+  // arianrhodsandlot/retroarch-emscripten-build (Nostalgist format, v1.22.2).
+  // Not the lighter snes9x2002/2005/2010 variants — accuracy wins here like mGBA
+  // did for GBA, and there's no device firmware to match speed-for-speed against.
+  // .sfc (headerless) and .smc (copier-headered) both boot HLE, no BIOS needed.
+  snes: "snes9x",
   // NOTE: Atari 2600/7800, Amstrad CPC, MSX, Pokémon Mini have no Nostalgist-compatible
   // core, so they run via a self-hosted JS engine in an iframe instead (see JS_ENGINE —
   // Amstrad uses CPCEC, MSX uses WebMSX, Poké Mini uses the webRcade PokeMini core).
@@ -152,6 +158,8 @@ const SCREEN_ASPECT = {
   vb: "12 / 7",
   // Game Boy Advance: 240×160, square pixels.
   gba: "3 / 2",
+  // Super Nintendo: 256×224 NTSC, PAR-corrected to the standard 4:3 CRT shape.
+  snes: "4 / 3",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -200,6 +208,9 @@ const KEY_HINTS = {
   // Game Boy Advance. The real G&W has no shoulder buttons at all — L/R are
   // keyboard-only here, and the firmware port will need a combo for them.
   gba:   [DPAD, ...AB, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
+  // Super Nintendo: 4 face buttons (A/B/X/Y) + L/R shoulders. The real G&W has
+  // A/B only — same shortage as GBA, X/Y/L/R stay keyboard-only here.
+  snes:  [DPAD, ...AB, { k: "A", b: "Y" }, { k: "S", b: "X" }, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],

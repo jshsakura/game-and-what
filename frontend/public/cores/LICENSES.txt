@@ -21,10 +21,11 @@ potator                       Watara Supervision                 Public Domain  
 retro8                        PICO-8                             GPLv3            https://github.com/libretro/retro8
 tamalibretro                  Tamagotchi                         GPLv2            https://github.com/celerizer/tamalibretro (based on jcrona/tamalib, GPLv2)
 handy                         Atari Lynx                         zlib             https://github.com/libretro/libretro-handy
+snes9x                        Super Nintendo                     NON-COMMERCIAL   https://github.com/libretro/snes9x
 
-IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX core is released under a
-non-commercial license. Any distribution that bundles it (including this one)
-may not be used or redistributed for commercial purposes.
+IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX and Snes9x cores are released
+under non-commercial licenses. Any distribution that bundles them (including
+this one) may not be used or redistributed for commercial purposes.
 
 Full GPL text (v2 / v3) and per-file copyright headers are in each upstream
 repository above.

@@ -40,7 +40,7 @@ const SYS_ABBREV = {
   pce: "PCE", pcecd: "PCD", col: "COL", msx: "MSX", a2600: "A26", a7800: "A78", amstrad: "CPC",
   wsv: "WSV", tama: "TAM", mini: "MIN", gw: "GW", homebrew: "HB", pico8: "P8",
   lynx: "LNX", videopac: "ODY", zxs: "ZX", c64: "C64", gamecom: "GCM", vb: "VB",
-  gba: "GBA",
+  gba: "GBA", snes: "SNES",
 };
 
 function hueFor(key) {
@@ -59,7 +59,7 @@ const SYS_PALETTE = {
   a2600: "#cb22e6", a7800: "#e6ab67", amstrad: "#3f8c6d", wsv: "#45e67a",
   tama: "#22cbe6", mini: "#e622a4", gw: "#e6be22", homebrew: "#6b7280", pico8: "#e67067",
   lynx: "#588c2a", videopac: "#8c3f82", zxs: "#b0e645", c64: "#3e2a8c", gamecom: "#1f9e8c",
-  vb: "#a01730", gba: "#5b45c9",
+  vb: "#a01730", gba: "#5b45c9", snes: "#5c7a99",
 };
 
 // What the Game & Watch's M7 leaves the GBA core per frame, in GBA cycles. A game

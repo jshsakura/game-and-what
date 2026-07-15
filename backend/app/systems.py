@@ -95,6 +95,14 @@ SYSTEMS: tuple[System, ...] = (
     # header of each ROM and reports which ones the table covers — that is what
     # the idle_loop flag records. Browser play uses mGBA (see emulator.jsx).
     System("gba", "Game Boy Advance", "gba", ("gba",), experimental=True),
+    # Super Nintendo — NOT in rg_emulators.c and not realistically portable to it:
+    # the M7 has no headroom for a 65816+SPC700+PPU emulator (SNES is a bigger ask
+    # than GBA's ARM7, which already only reaches full speed via the idle-loop
+    # skip table). Library-collection + browser play only, like vb/ngp/ws. Standard
+    # extensions are ".sfc" (headerless, the norm) and ".smc" (some dumps carry a
+    # 512-byte copier header; snes9x strips it automatically). Browser play uses
+    # snes9x (see emulator.jsx) — no BIOS needed, it boots both HLE.
+    System("snes", "Super Nintendo", "snes", ("sfc", "smc"), experimental=True),
     # Magnavox Odyssey² / Philips Videopac (same hardware). The firmware has a
     # videopac core (main_videopac.c) but its add_emulator is commented out, so
     # it's library-collection only for now (TOSEC .bin names). dirname "videopac"

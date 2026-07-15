@@ -21,7 +21,7 @@ _TOKEN: dict = {"value": None, "exp": 0.0}
 # Famicom (99) / FDS (51), NOT NES (18) — so we must search all three or every
 # Famicom-exclusive (e.g. Kid Dracula) comes back empty.
 _PLATFORM: dict[str, tuple[int, ...]] = {
-    "nes": (18, 99, 51), "gb": (33,), "gbc": (22,), "gba": (24,), "gg": (35,), "sms": (64,),
+    "nes": (18, 99, 51), "gb": (33,), "gbc": (22,), "gba": (24,), "snes": (19,), "gg": (35,), "sms": (64,),
     "md": (29,), "sg": (84,), "pce": (86, 128), "pcecd": (150,), "col": (68,), "msx": (27,),
     "a2600": (59,), "a7800": (60,), "amstrad": (25,), "mini": (166,), "gw": (307,),
     "ws": (57, 123), "ngp": (119, 120), "wsv": (415,), "lynx": (61,), "vb": (87,),
