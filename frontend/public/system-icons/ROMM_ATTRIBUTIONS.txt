@@ -18,9 +18,10 @@ Files covered (the icons actually shipped in this folder):
 ngp.svg (Neo Geo Pocket Color), ws.svg (WonderSwan Color), lynx.svg (Atari
 Lynx), pcecd.svg (PC Engine CD; uses the TurboGrafx-16 console art from tg16.svg,
 to read distinct from the white PC Engine icon), videopac.svg (Magnavox
-Odyssey² / Philips Videopac; from odyssey-2.svg), gba.svg (Game Boy Advance)
-and snes.svg (Super Nintendo) are from the RomM project's platform icon set
-(rommapp/romm, frontend/assets/platforms), same Libretro/CC BY 4.0 lineage.
+Odyssey² / Philips Videopac; from odyssey-2.svg), gba.svg (Game Boy Advance),
+snes.svg (Super Nintendo) and segacd.svg (Sega CD; from segacd32.svg) are from
+the RomM project's platform icon set (rommapp/romm, frontend/assets/platforms),
+same Libretro/CC BY 4.0 lineage.
   Source:  https://github.com/rommapp/romm
 
 zxs.png (Sinclair ZX Spectrum) and c64.png (Commodore 64) are converted from the

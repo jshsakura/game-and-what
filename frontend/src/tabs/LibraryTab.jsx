@@ -56,10 +56,11 @@ const shipsToSd = (rom) => !rom.sd_exclude && rom.pico8_compat !== "broken";
 
 const HANGUL_RE = /[가-힣]/;
 // Homebrew / Pico-8 are indie carts with no Korean release → never "missing".
-// Atari Lynx is a US/EU handheld with no Korean releases either; PC Engine CD is
-// a JP/US format with no official Korean releases; Virtual Boy was a JP/US-only
+// Atari Lynx is a US/EU handheld with no Korean releases either; PC Engine CD and
+// Sega CD are JP/US formats with no official Korean releases (Samsung localized
+// cartridge Genesis games, never the CD add-on); Virtual Boy was a JP/US-only
 // commercial flop, never sold in Korea.
-const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "vb"]);
+const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "segacd", "vb"]);
 // "Needs a Korean title" = no Hangul AND has a real translatable word: a run of
 // 2+ consecutive letters containing a lowercase one. This excludes titles that
 // are only digits/symbols ("1942"), all-caps acronyms ("NBA", "WWF"), and dotted

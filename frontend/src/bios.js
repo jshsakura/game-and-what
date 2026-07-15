@@ -47,6 +47,17 @@ export const BIOS_CATALOG = [
     ],
   },
   {
+    key: "segacd",
+    experimental: true,
+    label: "Sega CD",
+    note: "Region BIOS — games are region-locked to it, so US/EU/JP discs each need their own.",
+    files: [
+      { sdPath: "bios/segacd/bios_CD_U.bin", coreName: "bios_CD_U.bin", size: "128 KB" },
+      { sdPath: "bios/segacd/bios_CD_E.bin", coreName: "bios_CD_E.bin", size: "128 KB" },
+      { sdPath: "bios/segacd/bios_CD_J.bin", coreName: "bios_CD_J.bin", size: "128 KB" },
+    ],
+  },
+  {
     key: "videopac",
     experimental: true,
     label: "Odyssey² / Videopac",

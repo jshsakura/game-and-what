@@ -40,6 +40,12 @@ const CORE_MAP = {
   sms: "genesis_plus_gx",
   sg: "genesis_plus_gx",
   md: "genesis_plus_gx",
+  // Sega CD shares the same genesis_plus_gx core (it emulates the CD add-on
+  // too). Needs a region BIOS in the Extra folder (see BIOS below) — games are
+  // region-locked to their BIOS. Single-file .chd boots directly; .cue+.bin
+  // sets need their track sidecars, which the bare /rom endpoint can't supply,
+  // so browser play is .chd-only (marked EXPERIMENTAL, same as pcecd).
+  segacd: "genesis_plus_gx",
   pce: "mednafen_pce_fast",
   // PC Engine CD shares the beetle-pce-fast core (it emulates CD-ROM² too).
   // CD play needs the System Card BIOS (syscard3.pce) — user-uploaded to the
@@ -135,7 +141,7 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["pico8", "pcecd", "videopac", "c64", "zxs"]);
+const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "videopac", "c64", "zxs"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -144,7 +150,7 @@ const MOBILE_QUERY = "(max-width: 640px)";
 // the rest are 4:3. Atari runs in an iframe and is intentionally left alone.
 const SCREEN_ASPECT = {
   nes: "4 / 3", sms: "4 / 3", sg: "4 / 3", md: "4 / 3", pce: "4 / 3",
-  pcecd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
+  pcecd: "4 / 3", segacd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
   gb: "10 / 9", gbc: "10 / 9",
   pico8: "1 / 1", tama: "1 / 1", wsv: "1 / 1",
   amstrad: "4 / 3",
@@ -190,6 +196,7 @@ const KEY_HINTS = {
   sms:   [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }, { k: "Enter", b: "PAUSE" }],
   sg:    [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }],
   md:    [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
+  segacd: [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   pcecd: [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   videopac: [DPAD, { k: "Z", b: "Action" }, { k: "Enter", b: "Reset" }],

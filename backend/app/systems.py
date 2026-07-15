@@ -52,6 +52,18 @@ SYSTEMS: tuple[System, ...] = (
     System("gg", "Game Gear", "gg", ("gg",)),
     System("sms", "Master System", "sms", ("sms",)),
     System("md", "Genesis", "md", ("md", "gen", "bin")),
+    # Sega CD (a.k.a. Mega-CD). NOT in rg_emulators.c and not a realistic firmware
+    # port — same story as pcecd, but heavier: it's a full Genesis core PLUS a CD
+    # subsystem, nothing the M7 can add on top of what it already spends on `md`.
+    # Library-collection + browser play only, like pcecd. CD images live in the
+    # single /roms/segacd/ folder as .chd (preferred) or .cue (+ .bin sidecars
+    # tracked as extra_files). Booting needs a user-uploaded region BIOS
+    # (bios_CD_U/E/J.bin — see bios.js) since Sega CD games are region-locked to
+    # their BIOS. Browser play reuses genesis_plus_gx (already self-hosted for
+    # md/sms/gg/sg — it emulates the CD add-on too), single-file .chd boots,
+    # .cue/.bin sets need their track sidecars so they're not browser-playable
+    # (see emulator.jsx, same limitation as pcecd).
+    System("segacd", "Sega CD", "segacd", ("chd", "cue"), experimental=True),
     System("sg", "SG-1000", "sg", ("sg",)),
     System("pce", "PC Engine", "pce", ("pce",)),
     # PC Engine CD (a.k.a. TurboGrafx-CD). Upstream took it from this fork into main
