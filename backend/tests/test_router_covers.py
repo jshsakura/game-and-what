@@ -949,6 +949,12 @@ def test_search_term_falls_back_to_korean_name_when_nothing_searchable():
     assert covers_router._search_term("한글이름", "타이틀.nes") == "한글이름"
 
 
+def test_search_term_prefers_english_in_parens_even_when_korean_prefix_has_latin_suffix():
+    # A Korean prefix carrying a trailing Latin abbreviation ("CD") used to be
+    # mistaken for a latin stem, losing the real English title in the parens.
+    assert covers_router._search_term(None, "파이널 파이트 CD (Final Fight CD).chd") == "Final Fight CD"
+
+
 def test_term_variants_moves_leading_article():
     variants = covers_router._term_variants("Story of Thor, The")
     assert "The Story of Thor" in variants

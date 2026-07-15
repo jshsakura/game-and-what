@@ -340,11 +340,15 @@ def _strip_tags(stem: str) -> str:
 
 def _search_term(korean: str | None, stored: str) -> str:
     """Best English search term. The '한글 (English)' convention only holds when
-    the part BEFORE the parens is non-latin — otherwise the parens hold a region
-    tag like '(Japan)' (NOT a title), so we use the latin stem instead."""
+    the part BEFORE the parens actually contains Hangul — otherwise the parens
+    hold a region tag like '(Japan)' (NOT a title), so we use the latin stem
+    instead. Checking for Hangul (not "no latin at all") matters because a
+    Korean title can itself carry a trailing Latin abbreviation — "파이널 파이트
+    CD (Final Fight CD)" — and a plain "no latin" check would wrongly treat that
+    prefix as a latin stem and miss the real English title in the parens."""
     stem = stored.rsplit(".", 1)[0]
     m = re.search(r"\(([A-Za-z0-9][^)]*)\)", stem)
-    if m and not _has_latin(stem[:m.start()]) and not _is_region_tag(m.group(1)):
+    if m and _HANGUL.search(stem[:m.start()]) and not _is_region_tag(m.group(1)):
         return m.group(1).strip()
     base = _strip_tags(stem)          # drop trailing (Japan)/[!]/(Rev 1) tags
     if _has_searchable(base):          # latin OR numeric title (e.g. "1942")
