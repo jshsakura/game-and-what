@@ -1068,6 +1068,12 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   // hardware leaves the CPU — a number, not a promise: it is a cycle model, and it
   // has never been checked on a real device.
   const gba = gbaReading(rom);
+  // The poster's top corner holds EITHER a gauge or the system-icon/favourite chip, never
+  // both — a ring already fills that space, and the icon beside it just crowds it. A GBA
+  // card's measured rings and a PICO-8 card's code-size ring both count as a gauge; a
+  // favourited rom still shows its star over the top.
+  const hasGauge = (gba != null && !gba.unknown)
+    || (rom.system_key === "pico8" && rom.pico8_mem_hint != null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
@@ -1326,14 +1332,13 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
         status={rom.cover_status}
         overlay={
           <>
-            {/* On a measured GBA card the corner belongs to the rings — the system icon
-                next to them was just crowding a narrow space (and everything in this
-                corner is a GBA anyway). A favourited rom still shows its star; to favourite
-                one that is not, use the star in the card's detail panel. */}
+            {/* Where a gauge fills the corner (GBA rings, PICO-8 code-size ring) the system
+                icon is dropped — it was just crowding a narrow space. A favourited rom still
+                shows its star; to favourite one that is not, use the star in the detail panel. */}
             {/* Boolean(), not the raw value: rom.favorite comes back from sqlite as 0/1,
                 and `a || b || 0` evaluates to 0 — which React dutifully renders as a "0"
                 sitting next to the rings. */}
-            {Boolean(gba == null || gba.unknown || rom.favorite) && (
+            {Boolean(!hasGauge || rom.favorite) && (
               <button type="button" className={`cover-fav ${rom.favorite ? "on" : ""}`} disabled={busy}
                 onClick={toggleFavorite} title={rom.favorite ? t("Remove from favorites") : t("Add to favorites")}>
                 {rom.favorite
