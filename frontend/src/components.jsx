@@ -558,12 +558,14 @@ function InfoRow({ k, label, value, copyValue, copiedKey, onCopy, t, mono, trunc
 // reads the cache on open, "Fetch" pulls it fresh. Screenshots hotlink IGDB's
 // CDN (COEP is credentialless, so cross-origin <img> loads fine).
 function IgdbMetaSection({ rom, t }) {
+  const igdbOn = !!useCoverSources().igdb;   // no IGDB key → no info to show
   const [meta, setMeta] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(igdbOn);
   const [err, setErr] = useState("");
   const [lb, setLb] = useState(null);
 
   useEffect(() => {
+    if (!igdbOn) return;
     let alive = true;
     getIgdbMeta(rom.id)
       .then((m) => {
@@ -573,7 +575,7 @@ function IgdbMetaSection({ rom, t }) {
       })
       .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [rom.id]);
+  }, [rom.id, igdbOn]);
 
   async function fetchNow() {
     setLoading(true); setErr("");
@@ -584,6 +586,19 @@ function IgdbMetaSection({ rom, t }) {
 
   const has = meta && (meta.release_date || meta.summary
     || (meta.screenshots || []).length || (meta.genres || []).length);
+
+  // No IGDB credentials on this deploy → the section can't do anything. Show a
+  // one-line "key not set" note instead of an empty box that keeps spinning.
+  if (!igdbOn) {
+    return (
+      <div className="igdb-meta">
+        <div className="igdb-meta-head">
+          <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
+        </div>
+        <div className="igdb-shots-empty">{t("IGDB key is not set")}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="igdb-meta">
