@@ -616,7 +616,7 @@ function IgdbMetaSection({ rom, t }) {
             )}
           </tbody></table>
           {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
-          {meta.screenshots?.length > 0 && (
+          {meta.screenshots?.length > 0 ? (
             <div className="igdb-shots">
               {meta.screenshots.map((s, i) => (
                 <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
@@ -624,6 +624,8 @@ function IgdbMetaSection({ rom, t }) {
                 </button>
               ))}
             </div>
+          ) : (
+            <div className="igdb-shots-empty">{t("No screenshots")}</div>
           )}
           {meta.videos?.length > 0 && (
             <div className="igdb-videos">
@@ -1592,8 +1594,12 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   className={`modal-tab ${tab === "settings" ? "on" : ""}`} onClick={() => setTab("settings")}>{t("Settings")}</button>
               </div>
 
-              {tab === "info" && (<>
-              <CoverCompare rom={rom} bust={coverV} onRecrop={rom.cover_status === "ok" ? reCrop : null} />
+              {tab === "info" && (
+                <div className="info-cols">
+                  <div className="info-cover-col">
+                    <CoverCompare rom={rom} bust={coverV} onRecrop={rom.cover_status === "ok" ? reCrop : null} />
+                  </div>
+                  <div className="info-main-col">
 
               {/* IGDB rating line — shown once the score has been fetched. */}
               {rom.igdb_score != null && (
@@ -1739,7 +1745,9 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   )}
                 </div>
               )}
-              </>)}
+                  </div>
+                </div>
+              )}
 
               {tab === "settings" && (<>
               <div className="lang-row">

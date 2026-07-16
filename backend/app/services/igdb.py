@@ -207,7 +207,9 @@ def _parse_meta(g: dict) -> dict:
     devs = [c["company"]["name"] for c in (g.get("involved_companies") or [])
             if c.get("developer") and (c.get("company") or {}).get("name")]
     rating = g.get("total_rating") or g.get("aggregated_rating") or g.get("rating")
+    # Screenshots + artworks (both free on IGDB) → more images for the gallery.
     shots = [s["image_id"] for s in (g.get("screenshots") or []) if s.get("image_id")]
+    shots += [a["image_id"] for a in (g.get("artworks") or []) if a.get("image_id")]
     return {
         "name": g.get("name"),
         "release_date": time.strftime("%Y-%m-%d", time.gmtime(ts)) if ts else None,
@@ -240,7 +242,7 @@ async def fetch_meta(query: str, system: str | None = None, limit: int = 6) -> l
         "fields name,first_release_date,summary,genres.name,"
         "involved_companies.company.name,involved_companies.developer,"
         "total_rating,total_rating_count,aggregated_rating,rating,"
-        "screenshots.image_id,videos.video_id,videos.name; "
+        "screenshots.image_id,artworks.image_id,videos.video_id,videos.name; "
         f"limit {min(limit, 10)};{where}"
     )
     try:

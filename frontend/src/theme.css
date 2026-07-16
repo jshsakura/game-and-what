@@ -2826,3 +2826,34 @@ body::before {
 .modal-tab:not(.on):hover { color: var(--card-ink); background: #ffffff10; }
 /* First block in a tab shouldn't carry the section divider (it'd sit right under the tabs). */
 .modal-body > .lang-row:first-of-type { border-top: none; margin-top: 2px; padding-top: 0; }
+
+/* ── Info tab: 2-column (cover | facts) on desktop, stacked on mobile ── */
+.info-cols { display: grid; grid-template-columns: 200px 1fr; gap: 18px; align-items: start; }
+.info-cover-col { position: sticky; top: 0; }
+.info-cover-col .cover-compare { flex-direction: column; align-items: stretch; gap: 10px; }
+.info-cover-col .cover-compare figure { width: 100%; max-width: 100%; }
+.info-cover-col .cover-compare img,
+.info-cover-col .cover-compare .cmp-web { width: 100%; max-width: 100%; }
+.info-main-col { min-width: 0; }
+/* Section dividers only between the major blocks in the facts column. */
+.info-main-col > .rom-info,
+.info-main-col > .igdb-meta,
+.info-main-col > .gba-detail { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ffffff12; }
+.info-main-col > .igdb-line { margin: 0 0 2px; }
+
+/* Screenshot gallery: uniform cells that fit the grid; clear empty state. */
+.igdb-shots { grid-template-columns: repeat(3, 1fr); }
+.igdb-shots-empty {
+  margin-top: 10px; padding: 16px; text-align: center;
+  font-size: 11px; color: var(--card-dim);
+  background: #00000026; border: 1px dashed #ffffff1f; border-radius: 8px;
+}
+
+@media (max-width: 640px) {
+  .info-cols { grid-template-columns: 1fr; gap: 12px; }
+  .info-cover-col { position: static; }
+  .info-cover-col .cover-compare { flex-direction: row; justify-content: center; }
+  .info-cover-col .cover-compare img,
+  .info-cover-col .cover-compare .cmp-web { width: 40vw; }
+  .igdb-shots { grid-template-columns: repeat(2, 1fr); }
+}
