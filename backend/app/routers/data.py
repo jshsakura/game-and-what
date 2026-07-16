@@ -3,6 +3,7 @@ EXCLUDED from the SD package zip. Filesystem-backed (no DB metadata needed)."""
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import Response
@@ -67,10 +68,17 @@ def download_data(session_id: str, name: str) -> Response:
     target = _safe_target(session_id, name)
     if not target.exists():
         raise HTTPException(status_code=404, detail="파일이 없습니다")
+    # A Korean filename can't live in a plain latin-1 `filename="…"` header — it
+    # breaks, the browser gets no name and saves the URL tail ("download") as
+    # "download.txt". RFC 5987: ASCII fallback + UTF-8 filename* (same as the ROM
+    # download endpoint) so the real name comes through.
+    fn = target.name
+    ascii_name = fn.encode("ascii", "ignore").decode().strip() or "download.bin"
     return Response(
         content=target.read_bytes(),
         media_type="application/octet-stream",
-        headers={"Content-Disposition": f'attachment; filename="{target.name}"'},
+        headers={"Content-Disposition":
+                 f"attachment; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(fn)}"},
     )
 
 
