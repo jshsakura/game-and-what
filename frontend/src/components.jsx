@@ -531,6 +531,27 @@ export function Badge({ status }) {
 }
 
 // Centered popup over a dimmed backdrop.
+// One row of the ROM detail info table: label · value · copy button. The tick
+// swaps in for ~1.5s on the row whose `k` matches copiedKey.
+function InfoRow({ k, label, value, copyValue, copiedKey, onCopy, t, mono, trunc, hint }) {
+  const done = copiedKey === k;
+  return (
+    <tr className="rom-info-row" title={hint || undefined}>
+      <th scope="row">{label}</th>
+      <td>
+        <code className={`rom-info-val${mono ? " mono" : ""}${trunc ? " trunc" : ""}`} title={value}>{value}</code>
+      </td>
+      <td className="rom-info-copy-cell">
+        <button type="button" className="btn ghost rom-info-copy"
+          title={done ? t("Copied") : t("Copy")}
+          onClick={() => onCopy(k, copyValue ?? value)}>
+          {done ? <Check size={12} strokeWidth={2.5} /> : <Copy size={12} strokeWidth={2.5} />}
+        </button>
+      </td>
+    </tr>
+  );
+}
+
 export function Modal({ title, onClose, children, wide = false }) {
   // Close ONLY on the X button or Escape — never on an outside/backdrop click
   // (avoids losing work by mis-clicking).
@@ -1089,7 +1110,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const [coverV, setCoverV] = useState(0); // bumped on cover change → instant refresh
   const [cropper, setCropper] = useState(null); // { src, apply, revoke? }
   const [playing, setPlaying] = useState(false); // in-browser emulator overlay
-  const [copied, setCopied] = useState(false);   // content-hash copy feedback
+  const [copiedKey, setCopiedKey] = useState(null);   // which info-row's copy button just fired
   const dl = downloadRomUrl(rom.id);
   // Route downloads through the shared overlay (Preparing… + progress) instead of a
   // bare <a download>, which showed NOTHING while the server builds a big ZIP (a
@@ -1097,14 +1118,15 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const { download, busy: dlBusy } = useDownload();
   const startDownload = () => dl && download(dl, `${rom.stored_name || "rom"}.zip`);
 
-  // Copy the raw SHA-256 content hash so the user can diff look-alike dumps
-  // (same game, "부제 있고 없고" 차이) outside the app.
-  async function copyHash() {
-    if (!rom.content_hash) return;
+  // Copy any info-table field (size / CRC32 / SHA-256 / …) so the user can diff
+  // look-alike dumps (same game, "부제 있고 없고" 차이) or match a checksum list
+  // outside the app. `key` drives the per-row "Copied" tick.
+  async function copyField(key, value) {
+    if (value == null || value === "") return;
     try {
-      await navigator.clipboard.writeText(rom.content_hash);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      await navigator.clipboard.writeText(String(value));
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1500);
     } catch {
       toast.warn(t("Couldn't copy"));
     }
@@ -1510,40 +1532,40 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 </>
               )}
 
-              {rom.original_name && rom.original_name !== romBase && (
-                <div className="orig-name-row" title={t("Original filename at upload — preserves No-Intro region/dump/version info")}>
-                  <span className="orig-name-label">{t("Original name")}</span>
-                  <code className="orig-name-val">{rom.original_name}</code>
-                </div>
-              )}
-
-              {rom.patch_ver && (
-                <div className="patch-ver-row" title={t("Patch version parsed from the filename — used to tell newer vs older builds of the same game")}>
-                  <span className="patch-ver-label">{t("Patch version")}</span>
-                  <code className="patch-ver-val">{rom.patch_ver}</code>
-                </div>
-              )}
-
-              {rom.content_hash && (
-                <div className="hash-section">
-                  <label className="field-label">{t("Content hash (SHA-256)")}</label>
-                  <div className="hash-row">
-                    <code className="hash-value" title={rom.content_hash}>{rom.content_hash}</code>
-                    <button className="btn ghost hash-copy" disabled={busy} onClick={copyHash}
-                      title={t("Copy hash")}>
-                      {copied
-                        ? <><Check size={13} strokeWidth={2.5} /> {t("Copied")}</>
-                        : <><Copy size={13} strokeWidth={2.5} /> {t("Copy")}</>}
-                    </button>
-                  </div>
-                  {dupes.length > 0 && (
-                    <div className="hash-dups" title={t("Byte-for-byte identical files — likely the same game with a different subtitle")}>
-                      <AlertTriangle size={13} strokeWidth={2.5} aria-hidden />
-                      <span>{t("{n} rom(s) with identical content", { n: dupes.length })}: {dupes.map((d) => d.name).join(", ")}</span>
-                    </div>
+              {/* File info — size, checksums, provenance in one table; each row copyable
+                  (CRC32 matches No-Intro/한글패치 checksum lists; SHA-256 is our exact-dup id). */}
+              <div className="rom-info">
+                <table className="rom-info-table"><tbody>
+                  {rom.size_bytes != null && (
+                    <InfoRow k="size" label={t("Size")} value={formatBytes(rom.size_bytes)}
+                      copyValue={String(rom.size_bytes)} copiedKey={copiedKey} onCopy={copyField} t={t} />
                   )}
-                </div>
-              )}
+                  {rom.crc32 && (
+                    <InfoRow k="crc" label="CRC32" value={rom.crc32} mono
+                      copiedKey={copiedKey} onCopy={copyField} t={t} />
+                  )}
+                  {rom.content_hash && (
+                    <InfoRow k="sha" label="SHA-256" value={rom.content_hash} mono trunc
+                      copiedKey={copiedKey} onCopy={copyField} t={t} />
+                  )}
+                  {rom.original_name && rom.original_name !== romBase && (
+                    <InfoRow k="orig" label={t("Original name")} value={rom.original_name} mono trunc
+                      copiedKey={copiedKey} onCopy={copyField} t={t}
+                      hint={t("Original filename at upload — preserves No-Intro region/dump/version info")} />
+                  )}
+                  {rom.patch_ver && (
+                    <InfoRow k="patch" label={t("Patch version")} value={rom.patch_ver} mono
+                      copiedKey={copiedKey} onCopy={copyField} t={t}
+                      hint={t("Patch version parsed from the filename — used to tell newer vs older builds of the same game")} />
+                  )}
+                </tbody></table>
+                {dupes.length > 0 && (
+                  <div className="hash-dups" title={t("Byte-for-byte identical files — likely the same game with a different subtitle")}>
+                    <AlertTriangle size={13} strokeWidth={2.5} aria-hidden />
+                    <span>{t("{n} rom(s) with identical content", { n: dupes.length })}: {dupes.map((d) => d.name).join(", ")}</span>
+                  </div>
+                )}
+              </div>
 
               {/* GBA only. The two rings on the cover are the whole verdict, and nowhere
                   else does the card say what they mean or where they came from. Here it

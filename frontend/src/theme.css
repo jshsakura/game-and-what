@@ -614,6 +614,31 @@ body::before {
 }
 .hash-dups svg { flex: 0 0 auto; }
 
+/* ROM detail info table — size / CRC32 / SHA-256 / provenance, one copyable row each. */
+.rom-info { margin: 8px 0 2px; }
+.rom-info-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.rom-info-row > th, .rom-info-row > td { padding: 4px 0; vertical-align: middle; }
+.rom-info-row + .rom-info-row > th,
+.rom-info-row + .rom-info-row > td { border-top: 1px solid #ffffff10; }
+.rom-info-row > th {
+  width: 92px; text-align: left; font-weight: 600;
+  font-size: 11px; color: var(--card-dim); white-space: nowrap; padding-right: 10px;
+}
+.rom-info-val {
+  display: block; min-width: 0; font-size: 11px; line-height: 1.5;
+  color: var(--card-fg, #e8e8e8); user-select: all;
+}
+.rom-info-val.mono {
+  font-family: ui-monospace, "SFMono-Regular", "Menlo", monospace;
+  font-size: 10px; letter-spacing: 0.2px; color: var(--card-dim);
+}
+.rom-info-val.trunc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rom-info-copy-cell { width: 30px; text-align: right; }
+.rom-info-copy {
+  flex: 0 0 auto; padding: 3px 5px; line-height: 0;
+  min-width: 0; border-radius: 6px;
+}
+
 /* "중복" badge on a card whose bytes match another rom's */
 .dup-badge {
   display: inline-flex; align-items: center; gap: 3px; vertical-align: middle;
