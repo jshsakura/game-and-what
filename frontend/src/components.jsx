@@ -561,7 +561,6 @@ function IgdbMetaSection({ rom, t }) {
   const igdbOn = !!useCoverSources().igdb;   // no IGDB key → no info to show
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(igdbOn);
-  const [err, setErr] = useState("");
   const [lb, setLb] = useState(null);
 
   useEffect(() => {
@@ -578,27 +577,21 @@ function IgdbMetaSection({ rom, t }) {
   }, [rom.id, igdbOn]);
 
   async function fetchNow() {
-    setLoading(true); setErr("");
+    setLoading(true);
     try { setMeta(await fetchIgdbMeta(rom.id)); }
-    catch (e) { setErr(e.message || "IGDB"); }
+    catch { setMeta({}); }   // no IGDB match (or fetch failed) → the clean "no info" state
     finally { setLoading(false); }
   }
 
   const has = meta && (meta.release_date || meta.summary
     || (meta.screenshots || []).length || (meta.genres || []).length);
 
-  // No IGDB credentials on this deploy → the section can't do anything. Show a
-  // one-line "key not set" note instead of an empty box that keeps spinning.
-  if (!igdbOn) {
-    return (
-      <div className="igdb-meta">
-        <div className="igdb-meta-head">
-          <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
-        </div>
-        <div className="igdb-shots-empty">{t("IGDB key is not set")}</div>
-      </div>
-    );
-  }
+  // No IGDB credentials on this deploy → the section can do nothing, AND the key
+  // is a deploy-time env var (IGDB_CLIENT_ID/SECRET) the end-user can't set from
+  // the UI. So don't clutter every game's detail with a dead "key not set" box —
+  // hide the whole section. (The cover-search popup still surfaces IGDB with a 🔒
+  // lock, which is where a deployer discovers the key is needed.)
+  if (!igdbOn) return null;
 
   return (
     <div className="igdb-meta">
@@ -609,7 +602,9 @@ function IgdbMetaSection({ rom, t }) {
           {t("Refresh")}
         </button>
       </div>
-      {err && <div className="badge failed">{err}</div>}
+      {!has && !loading && (
+        <div className="igdb-shots-empty">{t("No IGDB info")}</div>
+      )}
       {has && (
         <>
           <table className="rom-info-table"><tbody>
