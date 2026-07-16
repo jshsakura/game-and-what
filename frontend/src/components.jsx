@@ -583,8 +583,10 @@ function IgdbMetaSection({ rom, t }) {
     finally { setLoading(false); }
   }
 
-  const has = meta && (meta.release_date || meta.summary
-    || (meta.screenshots || []).length || (meta.genres || []).length);
+  // NB: must be a real boolean — the trailing `.length` can be 0, and `{0 && …}`
+  // renders a stray "0" in the popup instead of nothing.
+  const has = !!(meta && (meta.release_date || meta.summary
+    || (meta.screenshots || []).length || (meta.genres || []).length));
 
   // No IGDB credentials on this deploy → the section can do nothing, AND the key
   // is a deploy-time env var (IGDB_CLIENT_ID/SECRET) the end-user can't set from

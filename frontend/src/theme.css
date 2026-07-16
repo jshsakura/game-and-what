@@ -461,9 +461,11 @@ body::before {
 
 /* 한글패치 toggle + language line inside the rom edit modal */
 .lang-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap; margin: 4px 0 2px;
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 8px; flex-wrap: wrap; margin: 4px 0 2px;
 }
+/* Patch toggle stays left; favorite + SD group to the right. */
+.lang-row .fav-toggle:first-of-type { margin-left: auto; }
 .lang-toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 .lang-toggle input { accent-color: #2e7d32; cursor: pointer; }
 .lang-toggle span { font-size: 11px; }
