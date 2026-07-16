@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
@@ -558,58 +558,48 @@ function InfoRow({ k, label, value, copyValue, copiedKey, onCopy, t, mono, trunc
 // rating table + summary + screenshot grid (lightbox) + video links. Lazy:
 // reads the cache on open, "Fetch" pulls it fresh. Screenshots hotlink IGDB's
 // CDN (COEP is credentialless, so cross-origin <img> loads fine).
-function IgdbMetaSection({ rom, t }) {
-  const igdbOn = !!useCoverSources().igdb;   // no IGDB key → no info to show
+// Lazy-load + cache IGDB meta for a rom. Shared by the facts panel (right column)
+// and the screenshot footer (full width) so they stay in sync off ONE fetch.
+function useIgdbMeta(romId, igdbOn) {
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(igdbOn);
-  const [lb, setLb] = useState(null);
-  const shotsRef = useRef(null);
-  const scrollShots = (dir) => shotsRef.current?.scrollBy({ left: dir * shotsRef.current.clientWidth * 0.85, behavior: "smooth" });
-
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try { setMeta(await fetchIgdbMeta(romId)); }
+    catch { setMeta({}); }     // no IGDB match / fetch failed → clean "no info" state
+    finally { setLoading(false); }
+  }, [romId]);
   useEffect(() => {
-    if (!igdbOn) return;
+    if (!igdbOn) { setLoading(false); return; }
     let alive = true;
-    getIgdbMeta(rom.id)
+    getIgdbMeta(romId)
       .then((m) => {
         if (!alive) return;
         if (m && Object.keys(m).length) { setMeta(m); setLoading(false); }
-        else { fetchNow(); }   // nothing cached yet → pull it automatically on open
+        else refresh();          // nothing cached → pull it automatically on open
       })
       .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [rom.id, igdbOn]);
+  }, [romId, igdbOn, refresh]);
+  return { meta, loading, refresh };
+}
 
-  async function fetchNow() {
-    setLoading(true);
-    try { setMeta(await fetchIgdbMeta(rom.id)); }
-    catch { setMeta({}); }   // no IGDB match (or fetch failed) → the clean "no info" state
-    finally { setLoading(false); }
-  }
-
-  // NB: must be a real boolean — the trailing `.length` can be 0, and `{0 && …}`
-  // renders a stray "0" in the popup instead of nothing.
+// IGDB facts (release/genre/dev/rating + summary + videos). Sits in the right
+// column next to the cover so that column fills to roughly poster height.
+function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
+  if (!igdbOn) return null;     // deploy-time key, user can't set it → hide entirely
   const has = !!(meta && (meta.release_date || meta.summary
-    || (meta.screenshots || []).length || (meta.genres || []).length));
-
-  // No IGDB credentials on this deploy → the section can do nothing, AND the key
-  // is a deploy-time env var (IGDB_CLIENT_ID/SECRET) the end-user can't set from
-  // the UI. So don't clutter every game's detail with a dead "key not set" box —
-  // hide the whole section. (The cover-search popup still surfaces IGDB with a 🔒
-  // lock, which is where a deployer discovers the key is needed.)
-  if (!igdbOn) return null;
-
+    || (meta.genres || []).length || (meta.developers || []).length || meta.rating != null));
   return (
     <div className="igdb-meta">
       <div className="igdb-meta-head">
         <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
-        <button type="button" className="btn ghost" disabled={loading} onClick={fetchNow}>
+        <button type="button" className="btn ghost" disabled={loading} onClick={refresh}>
           {loading ? <Loader size={13} className="spin" /> : <RefreshCw size={13} strokeWidth={2.5} />}
           {t("Refresh")}
         </button>
       </div>
-      {!has && !loading && (
-        <div className="igdb-shots-empty">{t("No IGDB info")}</div>
-      )}
+      {!has && !loading && <div className="igdb-shots-empty">{t("No IGDB info")}</div>}
       {has && (
         <>
           <table className="rom-info-table"><tbody>
@@ -631,29 +621,6 @@ function IgdbMetaSection({ rom, t }) {
             )}
           </tbody></table>
           {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
-          {meta.screenshots?.length > 0 ? (
-            <div className="igdb-shots-strip">
-              {meta.screenshots.length > 3 && (
-                <button type="button" className="igdb-arrow left" onClick={() => scrollShots(-1)} aria-label={t("Previous")}>
-                  <ChevronLeft size={18} strokeWidth={2.5} />
-                </button>
-              )}
-              <div className="igdb-shots" ref={shotsRef}>
-                {meta.screenshots.map((s, i) => (
-                  <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
-                    <img src={s} loading="lazy" alt="" />
-                  </button>
-                ))}
-              </div>
-              {meta.screenshots.length > 3 && (
-                <button type="button" className="igdb-arrow right" onClick={() => scrollShots(1)} aria-label={t("Next")}>
-                  <ChevronRight size={18} strokeWidth={2.5} />
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="igdb-shots-empty">{t("No screenshots")}</div>
-          )}
           {meta.videos?.length > 0 && (
             <div className="igdb-videos">
               {meta.videos.map((v, i) => (
@@ -664,7 +631,37 @@ function IgdbMetaSection({ rom, t }) {
           )}
         </>
       )}
-      {lb != null && meta?.screenshots_full?.[lb] && (
+    </div>
+  );
+}
+
+// Screenshot footer — full-width glassmorphic horizontal strip (swipe/arrows).
+function IgdbShotsFooter({ meta, t }) {
+  const [lb, setLb] = useState(null);
+  const shotsRef = useRef(null);
+  const scrollShots = (dir) => shotsRef.current?.scrollBy({ left: dir * shotsRef.current.clientWidth * 0.85, behavior: "smooth" });
+  const shots = meta?.screenshots || [];
+  if (!shots.length) return null;   // no key / no match / no screenshots → nothing here
+  return (
+    <div className="igdb-shots-strip">
+      {shots.length > 3 && (
+        <button type="button" className="igdb-arrow left" onClick={() => scrollShots(-1)} aria-label={t("Previous")}>
+          <ChevronLeft size={18} strokeWidth={2.5} />
+        </button>
+      )}
+      <div className="igdb-shots" ref={shotsRef}>
+        {shots.map((s, i) => (
+          <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
+            <img src={s} loading="lazy" alt="" />
+          </button>
+        ))}
+      </div>
+      {shots.length > 3 && (
+        <button type="button" className="igdb-arrow right" onClick={() => scrollShots(1)} aria-label={t("Next")}>
+          <ChevronRight size={18} strokeWidth={2.5} />
+        </button>
+      )}
+      {lb != null && meta.screenshots_full?.[lb] && (
         <div className="igdb-lightbox" onClick={() => setLb(null)} role="dialog">
           <img src={meta.screenshots_full[lb]} alt="" />
         </div>
@@ -681,10 +678,26 @@ export function Modal({ title, onClose, children, wide = false }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+  // Drag by the header — starts centered but the user can move it anywhere so it
+  // never obscures what's behind. Offset from the centered position via transform.
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const drag = useRef(null);
+  const startDrag = (e) => {
+    if ((e.button ?? 0) !== 0 || e.target.closest("button")) return;  // left button, not the X
+    drag.current = { sx: e.clientX, sy: e.clientY, ox: pos.x, oy: pos.y };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onDrag = (e) => {
+    if (!drag.current) return;
+    setPos({ x: drag.current.ox + e.clientX - drag.current.sx, y: drag.current.oy + e.clientY - drag.current.sy });
+  };
+  const endDrag = (e) => { drag.current = null; e.currentTarget.releasePointerCapture?.(e.pointerId); };
   return (
     <div className="modal-backdrop">
-      <div className={`modal ${wide ? "wide" : ""}`}>
-        <div className="modal-head">
+      <div className={`modal ${wide ? "wide" : ""}`}
+        style={(pos.x || pos.y) ? { transform: `translate(${pos.x}px, ${pos.y}px)` } : undefined}>
+        <div className="modal-head modal-drag" onPointerDown={startDrag} onPointerMove={onDrag}
+          onPointerUp={endDrag} onPointerCancel={endDrag}>
           <span className="modal-title">{title}</span>
           <button className="icon-btn" onClick={onClose} aria-label="close">
             <X size={14} strokeWidth={2.5} />
@@ -1218,6 +1231,8 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
     || (rom.system_key === "pico8" && rom.pico8_mem_hint != null);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("info");   // detail popup: "info" | "settings"
+  const igdbOn = !!useCoverSources().igdb;
+  const igdbMeta = useIgdbMeta(rom.id, igdbOn);   // one fetch → facts panel + shots footer
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const romFileRef = useRef(null);
@@ -1702,6 +1717,8 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 )}
               </div>
 
+              <IgdbFactsPanel igdbOn={igdbOn} meta={igdbMeta.meta} loading={igdbMeta.loading} refresh={igdbMeta.refresh} t={t} />
+
               {/* GBA only. The two rings on the cover are the whole verdict, and nowhere
                   else does the card say what they mean or where they came from. Here it
                   does — including the part that matters most: the budget is an estimate,
@@ -1772,7 +1789,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               )}
                   </div>
                 </div>
-                <IgdbMetaSection rom={rom} t={t} />
+                <IgdbShotsFooter meta={igdbMeta.meta} t={t} />
               </>)}
 
               {tab === "settings" && (<>

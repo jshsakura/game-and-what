@@ -2891,3 +2891,7 @@ body::before {
 .igdb-arrow.right { right: 4px; }
 /* Touch devices scroll by swiping — the arrows just take up space there. */
 @media (hover: none), (max-width: 640px) { .igdb-arrow { display: none; } }
+
+/* Draggable modal header — grab it to move the popup off-center. */
+.modal-drag { cursor: move; touch-action: none; user-select: none; }
+.modal-drag .icon-btn { cursor: pointer; }
