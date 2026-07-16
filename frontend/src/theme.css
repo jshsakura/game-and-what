@@ -646,8 +646,10 @@ body::before {
 .igdb-meta-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .igdb-meta-head .field-label { display: inline-flex; align-items: center; gap: 5px; }
 .igdb-summary {
-  margin: 8px 0 0; font-size: 11px; line-height: 1.55; color: var(--card-dim);
+  margin: 8px 0 0; padding: 10px 12px; font-size: 11px; line-height: 1.6; color: var(--card-dim);
   max-height: 7.5em; overflow: auto;
+  background: #00000026; border: 1px solid #ffffff14; border-left: 3px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  border-radius: 8px; box-shadow: inset 0 1px 3px #00000022;
 }
 .igdb-shots {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
@@ -659,7 +661,9 @@ body::before {
 }
 .igdb-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .igdb-shot:hover { border-color: var(--gold); }
-.igdb-videos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.igdb-videos { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.igdb-video { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; }
+.igdb-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .igdb-lightbox {
   position: fixed; inset: 0; z-index: 1000; background: #000000d0;
   display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out;

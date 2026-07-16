@@ -624,8 +624,15 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
           {meta.videos?.length > 0 && (
             <div className="igdb-videos">
               {meta.videos.map((v, i) => (
-                <a key={i} className="btn ghost" href={`https://www.youtube.com/watch?v=${v.id}`}
-                   target="_blank" rel="noreferrer"><Play size={12} strokeWidth={2.5} /> {v.name || t("Video")}</a>
+                <div key={i} className="igdb-video">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${v.id}`}
+                    title={v.name || t("Video")}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
               ))}
             </div>
           )}
