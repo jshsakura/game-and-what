@@ -15,13 +15,19 @@ export function useDownload() {
 }
 
 function filenameFromHeader(cd, fallback) {
-  const m = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(cd || "");
-  if (!m) return fallback;
-  try {
-    return decodeURIComponent(m[1]);
-  } catch (_) {
-    return m[1] || fallback;
+  if (!cd) return fallback;
+  // PREFER RFC 5987 `filename*=UTF-8''<pct-encoded>` — it carries the real,
+  // non-ASCII name (e.g. Korean). The plain `filename="…"` beside it is an
+  // ASCII-only fallback with every non-latin char stripped, so a Korean title
+  // there collapses to blanks (or "rom.zip"); matching it first dropped the name.
+  const star = /filename\*=(?:UTF-8'')?([^;]+)/i.exec(cd);
+  if (star) {
+    try {
+      return decodeURIComponent(star[1].trim().replace(/^"|"$/g, ""));
+    } catch (_) { /* fall through to the plain form */ }
   }
+  const plain = /filename=\s*"?([^";]+?)"?\s*(?:;|$)/i.exec(cd);
+  return plain ? plain[1].trim() : fallback;
 }
 
 // Build job reports "689/3281 MB · Zelda....gba" — the numbers, and what it is packing.
