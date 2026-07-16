@@ -4,6 +4,7 @@
 export default {
   "IGDB info": "IGDB 정보",
   "IGDB rating": "평점",
+  "Settings": "설정",
   "Release date": "출시일",
   "Genre": "장르",
   "Developer": "개발사",

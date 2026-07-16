@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
-  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge, Info,
+  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge, Info, RefreshCw,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import { useDownload } from "./download.jsx";
@@ -566,9 +566,12 @@ function IgdbMetaSection({ rom, t }) {
   useEffect(() => {
     let alive = true;
     getIgdbMeta(rom.id)
-      .then((m) => { if (alive) setMeta(m && Object.keys(m).length ? m : null); })
-      .catch(() => {})
-      .finally(() => { if (alive) setLoading(false); });
+      .then((m) => {
+        if (!alive) return;
+        if (m && Object.keys(m).length) { setMeta(m); setLoading(false); }
+        else { fetchNow(); }   // nothing cached yet → pull it automatically on open
+      })
+      .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [rom.id]);
 
@@ -587,8 +590,8 @@ function IgdbMetaSection({ rom, t }) {
       <div className="igdb-meta-head">
         <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
         <button type="button" className="btn ghost" disabled={loading} onClick={fetchNow}>
-          {loading ? <Loader size={13} className="spin" /> : <Download size={13} strokeWidth={2.5} />}
-          {has ? t("Refresh") : t("Fetch")}
+          {loading ? <Loader size={13} className="spin" /> : <RefreshCw size={13} strokeWidth={2.5} />}
+          {t("Refresh")}
         </button>
       </div>
       {err && <div className="badge failed">{err}</div>}
@@ -1185,6 +1188,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const hasGauge = (gba != null && !gba.unknown)
     || (rom.system_key === "pico8" && rom.pico8_mem_hint != null);
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState("info");   // detail popup: "info" | "settings"
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const romFileRef = useRef(null);
@@ -1243,6 +1247,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   function openModal() {
     setName(romBase);
     setNameErr("");
+    setTab("info");        // always land on the Info tab
     setOpen(true);
   }
   // Picking a cover (IGDB or file) opens the crop step instead of applying直接.
@@ -1580,6 +1585,14 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
             <CoverCropper src={cropper.src} aspect={coverAspect(rom.system_key)} busy={busy} onCancel={closeCropper} onDone={applyCrop} />
           ) : (
             <>
+              <div className="modal-tabs" role="tablist">
+                <button type="button" role="tab" aria-selected={tab === "info"}
+                  className={`modal-tab ${tab === "info" ? "on" : ""}`} onClick={() => setTab("info")}>{t("Info")}</button>
+                <button type="button" role="tab" aria-selected={tab === "settings"}
+                  className={`modal-tab ${tab === "settings" ? "on" : ""}`} onClick={() => setTab("settings")}>{t("Settings")}</button>
+              </div>
+
+              {tab === "info" && (<>
               <CoverCompare rom={rom} bust={coverV} onRecrop={rom.cover_status === "ok" ? reCrop : null} />
 
               {/* IGDB rating line — shown once the score has been fetched. */}
@@ -1726,7 +1739,9 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   )}
                 </div>
               )}
+              </>)}
 
+              {tab === "settings" && (<>
               <div className="lang-row">
                 <label className="lang-toggle" title={t("Mark whether this ROM has a user patch (translation, hack, etc.) applied")}>
                   <input type="checkbox" checked={koPatched} disabled={busy} onChange={togglePatch} />
@@ -1852,6 +1867,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 </button>
               </div>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={replaceCover} />
+              </>)}
             </>
           )}
         </Modal>

@@ -2810,3 +2810,19 @@ body::before {
   .modal-actions .btn { padding: 13px 8px; }
   .cover-compare img, .cover-compare .cmp-web { width: 40vw; }
 }
+
+/* Detail popup tabs — segmented control (Info / Settings). */
+.modal-tabs {
+  display: flex; gap: 4px; margin-bottom: 10px;
+  background: #00000033; border: 1px solid #ffffff14; border-radius: 10px; padding: 4px;
+}
+.modal-tab {
+  flex: 1; padding: 9px 10px; border: none; border-radius: 7px; cursor: pointer;
+  background: transparent; color: var(--card-dim);
+  font-family: var(--body-font); font-weight: 700; font-size: 12px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.modal-tab.on { background: var(--gold); color: #1a1206; box-shadow: 0 1px 0 #00000055; }
+.modal-tab:not(.on):hover { color: var(--card-ink); background: #ffffff10; }
+/* First block in a tab shouldn't carry the section divider (it'd sit right under the tabs). */
+.modal-body > .lang-row:first-of-type { border-top: none; margin-top: 2px; padding-top: 0; }
