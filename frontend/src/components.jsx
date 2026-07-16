@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
-  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge,
+  AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge, Info,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import { useDownload } from "./download.jsx";
