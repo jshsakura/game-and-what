@@ -192,3 +192,62 @@ async def fetch_rating(query: str, system: str | None = None) -> dict | None:
         "name": best.get("name"),
         "confidence": round(best_sim, 2),
     }
+
+
+# Rich detail metadata (one expanded round-trip): release date, genres, developer,
+# rating, summary, screenshots + IGDB videos. Screenshots are hotlink-ready CDN
+# URLs (browser loads them; COEP is credentialless). Returns a LIST of parsed
+# candidates (top N) so the caller can title-match before storing.
+def _screenshot_url(image_id: str, size: str) -> str:
+    return f"https://images.igdb.com/igdb/image/upload/{size}/{image_id}.jpg"
+
+
+def _parse_meta(g: dict) -> dict:
+    ts = g.get("first_release_date")
+    devs = [c["company"]["name"] for c in (g.get("involved_companies") or [])
+            if c.get("developer") and (c.get("company") or {}).get("name")]
+    rating = g.get("total_rating") or g.get("aggregated_rating") or g.get("rating")
+    shots = [s["image_id"] for s in (g.get("screenshots") or []) if s.get("image_id")]
+    return {
+        "name": g.get("name"),
+        "release_date": time.strftime("%Y-%m-%d", time.gmtime(ts)) if ts else None,
+        "summary": g.get("summary"),
+        "genres": [x["name"] for x in (g.get("genres") or []) if x.get("name")],
+        "developers": devs,
+        "rating": round(rating) if rating is not None else None,
+        "rating_count": g.get("total_rating_count") or 0,
+        "screenshots": [_screenshot_url(i, "t_screenshot_med") for i in shots],
+        "screenshots_full": [_screenshot_url(i, "t_1080p") for i in shots],
+        "videos": [{"name": v.get("name"), "id": v["video_id"]}
+                   for v in (g.get("videos") or []) if v.get("video_id")],
+    }
+
+
+async def fetch_meta(query: str, system: str | None = None, limit: int = 6) -> list[dict]:
+    """Top IGDB matches for a title with full detail fields, parsed. [] if no
+    key / no match. Caller should title-match `name` before trusting one."""
+    query = (query or "").strip()
+    if not query:
+        return []
+    token = await _token()
+    if not token:
+        return []
+    headers = {"Client-ID": config.IGDB_CLIENT_ID, "Authorization": f"Bearer {token}"}
+    pf = _platform_filter(system)
+    where = (f" where{pf[2:]};" if pf else ";")
+    body = (
+        f'search "{_esc(query)}"; '
+        "fields name,first_release_date,summary,genres.name,"
+        "involved_companies.company.name,involved_companies.developer,"
+        "total_rating,total_rating_count,aggregated_rating,rating,"
+        "screenshots.image_id,videos.video_id,videos.name; "
+        f"limit {min(limit, 10)};{where}"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=25) as client:
+            resp = await client.post(f"{_BASE}/games", headers=headers, content=body)
+    except httpx.HTTPError:
+        return []
+    if resp.status_code != 200:
+        return []
+    return [_parse_meta(g) for g in resp.json() if g.get("name")]

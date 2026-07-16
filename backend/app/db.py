@@ -185,6 +185,11 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # NULL until backfilled — see backfill_crc.py.
         conn.execute("ALTER TABLE roms ADD COLUMN crc32 TEXT")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_roms_crc32 ON roms(crc32)")
+    if "igdb_meta" not in cols:
+        # Rich IGDB detail as JSON — release date, genres, developer, rating,
+        # summary, screenshot URLs, videos. Fetched on demand (POST …/igdb-meta),
+        # shown in the detail popup. NULL until fetched.
+        conn.execute("ALTER TABLE roms ADD COLUMN igdb_meta TEXT")
     if "favorite" not in cols:
         # User-marked favorite (★) — purely a UI convenience for filtering/gathering
         # the roms you care about. No effect on packaging/download.

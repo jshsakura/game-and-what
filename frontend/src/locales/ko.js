@@ -2,6 +2,12 @@
 // Keys must EXACTLY equal the in-code English literal (including punctuation/ellipsis/{placeholders}).
 // Missing keys fall back to the English key (which is the source language).
 export default {
+  "IGDB info": "IGDB 정보",
+  "Release date": "출시일",
+  "Genre": "장르",
+  "Developer": "개발사",
+  "Fetch": "가져오기",
+  "Refresh": "새로고침",
   "Works": "정상",
   "Library": "라이브러리",
   "Extra": "추가파일",

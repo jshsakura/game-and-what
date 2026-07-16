@@ -12,6 +12,7 @@ import {
   videoThumbUrl, videoPreviewUrl, musicCoverUrl, streamMusicUrl, deleteRom, deleteVideo, deleteMusic,
   renameRom, igdbSearch, tgdbSearch, sgdbSearch, libretroSearch, setCoverFromUrl, deleteCover, recropCover, replaceRomFile, formatBytes, setRomLang, setSdInclude, setSdExclude,
   setFavorite, addRomFile, deleteRomFile, setPico8Compat, setCoverFlag,
+  getIgdbMeta, fetchIgdbMeta,
 } from "./api.js";
 import { useToast } from "./toast.jsx";
 import { useT } from "./i18n.jsx";
@@ -549,6 +550,94 @@ function InfoRow({ k, label, value, copyValue, copiedKey, onCopy, t, mono, trunc
         </button>
       </td>
     </tr>
+  );
+}
+
+// IGDB rich detail in the ROM detail popup: release date / genre / developer /
+// rating table + summary + screenshot grid (lightbox) + video links. Lazy:
+// reads the cache on open, "Fetch" pulls it fresh. Screenshots hotlink IGDB's
+// CDN (COEP is credentialless, so cross-origin <img> loads fine).
+function IgdbMetaSection({ rom, t }) {
+  const [meta, setMeta] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+  const [lb, setLb] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    getIgdbMeta(rom.id)
+      .then((m) => { if (alive) setMeta(m && Object.keys(m).length ? m : null); })
+      .catch(() => {})
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [rom.id]);
+
+  async function fetchNow() {
+    setLoading(true); setErr("");
+    try { setMeta(await fetchIgdbMeta(rom.id)); }
+    catch (e) { setErr(e.message || "IGDB"); }
+    finally { setLoading(false); }
+  }
+
+  const has = meta && (meta.release_date || meta.summary
+    || (meta.screenshots || []).length || (meta.genres || []).length);
+
+  return (
+    <div className="igdb-meta">
+      <div className="igdb-meta-head">
+        <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
+        <button type="button" className="btn ghost" disabled={loading} onClick={fetchNow}>
+          {loading ? <Loader size={13} className="spin" /> : <Download size={13} strokeWidth={2.5} />}
+          {has ? t("Refresh") : t("Fetch")}
+        </button>
+      </div>
+      {err && <div className="badge failed">{err}</div>}
+      {has && (
+        <>
+          <table className="rom-info-table"><tbody>
+            {meta.release_date && (
+              <tr className="rom-info-row"><th scope="row">{t("Release date")}</th>
+                <td colSpan={2}><span className="rom-info-val">{meta.release_date}</span></td></tr>
+            )}
+            {meta.genres?.length > 0 && (
+              <tr className="rom-info-row"><th scope="row">{t("Genre")}</th>
+                <td colSpan={2}><span className="rom-info-val">{meta.genres.join(", ")}</span></td></tr>
+            )}
+            {meta.developers?.length > 0 && (
+              <tr className="rom-info-row"><th scope="row">{t("Developer")}</th>
+                <td colSpan={2}><span className="rom-info-val">{meta.developers.join(", ")}</span></td></tr>
+            )}
+            {meta.rating != null && (
+              <tr className="rom-info-row"><th scope="row">{t("Rating")}</th>
+                <td colSpan={2}><span className="rom-info-val">{meta.rating}/100{meta.rating_count ? ` (${meta.rating_count})` : ""}</span></td></tr>
+            )}
+          </tbody></table>
+          {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
+          {meta.screenshots?.length > 0 && (
+            <div className="igdb-shots">
+              {meta.screenshots.map((s, i) => (
+                <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
+                  <img src={s} loading="lazy" alt="" />
+                </button>
+              ))}
+            </div>
+          )}
+          {meta.videos?.length > 0 && (
+            <div className="igdb-videos">
+              {meta.videos.map((v, i) => (
+                <a key={i} className="btn ghost" href={`https://www.youtube.com/watch?v=${v.id}`}
+                   target="_blank" rel="noreferrer"><Play size={12} strokeWidth={2.5} /> {v.name || t("Video")}</a>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+      {lb != null && meta?.screenshots_full?.[lb] && (
+        <div className="igdb-lightbox" onClick={() => setLb(null)} role="dialog">
+          <img src={meta.screenshots_full[lb]} alt="" />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1566,6 +1655,8 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   </div>
                 )}
               </div>
+
+              <IgdbMetaSection rom={rom} t={t} />
 
               {/* GBA only. The two rings on the cover are the whole verdict, and nowhere
                   else does the card say what they mean or where they came from. Here it

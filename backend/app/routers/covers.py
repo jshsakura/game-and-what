@@ -703,3 +703,50 @@ async def cover_from_url(session_id: str, rom_id: str, payload: dict = Body(...)
     with db.connect() as conn:
         _update_cover_db(conn, rom_id, cover_rel, "ok", "manual", crop_box)
     return {"rom_id": rom_id, "cover_status": "ok", "cover_path": cover_rel}
+
+
+@router.post("/sessions/{session_id}/roms/{rom_id}/igdb-meta")
+async def fetch_igdb_meta(session_id: str, rom_id: str) -> dict:
+    """Fetch rich IGDB detail for ONE rom (release date, genres, developer,
+    rating, summary, screenshots, videos), title-matched so a fuzzy hit can't
+    attach the wrong game, and cache it as JSON on the row."""
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        row = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
+                            (rom_id, session_id)).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+        rom = dict(row)
+
+    meta = None
+    for cand in _rom_terms(rom):
+        metas = await igdb.fetch_meta(cand, rom["system_key"])
+        if not metas:                                   # IGDB platform-tag gap: retry unfiltered
+            metas = await igdb.fetch_meta(cand, None)
+        hit = titlematch.best(cand, [(m["name"], m) for m in metas if m.get("name")])
+        if hit:
+            meta = hit[1]
+            break
+    if meta is None:
+        raise HTTPException(status_code=404, detail="IGDB에서 정보를 찾지 못했습니다")
+
+    with db.connect() as conn:
+        conn.execute("UPDATE roms SET igdb_meta=? WHERE id=?",
+                     (json.dumps(meta, ensure_ascii=False), rom_id))
+    return meta
+
+
+@router.get("/sessions/{session_id}/roms/{rom_id}/igdb-meta")
+def get_igdb_meta(session_id: str, rom_id: str) -> dict:
+    """Return the cached IGDB detail for a rom (or {} if never fetched). Kept out
+    of the library list to keep that payload lean — loaded when a detail opens."""
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        row = conn.execute("SELECT igdb_meta FROM roms WHERE id=? AND session_id=?",
+                            (rom_id, session_id)).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+    try:
+        return json.loads(row[0]) if row[0] else {}
+    except (ValueError, TypeError):
+        return {}

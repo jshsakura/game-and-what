@@ -516,6 +516,22 @@ export async function deleteCover(romId) {
   return res.json();
 }
 
+// Cached IGDB detail for a rom (release date / genres / dev / rating / summary /
+// screenshots / videos). GET reads the cache ({} if none); POST fetches it fresh.
+export async function getIgdbMeta(romId) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/roms/${romId}/igdb-meta`));
+  if (!res.ok) throw new Error("Failed to load IGDB info");
+  return res.json();
+}
+
+export async function fetchIgdbMeta(romId) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/roms/${romId}/igdb-meta`, { method: "POST" }));
+  if (!res.ok) throw new Error((await res.json()).detail || "IGDB fetch failed");
+  return res.json();
+}
+
 export async function renameRom(romId, name) {
   const res = await withSession((sid) =>
     fetch(`/api/sessions/${sid}/roms/${romId}`, {
