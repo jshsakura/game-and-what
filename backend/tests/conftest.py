@@ -50,7 +50,13 @@ from typing import Callable
 
 import httpx
 import pytest
-import requests
+try:
+    # `requests` is not an app dependency (the app uses httpx) — it's only here
+    # so the no_network fixture can also gag it if a test pulls it in. Absent in
+    # a minimal CI env, so import defensively and skip blocking it when missing.
+    import requests
+except ModuleNotFoundError:
+    requests = None
 from fastapi.testclient import TestClient
 
 from app import config, db
@@ -71,7 +77,8 @@ def no_network(monkeypatch):
     # subclass), which never touches HTTPTransport/AsyncHTTPTransport.
     monkeypatch.setattr(httpx.HTTPTransport, "handle_request", _blocked)
     monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", _blocked)
-    monkeypatch.setattr(requests.adapters.HTTPAdapter, "send", _blocked)
+    if requests is not None:
+        monkeypatch.setattr(requests.adapters.HTTPAdapter, "send", _blocked)
     monkeypatch.setattr(urllib.request, "urlopen", _blocked)
 
 
