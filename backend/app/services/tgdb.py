@@ -16,7 +16,7 @@ _TIMEOUT = httpx.Timeout(15.0)
 # Systems without a reliable TGDB platform (tama, mini, homebrew, pico8) are
 # omitted → we search without a platform filter for those.
 _PLATFORM: dict[str, int] = {
-    "nes": 7, "gb": 4, "gbc": 41, "gba": 5, "snes": 6, "gg": 20, "sms": 35, "md": 18, "segacd": 21, "sg": 4949,
+    "nes": 7, "gb": 4, "gbc": 41, "gba": 5, "snes": 6, "gg": 20, "sms": 35, "md": 18, "segacd": 21, "32x": 33, "sg": 4949,
     "pce": 34, "col": 31, "msx": 4929, "a2600": 22, "a7800": 27,
     "amstrad": 4914, "wsv": 4959, "gw": 4950, "lynx": 4924, "vb": 4918,
 }

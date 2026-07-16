@@ -33,6 +33,7 @@ _LIBRETRO_REPO = {
     "sms": "Sega - Master System - Mark III",
     "md": "Sega - Mega Drive - Genesis",
     "segacd": "Sega - Mega-CD - Sega CD",
+    "32x": "Sega - 32X",
     "sg": "Sega - SG-1000",
     "pce": "NEC - PC Engine - TurboGrafx 16",
     "pcecd": "NEC - PC Engine CD - TurboGrafx-CD",
