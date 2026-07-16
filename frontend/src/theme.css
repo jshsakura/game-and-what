@@ -1038,7 +1038,7 @@ body::before {
   display: flex; flex-direction: column;
 }
 /* Detail/info popups get more room on desktop; 92vw still caps mobile. */
-.modal.wide { width: 640px; }
+.modal.wide { width: 700px; }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   font-family: var(--body-font); font-size: 13px; font-weight: 700; color: var(--gold);
@@ -2765,4 +2765,48 @@ body::before {
   color: var(--card-dim); opacity: 0.9;
   max-width: 34ch; text-align: center;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ROM detail popup — "정리": clear sections, calmer rhythm, mobile bottom-sheet.
+   ───────────────────────────────────────────────────────────────────────── */
+.modal-body { gap: 4px; }
+/* Each major block reads as its own section: a hairline rule + breathing room
+   above, so the long popup stops feeling like one undifferentiated wall. */
+.modal-body > .rom-info,
+.modal-body > .igdb-meta,
+.modal-body > .gba-detail,
+.modal-body > .cover-editor,
+.modal-body > .lang-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ffffff12; }
+.igdb-meta { border-top: none; padding-top: 0; }   /* handled by the rule above now */
+/* Section headers: quiet uppercase caption so labels group content without shouting. */
+.modal-body .field-label,
+.igdb-meta-head .field-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--card-dim); margin: 10px 0 5px;
+}
+.igdb-meta-head .field-label { margin: 0; }
+.modal-body > .field-label:first-child { margin-top: 2px; }
+/* IGDB rating line sits tight under the covers. */
+.igdb-line { margin: 6px 0 2px; }
+/* Screenshot grid: even, rounded, gentle zoom on hover. */
+.igdb-shots { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.igdb-shot img { transition: transform 0.18s ease; }
+.igdb-shot:hover img { transform: scale(1.05); }
+
+@media (max-width: 640px) {
+  /* Bottom-sheet on phones: full width, docked to the bottom, big scroll area. */
+  .modal-backdrop { padding: 0; align-items: flex-end; }
+  .modal, .modal.wide {
+    width: 100%; max-width: 100%;
+    max-height: 92dvh; border-radius: 16px 16px 0 0; border-width: 2px 0 0;
+  }
+  .modal-head { padding: 14px 16px; }
+  .modal-body { padding: 14px; }
+  /* Two screenshots per row reads better than many tiny ones on a narrow screen. */
+  .igdb-shots { grid-template-columns: repeat(2, 1fr); }
+  /* Comfortable touch targets. */
+  .rom-info-copy { padding: 7px 9px; }
+  .modal-actions .btn { padding: 13px 8px; }
+  .cover-compare img, .cover-compare .cmp-web { width: 40vw; }
 }
