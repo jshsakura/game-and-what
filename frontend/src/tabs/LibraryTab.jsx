@@ -387,8 +387,12 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
       {!loading && !(searching && searchAll) && (
         <div className="lib-chips">
           {groups.map((g) => {
-            // The count reflects what actually ships to the device. Excluded
-            // ROMs (manual opt-out or PICO-8 구동불가) are tallied in the footer.
+            // The big count is the WHOLE library for this system — how many games
+            // the user has — not just the SD-shipping subset. A fully
+            // download-excluded system (snes/segacd/32x: every rom sd_exclude=1)
+            // would otherwise read 0 despite holding thousands of browser-play
+            // titles. The SD-excluded tally lives in the footer; the cover/Korean
+            // warning badges still track only what ships (incl).
             const incl = g.roms.filter(shipsToSd);
             const miss = incl.filter((r) => r.cover_status !== "ok").length;
             const koMiss = incl.filter(needsKorean).length;
@@ -402,7 +406,7 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
               {/* One issue badge at most (avoid 3-up crowding): cover-missing has
                   priority; the 한글제목 badge only shows once covers are done. */}
               <span className="lib-chip-badges">
-                <span className="lib-chip-count">{incl.length}</span>
+                <span className="lib-chip-count">{g.roms.length}</span>
                 {always(g.key) && (
                   <span className="lib-chip-always"
                     title={t("Always on the card — the firmware's built-in apps need these files, whatever the conditions")}>!</span>
