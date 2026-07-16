@@ -30,6 +30,13 @@ jobs:
           pip install -r backend/requirements.txt -r backend/requirements-dev.txt
       - name: Run tests
         working-directory: backend
+        # The suite is written for the fork build (experimental systems + Korean
+        # features). Locally these come from the git-ignored project .env; CI has
+        # no .env, so set the same toggles here or the experimental-gated endpoints
+        # (e.g. CD-folder upload) 403 and their tests fail.
+        env:
+          GNW_EXPERIMENTAL_MODE: "true"
+          GNW_KOREAN_MODE: "true"
         run: python -m pytest -q
 
   # ── Build each platform on a NATIVE runner (amd64 on x86, arm64 on ARM) ─────
