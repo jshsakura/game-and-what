@@ -1232,7 +1232,9 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("info");   // detail popup: "info" | "settings"
   const igdbOn = !!useCoverSources().igdb;
-  const igdbMeta = useIgdbMeta(rom.id, igdbOn);   // one fetch → facts panel + shots footer
+  // Gate on `open` — this component renders for EVERY card in the grid, so
+  // fetching unconditionally would hit IGDB once per card. Only when its popup opens.
+  const igdbMeta = useIgdbMeta(rom.id, igdbOn && open);   // one fetch → facts panel + shots footer
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const romFileRef = useRef(null);
