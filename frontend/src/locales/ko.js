@@ -7,6 +7,8 @@ export default {
   "Settings": "설정",
   "No screenshots": "스크린샷 없음",
   "No IGDB info": "IGDB 정보 없음",
+  "Next": "다음",
+  "Previous": "이전",
   "Release date": "출시일",
   "Genre": "장르",
   "Developer": "개발사",

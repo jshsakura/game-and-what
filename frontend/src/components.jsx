@@ -4,6 +4,7 @@ import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
   AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge, Info, RefreshCw,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import { useDownload } from "./download.jsx";
@@ -562,6 +563,8 @@ function IgdbMetaSection({ rom, t }) {
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(igdbOn);
   const [lb, setLb] = useState(null);
+  const shotsRef = useRef(null);
+  const scrollShots = (dir) => shotsRef.current?.scrollBy({ left: dir * shotsRef.current.clientWidth * 0.85, behavior: "smooth" });
 
   useEffect(() => {
     if (!igdbOn) return;
@@ -629,12 +632,24 @@ function IgdbMetaSection({ rom, t }) {
           </tbody></table>
           {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
           {meta.screenshots?.length > 0 ? (
-            <div className="igdb-shots">
-              {meta.screenshots.map((s, i) => (
-                <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
-                  <img src={s} loading="lazy" alt="" />
+            <div className="igdb-shots-strip">
+              {meta.screenshots.length > 3 && (
+                <button type="button" className="igdb-arrow left" onClick={() => scrollShots(-1)} aria-label={t("Previous")}>
+                  <ChevronLeft size={18} strokeWidth={2.5} />
                 </button>
-              ))}
+              )}
+              <div className="igdb-shots" ref={shotsRef}>
+                {meta.screenshots.map((s, i) => (
+                  <button type="button" key={i} className="igdb-shot" onClick={() => setLb(i)} aria-label={`screenshot ${i + 1}`}>
+                    <img src={s} loading="lazy" alt="" />
+                  </button>
+                ))}
+              </div>
+              {meta.screenshots.length > 3 && (
+                <button type="button" className="igdb-arrow right" onClick={() => scrollShots(1)} aria-label={t("Next")}>
+                  <ChevronRight size={18} strokeWidth={2.5} />
+                </button>
+              )}
             </div>
           ) : (
             <div className="igdb-shots-empty">{t("No screenshots")}</div>
@@ -1606,7 +1621,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   className={`modal-tab ${tab === "settings" ? "on" : ""}`} onClick={() => setTab("settings")}>{t("Settings")}</button>
               </div>
 
-              {tab === "info" && (
+              {tab === "info" && (<>
                 <div className="info-cols">
                   <div className="info-cover-col">
                     <CoverCompare rom={rom} bust={coverV} onRecrop={rom.cover_status === "ok" ? reCrop : null} />
@@ -1687,8 +1702,6 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 )}
               </div>
 
-              <IgdbMetaSection rom={rom} t={t} />
-
               {/* GBA only. The two rings on the cover are the whole verdict, and nowhere
                   else does the card say what they mean or where they came from. Here it
                   does — including the part that matters most: the budget is an estimate,
@@ -1759,7 +1772,8 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
               )}
                   </div>
                 </div>
-              )}
+                <IgdbMetaSection rom={rom} t={t} />
+              </>)}
 
               {tab === "settings" && (<>
               <div className="lang-row">

@@ -2862,3 +2862,32 @@ body::before {
   .info-cover-col .cover-compare .cmp-web { width: 40vw; max-width: 100%; }
   .igdb-shots { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── Screenshot strip: one horizontal row (swipe on touch / arrows on desktop),
+   inside a glassmorphic footer band. Overrides the earlier grid layout. ── */
+.igdb-shots-strip {
+  position: relative; margin-top: 12px; padding: 12px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.igdb-shots {
+  display: flex; gap: 8px; overflow-x: auto; scroll-behavior: smooth;
+  grid-template-columns: none;            /* undo the grid */
+  scrollbar-width: none;
+}
+.igdb-shots::-webkit-scrollbar { display: none; }
+.igdb-shot { flex: 0 0 auto; width: 168px; }   /* uniform 16:9 cards in one row */
+.igdb-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer; color: var(--card-ink);
+  background: rgba(15, 15, 15, 0.55); border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.igdb-arrow:hover { background: rgba(15, 15, 15, 0.85); color: var(--gold); }
+.igdb-arrow.left { left: 4px; }
+.igdb-arrow.right { right: 4px; }
+/* Touch devices scroll by swiping — the arrows just take up space there. */
+@media (hover: none), (max-width: 640px) { .igdb-arrow { display: none; } }
