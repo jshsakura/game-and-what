@@ -420,6 +420,9 @@ def _fake_cache_zip(cache_dir, name, size, mtime):
 def test_prune_keeps_newest_within_count_cap(tmp_path, monkeypatch):
     monkeypatch.setattr(packaging, "_SD_CACHE_KEEP", 2)
     monkeypatch.setattr(packaging, "_SD_CACHE_MAX_BYTES", 10_000)
+    # Budget is normally clamped by real free disk (reserve). Pin it to the cap so
+    # the test is deterministic on any CI runner, tight disk or not.
+    monkeypatch.setattr(packaging, "_cache_budget", lambda _d: packaging._SD_CACHE_MAX_BYTES)
     cache_dir = tmp_path / "_cache"
     now = 1_000_000
     for i in range(5):
@@ -447,6 +450,7 @@ def test_prune_always_keeps_the_single_newest_even_if_oversized(tmp_path, monkey
 def test_prune_respects_byte_budget_over_count_cap(tmp_path, monkeypatch):
     monkeypatch.setattr(packaging, "_SD_CACHE_KEEP", 10)
     monkeypatch.setattr(packaging, "_SD_CACHE_MAX_BYTES", 250)
+    monkeypatch.setattr(packaging, "_cache_budget", lambda _d: packaging._SD_CACHE_MAX_BYTES)
     cache_dir = tmp_path / "_cache"
     _fake_cache_zip(cache_dir, "sd-a.zip", 100, 3_000_000)  # newest
     _fake_cache_zip(cache_dir, "sd-b.zip", 100, 2_000_000)  # 2nd: 200 <= 250 kept
