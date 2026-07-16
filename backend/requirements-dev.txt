@@ -1,0 +1,8 @@
+# Test-only dependencies — NOT baked into the runtime image (the Dockerfile
+# installs requirements.txt only). CI installs these on top for the test job,
+# so the async tests (@pytest.mark.asyncio) actually run and the no_network
+# fixture can gag the `requests` transport. Keeping them out of requirements.txt
+# keeps the shipped image lean.
+pytest
+pytest-asyncio
+requests
