@@ -3,6 +3,7 @@
 // Missing keys fall back to the English key (which is the source language).
 export default {
   "IGDB info": "IGDB 정보",
+  "IGDB rating": "평점",
   "Release date": "출시일",
   "Genre": "장르",
   "Developer": "개발사",

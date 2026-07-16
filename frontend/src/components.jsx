@@ -608,7 +608,7 @@ function IgdbMetaSection({ rom, t }) {
                 <td colSpan={2}><span className="rom-info-val">{meta.developers.join(", ")}</span></td></tr>
             )}
             {meta.rating != null && (
-              <tr className="rom-info-row"><th scope="row">{t("Rating")}</th>
+              <tr className="rom-info-row"><th scope="row">{t("IGDB rating")}</th>
                 <td colSpan={2}><span className="rom-info-val">{meta.rating}/100{meta.rating_count ? ` (${meta.rating_count})` : ""}</span></td></tr>
             )}
           </tbody></table>
