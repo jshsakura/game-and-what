@@ -2854,8 +2854,11 @@ body::before {
 @media (max-width: 640px) {
   .info-cols { grid-template-columns: 1fr; gap: 12px; }
   .info-cover-col { position: static; }
-  .info-cover-col .cover-compare { flex-direction: row; justify-content: center; }
+  /* Covers go back SIDE BY SIDE on mobile (not the desktop stacked column) —
+     reset the figure width or each one fills 100% and they stack top-to-bottom. */
+  .info-cover-col .cover-compare { flex-direction: row; justify-content: center; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .info-cover-col .cover-compare figure { width: auto; max-width: 45%; }
   .info-cover-col .cover-compare img,
-  .info-cover-col .cover-compare .cmp-web { width: 40vw; }
+  .info-cover-col .cover-compare .cmp-web { width: 40vw; max-width: 100%; }
   .igdb-shots { grid-template-columns: repeat(2, 1fr); }
 }
