@@ -155,13 +155,14 @@ async def upload_roms(
                 """INSERT INTO roms (id, session_id, system_key, original_name,
                        stored_name, korean_name, rom_path, cover_path, cover_status,
                        orig_lang, play_lang, is_korean_patched, lang_source, region, cover_flag,
-                       content_hash, pico8_compat, pico8_mem_hint, patch_ver, probe_status)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                       content_hash, crc32, pico8_compat, pico8_mem_hint, patch_ver, probe_status)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (rom_id, session_id, sys_obj.key, storage.nfc(meta.original_name), stored_name,
                  storage.nfc(meta.korean_name), storage.relative_to_session(session_id, rom_path),
                  cover_rel, cover_status,
                  li.orig_lang, li.play_lang, int(ko_patched), li.source, region, cover_flag,
-                 chash, pico8_compat.lookup(stored_name) if sys_obj.pico8 else None,
+                 chash, name_index.crc32_bytes(data, sys_obj.key),
+                 pico8_compat.lookup(stored_name) if sys_obj.pico8 else None,
                  pico8_memhint.estimate(rom_path) if sys_obj.pico8 else None,
                  patchver.parse(original), probe_status),
             )

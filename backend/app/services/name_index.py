@@ -4,12 +4,23 @@ the source archives are removed from DATA."""
 from __future__ import annotations
 
 import hashlib
+import zlib
 
 from . import storage
 
 
 def hash_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def crc32_bytes(data: bytes, system_key: str | None = None) -> str:
+    """No-Intro/RetroArch-style CRC32 (8 hex, upper). Korean-patch checksum lists
+    key on CRC32, so this is what lets a file be matched to a known patch without
+    booting it. SNES .smc dumps may carry a 512-byte copier header that No-Intro
+    strips before hashing; do the same so our CRCs line up with those lists."""
+    if system_key == "snes" and len(data) % 1024 == 512:
+        data = data[512:]
+    return f"{zlib.crc32(data) & 0xFFFFFFFF:08X}"
 
 
 def hash_file(path) -> str:

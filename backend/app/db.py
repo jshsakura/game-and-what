@@ -178,6 +178,13 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # which may already carry the Korean name). NULL until hashed/backfilled.
         conn.execute("ALTER TABLE roms ADD COLUMN content_hash TEXT")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_roms_hash ON roms(session_id, content_hash)")
+    if "crc32" not in cols:
+        # No-Intro/RetroArch-style CRC32 (SNES copier header stripped) — the id
+        # Korean-patch checksum lists key on, so a ROM can be matched to a known
+        # patch WITHOUT booting it (sha256 above is ours; CRC32 is the shared one).
+        # NULL until backfilled — see backfill_crc.py.
+        conn.execute("ALTER TABLE roms ADD COLUMN crc32 TEXT")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_roms_crc32 ON roms(crc32)")
     if "favorite" not in cols:
         # User-marked favorite (★) — purely a UI convenience for filtering/gathering
         # the roms you care about. No effect on packaging/download.
