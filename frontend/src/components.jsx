@@ -604,21 +604,30 @@ function loadYoutubeApi() {
 // A single trailer: embeds inline via the IFrame API by default, but the
 // owner can disable embedding per-video — that surfaces as onError 101/150
 // (age-gated/private is 100), at which point we swap to a plain watch-on-
-// YouTube link instead of the API's own blocked-iframe page.
+// YouTube link instead of the API's own blocked-iframe page. Some restricted
+// videos redirect to a consent/verification page *before* the player JS ever
+// runs, so no onError ever fires — the nocookie host avoids most of those
+// redirects, and an onReady timeout catches whatever's left.
 function IgdbVideo({ video, t }) {
   const elRef = useRef(null);
   const playerRef = useRef(null);
   const [blocked, setBlocked] = useState(false);
   useEffect(() => {
     let cancelled = false;
+    let readyTimer = null;
     loadYoutubeApi().then((YT) => {
       if (cancelled || !elRef.current) return;
+      readyTimer = setTimeout(() => setBlocked(true), 6000);
       playerRef.current = new YT.Player(elRef.current, {
         videoId: video.id,
-        events: { onError: (e) => { if ([100, 101, 150].includes(e.data)) setBlocked(true); } },
+        host: "https://www.youtube-nocookie.com",
+        events: {
+          onReady: () => clearTimeout(readyTimer),
+          onError: (e) => { if ([100, 101, 150].includes(e.data)) setBlocked(true); },
+        },
       });
     });
-    return () => { cancelled = true; playerRef.current?.destroy?.(); };
+    return () => { cancelled = true; clearTimeout(readyTimer); playerRef.current?.destroy?.(); };
   }, [video.id]);
 
   if (blocked) {
