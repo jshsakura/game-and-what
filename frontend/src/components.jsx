@@ -584,6 +584,54 @@ function useIgdbMeta(romId, igdbOn) {
   return { meta, loading, refresh };
 }
 
+// Loads the YouTube IFrame Player API once (shared across every embedded
+// trailer), so each player can report playback errors instead of silently
+// showing YouTube's own "refused to connect" page for embed-restricted videos.
+let ytApiPromise = null;
+function loadYoutubeApi() {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise((resolve) => {
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { prev?.(); resolve(window.YT); };
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  });
+  return ytApiPromise;
+}
+
+// A single trailer: embeds inline via the IFrame API by default, but the
+// owner can disable embedding per-video — that surfaces as onError 101/150
+// (age-gated/private is 100), at which point we swap to a plain watch-on-
+// YouTube link instead of the API's own blocked-iframe page.
+function IgdbVideo({ video, t }) {
+  const elRef = useRef(null);
+  const playerRef = useRef(null);
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    loadYoutubeApi().then((YT) => {
+      if (cancelled || !elRef.current) return;
+      playerRef.current = new YT.Player(elRef.current, {
+        videoId: video.id,
+        events: { onError: (e) => { if ([100, 101, 150].includes(e.data)) setBlocked(true); } },
+      });
+    });
+    return () => { cancelled = true; playerRef.current?.destroy?.(); };
+  }, [video.id]);
+
+  if (blocked) {
+    return (
+      <a className="igdb-video-blocked btn ghost" href={`https://www.youtube.com/watch?v=${video.id}`}
+         target="_blank" rel="noreferrer">
+        <Play size={12} strokeWidth={2.5} /> {video.name || t("Video")} · {t("Watch on YouTube")}
+      </a>
+    );
+  }
+  return <div className="igdb-video"><div ref={elRef} /></div>;
+}
+
 // IGDB facts (release/genre/dev/rating + summary + videos). Sits in the right
 // column next to the cover so that column fills to roughly poster height.
 function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
@@ -599,7 +647,12 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
           {t("Refresh")}
         </button>
       </div>
-      {!has && !loading && <div className="igdb-shots-empty">{t("No IGDB info")}</div>}
+      {!has && !loading && (
+        <div className="igdb-shots-empty">
+          <ImageOff size={18} strokeWidth={2} aria-hidden />
+          <span>{t("No IGDB info")}</span>
+        </div>
+      )}
       {has && (
         <>
           <table className="rom-info-table"><tbody>
@@ -623,17 +676,7 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
           {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
           {meta.videos?.length > 0 && (
             <div className="igdb-videos">
-              {meta.videos.map((v, i) => (
-                <div key={i} className="igdb-video">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${v.id}`}
-                    title={v.name || t("Video")}
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              ))}
+              {meta.videos.map((v, i) => <IgdbVideo key={i} video={v} t={t} />)}
             </div>
           )}
         </>
