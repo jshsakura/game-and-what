@@ -7,7 +7,6 @@ export default {
   "Settings": "설정",
   "No screenshots": "스크린샷 없음",
   "No IGDB info": "IGDB 정보 없음",
-  "Watch on YouTube": "유튜브에서 보기",
   "Next": "다음",
   "Previous": "이전",
   "Release date": "출시일",

@@ -584,63 +584,6 @@ function useIgdbMeta(romId, igdbOn) {
   return { meta, loading, refresh };
 }
 
-// Loads the YouTube IFrame Player API once (shared across every embedded
-// trailer), so each player can report playback errors instead of silently
-// showing YouTube's own "refused to connect" page for embed-restricted videos.
-let ytApiPromise = null;
-function loadYoutubeApi() {
-  if (window.YT?.Player) return Promise.resolve(window.YT);
-  if (ytApiPromise) return ytApiPromise;
-  ytApiPromise = new Promise((resolve) => {
-    const prev = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => { prev?.(); resolve(window.YT); };
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-  });
-  return ytApiPromise;
-}
-
-// A single trailer: embeds inline via the IFrame API by default, but the
-// owner can disable embedding per-video — that surfaces as onError 101/150
-// (age-gated/private is 100), at which point we swap to a plain watch-on-
-// YouTube link instead of the API's own blocked-iframe page. Some restricted
-// videos redirect to a consent/verification page *before* the player JS ever
-// runs, so no onError ever fires — the nocookie host avoids most of those
-// redirects, and an onReady timeout catches whatever's left.
-function IgdbVideo({ video, t }) {
-  const elRef = useRef(null);
-  const playerRef = useRef(null);
-  const [blocked, setBlocked] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    let readyTimer = null;
-    loadYoutubeApi().then((YT) => {
-      if (cancelled || !elRef.current) return;
-      readyTimer = setTimeout(() => setBlocked(true), 6000);
-      playerRef.current = new YT.Player(elRef.current, {
-        videoId: video.id,
-        host: "https://www.youtube-nocookie.com",
-        events: {
-          onReady: () => clearTimeout(readyTimer),
-          onError: (e) => { if ([100, 101, 150].includes(e.data)) setBlocked(true); },
-        },
-      });
-    });
-    return () => { cancelled = true; clearTimeout(readyTimer); playerRef.current?.destroy?.(); };
-  }, [video.id]);
-
-  if (blocked) {
-    return (
-      <a className="igdb-video-blocked btn ghost" href={`https://www.youtube.com/watch?v=${video.id}`}
-         target="_blank" rel="noreferrer">
-        <Play size={12} strokeWidth={2.5} /> {video.name || t("Video")} · {t("Watch on YouTube")}
-      </a>
-    );
-  }
-  return <div className="igdb-video"><div ref={elRef} /></div>;
-}
-
 // IGDB facts (release/genre/dev/rating + summary + videos). Sits in the right
 // column next to the cover so that column fills to roughly poster height.
 function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
@@ -685,7 +628,10 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
           {meta.summary && <p className="igdb-summary">{meta.summary}</p>}
           {meta.videos?.length > 0 && (
             <div className="igdb-videos">
-              {meta.videos.map((v, i) => <IgdbVideo key={i} video={v} t={t} />)}
+              {meta.videos.map((v, i) => (
+                <a key={i} className="btn ghost" href={`https://www.youtube.com/watch?v=${v.id}`}
+                   target="_blank" rel="noreferrer"><Play size={12} strokeWidth={2.5} /> {v.name || t("Video")}</a>
+              ))}
             </div>
           )}
         </>
