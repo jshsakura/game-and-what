@@ -90,7 +90,7 @@ function usePageSize() {
 // passes/keepKeys/filtered come from the SD-ZIP conditions (상세 조건): a platform the
 // conditions empty out is not selectable and says so, instead of taking a check that
 // silently produces an empty folder. `passes(rom)` mirrors the server's SdFilter.
-export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel,
+export default function LibraryTab({ onChanged, selected, onToggleSel,
                                      passes, keepKeys, filtered = false, alwaysKeys }) {
   const toast = useToast();
   const { t, lang } = useI18n();
@@ -145,7 +145,11 @@ export default function LibraryTab({ reloadKey, onChanged, selected, onToggleSel
     getLibrary().then(setLib).catch(() => {});
   }, []);
 
-  useEffect(() => { reload(); }, [reload, reloadKey]);
+  // Mount-only: `reloadKey` bumps from this tab's own edits (rename, cover
+  // change, upload) are already handled by refresh()'s reloadSilent() below —
+  // re-running the noisy reload() here would flash the grid back to skeletons
+  // right after the silent update just rendered the change.
+  useEffect(() => { reload(); }, [reload]);
   useEffect(() => {
     getSystems().then((s) => {
       setSystems(s);

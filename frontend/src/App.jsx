@@ -425,7 +425,7 @@ export default function App() {
           {tab === "rom" && <RomTab onChanged={bumpLibrary} />}
           {tab === "extra" && <ExtraTab onChanged={bumpLibrary} />}
           {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
-          {tab === "library" && <LibraryTab reloadKey={reloadKey} onChanged={bumpLibrary} selected={selected}
+          {tab === "library" && <LibraryTab onChanged={bumpLibrary} selected={selected}
             onToggleSel={toggleSel} passes={passes} keepKeys={keepKeys}
             filtered={filterCount > 0} alwaysKeys={ALWAYS_SHIPPED} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
