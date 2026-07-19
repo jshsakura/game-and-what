@@ -32,6 +32,10 @@ I18N_HANDOFF.md
 # Local session handoff notes — not for the repo
 HANDOFF.md
 
+# Local agent memory — never committed
+MEMORY.md
+.opencode/
+
 # ROM-translation tooling (kept out of the public repo; lives in the private tools repo)
 backend/tools/
 
