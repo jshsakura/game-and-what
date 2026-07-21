@@ -19,7 +19,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response, StreamingResponse
 
 from .. import db
-from ..services import storage, video
+from ..services import cps1, storage, video
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["downloads"])
@@ -114,10 +114,21 @@ def serve_rom(session_id: str, rom_id: str) -> Response:
     if not abs_path.exists():
         raise HTTPException(status_code=404, detail="ROM file missing from disk")
 
+    payload = abs_path.read_bytes()
+    if rom["system_key"] == "cps1":
+        # A CPS-1 game folder can hold more than one archive, because a MAME
+        # clone set leaves out the chips it shares with its parent. The browser
+        # core is handed a single file, so hand it one that is complete —
+        # otherwise a clone boots to nothing and there is no way to say why.
+        # Folders with a single archive are served untouched.
+        merged = cps1.merged_archive_bytes(abs_path.parent)
+        if merged is not None:
+            payload = merged
+
     name = Path(rom["stored_name"]).name
     ascii_name = name.encode("ascii", "ignore").decode() or "game.bin"
     return Response(
-        content=abs_path.read_bytes(),
+        content=payload,
         media_type="application/octet-stream",
         headers={
             "Content-Disposition":

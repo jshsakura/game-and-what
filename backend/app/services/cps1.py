@@ -298,6 +298,48 @@ def plan_games(archives) -> list[PlannedGame]:
     return children if children else planned
 
 
+def merged_archive_bytes(game_dir: Path) -> bytes | None:
+    """One zip holding every member of every archive in a game folder.
+
+    For the BROWSER, not the card. An arcade core (fbalpha2012_cps1) reads a
+    MAME romset zip's entries itself and is handed exactly one file, so a clone
+    set served as its own archive is missing the chips it shares with its
+    parent and will not boot — the same incompleteness the device reports, just
+    with no way to report it.
+
+    Deliberately merges EVERYTHING, not the ten chips sd_chip_entries() picks:
+    the device skips the Z80 program, the QSound samples and the PROMs because
+    it does not emulate that hardware yet, while the browser core does emulate
+    it and wants the lot.
+
+    Returns None when the folder holds a single archive — then the original
+    file is already the right answer and is served untouched, which keeps the
+    common case byte-identical to what it was before this existed.
+    """
+    archives = archives_in(game_dir)
+    if len(archives) < 2:
+        return None
+
+    import io
+    buf = io.BytesIO()
+    seen: set[str] = set()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as out:
+        for _name, path in archives:
+            with _open_zip(path) as zf:
+                for info in zf.infolist():
+                    if info.is_dir():
+                        continue
+                    member = Path(info.filename).name
+                    # First archive wins. A name in two archives is the same
+                    # chip (that is why the clone omits it), so this is a
+                    # duplicate rather than a conflict.
+                    if member in seen:
+                        continue
+                    seen.add(member)
+                    out.writestr(member, zf.read(info))
+    return buf.getvalue()
+
+
 def compose_folder(dest: Path, archives) -> list[str]:
     """Write a COMPLETE romset into `dest` as loose chip dumps.
 

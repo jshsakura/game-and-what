@@ -447,3 +447,42 @@ def test_endpoint_rejects_a_non_zip(client, session_id):
     body = r.json()
     assert body["stored"] == 0
     assert body["results"][0]["error"] == "not a .zip"
+
+
+# --- browser play: the core gets ONE file, so make it a complete one ---------
+
+def test_serve_rom_merges_a_clone_with_its_donor(client, session_id, clone_zip, parent_zip):
+    """fbalpha2012_cps1 reads the zip itself and is handed a single file.
+
+    A clone archive on its own is missing the chips it shares with its parent,
+    so it would boot to nothing with nowhere to report why.
+    """
+    r = _post(client, session_id, [("wofj.zip", clone_zip), ("wof.zip", parent_zip)])
+    rom_id = r.json()["results"][0]["id"]
+
+    served = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/rom")
+    assert served.status_code == 200
+
+    import io
+    with zipfile.ZipFile(io.BytesIO(served.content)) as zf:
+        names = set(zf.namelist())
+    # Every member of BOTH archives, including the ones the device skips
+    # (the PAL dump) — the browser core emulates more than the firmware does.
+    with zipfile.ZipFile(io.BytesIO(clone_zip)) as a, zipfile.ZipFile(io.BytesIO(parent_zip)) as b:
+        assert set(a.namelist()) | set(b.namelist()) == names
+    # And the served bytes are a real zip the size of both, not just the clone.
+    assert len(served.content) > len(clone_zip)
+
+
+def test_serve_rom_leaves_a_single_archive_untouched(client, session_id, data_dir,
+                                                     sibling_zip, parent_zip):
+    """The common case must stay byte-identical to what it was before."""
+    r = _post(client, session_id, [("wofr1.zip", sibling_zip), ("wof.zip", parent_zip)])
+    rom_id = r.json()["results"][0]["id"]
+    base = data_dir / "library" / session_id / "roms" / "cps1"
+    game = next(p for p in base.iterdir() if p.is_dir())
+    # Drop the donor so only one archive remains.
+    (game / "wof.zip").unlink()
+
+    served = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/rom")
+    assert served.content == (game / "wofr1.zip").read_bytes()
