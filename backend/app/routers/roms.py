@@ -13,7 +13,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import covers, covers_pico8, events, gamelist, gba_probe, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
+from ..services import covers, covers_pico8, cps1 as cps1_svc, events, gamelist, gba_probe, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, storage
 from .sessions import require_session, require_system_enabled
 
 log = logging.getLogger(__name__)
@@ -439,6 +439,140 @@ async def upload_cd_folder(
         "system_name": sys_obj.name, "stored_name": stored_name,
         "tracks": len(extra), "cover_status": "none",
     }]}
+
+
+@router.post("/sessions/{session_id}/roms/cps1")
+async def upload_cps1_romsets(
+    session_id: str,
+    files: list[UploadFile] = File(...),
+) -> dict:
+    """Drop CPS-1 MAME romset ZIPs in — any number, in any combination.
+
+    There is no parent/child slot to fill. Every archive is hashed, the chips are
+    matched against the romset table by CRC32, and what comes out is one game per
+    RELEASE, with this rule deciding which archives are games and which were only
+    chip donors:
+
+        a set that could not complete on its own borrowed chips, so it is the
+        release being added; whatever it borrowed from was a donor.
+
+    Upload a clone and its base release and you get the clone, once. Upload a base
+    release alone and you get the base release. Two clones sharing one donor give
+    two games, and EACH folder carries its own copy of the donor's chips, because
+    a game folder the device can only read if a different folder still exists is a
+    game that breaks the day that folder is deleted.
+
+    The card gets loose chip dumps, never the zip: the firmware caches each chip
+    into external flash and reads it in place, which needs raw chip bytes. The
+    archives stay in the folder as the master copy (services/cps1.py explains why
+    that is the right way round for a browser arcade core).
+    """
+    sys_obj = get_system("cps1")
+    require_system_enabled(sys_obj)
+    with db.connect() as conn:
+        require_session(conn, session_id)
+    if not files:
+        raise HTTPException(status_code=400, detail="No files")
+
+    roms_root = storage.roms_dir(session_id, sys_obj.dirname)
+    stage = roms_root / f".incoming-{storage.new_id()}"
+    stage.mkdir(parents=True, exist_ok=True)
+
+    results: list[dict] = []
+    try:
+        # 1) Land every archive in a staging dir. Nothing is judged until they
+        #    are all here -- a clone is only recognisable next to its donor.
+        staged: list[tuple[str, Path]] = []
+        for upload in files:
+            name = storage.nfc(upload.filename) or "romset.zip"
+            name = Path(name).name
+            if not name.lower().endswith(".zip") or name in ("", ".", ".."):
+                results.append({"name": name, "ok": False, "error": "not a .zip"})
+                continue
+            target = stage / name
+            size = 0
+            with target.open("wb") as out:
+                while True:
+                    chunk = await upload.read(1 << 20)
+                    if not chunk:
+                        break
+                    size += len(chunk)
+                    if size > config.MAX_CD_FILE_BYTES:
+                        raise HTTPException(status_code=413, detail=f"파일이 너무 큽니다: {name}")
+                    out.write(chunk)
+            staged.append((name, target))
+
+        if not staged:
+            shutil.rmtree(stage, ignore_errors=True)
+            return {"session_id": session_id, "stored": 0, "results": results}
+
+        try:
+            games = cps1_svc.plan_games(staged)
+        except Exception as exc:                       # a corrupt zip, say
+            logging.warning("cps1: could not read an archive: %s", exc)
+            games = []
+
+        if not games:
+            # Say WHICH set it nearly is and what is missing -- "unrecognised"
+            # and "you are four chips short of wofj" look identical otherwise.
+            ident = cps1_svc.identify(staged)
+            shutil.rmtree(stage, ignore_errors=True)
+            results.append({"name": ", ".join(n for n, _ in staged), "ok": False,
+                            "error": "incomplete", "detail": ident.message()})
+            return {"session_id": session_id, "stored": 0, "results": results}
+
+        # 2) One folder per game, each self-contained.
+        for game in games:
+            title = game.title or game.setname
+            folder = storage.safe_name(title)
+            final_dir = roms_root / folder
+            n = 2
+            while final_dir.exists():
+                final_dir = roms_root / f"{folder} ({n})"
+                n += 1
+            final_dir.mkdir(parents=True)
+            for archive_name in game.archives:
+                src = dict(staged)[archive_name]
+                shutil.copy2(src, final_dir / archive_name)
+
+            primary = game.archives[0]
+            chash = hashlib.sha256((final_dir / primary).read_bytes()).hexdigest()
+            rom_rel = f"{config.ROMS_DIR_NAME}/{sys_obj.dirname}/{final_dir.name}/{primary}"
+            li = langtag.detect(title)
+            rom_id = storage.new_id()
+            with db.connect() as conn:
+                dup = conn.execute(
+                    "SELECT stored_name FROM roms WHERE session_id = ? AND content_hash = ? "
+                    "AND system_key = ? LIMIT 1", (session_id, chash, sys_obj.key)).fetchone()
+                if dup:
+                    shutil.rmtree(final_dir, ignore_errors=True)
+                    results.append({"name": title, "ok": False, "error": "duplicate",
+                                    "duplicate_of": dup["stored_name"]})
+                    continue
+                conn.execute(
+                    """INSERT INTO roms (id, session_id, system_key, original_name,
+                           stored_name, korean_name, rom_path, cover_path, cover_status,
+                           orig_lang, play_lang, is_korean_patched, lang_source, region,
+                           cover_flag, content_hash, extra_files)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    (rom_id, session_id, sys_obj.key, game.setname, primary, None,
+                     rom_rel, None, "none", li.orig_lang, li.play_lang, 0, li.source,
+                     romtag.region_of(title), None, chash,
+                     json.dumps(list(game.archives[1:]))),
+                )
+                events.log(conn, session_id, "rom_upload", rom_id=rom_id,
+                           rom_name=primary, system_key=sys_obj.key)
+            results.append({
+                "id": rom_id, "name": title, "ok": True, "system_key": sys_obj.key,
+                "system_name": sys_obj.name, "stored_name": primary,
+                "romset": game.setname, "cover_status": "none",
+                "donors": list(game.borrowed_from),
+            })
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+    return {"session_id": session_id,
+            "stored": sum(1 for r in results if r.get("ok")), "results": results}
 
 
 @router.post("/sessions/{session_id}/roms/{rom_id}/cdtracks")

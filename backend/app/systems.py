@@ -134,6 +134,20 @@ SYSTEMS: tuple[System, ...] = (
     # Tiger Game.com — cartridge handheld (Sharp SM8500). dirname "gamecom"
     # matches the firmware /roms/gamecom folder; carts are ".bin"/".tgc".
     System("gamecom", "Tiger Game.com", "gamecom", ("bin", "tgc"), experimental=True),
+    # Capcom Play System 1 (arcade). A "rom" here is a MAME romset ZIP, which is
+    # what the library stores and what a browser arcade core would want — but the
+    # CARD gets it EXTRACTED, as /roms/cps1/<game>/ full of raw chip dumps. The
+    # firmware caches each chip into external flash and reads it in place (XIP),
+    # which needs raw chip bytes: it has no inflate in the emulator path and
+    # nowhere to put 4 MB of decompressed graphics against 724 KB of RAM. So the
+    # zip is the master and services/cps1.py composes the folder at packaging
+    # time; the two are not convertible in the other direction.
+    # Chips are identified by CRC32, NEVER filename — see services/cps1.py and
+    # docs/CPS1_LIBRARY_CONTRACT.md. Many sets are MAME "split sets" whose clone
+    # archive omits the chips it shares with its parent, so an upload may need
+    # two zips before it is playable.
+    # No browser play: there is no arcade core in frontend/public/cores.
+    System("cps1", "CPS-1", "cps1", ("zip",), experimental=True),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
     # Device-only: the firmware plays LCD-Game-Shrinker ".gw" files. The MADrigal

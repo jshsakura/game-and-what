@@ -207,6 +207,23 @@ export async function uploadRoms(systemKey, files, onProgress) {
 // every request stays small. Progress aggregates bytes across all requests.
 const EXT = (n) => (n.includes(".") ? n.split(".").pop().toLowerCase() : "");
 
+/* CPS-1: drop any number of MAME romset ZIPs at once and let the server work out
+ * which are games and which were only chip donors (a set that had to borrow is
+ * the release being added). One request, because a clone is only recognisable
+ * standing next to the archive that completes it — uploading them one at a time
+ * would reject the first one before the second arrived. */
+export async function uploadCps1(files, onProgress) {
+  const sid = getSessionId();
+  if (!sid) throw new Error("No session");
+  const arr = Array.from(files).filter((f) => /\.zip$/i.test(f.name));
+  if (!arr.length) throw new Error("No .zip romset found");
+
+  const form = new FormData();
+  for (const f of arr) form.append("files", f);
+  const total = arr.reduce((s, f) => s + (f.size || 0), 0);
+  return xhrUpload(`/api/sessions/${sid}/roms/cps1`, form, (loaded) => onProgress?.(loaded, total));
+}
+
 export async function uploadCdFolder(systemKey, files, onProgress) {
   const sid = getSessionId();
   if (!sid) throw new Error("No session");
@@ -246,7 +263,15 @@ export async function uploadCdFolder(systemKey, files, onProgress) {
 }
 
 // Systems managed as a folder-per-game (disc images: .cue + tracks, or .chd).
-export const FOLDER_SYSTEMS = new Set(["pcecd"]);
+/* Folder-per-game systems: the entry on the card is a DIRECTORY, so the upload
+ * has to carry every file in it.
+ *
+ * segacd was missing and has the same shape as pcecd exactly — same accepted
+ * extensions (chd/cue), same "a .cue is an index and its tracks live beside it"
+ * rule, and /roms/cdfolder is generic rather than pcecd-specific. Without it a
+ * Sega CD .cue uploaded alone produced an entry whose tracks were simply not
+ * there. */
+export const FOLDER_SYSTEMS = new Set(["pcecd", "segacd"]);
 
 // Goodtools/No-Intro alt-or-bad dump tags ([a1]/[b1]/[h1]/[o1]/[t1]/[f1]/[p1]).
 const ALT_DUMP_RE = /\[(?:a|b|h|o|t|f|p)\d*\]/i;
