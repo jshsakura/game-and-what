@@ -70,12 +70,21 @@ def download_rom(session_id: str, rom_id: str) -> Response:
         skip_primary = is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"]
         if rom_abs.exists() and not skip_primary:
             zf.write(rom_abs, arcname=rom_rel); added += 1
-        # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
-        for ef in json.loads(rom["extra_files"] or "[]"):
-            ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
-            ef_abs = session_root / ef_rel
-            if ef_abs.exists():
-                zf.write(ef_abs, arcname=ef_rel); added += 1
+        if rom["system_key"] == "cps1":
+            # A CPS-1 game folder holds one archive per romset (the clone plus,
+            # for a MAME split set, its parent) — not the dict-shaped sidecars
+            # extra_files means for every other system. List the folder instead
+            # of trusting extra_files' shape.
+            for name, path in cps1.archives_in(rom_abs.parent):
+                if path != rom_abs and path.exists():
+                    zf.write(path, arcname=f"{Path(rom_rel).parent}/{name}"); added += 1
+        else:
+            # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
+            for ef in json.loads(rom["extra_files"] or "[]"):
+                ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
+                ef_abs = session_root / ef_rel
+                if ef_abs.exists():
+                    zf.write(ef_abs, arcname=ef_rel); added += 1
         # Cover ships alongside (separate name from the data file).
         if cover_rel:
             cover_abs = session_root / cover_rel
