@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive, Rocket, Cpu, Copy, Check, Blocks } from "lucide-react";
+import { Gamepad2, Keyboard, Power, Info, ListOrdered, HardDrive, Rocket, Cpu, Copy, Check, Blocks, Joystick, AlertTriangle } from "lucide-react";
 import { useT } from "../i18n.jsx";
 import { SystemIcon } from "../components.jsx";
 import { useExperimentalMode, useKoreanMode } from "../config.jsx";
@@ -198,6 +198,39 @@ export default function HelpTab() {
               <div className="bios-note">{t(b.note)}</div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* CPS-1 아케이드 — 이제 ROM 탭에서 고를 수 있는 정식 플랫폼이다(EXTRA 패스스루
+          과도기는 끝났다). 롬셋이 여러 칩 파일로 쪼개져 있고 클론셋이 부모 없이는
+          못 돌아간다는 두 함정이 이 시스템에만 있어서 별도 섹션으로 남긴다. */}
+      <div className="help-section">
+        <div className="help-head"><Joystick size={14} strokeWidth={2.5} aria-hidden /> {t("Arcade (CPS-1) ROMs")}</div>
+        <div className="muted bios-intro">
+          {t("One CPS-1 game is a MAME romset, not a single ROM file — many separate chip-dump files that belong together. Pick CPS-1 in the ROM tab and drop the .zip in exactly as you downloaded it; nothing needs extracting or renaming. The card gets the chips loose in one folder per game, which the app produces for you: the firmware reads each chip straight out of external flash and cannot open an archive.")}
+        </div>
+
+        <div className="upload-note warn">
+          <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />
+          <div>
+            <b>{t("Drop every zip the game needs in ONE go — a clone set cannot complete on its own")}</b>
+            {t("Some CPS-1 romsets are MAME \"clones\" that only include the files unique to that release; the rest come from a parent set. Example: the Japan release (wofj) ships only 6 of its 10 chips — the lower 4 graphics chips are left out because they are byte-for-byte identical to ones in the World set (wof). Select both zips and upload them together and you get ONE game: the app works out which archive is the release and which was only supplying chips, and keeps both in that game's folder. Upload the clone alone and nothing is stored — it tells you which parent set is missing instead.")}
+          </div>
+        </div>
+
+        <div className="muted bios-intro">
+          {t("Don't rename chip files. But if a different dump of the same game happens to use different filenames than you expect, that's fine too — the firmware identifies each chip by its CRC32 (content), never by filename.")}
+        </div>
+        <div className="muted bios-intro">
+          {t("The game folder is named for you and its name is cosmetic — the firmware identifies chips by content, never by the folder or the file they sit in, so renaming a folder later breaks nothing.")}
+        </div>
+
+        <div className="bios-note">
+          {t("Concrete example of why filenames can't be trusted:")}{" "}
+          <code>wof.zip</code> {t("is actually the MAME romset")} <code>wofr1</code>
+          {t(", despite its filename saying")} <code>wof</code>.{" "}
+          {t("And within it,")} <code>tk2_gfx2.rom</code> {t("belongs in graphics slot 3, while")}{" "}
+          <code>tk2_gfx3.rom</code> {t("belongs in slot 2")} — {t("mapping by the numbers in the filenames silently produces broken graphics, not a load failure.")}
         </div>
       </div>
 
