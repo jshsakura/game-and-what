@@ -50,6 +50,12 @@ _LIBRETRO_REPO = {
     "wsv": "Watara - Supervision",
     "mini": "Nintendo - Pokemon Mini",
     "gamecom": "Tiger - Game.com",
+    # FBNeo's thumbnail repo indexes by the full MAME game description (e.g.
+    # "Street Fighter II' - Hyper Fighting (World 921209)"), NOT the romset's
+    # short filename ("sf2hf.zip") — so this only auto-matches when the uploaded
+    # zip is renamed to that description. No match just means cover_status stays
+    # "none", same as any other miss in this best-effort chain.
+    "cps1": "FBNeo - Arcade Games",
     # gw / tama / videopac / pico8: no standard libretro thumbnail repo
 }
 

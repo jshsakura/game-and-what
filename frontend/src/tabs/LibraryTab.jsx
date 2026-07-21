@@ -59,8 +59,9 @@ const HANGUL_RE = /[가-힣]/;
 // Atari Lynx is a US/EU handheld with no Korean releases either; PC Engine CD,
 // Sega CD and the Sega 32X are JP/US formats with no official Korean releases
 // (Samsung localized cartridge Genesis games, never the CD or 32X add-ons);
-// Virtual Boy was a JP/US-only commercial flop, never sold in Korea.
-const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "segacd", "32x", "vb"]);
+// Virtual Boy was a JP/US-only commercial flop, never sold in Korea. CPS1 arcade
+// boards were never officially localized/distributed in Korea either.
+const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "segacd", "32x", "vb", "cps1"]);
 // "Needs a Korean title" = no Hangul AND has a real translatable word: a run of
 // 2+ consecutive letters containing a lowercase one. This excludes titles that
 // are only digits/symbols ("1942"), all-caps acronyms ("NBA", "WWF"), and dotted

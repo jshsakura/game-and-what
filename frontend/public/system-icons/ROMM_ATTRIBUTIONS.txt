@@ -37,6 +37,11 @@ virtualboy.svg) — the libretro monochrome VB glyph is a generic gamepad, not t
 console, so the RomM console art is used instead (matches the colored PNG icons).
   Source:  https://github.com/rommapp/romm
 
+cps1.svg (Capcom Play System 1) is the full-color arcade-cabinet art from the
+same RomM "systematic" platform icon set (frontend/assets/platforms/systematic/
+cps1.svg) — libretro's assets project has no CPS1-specific glyph.
+  Source:  https://github.com/rommapp/romm
+
 chip8.svg (CHIP-8) is an original icon made for this project (no attribution
 required).
 

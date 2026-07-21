@@ -151,6 +151,20 @@ SYSTEMS: tuple[System, ...] = (
     # them. Zelda3's zelda3.ro rides along the same way.
     System("homebrew", "Homebrew", "homebrew", ("bin", "dat", "xip", "smc"), square=True),
     System("pico8", "PICO-8", "pico8", ("p8", "png"), pico8=True, square=True),
+    # Capcom Play System 1 (arcade). NOT in rg_emulators.c and never realistically
+    # portable to it — this is a full arcade board (68000 + Z80 + custom GA/OBJ/
+    # PRI chips), nothing like the handheld cores above. Library-collection +
+    # browser play only. Unlike every other system here, the accepted "extension"
+    # IS a compressed container: a standard MAME/FBNeo romset is a .zip holding
+    # several separate chip dumps (program/graphics/sound/priority-PROM), and the
+    # emulator core reads that zip's entries directly by name — there is no single
+    # raw ROM file to point at, and no separate unzip step on our side (the
+    # firmware's `lzma` wrapper is unrelated: that's a compression wrapper ON TOP
+    # of a system's native rom, whereas here the .zip already IS the native rom).
+    # So exts=("zip",) is exact, not a placeholder. Browser play uses the
+    # CPS1-only fbalpha2012_cps1 core (see emulator.jsx); CPS1 needs no
+    # external BIOS, each romset is self-contained.
+    System("cps1", "CPS1", "cps1", ("zip",), experimental=True),
 )
 # NOTE: "videopac" is commented out (disabled) in rg_emulators.c, so it is NOT a
 # usable SD folder — intentionally excluded.

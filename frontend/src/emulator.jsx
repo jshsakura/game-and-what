@@ -110,6 +110,24 @@ const CORE_MAP = {
   // emscripten core set), so it was compiled from source (emsdk + RetroArch). fuse
   // bundles the 48K/128K system ROMs internally, so no external BIOS is needed.
   zxs: "fuse",
+  // Capcom Play System 1 (arcade) via fbalpha2012_cps1 — a CPS1-ONLY FB Alpha
+  // 2012 split core (not full FBNeo, which also works but is ~7x bigger at
+  // ~36MB since it statically links in hundreds of unrelated arcade drivers).
+  // No prebuilt Nostalgist-format build exists for this core (it's only
+  // distributed via EmulatorJS's npm packages, 7z-compressed and wrapped in
+  // EmulatorJS's own non-ESM loader shim) — the .js here was extracted from
+  // @emulatorjs/core-fbalpha2012_cps1 and had its export tail rewritten from
+  // EmulatorJS's `EJS_Runtime`/CommonJS wrapper to the
+  // `var libretro_<name> = (() => { var _scriptDir = import.meta.url; ...`
+  // ESM shape Nostalgist's patchCoreJs() expects (same shape every other core
+  // here already has) — verified by running Nostalgist's own patch+boot logic
+  // against it in Node: it reaches the same post-boot Module state (WASM
+  // instantiated, Emscripten runtime initialized) as the reference fbneo
+  // build. The rom IS the standard MAME-style .zip romset (matches
+  // core.json's own `"extensions":["zip"]`); the core reads its chip-dump
+  // entries internally, no separate unzip step here. No BIOS needed, every
+  // CPS1 romset is self-contained.
+  cps1: "fbalpha2012_cps1",
 };
 
 // Every core listed above is mirrored under /public/cores/<core>_libretro.{js,wasm}.
@@ -147,7 +165,7 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "videopac", "c64", "zxs"]);
+const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "videopac", "c64", "zxs", "cps1"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -174,6 +192,9 @@ const SCREEN_ASPECT = {
   snes: "4 / 3",
   // Sega 32X: 320×224, PAR-corrected to the standard 4:3 CRT shape (same as md).
   "32x": "4 / 3",
+  // CPS1: 384×224 native, but the arcade cabinet's CRT is 4:3 physical — same
+  // PAR-correction story as every console above with a non-4:3 pixel count.
+  cps1: "4 / 3",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -228,6 +249,12 @@ const KEY_HINTS = {
   snes:  [DPAD, ...AB, { k: "A", b: "Y" }, { k: "S", b: "X" }, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
   // Sega 32X uses the standard Genesis 3-button pad (A/B/C + Mode/Start), same as md.
   "32x": [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
+  // CPS1 arcade panels range from 2 buttons (Final Fight, 1941, Strider) to 6
+  // (the Street Fighter II family) and fbneo maps each game's real buttons onto
+  // RetroPad B/A/Y/X/L/R in order — so labeling them "Weak Punch"/"Strong Kick"
+  // etc. would be wrong for most games; generic numbering is honest here. Select
+  // is COIN (arcade credit), not a menu key.
+  cps1: [DPAD, { k: "Z", b: "Button 1" }, { k: "X", b: "Button 2" }, { k: "A", b: "Button 3" }, { k: "S", b: "Button 4" }, { k: "Q", b: "Button 5" }, { k: "W", b: "Button 6" }, { k: "Shift", b: "Coin" }, { k: "Enter", b: "Start" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],
