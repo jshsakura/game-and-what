@@ -134,20 +134,6 @@ SYSTEMS: tuple[System, ...] = (
     # Tiger Game.com — cartridge handheld (Sharp SM8500). dirname "gamecom"
     # matches the firmware /roms/gamecom folder; carts are ".bin"/".tgc".
     System("gamecom", "Tiger Game.com", "gamecom", ("bin", "tgc"), experimental=True),
-    # Capcom Play System 1 (arcade). A "rom" here is a MAME romset ZIP, which is
-    # what the library stores and what a browser arcade core would want — but the
-    # CARD gets it EXTRACTED, as /roms/cps1/<game>/ full of raw chip dumps. The
-    # firmware caches each chip into external flash and reads it in place (XIP),
-    # which needs raw chip bytes: it has no inflate in the emulator path and
-    # nowhere to put 4 MB of decompressed graphics against 724 KB of RAM. So the
-    # zip is the master and services/cps1.py composes the folder at packaging
-    # time; the two are not convertible in the other direction.
-    # Chips are identified by CRC32, NEVER filename — see services/cps1.py and
-    # docs/CPS1_LIBRARY_CONTRACT.md. Many sets are MAME "split sets" whose clone
-    # archive omits the chips it shares with its parent, so an upload may need
-    # two zips before it is playable.
-    # No browser play: there is no arcade core in frontend/public/cores.
-    System("cps1", "CPS-1", "cps1", ("zip",), experimental=True),
     System("tama", "Tamagotchi", "tama", ("b",)),
     System("mini", "Pokémon Mini", "mini", ("min",)),
     # Device-only: the firmware plays LCD-Game-Shrinker ".gw" files. The MADrigal
@@ -165,19 +151,29 @@ SYSTEMS: tuple[System, ...] = (
     # them. Zelda3's zelda3.ro rides along the same way.
     System("homebrew", "Homebrew", "homebrew", ("bin", "dat", "xip", "smc"), square=True),
     System("pico8", "PICO-8", "pico8", ("p8", "png"), pico8=True, square=True),
-    # Capcom Play System 1 (arcade). NOT in rg_emulators.c and never realistically
-    # portable to it — this is a full arcade board (68000 + Z80 + custom GA/OBJ/
-    # PRI chips), nothing like the handheld cores above. Library-collection +
-    # browser play only. Unlike every other system here, the accepted "extension"
-    # IS a compressed container: a standard MAME/FBNeo romset is a .zip holding
-    # several separate chip dumps (program/graphics/sound/priority-PROM), and the
-    # emulator core reads that zip's entries directly by name — there is no single
-    # raw ROM file to point at, and no separate unzip step on our side (the
-    # firmware's `lzma` wrapper is unrelated: that's a compression wrapper ON TOP
-    # of a system's native rom, whereas here the .zip already IS the native rom).
-    # So exts=("zip",) is exact, not a placeholder. Browser play uses the
-    # CPS1-only fbalpha2012_cps1 core (see emulator.jsx); CPS1 needs no
-    # external BIOS, each romset is self-contained.
+    # Capcom Play System 1 (arcade). Not in rg_emulators.c — a full arcade board
+    # (68000 + Z80 + custom GA/OBJ/PRI chips), nothing like the handheld cores
+    # above. It now has BOTH consumers, and they want opposite things, which is
+    # why the library stores one form and derives the other:
+    #
+    #   browser  fbalpha2012_cps1 (emulator.jsx) reads a MAME romset .zip's
+    #            entries itself, exactly as desktop RetroArch does. So the .zip
+    #            already IS the native rom — exts=("zip",) is exact, not a
+    #            placeholder, and the firmware's `lzma` wrapper is unrelated
+    #            (that wraps a system's native rom; here the zip is it).
+    #   device   the SD firmware DOES run this board now (Core/Src/porting/cps1).
+    #            It caches each chip into external flash and reads it in place,
+    #            which needs raw chip bytes — it has no inflate in the emulator
+    #            path and nowhere to put 4 MB of decompressed graphics against
+    #            724 KB of RAM. So the card gets /roms/cps1/<game>/<chip> and
+    #            never the zip.
+    #
+    # The zip is therefore the master and services/cps1.py composes the folder at
+    # packaging time; the two are not convertible in the other direction.
+    # Chips are identified by CRC32, NEVER filename — see services/cps1.py and
+    # docs/CPS1_LIBRARY_CONTRACT.md. Many sets are MAME "split sets" whose clone
+    # archive omits the chips it shares with its parent, so ONE game may hold
+    # more than one archive. No external BIOS either way.
     System("cps1", "CPS1", "cps1", ("zip",), experimental=True),
 )
 # NOTE: "videopac" is commented out (disabled) in rg_emulators.c, so it is NOT a
