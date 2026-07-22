@@ -16,12 +16,17 @@ import { X, Maximize2, Minimize2, Monitor, Copy, Check } from "lucide-react";
 import { romFileUrl, cdTrackUrl, extraDownloadUrl } from "./api.js";
 import { BIOS_CATALOG, BIOS_BY_KEY } from "./bios.js";
 
-// extra_files (CD track sidecars) may arrive as a JSON string or array; return
-// the list of track filenames (empty for non-CD roms).
+// extra_files may arrive as a JSON string or array, and its ELEMENT SHAPE
+// differs by who wrote it: CD systems (pcecd/segacd) store {name,size} dicts
+// for their track sidecars, while the cps1 upload endpoint stores bare
+// filename strings for a clone's donor archives (backend/app/routers/roms.py
+// upload_cps1_romsets: `json.dumps(list(game.archives[1:]))`). Handle both so
+// a bare string doesn't silently vanish (`"wof.zip"?.name` is undefined).
 function parseExtraFiles(extra) {
   try {
     const arr = typeof extra === "string" ? JSON.parse(extra) : extra;
-    return Array.isArray(arr) ? arr.map((e) => e?.name).filter(Boolean) : [];
+    if (!Array.isArray(arr)) return [];
+    return arr.map((e) => (typeof e === "string" ? e : e?.name)).filter(Boolean);
   } catch (_) {
     return [];
   }
@@ -166,6 +171,18 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
 const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "videopac", "c64", "zxs", "cps1"]);
+
+// Systems whose extra_files means "sibling files the core needs written next
+// to the primary one" — pcecd/segacd's .cue references its .bin tracks by
+// name, and a CPS-1 clone's zip is missing chips its parent donor zip
+// supplies. Both are handed to Nostalgist as one romArg array so every file
+// lands together in the emulator's virtual filesystem (setupFileSystem writes
+// each array entry to contentDirectory/<name>) — the core's own file lookup
+// (RetroArch's .cue parser, or FBA's own parent-zip search) then finds them
+// exactly like it would find real sibling files on disk. Gated to just these
+// systems because extra_files is a generic column also used for unrelated
+// sidecars (homebrew's smw_assets.dat) that must NOT be bundled into a launch.
+const MULTI_FILE_SYSTEMS = new Set(["pcecd", "segacd", "cps1"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -409,11 +426,13 @@ export function EmulatorOverlay({ rom, onClose }) {
             throw new Error(t("This game uses the Game Boy Color's tilt sensor (MBC7), which isn't supported in the browser. Play it on the device instead."));
           }
         }
-        // CD games (PC Engine CD) are a .cue + track files: hand the core the WHOLE
-        // set so it can mount the disc (the .cue references the tracks by name).
-        // Fetched ONE AT A TIME so we can show progress (a big CD takes a while) and
-        // keep peak memory down. Large multi-hundred-MB discs are still heavy.
-        const tracks = parseExtraFiles(rom.extra_files);
+        // Multi-file systems (see MULTI_FILE_SYSTEMS): CD games are a .cue + track
+        // files (the .cue references tracks by name), and a CPS-1 clone's zip needs
+        // its donor's zip sitting beside it (FBA's own parent-zip lookup finds it by
+        // name in the same directory — same as a real filesystem, see cps1.py).
+        // Hand the core the WHOLE set. Fetched ONE AT A TIME so we can show progress
+        // (a big CD takes a while) and keep peak memory down.
+        const tracks = MULTI_FILE_SYSTEMS.has(rom.system_key) ? parseExtraFiles(rom.extra_files) : [];
         let romArg = { fileName: rom.stored_name, fileContent };
         if (tracks.length) {
           romArg = [{ fileName: rom.stored_name, fileContent }];

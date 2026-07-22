@@ -451,27 +451,25 @@ def test_endpoint_rejects_a_non_zip(client, session_id):
 
 # --- browser play: the core gets ONE file, so make it a complete one ---------
 
-def test_serve_rom_merges_a_clone_with_its_donor(client, session_id, clone_zip, parent_zip):
-    """fbalpha2012_cps1 reads the zip itself and is handed a single file.
-
-    A clone archive on its own is missing the chips it shares with its parent,
-    so it would boot to nothing with nowhere to report why.
-    """
+def test_serve_rom_leaves_the_clone_untouched_and_donor_fetchable_separately(
+        client, session_id, clone_zip, parent_zip):
+    """fbalpha2012_cps1 does its own parent-zip lookup by opening a sibling
+    archive on disk (the same thing it does on a real filesystem) — a hand-
+    merged zip was never confirmed to boot and skipped that lookup entirely.
+    /rom serves the clone archive byte-identical to what was uploaded; the
+    browser fetches the donor separately via /cdfile and writes it alongside
+    the clone in the emulator's virtual filesystem (see emulator.jsx), so the
+    core finds it exactly the way it would find a real sibling file."""
     r = _post(client, session_id, [("wofj.zip", clone_zip), ("wof.zip", parent_zip)])
     rom_id = r.json()["results"][0]["id"]
 
     served = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/rom")
     assert served.status_code == 200
+    assert served.content == clone_zip
 
-    import io
-    with zipfile.ZipFile(io.BytesIO(served.content)) as zf:
-        names = set(zf.namelist())
-    # Every member of BOTH archives, including the ones the device skips
-    # (the PAL dump) — the browser core emulates more than the firmware does.
-    with zipfile.ZipFile(io.BytesIO(clone_zip)) as a, zipfile.ZipFile(io.BytesIO(parent_zip)) as b:
-        assert set(a.namelist()) | set(b.namelist()) == names
-    # And the served bytes are a real zip the size of both, not just the clone.
-    assert len(served.content) > len(clone_zip)
+    donor = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/cdfile?name=wof.zip")
+    assert donor.status_code == 200
+    assert donor.content == parent_zip
 
 
 def test_serve_rom_leaves_a_single_archive_untouched(client, session_id, data_dir,
