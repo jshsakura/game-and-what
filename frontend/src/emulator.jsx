@@ -438,6 +438,16 @@ export function EmulatorOverlay({ rom, onClose }) {
           rom: romArg,
           ...(bios.length ? { bios } : {}),
           ...(CORE_CONFIG[rom.system_key] ? { retroarchCoreConfig: CORE_CONFIG[rom.system_key] } : {}),
+          // fbalpha2012_cps1 was built for EmulatorJS's own loader, which always
+          // sets Module.parent (the canvas's container, used by its resize/
+          // fullscreen event targeting as the "!parent" specialHTMLTarget).
+          // Nostalgist doesn't know to supply it, so without this the core's
+          // findEventTarget() falls through to document.querySelector("!parent")
+          // and throws ("'!parent' is not a valid selector") the instant it tries
+          // to wire up canvas resize handling — before a single frame renders.
+          ...(rom.system_key === "cps1"
+            ? { emscriptenModule: { parent: canvasRef.current?.parentElement } }
+            : {}),
           element: canvasRef.current,
           respondToGlobalEvents: true,
         });
