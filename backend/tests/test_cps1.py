@@ -597,20 +597,29 @@ def test_serve_rom_leaves_the_clone_untouched_and_donor_fetchable_separately(
 
 # --- device download: exactly one .cps1 file --------------------------------
 
-def test_download_serves_a_single_cps1_container(client, session_id, clone_zip, parent_zip):
-    """The user/device download is ONE uncompressed <game>.cps1 file -- not a zip,
-    not loose chips, not the source archives."""
+def test_download_serves_a_cps1_zip_with_container_and_cover(client, session_id, clone_zip, parent_zip):
+    """The download is a <game>.zip in the SAME envelope as every other system --
+    roms/cps1/<game>.cps1 (the single container, not loose chips, not the source
+    archives) plus covers/cps1/<game>.img when a cover exists."""
     r = _post(client, session_id, [("wofj.zip", clone_zip), ("wof.zip", parent_zip)])
-    body = r.json()
-    rom_id = body["results"][0]["id"]
+    rom_id = r.json()["results"][0]["id"]
 
     dl = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/download")
     assert dl.status_code == 200, dl.text
-    assert dl.headers["content-type"] == "application/octet-stream"
-    assert dl.headers["content-disposition"].endswith(".cps1")
+    assert dl.headers["content-type"] == "application/zip"
+    assert dl.headers["content-disposition"].endswith(".zip")
 
-    data = dl.content
-    # A raw concat of the 10 distinct 512 KB chips: no zip header, no index.
+    zf = zipfile.ZipFile(io.BytesIO(dl.content))
+    names = zf.namelist()
+    # Exactly one .cps1, under roms/cps1/, named by the game folder -- no folder of
+    # chips, no wof.zip/wofj.zip.
+    cps1_names = [n for n in names if n.endswith(".cps1")]
+    assert len(cps1_names) == 1
+    assert cps1_names[0].startswith("roms/cps1/")
+    assert not any(n.endswith(".zip") for n in names)
+
+    data = zf.read(cps1_names[0])
+    # The container: a raw concat of the 10 distinct 512 KB chips, no header/index.
     assert data[:2] != b"PK"
     assert len(data) == 10 * CHIP
     block_crcs = {"%08x" % (zlib.crc32(data[i:i + CHIP]) & 0xFFFFFFFF)
