@@ -534,6 +534,12 @@ async def upload_cps1_romsets(
             for archive_name in game.archives:
                 src = dict(staged)[archive_name]
                 shutil.copy2(src, final_dir / archive_name)
+            # Pre-build the device's chip folder NOW, once. The card build and
+            # the device then read these loose <crc>.bin files straight; a
+            # download copies them and never re-composes the set from the zips.
+            # The zips stay for the browser core (it runs a MAME romset .zip) --
+            # two forms of the same game, deliberately.
+            cps1_svc.materialize_chips(final_dir)
 
             primary = game.archives[0]
             chash = hashlib.sha256((final_dir / primary).read_bytes()).hexdigest()

@@ -286,6 +286,39 @@ def all_chip_entries(game_dir: Path) -> list[ChipEntry]:
     return entries
 
 
+def materialize_chips(game_dir: Path) -> list[Path]:
+    """Write the folder's whole chip pool out as loose `<crc>.bin` files IN the
+    folder, once, at upload time -- so the card is BUILT from ready chips and a
+    download just copies them, instead of re-opening the archives and composing
+    the set on every build. The device reads exactly these files.
+
+    Idempotent: a chip already present at the right size is left alone, so
+    re-uploading or re-running costs nothing. Returns the chip paths, or [] when
+    the folder completes no set (nothing is written -- an incomplete folder
+    materialises nothing, same guard as everywhere else).
+    """
+    entries = all_chip_entries(game_dir)          # [] if incomplete
+    written: list[Path] = []
+    for e in entries:
+        dst = game_dir / e.name
+        if not (dst.exists() and dst.stat().st_size == e.size):
+            with _open_zip(e.archive) as zf:
+                dst.write_bytes(zf.read(e.member))
+        written.append(dst)
+    return written
+
+
+def prebuilt_chips(game_dir: Path) -> list[Path]:
+    """The loose `<crc>.bin` chips already sitting in the folder (materialised at
+    upload). Empty for an archive-only folder that predates materialisation, so
+    the packager can fall back to composing from the zips."""
+    if not game_dir.is_dir():
+        return []
+    return sorted(p for p in game_dir.iterdir()
+                  if p.is_file() and p.suffix.lower() == ".bin"
+                  and p.stat().st_size == CHIP_SIZE)
+
+
 @dataclass(frozen=True)
 class PlannedGame:
     """One romset that should become a library entry."""

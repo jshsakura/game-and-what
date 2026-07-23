@@ -444,7 +444,12 @@ def test_endpoint_makes_one_game_from_a_clone_and_its_donor(
     base = data_dir / "library" / session_id / "roms" / "cps1"
     dirs = [p for p in base.iterdir() if p.is_dir()]
     assert len(dirs) == 1
-    assert {p.name for p in dirs[0].iterdir()} == {"wofj.zip", "wof.zip"}
+    contents = {p.name for p in dirs[0].iterdir()}
+    # Two forms in the one folder, deliberately: the archives stay (the browser
+    # core runs a MAME romset .zip) AND the chips are pre-built as loose <crc>.bin
+    # (the device reads those straight, a download just copies them).
+    assert contents == ({"wofj.zip", "wof.zip"}
+                        | {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)})
 
 
 def test_endpoint_reports_a_clone_uploaded_alone_instead_of_storing_half(

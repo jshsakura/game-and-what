@@ -177,8 +177,15 @@ def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[st
         rel = f"{config.ROMS_DIR_NAME}/cps1/{game_dir.name}"
         if excluded_roms and rel in excluded_roms:
             continue
-        for chip in cps1.all_chip_entries(game_dir):
-            yield chip.archive, f"{rel}/{chip.name}", chip.member
+        prebuilt = cps1.prebuilt_chips(game_dir)
+        if prebuilt:
+            # The chips were materialised at upload: copy them straight in.
+            for chip in prebuilt:
+                yield chip, f"{rel}/{chip.name}", None
+        else:
+            # An older, archive-only folder: compose from the zips on the fly.
+            for chip in cps1.all_chip_entries(game_dir):
+                yield chip.archive, f"{rel}/{chip.name}", chip.member
 
 
 class BuildCancelled(Exception):
