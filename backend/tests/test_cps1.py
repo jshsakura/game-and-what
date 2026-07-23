@@ -267,12 +267,45 @@ def test_card_gets_chips_under_the_game_name_folder(tmp_path, clone_zip, parent_
     (game / "wof.zip").write_bytes(parent_zip)
 
     names = _sd_names(tmp_path)
-    assert len(names) == 10
     prefix = f"{config.ROMS_DIR_NAME}/cps1/천지를 먹다 2 (Warriors of Fate)/"
     assert all(n.startswith(prefix) for n in names)
-    assert prefix + "tk2_gfx3.rom" in names
+    # Every chip in the pool, named by CONTENT crc (never by its on-disk name,
+    # which can collide across two archives and does not survive a repack).
+    assert {n[len(prefix):] for n in names} == {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)}
+    # tk2_gfx3.rom is crc 45227027 in the parent archive -- it ships by that crc,
+    # not by a name a filename-ordered packer could have mixed up.
+    assert prefix + "45227027.bin" in names
     # No zip, no PAL dump.
     assert not any(n.endswith(".zip") or n.endswith("tk263b.1a") for n in names)
+
+
+def test_pool_ships_every_chip_named_by_crc_and_cannot_clobber(tmp_path, clone_zip, parent_zip):
+    """The whole chip pool is extracted, named by content crc — so no chip a set
+    might need is left behind, and no two archives can overwrite each other on
+    the card. This is the shape that used to fail: the packager identified one
+    set and shipped only its slice, and a chip a DIFFERENT runnable set needed
+    was dropped even though it was right there in the folder.
+    """
+    from app import config
+    from app.services import cps1
+    game = tmp_path / config.ROMS_DIR_NAME / "cps1" / "game"
+    game.mkdir(parents=True)
+    (game / "wofj.zip").write_bytes(clone_zip)
+    (game / "wof.zip").write_bytes(parent_zip)
+    # The parent's chips AGAIN under a second archive name: the identical bytes
+    # must collapse to one file, not two entries racing for the same slot.
+    (game / "wof_again.zip").write_bytes(parent_zip)
+
+    names = [e.name for e in cps1.all_chip_entries(game)]
+    # Every name is an 8-hex-digit crc: no on-disk name to collide, ever.
+    assert all(len(n) == 12 and n.endswith(".bin") for n in names)
+    # No filename repeats -> nothing can be clobbered by a same-named neighbour.
+    assert len(names) == len(set(names))
+    # A chip present in two archives ships exactly once.
+    assert names.count("0d9cb9bf.bin") == 1
+    # Every chip of the completable set is there -- none dropped for being in the
+    # "wrong" archive.
+    assert set(names) == {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)}
 
 
 def test_incomplete_game_contributes_nothing_to_the_card(tmp_path, clone_zip):

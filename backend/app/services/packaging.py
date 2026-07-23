@@ -157,9 +157,16 @@ def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[st
     /roms/cps1/<game name>/<chip> instead, because that is the only form the
     firmware can read (see _excluded).
 
-    An INCOMPLETE folder contributes nothing. Shipping half a romset produces a
-    game that appears in the launcher and dies when opened, which is worse than
-    one that is visibly absent and was reported as incomplete at upload time.
+    The whole chip pool is extracted as-is, named by CRC — NOT one guessed
+    romset's slice. Emitting only the set the packager picks made the card and
+    the device guess a romset independently and disagree: the same folder was
+    `wofj` here and `wofr1` on the device, which then reported two chips absent
+    that were present in the archives all along. Shipping every chip lets the
+    firmware bind by CRC and complete whatever set it runs; extra chips are free.
+
+    An INCOMPLETE folder (one that completes NO set) still contributes nothing:
+    half a romset is a game that appears in the launcher and dies when opened,
+    worse than one visibly absent and reported as incomplete at upload time.
     """
     if systems is not None and "cps1" not in systems:
         return
@@ -170,7 +177,7 @@ def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[st
         rel = f"{config.ROMS_DIR_NAME}/cps1/{game_dir.name}"
         if excluded_roms and rel in excluded_roms:
             continue
-        for chip in cps1.sd_chip_entries(game_dir):
+        for chip in cps1.all_chip_entries(game_dir):
             yield chip.archive, f"{rel}/{chip.name}", chip.member
 
 

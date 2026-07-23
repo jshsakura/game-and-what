@@ -238,6 +238,54 @@ def sd_chip_entries(game_dir: Path) -> list[ChipEntry]:
     return entries
 
 
+def all_chip_entries(game_dir: Path) -> list[ChipEntry]:
+    """Every chip in the folder's archives, deduped by content CRC and NAMED BY
+    that CRC -- the whole pool, extracted as-is, not one guessed romset's slice.
+
+    sd_chip_entries() picks the single set with the fewest missing chips and
+    ships only that set's chips. That is minimal, but it makes the card and the
+    device guess independently: the packager here identified the folder as
+    `wofj` and the firmware, from the same chips, went for `wofr1` and reported
+    two absent -- chips that WERE in the archives but were left behind because
+    they belonged to the set the packager did not pick.
+
+    So ship the whole pool. The device binds a chip to a slot by CRC, never by
+    filename and never by which set we guessed (Core/Src/porting/cps1), so extra
+    chips are free -- it takes what its chosen set needs and ignores the rest --
+    and no chip any runnable set might need is ever dropped. Files are named
+    `<crc>.bin`, which is also the shared-pool name the firmware looks up, so the
+    same output doubles as a /roms/cps1/.shared pool.
+
+    Still returns [] when the folder completes NO set: a pool that cannot make
+    even one playable game ships nothing rather than a folder that reaches the
+    launcher and dies. That guard is the one thing worth guessing a set for.
+    """
+    archives = archives_in(game_dir)
+    if not archives:
+        return []
+    if not identify([(name, path) for name, path in archives]).complete:
+        return []
+
+    entries: list[ChipEntry] = []
+    seen: set[str] = set()
+    for name, path in archives:
+        with _open_zip(path) as zf:
+            for info in zf.infolist():
+                if info.is_dir() or info.file_size != CHIP_SIZE:
+                    continue
+                crc = "%08x" % (zlib.crc32(zf.read(info)) & 0xFFFFFFFF)
+                if crc in seen:                 # same bytes in two archives = one chip
+                    continue
+                seen.add(crc)
+                entries.append(ChipEntry(
+                    archive=path,
+                    member=info.filename,
+                    name=f"{crc}.bin",          # by content, never by on-disk name
+                    size=info.file_size,
+                ))
+    return entries
+
+
 @dataclass(frozen=True)
 class PlannedGame:
     """One romset that should become a library entry."""
