@@ -67,17 +67,27 @@ def download_rom(session_id: str, rom_id: str) -> Response:
         # Primary ROM file — but a homebrew .bin app lives in the firmware (not on
         # SD), so skip it unless the user opted it in (matches the SD package rule).
         rom_abs = session_root / rom_rel
-        skip_primary = is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"]
+        is_cps1 = rom["system_key"] == "cps1"
+        # The primary for CPS-1 is a romset .zip, which the DEVICE cannot read --
+        # it wants loose chips. Never ship the archive here; the chips go in below.
+        skip_primary = (is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"]) or is_cps1
         if rom_abs.exists() and not skip_primary:
             zf.write(rom_abs, arcname=rom_rel); added += 1
-        if rom["system_key"] == "cps1":
-            # A CPS-1 game folder holds one archive per romset (the clone plus,
-            # for a MAME split set, its parent) — not the dict-shaped sidecars
-            # extra_files means for every other system. List the folder instead
-            # of trusting extra_files' shape.
-            for name, path in cps1.archives_in(rom_abs.parent):
-                if path != rom_abs and path.exists():
-                    zf.write(path, arcname=f"{Path(rom_rel).parent}/{name}"); added += 1
+        if is_cps1:
+            # Ship the pre-built loose <crc>.bin chips, so unzipping this drops a
+            # device-ready /roms/cps1/<game>/ onto the card -- NOT the .zip
+            # archives (the device has no inflate). Fall back to composing from
+            # the archives for an older folder that was never materialised.
+            game_dir = rom_abs.parent
+            folder_rel = Path(rom_rel).parent
+            prebuilt = cps1.prebuilt_chips(game_dir)
+            if prebuilt:
+                for chip in prebuilt:
+                    zf.write(chip, arcname=f"{folder_rel}/{chip.name}"); added += 1
+            else:
+                for e in cps1.all_chip_entries(game_dir):
+                    with zipfile.ZipFile(e.archive) as src:
+                        zf.writestr(f"{folder_rel}/{e.name}", src.read(e.member)); added += 1
         else:
             # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
             for ef in json.loads(rom["extra_files"] or "[]"):
@@ -94,7 +104,9 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     if added == 0:
         raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
 
-    stem = Path(rom["stored_name"]).stem
+    # CPS-1's stored_name is a romset code ("wofj.zip"); name the download by the
+    # game folder so the user gets "<game>.zip", not "wofj.zip".
+    stem = Path(rom_rel).parent.name if is_cps1 else Path(rom["stored_name"]).stem
     filename = f"{stem}.zip"
     # Korean (non-latin-1) names crash a plain filename="…" header → RFC 5987:
     # ASCII fallback + UTF-8 filename* (HTTP headers are latin-1 only).
