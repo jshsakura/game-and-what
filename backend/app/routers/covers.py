@@ -120,10 +120,24 @@ def _render_cover(rom: dict, source, crop_box=None) -> bytes:
                                crop_box=crop_box, lang=_rom_lang(rom))
 
 
+def _cover_basename(rom: dict) -> str:
+    """The device cover's .img basename.
+
+    CPS-1's stored_name is ONE romset archive ("wofj.zip"), not the game -- so
+    cover_filename() would name the cover "wofj.img", which never matches the
+    firmware's per-folder lookup (/romart/cps1/<game folder>.img, the same shape
+    pcecd/segacd use, gui.c). Name it by the game folder. Every other system's
+    stored_name already stands for the game, so it keeps rom-name → .img.
+    """
+    if rom["system_key"] == "cps1":
+        return Path(rom["rom_path"]).parent.name + ".img"
+    return covers.cover_filename(rom["stored_name"])
+
+
 def _save_cover(session_id: str, rom: dict, cover_bytes: bytes, raw: bytes | None = None) -> str:
     """Write the device cover (186x100 .img). If `raw` (original source bytes) is
     given, also write the high-res WebP web preview. Returns the .img rel path."""
-    cover_name = covers.cover_filename(rom["stored_name"])
+    cover_name = _cover_basename(rom)
     cover_path = storage.covers_dir(session_id, _dirname_of(rom)) / cover_name
     storage.write_bytes(cover_path, cover_bytes)
     if raw:
