@@ -555,7 +555,7 @@ async def upload_cps1_romsets(
                            orig_lang, play_lang, is_korean_patched, lang_source, region,
                            cover_flag, content_hash, extra_files)
                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                    (rom_id, session_id, sys_obj.key, game.setname, primary, None,
+                    (rom_id, session_id, sys_obj.key, title, primary, None,
                      rom_rel, None, "none", li.orig_lang, li.play_lang, 0, li.source,
                      romtag.region_of(title), None, chash,
                      json.dumps(list(game.archives[1:]))),
