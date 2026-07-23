@@ -30,7 +30,9 @@ the same file. Do not hand-edit either side; see docs/CPS1_LIBRARY_CONTRACT.md.
 from __future__ import annotations
 
 import json
+import os
 import shutil
+import tempfile
 import zipfile
 import zlib
 from dataclasses import dataclass, field
@@ -317,6 +319,93 @@ def prebuilt_chips(game_dir: Path) -> list[Path]:
     return sorted(p for p in game_dir.iterdir()
                   if p.is_file() and p.suffix.lower() == ".bin"
                   and p.stat().st_size == CHIP_SIZE)
+
+
+def _container_target(game_dir: Path) -> Path:
+    """Where the single-file container lives: `<game_dir>/<game>.cps1`."""
+    return game_dir / f"{game_dir.name}.cps1"
+
+
+def _chip_bytes(game_dir: Path, entry: "ChipEntry") -> bytes:
+    """The 512 KB of one chip, cheapest source first.
+
+    A materialised `<crc>.bin` sitting in the folder is the same bytes the
+    archive holds and is already decompressed, so read it when present; fall
+    back to inflating `entry.member` out of `entry.archive` for a folder that
+    predates materialisation (or was never materialised at all)."""
+    loose = game_dir / entry.name
+    if loose.exists() and loose.stat().st_size == CHIP_SIZE:
+        return loose.read_bytes()
+    with _open_zip(entry.archive) as zf:
+        return zf.read(entry.member)
+
+
+def build_container(game_dir: Path) -> Path | None:
+    """Write the folder's whole chip pool as ONE uncompressed `<game>.cps1` file
+    -- the raw concatenation of every distinct 512 KB chip, back to back, with no
+    header, no index and no compression.
+
+    This is the single-file form the device now receives instead of a folder of
+    loose `<crc>.bin` chips. Order does not matter and no header is needed because
+    the firmware splits the file into 512 KB blocks and identifies each block by
+    content hash, exactly as it does a directory scan -- so the container is just
+    that directory flattened into one file. The chip order written here is the
+    order all_chip_entries() returns, which is deterministic (archive order, then
+    member order), but nothing downstream depends on it.
+
+    Idempotent: a container already present at the right size (distinct chip
+    count x 512 KB) is left untouched, so re-uploading or re-running costs
+    nothing. Written to a temp file and renamed into place so a concurrent
+    download never sees a half-written container.
+
+    Returns the container path, or None when the folder completes NO set -- an
+    incomplete pool builds nothing, the same guard as all_chip_entries() and
+    materialize_chips().
+    """
+    entries = all_chip_entries(game_dir)          # [] if incomplete
+    if not entries:
+        return None
+
+    target = _container_target(game_dir)
+    expected = len(entries) * CHIP_SIZE
+    if target.exists() and target.stat().st_size == expected:
+        return target
+
+    fd, tmp = None, None
+    try:
+        fd, tmp = tempfile.mkstemp(prefix=".cps1-", suffix=".tmp", dir=str(game_dir))
+        with os.fdopen(fd, "wb") as out:
+            fd = None                              # now owned by the file object
+            for e in entries:
+                out.write(_chip_bytes(game_dir, e))
+        os.replace(tmp, target)
+        tmp = None
+    finally:
+        if fd is not None:
+            os.close(fd)
+        if tmp is not None:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+    return target
+
+
+def container_path(game_dir: Path) -> Path | None:
+    """The prebuilt `<game>.cps1` sitting in the folder, or None.
+
+    Returns it only when it exists and its size is a NONZERO multiple of the
+    chip size -- a half-written or empty file is not a container the device can
+    split into 512 KB blocks, so it reads as absent and the caller rebuilds."""
+    if not game_dir.is_dir():
+        return None
+    p = _container_target(game_dir)
+    if not p.is_file():
+        return None
+    size = p.stat().st_size
+    if size == 0 or size % CHIP_SIZE != 0:
+        return None
+    return p
 
 
 @dataclass(frozen=True)

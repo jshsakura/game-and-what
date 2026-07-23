@@ -540,6 +540,11 @@ async def upload_cps1_romsets(
             # The zips stay for the browser core (it runs a MAME romset .zip) --
             # two forms of the same game, deliberately.
             cps1_svc.materialize_chips(final_dir)
+            # And pre-build the single-file <game>.cps1 container the DEVICE/user
+            # now downloads: the raw concatenation of those distinct chips. Built
+            # here so the download path just serves a file rather than composing
+            # one; an incomplete folder builds nothing (same guard).
+            cps1_svc.build_container(final_dir)
 
             primary = game.archives[0]
             chash = hashlib.sha256((final_dir / primary).read_bytes()).hexdigest()

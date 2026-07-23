@@ -235,6 +235,93 @@ def test_empty_or_missing_folder_is_not_an_error(tmp_path):
     assert cps1.sd_chip_entries(tmp_path / "empty") == []
 
 
+# --- the single-file container: <game>.cps1 --------------------------------
+
+def _split_blocks(data: bytes) -> list[bytes]:
+    """A .cps1 file is a headerless concat of 512 KB chips; split it back."""
+    assert len(data) % CHIP == 0
+    return [data[i:i + CHIP] for i in range(0, len(data), CHIP)]
+
+
+def test_build_container_concats_the_distinct_chips(tmp_path, clone_zip, parent_zip):
+    game = tmp_path / "천지를 먹다 2 (Warriors of Fate)"
+    game.mkdir()
+    (game / "wofj.zip").write_bytes(clone_zip)
+    (game / "wof.zip").write_bytes(parent_zip)
+
+    path = cps1.build_container(game)
+    assert path is not None
+    # Named for the folder, and it is a raw concat: size == distinct chips x 512 KB.
+    assert path.name == "천지를 먹다 2 (Warriors of Fate).cps1"
+    distinct = cps1.all_chip_entries(game)
+    assert len(distinct) == 10
+    data = path.read_bytes()
+    assert len(data) == 10 * CHIP
+
+    # Every 512 KB block is exactly one distinct chip (by content CRC), the whole
+    # pool and nothing else -- order does not matter to the device, so compare sets.
+    block_crcs = {"%08x" % (zlib.crc32(b) & 0xFFFFFFFF) for b in _split_blocks(data)}
+    assert block_crcs == set(WOFJ_PRG + WOFJ_GFX)
+    # And the write order is all_chip_entries' order, deterministically.
+    assert [ "%08x" % (zlib.crc32(b) & 0xFFFFFFFF) for b in _split_blocks(data) ] == \
+           [ e.name[:-4] for e in distinct ]
+
+
+def test_build_container_is_idempotent(tmp_path, clone_zip, parent_zip):
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "wofj.zip").write_bytes(clone_zip)
+    (game / "wof.zip").write_bytes(parent_zip)
+
+    first = cps1.build_container(game)
+    stamp = first.stat().st_mtime_ns
+    # A container already at the right size is left untouched (not rewritten).
+    again = cps1.build_container(game)
+    assert again == first
+    assert again.stat().st_mtime_ns == stamp
+
+
+def test_container_path_reports_a_prebuilt_container(tmp_path, clone_zip, parent_zip):
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "wofj.zip").write_bytes(clone_zip)
+    (game / "wof.zip").write_bytes(parent_zip)
+    assert cps1.container_path(game) is None      # nothing built yet
+    built = cps1.build_container(game)
+    assert cps1.container_path(game) == built
+
+
+def test_container_path_rejects_a_truncated_file(tmp_path):
+    game = tmp_path / "game"
+    game.mkdir()
+    # A half-written container is not a whole number of 512 KB blocks → absent.
+    (game / "game.cps1").write_bytes(b"\x00" * (CHIP + 7))
+    assert cps1.container_path(game) is None
+
+
+def test_build_container_reads_materialised_chips_when_present(tmp_path, clone_zip, parent_zip):
+    """The container reads a loose <crc>.bin from the folder when it is there
+    (already decompressed) rather than re-inflating the archive -- same bytes."""
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "wofj.zip").write_bytes(clone_zip)
+    (game / "wof.zip").write_bytes(parent_zip)
+    cps1.materialize_chips(game)
+    data = cps1.build_container(game).read_bytes()
+    block_crcs = {"%08x" % (zlib.crc32(b) & 0xFFFFFFFF) for b in _split_blocks(data)}
+    assert block_crcs == set(WOFJ_PRG + WOFJ_GFX)
+
+
+def test_incomplete_folder_builds_no_container(tmp_path, clone_zip):
+    game = tmp_path / "wofj only"
+    game.mkdir()
+    (game / "wofj.zip").write_bytes(clone_zip)
+    # Half a romset builds nothing -- the same guard as everywhere else.
+    assert cps1.build_container(game) is None
+    assert not (game / "wofj only.cps1").exists()
+    assert cps1.container_path(game) is None
+
+
 # --- end to end: what actually lands on the card ----------------------------
 
 def _sd_names(root, **kw):
@@ -259,7 +346,7 @@ def test_romset_zips_never_reach_the_card(tmp_path):
     assert _excluded(tmp_path, cover, include_video=False) is False
 
 
-def test_card_gets_chips_under_the_game_name_folder(tmp_path, clone_zip, parent_zip):
+def test_card_gets_one_cps1_container_named_by_game(tmp_path, clone_zip, parent_zip):
     from app import config
     game = tmp_path / config.ROMS_DIR_NAME / "cps1" / "천지를 먹다 2 (Warriors of Fate)"
     game.mkdir(parents=True)
@@ -267,16 +354,12 @@ def test_card_gets_chips_under_the_game_name_folder(tmp_path, clone_zip, parent_
     (game / "wof.zip").write_bytes(parent_zip)
 
     names = _sd_names(tmp_path)
-    prefix = f"{config.ROMS_DIR_NAME}/cps1/천지를 먹다 2 (Warriors of Fate)/"
-    assert all(n.startswith(prefix) for n in names)
-    # Every chip in the pool, named by CONTENT crc (never by its on-disk name,
-    # which can collide across two archives and does not survive a repack).
-    assert {n[len(prefix):] for n in names} == {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)}
-    # tk2_gfx3.rom is crc 45227027 in the parent archive -- it ships by that crc,
-    # not by a name a filename-ordered packer could have mixed up.
-    assert prefix + "45227027.bin" in names
-    # No zip, no PAL dump.
-    assert not any(n.endswith(".zip") or n.endswith("tk263b.1a") for n in names)
+    # The card gets ONE file: /roms/cps1/<game>.cps1 (not a folder of chips, not
+    # the source zips). The device splits it into 512 KB blocks and hashes each.
+    assert names == {f"{config.ROMS_DIR_NAME}/cps1/천지를 먹다 2 (Warriors of Fate).cps1"}
+    # No zip, no PAL dump, no loose chip folder.
+    assert not any(n.endswith(".zip") or n.endswith("tk263b.1a") or n.endswith(".bin")
+                   for n in names)
 
 
 def test_pool_ships_every_chip_named_by_crc_and_cannot_clobber(tmp_path, clone_zip, parent_zip):
@@ -445,11 +528,13 @@ def test_endpoint_makes_one_game_from_a_clone_and_its_donor(
     dirs = [p for p in base.iterdir() if p.is_dir()]
     assert len(dirs) == 1
     contents = {p.name for p in dirs[0].iterdir()}
-    # Two forms in the one folder, deliberately: the archives stay (the browser
-    # core runs a MAME romset .zip) AND the chips are pre-built as loose <crc>.bin
-    # (the device reads those straight, a download just copies them).
+    # Three forms in the one folder, deliberately: the archives stay (the browser
+    # core runs a MAME romset .zip), the chips are pre-built as loose <crc>.bin
+    # (the shared-pool form), AND the single-file <game>.cps1 container the device
+    # and the user now download.
     assert contents == ({"wofj.zip", "wof.zip"}
-                        | {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)})
+                        | {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)}
+                        | {f"{dirs[0].name}.cps1"})
 
 
 def test_endpoint_reports_a_clone_uploaded_alone_instead_of_storing_half(
@@ -508,6 +593,29 @@ def test_serve_rom_leaves_the_clone_untouched_and_donor_fetchable_separately(
     donor = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/cdfile?name=wof.zip")
     assert donor.status_code == 200
     assert donor.content == parent_zip
+
+
+# --- device download: exactly one .cps1 file --------------------------------
+
+def test_download_serves_a_single_cps1_container(client, session_id, clone_zip, parent_zip):
+    """The user/device download is ONE uncompressed <game>.cps1 file -- not a zip,
+    not loose chips, not the source archives."""
+    r = _post(client, session_id, [("wofj.zip", clone_zip), ("wof.zip", parent_zip)])
+    body = r.json()
+    rom_id = body["results"][0]["id"]
+
+    dl = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/download")
+    assert dl.status_code == 200, dl.text
+    assert dl.headers["content-type"] == "application/octet-stream"
+    assert dl.headers["content-disposition"].endswith(".cps1")
+
+    data = dl.content
+    # A raw concat of the 10 distinct 512 KB chips: no zip header, no index.
+    assert data[:2] != b"PK"
+    assert len(data) == 10 * CHIP
+    block_crcs = {"%08x" % (zlib.crc32(data[i:i + CHIP]) & 0xFFFFFFFF)
+                  for i in range(0, len(data), CHIP)}
+    assert block_crcs == set(WOFJ_PRG + WOFJ_GFX)
 
 
 def test_serve_rom_leaves_a_single_archive_untouched(client, session_id, data_dir,

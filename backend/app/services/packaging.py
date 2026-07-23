@@ -150,23 +150,26 @@ def _entry_size(src: Path, member: "str | None") -> int:
 
 
 def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[str] | None"):
-    """Expand each CPS-1 game folder of romset ZIPs into its chips.
+    """Emit each CPS-1 game folder as its single-file `<game>.cps1` container.
 
     A CPS-1 game on the server is /roms/cps1/<game name>/*.zip — the clone's
-    archive plus, for a MAME split set, its parent's. The card gets
-    /roms/cps1/<game name>/<chip> instead, because that is the only form the
-    firmware can read (see _excluded).
+    archive plus, for a MAME split set, its parent's. The card gets ONE file,
+    /roms/cps1/<game name>.cps1, which is the raw concatenation of the folder's
+    distinct 512 KB chips (no header, no index, no compression). That is the only
+    form the firmware can read (see _excluded): it splits the file into 512 KB
+    blocks and binds each block to a slot by content hash.
 
-    The whole chip pool is extracted as-is, named by CRC — NOT one guessed
-    romset's slice. Emitting only the set the packager picks made the card and
-    the device guess a romset independently and disagree: the same folder was
-    `wofj` here and `wofr1` on the device, which then reported two chips absent
-    that were present in the archives all along. Shipping every chip lets the
-    firmware bind by CRC and complete whatever set it runs; extra chips are free.
+    Every distinct chip is included, named by nothing — the device identifies by
+    CRC alone, never by which romset the packager guessed. Emitting only the set
+    the packager picks made the card and the device disagree: the same folder was
+    `wofj` here and `wofr1` on the device, which then reported chips absent that
+    were present all along. The whole pool goes in; extra chips are free.
 
-    An INCOMPLETE folder (one that completes NO set) still contributes nothing:
-    half a romset is a game that appears in the launcher and dies when opened,
-    worse than one visibly absent and reported as incomplete at upload time.
+    The container is pre-built at upload (build_container); it is (re)built here
+    on the fly for an older folder that predates it. An INCOMPLETE folder (one
+    that completes NO set) builds nothing and contributes nothing: half a romset
+    is a game that appears in the launcher and dies when opened, worse than one
+    visibly absent and reported as incomplete at upload time.
     """
     if systems is not None and "cps1" not in systems:
         return
@@ -177,15 +180,10 @@ def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[st
         rel = f"{config.ROMS_DIR_NAME}/cps1/{game_dir.name}"
         if excluded_roms and rel in excluded_roms:
             continue
-        prebuilt = cps1.prebuilt_chips(game_dir)
-        if prebuilt:
-            # The chips were materialised at upload: copy them straight in.
-            for chip in prebuilt:
-                yield chip, f"{rel}/{chip.name}", None
-        else:
-            # An older, archive-only folder: compose from the zips on the fly.
-            for chip in cps1.all_chip_entries(game_dir):
-                yield chip.archive, f"{rel}/{chip.name}", chip.member
+        container = cps1.container_path(game_dir) or cps1.build_container(game_dir)
+        if container is None:            # completes no set → nothing on the card
+            continue
+        yield container, f"{rel}.cps1", None
 
 
 class BuildCancelled(Exception):
@@ -248,8 +246,9 @@ def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[s
     for abs_path, arcname, member in _sd_entries(session_id, include_video, systems,
                                                  homebrew_roms, excluded_roms):
         st = abs_path.stat()
-        # For a CPS-1 chip the source is its ARCHIVE, so the key moves exactly
-        # when the archive does -- which is when the composed chips would change.
+        # For a CPS-1 game the source is its prebuilt <game>.cps1 container, so
+        # the key moves exactly when the container does -- which is when the
+        # folder's chip pool changed and it was rebuilt.
         h.update(f"{arcname}|{member or ''}|{st.st_size}|{st.st_mtime_ns}\n".encode())
     return h.hexdigest()
 

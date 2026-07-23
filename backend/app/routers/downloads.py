@@ -60,41 +60,45 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     rom_rel: str = rom["rom_path"]        # e.g. "roms/nes/Game.nes"
     cover_rel: str | None = rom["cover_path"]  # e.g. "covers/nes/Game.img" or None
     is_homebrew = Path(rom_rel).parts[1:2] == ("homebrew",) if "/" in rom_rel else False
+    rom_abs = session_root / rom_rel
+
+    # CPS-1 is not a file the user unzips onto the card -- it is a single
+    # uncompressed <game>.cps1 container: the raw concatenation of the folder's
+    # distinct 512 KB chips, no header, no index. The device splits it into 512 KB
+    # blocks and identifies each by content hash. Serve that ONE file directly (no
+    # zip, no cover, no loose chips, no source archives). It is pre-built at upload;
+    # compose it on the fly for an older folder that predates the container.
+    if rom["system_key"] == "cps1":
+        game_dir = rom_abs.parent
+        container = cps1.container_path(game_dir) or cps1.build_container(game_dir)
+        if container is None:
+            # The folder completes no runnable set -- same error as everywhere else.
+            raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
+        # Name the download by the game folder, not the romset code ("wofj").
+        filename = f"{game_dir.name}.cps1"
+        ascii_name = filename.encode("ascii", "ignore").decode().strip() or "game.cps1"
+        return FileResponse(
+            container,
+            media_type="application/octet-stream",
+            filename=filename,
+            headers={"Content-Disposition":
+                     f"attachment; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(filename)}"},
+        )
 
     buf = io.BytesIO()
     added = 0
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         # Primary ROM file — but a homebrew .bin app lives in the firmware (not on
         # SD), so skip it unless the user opted it in (matches the SD package rule).
-        rom_abs = session_root / rom_rel
-        is_cps1 = rom["system_key"] == "cps1"
-        # The primary for CPS-1 is a romset .zip, which the DEVICE cannot read --
-        # it wants loose chips. Never ship the archive here; the chips go in below.
-        skip_primary = (is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"]) or is_cps1
+        skip_primary = (is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"])
         if rom_abs.exists() and not skip_primary:
             zf.write(rom_abs, arcname=rom_rel); added += 1
-        if is_cps1:
-            # Ship the pre-built loose <crc>.bin chips, so unzipping this drops a
-            # device-ready /roms/cps1/<game>/ onto the card -- NOT the .zip
-            # archives (the device has no inflate). Fall back to composing from
-            # the archives for an older folder that was never materialised.
-            game_dir = rom_abs.parent
-            folder_rel = Path(rom_rel).parent
-            prebuilt = cps1.prebuilt_chips(game_dir)
-            if prebuilt:
-                for chip in prebuilt:
-                    zf.write(chip, arcname=f"{folder_rel}/{chip.name}"); added += 1
-            else:
-                for e in cps1.all_chip_entries(game_dir):
-                    with zipfile.ZipFile(e.archive) as src:
-                        zf.writestr(f"{folder_rel}/{e.name}", src.read(e.member)); added += 1
-        else:
-            # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
-            for ef in json.loads(rom["extra_files"] or "[]"):
-                ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
-                ef_abs = session_root / ef_rel
-                if ef_abs.exists():
-                    zf.write(ef_abs, arcname=ef_rel); added += 1
+        # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
+        for ef in json.loads(rom["extra_files"] or "[]"):
+            ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
+            ef_abs = session_root / ef_rel
+            if ef_abs.exists():
+                zf.write(ef_abs, arcname=ef_rel); added += 1
         # Cover ships alongside (separate name from the data file).
         if cover_rel:
             cover_abs = session_root / cover_rel
@@ -104,9 +108,7 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     if added == 0:
         raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
 
-    # CPS-1's stored_name is a romset code ("wofj.zip"); name the download by the
-    # game folder so the user gets "<game>.zip", not "wofj.zip".
-    stem = Path(rom_rel).parent.name if is_cps1 else Path(rom["stored_name"]).stem
+    stem = Path(rom["stored_name"]).stem
     filename = f"{stem}.zip"
     # Korean (non-latin-1) names crash a plain filename="…" header → RFC 5987:
     # ASCII fallback + UTF-8 filename* (HTTP headers are latin-1 only).
