@@ -760,8 +760,17 @@ def test_norm_strips_extension_and_tags():
 # artfetch.py
 # ---------------------------------------------------------------------------
 
+# fetch_image now resolves the URL's host over DNS to block SSRF (see the
+# _is_safe_target tests below, which exercise that check for real). The fake
+# "cdn.example" hostnames used here don't resolve to anything, so these
+# response-handling tests bypass the check — it's not what they're testing.
+def _allow_any_target(monkeypatch):
+    monkeypatch.setattr(artfetch, "_is_safe_target", lambda url: True)
+
+
 @pytest.mark.asyncio
 async def test_fetch_image_success_returns_bytes(monkeypatch):
+    _allow_any_target(monkeypatch)
     monkeypatch.setattr(
         artfetch.httpx, "AsyncClient",
         _fake_client_cls(lambda m, u, **kw: httpx.Response(200, content=b"\x89PNGdata")),
@@ -772,6 +781,7 @@ async def test_fetch_image_success_returns_bytes(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_fetch_image_non_200_returns_none(monkeypatch):
+    _allow_any_target(monkeypatch)
     monkeypatch.setattr(artfetch.httpx, "AsyncClient",
                          _fake_client_cls(lambda m, u, **kw: httpx.Response(404)))
     assert await artfetch.fetch_image("https://cdn.example/missing.png") is None
@@ -779,6 +789,7 @@ async def test_fetch_image_non_200_returns_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_fetch_image_empty_body_returns_none(monkeypatch):
+    _allow_any_target(monkeypatch)
     monkeypatch.setattr(
         artfetch.httpx, "AsyncClient",
         _fake_client_cls(lambda m, u, **kw: httpx.Response(200, content=b"")),
@@ -788,6 +799,7 @@ async def test_fetch_image_empty_body_returns_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_fetch_image_oversized_body_returns_none(monkeypatch):
+    _allow_any_target(monkeypatch)
     monkeypatch.setattr(artfetch, "_MAX_ART_BYTES", 10)
     monkeypatch.setattr(
         artfetch.httpx, "AsyncClient",
@@ -798,6 +810,8 @@ async def test_fetch_image_oversized_body_returns_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_fetch_image_network_error_returns_none(monkeypatch):
+    _allow_any_target(monkeypatch)
+
     def handler(method, url, **kwargs):
         raise httpx.ConnectError("boom")
 
@@ -807,8 +821,61 @@ async def test_fetch_image_network_error_returns_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_fetch_image_os_error_returns_none(monkeypatch):
+    _allow_any_target(monkeypatch)
+
     def handler(method, url, **kwargs):
         raise OSError("disk on fire")
 
     monkeypatch.setattr(artfetch.httpx, "AsyncClient", _fake_client_cls(handler))
     assert await artfetch.fetch_image("https://cdn.example/cover.png") is None
+
+
+# ── SSRF guard (_is_safe_target) — these exercise the real check, so they
+#    use literal IP addresses / loopback, which getaddrinfo resolves locally
+#    without any real DNS/network round-trip. ───────────────────────────────
+
+@pytest.mark.asyncio
+async def test_fetch_image_rejects_loopback_target(monkeypatch):
+    calls = []
+
+    def handler(method, url, **kw):
+        calls.append(url)
+        return httpx.Response(200, content=b"\x89PNGdata")
+
+    monkeypatch.setattr(artfetch.httpx, "AsyncClient", _fake_client_cls(handler))
+    assert await artfetch.fetch_image("http://127.0.0.1:6379/") is None
+    assert calls == []
+
+
+@pytest.mark.asyncio
+async def test_fetch_image_rejects_link_local_metadata_target(monkeypatch):
+    monkeypatch.setattr(
+        artfetch.httpx, "AsyncClient",
+        _fake_client_cls(lambda m, u, **kw: httpx.Response(200, content=b"\x89PNGdata")),
+    )
+    assert await artfetch.fetch_image("http://169.254.169.254/latest/meta-data/") is None
+
+
+@pytest.mark.asyncio
+async def test_fetch_image_rejects_non_http_scheme(monkeypatch):
+    monkeypatch.setattr(
+        artfetch.httpx, "AsyncClient",
+        _fake_client_cls(lambda m, u, **kw: httpx.Response(200, content=b"\x89PNGdata")),
+    )
+    assert await artfetch.fetch_image("file:///etc/passwd") is None
+
+
+@pytest.mark.asyncio
+async def test_fetch_image_rejects_redirect_to_private_target(monkeypatch):
+    """A public-looking URL that 302s to an internal host must not be fetched —
+    the redirect target is re-validated, not followed blindly."""
+    monkeypatch.setattr(artfetch, "_is_safe_target",
+                         lambda url: "example.com" in url)
+
+    def handler(method, url, **kw):
+        if "example.com" in url:
+            return httpx.Response(302, headers={"location": "http://10.0.0.5/internal"})
+        return httpx.Response(200, content=b"\x89PNGdata")
+
+    monkeypatch.setattr(artfetch.httpx, "AsyncClient", _fake_client_cls(handler))
+    assert await artfetch.fetch_image("https://example.com/redirect") is None
