@@ -63,15 +63,12 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     rom_abs = session_root / rom_rel
 
     # CPS-1 downloads in the SAME envelope as every other system: a <game>.zip
-    # whose SD layout is roms/cps1/<game folder>/<setname>.cps1 (the container
-    # NESTED inside the game folder) + covers/cps1/<game folder>.img. The one
+    # whose SD layout is roms/cps1/<game>.cps1 + covers/cps1/<game>.img. The one
     # difference is WHAT the rom file is -- not the source romset .zip(s) (the
-    # device can't inflate them) but the single uncompressed .cps1 container: the
-    # raw concatenation of the folder's distinct 512 KB chips, no header, split
-    # into 512 KB blocks and hashed on device. The FILE is named by the ASCII
-    # romset code so the SD/FAT path never carries a Korean filename, while the
-    # FOLDER keeps its Korean display name. Pre-built at upload; composed on the
-    # fly for an older folder that predates the container.
+    # device can't inflate them) but the single uncompressed <game>.cps1
+    # container: the raw concatenation of the folder's distinct 512 KB chips, no
+    # header, split into 512 KB blocks and hashed on device. Pre-built at upload;
+    # composed on the fly for an older folder that predates the container.
     is_cps1 = rom["system_key"] == "cps1"
     cps1_container = None
     cps1_arcname = None
@@ -81,8 +78,7 @@ def download_rom(session_id: str, rom_id: str) -> Response:
         if cps1_container is None:
             # The folder completes no runnable set -- same error as everywhere else.
             raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
-        # roms/cps1/<game folder>/<setname>.cps1 -- nested in the Korean folder.
-        cps1_arcname = f"{Path(rom_rel).parent}/{cps1_container.name}"
+        cps1_arcname = f"{Path(rom_rel).parent}.cps1"   # roms/cps1/<game>.cps1
 
     buf = io.BytesIO()
     added = 0

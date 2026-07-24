@@ -14,7 +14,6 @@ from __future__ import annotations
 import io
 import zipfile
 import zlib
-from pathlib import Path
 
 import pytest
 
@@ -252,11 +251,8 @@ def test_build_container_concats_the_distinct_chips(tmp_path, clone_zip, parent_
 
     path = cps1.build_container(game)
     assert path is not None
-    # Named by the ASCII romset code (wofj), NOT the Korean folder — the folder
-    # keeps its display name, the file stays ASCII for the SD/FAT path.
-    assert path.name == "wofj.cps1"
-    assert path.name.isascii() and path.name.endswith(".cps1")
-    # It is a raw concat: size == distinct chips x 512 KB.
+    # Named for the folder, and it is a raw concat: size == distinct chips x 512 KB.
+    assert path.name == "천지를 먹다 2 (Warriors of Fate).cps1"
     distinct = cps1.all_chip_entries(game)
     assert len(distinct) == 10
     data = path.read_bytes()
@@ -293,18 +289,6 @@ def test_container_path_reports_a_prebuilt_container(tmp_path, clone_zip, parent
     assert cps1.container_path(game) is None      # nothing built yet
     built = cps1.build_container(game)
     assert cps1.container_path(game) == built
-
-
-def test_container_path_finds_a_cps1_regardless_of_its_name(tmp_path):
-    """An OLD folder may still hold the game-named `<folder>.cps1`; a new one
-    holds `<setname>.cps1`. container_path finds a valid *.cps1 either way, by
-    size, not by guessing the name."""
-    game = tmp_path / "천지를 먹다 2 (Warriors of Fate)"
-    game.mkdir()
-    # A legacy game-named container (Korean name, still a valid 512 KB multiple).
-    legacy = game / "천지를 먹다 2 (Warriors of Fate).cps1"
-    legacy.write_bytes(b"\x00" * (2 * CHIP))
-    assert cps1.container_path(game) == legacy
 
 
 def test_container_path_rejects_a_truncated_file(tmp_path):
@@ -362,24 +346,20 @@ def test_romset_zips_never_reach_the_card(tmp_path):
     assert _excluded(tmp_path, cover, include_video=False) is False
 
 
-def test_card_gets_one_cps1_container_nested_in_the_game_folder(tmp_path, clone_zip, parent_zip):
+def test_card_gets_one_cps1_container_named_by_game(tmp_path, clone_zip, parent_zip):
     from app import config
-    folder = "천지를 먹다 2 (Warriors of Fate)"
-    game = tmp_path / config.ROMS_DIR_NAME / "cps1" / folder
+    game = tmp_path / config.ROMS_DIR_NAME / "cps1" / "천지를 먹다 2 (Warriors of Fate)"
     game.mkdir(parents=True)
     (game / "wofj.zip").write_bytes(clone_zip)
     (game / "wof.zip").write_bytes(parent_zip)
 
     names = _sd_names(tmp_path)
-    # The card gets ONE file: /roms/cps1/<Korean folder>/<setname>.cps1 -- the
-    # container NESTED inside the folder, named by the ASCII romset code (wofj).
-    # The device treats the folder as the game and opens the single *.cps1 inside.
-    assert names == {f"{config.ROMS_DIR_NAME}/cps1/{folder}/wofj.cps1"}
-    # No zip, no PAL dump, no loose chip folder; the .cps1 file name is ASCII.
+    # The card gets ONE file: /roms/cps1/<game>.cps1 (not a folder of chips, not
+    # the source zips). The device splits it into 512 KB blocks and hashes each.
+    assert names == {f"{config.ROMS_DIR_NAME}/cps1/천지를 먹다 2 (Warriors of Fate).cps1"}
+    # No zip, no PAL dump, no loose chip folder.
     assert not any(n.endswith(".zip") or n.endswith("tk263b.1a") or n.endswith(".bin")
                    for n in names)
-    (only,) = names
-    assert Path(only).name.isascii() and Path(only).name.endswith(".cps1")
 
 
 def test_pool_ships_every_chip_named_by_crc_and_cannot_clobber(tmp_path, clone_zip, parent_zip):
@@ -550,12 +530,11 @@ def test_endpoint_makes_one_game_from_a_clone_and_its_donor(
     contents = {p.name for p in dirs[0].iterdir()}
     # Three forms in the one folder, deliberately: the archives stay (the browser
     # core runs a MAME romset .zip), the chips are pre-built as loose <crc>.bin
-    # (the shared-pool form), AND the single-file <setname>.cps1 container the
-    # device and the user now download -- named by the ASCII romset code (wofj),
-    # not the (possibly Korean) folder.
+    # (the shared-pool form), AND the single-file <game>.cps1 container the device
+    # and the user now download.
     assert contents == ({"wofj.zip", "wof.zip"}
                         | {f"{c}.bin" for c in (WOFJ_PRG + WOFJ_GFX)}
-                        | {"wofj.cps1"})
+                        | {f"{dirs[0].name}.cps1"})
 
 
 def test_endpoint_reports_a_clone_uploaded_alone_instead_of_storing_half(
@@ -618,28 +597,12 @@ def test_serve_rom_leaves_the_clone_untouched_and_donor_fetchable_separately(
 
 # --- device download: exactly one .cps1 file --------------------------------
 
-def test_download_serves_a_cps1_zip_with_container_and_cover(client, session_id, data_dir,
-                                                             clone_zip, parent_zip):
+def test_download_serves_a_cps1_zip_with_container_and_cover(client, session_id, clone_zip, parent_zip):
     """The download is a <game>.zip in the SAME envelope as every other system --
-    roms/cps1/<game folder>/<setname>.cps1 (the single container NESTED in the
-    Korean folder, not loose chips, not the source archives) plus
-    covers/cps1/<game folder>.img when a cover exists."""
+    roms/cps1/<game>.cps1 (the single container, not loose chips, not the source
+    archives) plus covers/cps1/<game>.img when a cover exists."""
     r = _post(client, session_id, [("wofj.zip", clone_zip), ("wof.zip", parent_zip)])
     rom_id = r.json()["results"][0]["id"]
-
-    # Give the game a cover so the download bundles it (covers/cps1/<folder>.img).
-    from app import db
-    from app.services import storage
-    with db.connect() as conn:
-        rom = dict(conn.execute("SELECT * FROM roms WHERE id = ?", (rom_id,)).fetchone())
-    folder = Path(rom["rom_path"]).parent.name          # the Korean game folder
-    cover_rel = f"covers/cps1/{folder}.img"
-    cover_abs = storage.session_root(session_id) / cover_rel
-    cover_abs.parent.mkdir(parents=True, exist_ok=True)
-    cover_abs.write_bytes(b"\x00" * 16)
-    with db.connect() as conn:
-        conn.execute("UPDATE roms SET cover_path = ? WHERE id = ?", (cover_rel, rom_id))
-        conn.commit()
 
     dl = client.get(f"/api/sessions/{session_id}/roms/{rom_id}/download")
     assert dl.status_code == 200, dl.text
@@ -648,15 +611,12 @@ def test_download_serves_a_cps1_zip_with_container_and_cover(client, session_id,
 
     zf = zipfile.ZipFile(io.BytesIO(dl.content))
     names = zf.namelist()
-    # Exactly one .cps1, NESTED at roms/cps1/<folder>/<ascii>.cps1 -- no folder of
+    # Exactly one .cps1, under roms/cps1/, named by the game folder -- no folder of
     # chips, no wof.zip/wofj.zip.
     cps1_names = [n for n in names if n.endswith(".cps1")]
     assert len(cps1_names) == 1
-    assert cps1_names[0] == f"roms/cps1/{folder}/wofj.cps1"
-    assert Path(cps1_names[0]).name.isascii()
+    assert cps1_names[0].startswith("roms/cps1/")
     assert not any(n.endswith(".zip") for n in names)
-    # The cover ships alongside, at its folder-named path.
-    assert cover_rel in names
 
     data = zf.read(cps1_names[0])
     # The container: a raw concat of the 10 distinct 512 KB chips, no header/index.

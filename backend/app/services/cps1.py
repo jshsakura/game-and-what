@@ -31,7 +31,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shutil
 import tempfile
 import zipfile
@@ -322,34 +321,9 @@ def prebuilt_chips(game_dir: Path) -> list[Path]:
                   and p.stat().st_size == CHIP_SIZE)
 
 
-#: A container filename must be ASCII: a Korean name is fragile on the device's
-#: SD/FAT path, so the file is named after the romset CODE (which is ASCII), even
-#: though the FOLDER it lives in keeps its Korean display name. Anything outside
-#: this set is stripped as a belt-and-braces guard -- romset codes already are.
-_SETNAME_SAFE = re.compile(r"[^A-Za-z0-9._-]")
-_FALLBACK_SETNAME = "game"
-
-
-def _setname_for(game_dir: Path) -> str:
-    """The ASCII romset code the folder identifies as (e.g. `wofj`), for the
-    container filename. Falls back to "game" when nothing identifies -- which
-    should not happen for a completable folder, but keeps the name ASCII and
-    non-empty regardless."""
-    archives = archives_in(game_dir)
-    setname = identify(archives).setname if archives else None
-    if not setname:
-        return _FALLBACK_SETNAME
-    return _SETNAME_SAFE.sub("", setname) or _FALLBACK_SETNAME
-
-
 def _container_target(game_dir: Path) -> Path:
-    """Where a newly built container is written: `<game_dir>/<setname>.cps1`.
-
-    The FILE is named by the ASCII romset code, not the (often Korean) folder
-    name -- the folder keeps its display name for the launcher, the file stays
-    ASCII for the SD/FAT path. See `container_path` for finding an EXISTING one,
-    whatever it was named."""
-    return game_dir / f"{_setname_for(game_dir)}.cps1"
+    """Where the single-file container lives: `<game_dir>/<game>.cps1`."""
+    return game_dir / f"{game_dir.name}.cps1"
 
 
 def _chip_bytes(game_dir: Path, entry: "ChipEntry") -> bytes:
@@ -367,11 +341,9 @@ def _chip_bytes(game_dir: Path, entry: "ChipEntry") -> bytes:
 
 
 def build_container(game_dir: Path) -> Path | None:
-    """Write the folder's whole chip pool as ONE uncompressed `<setname>.cps1`
-    file -- the raw concatenation of every distinct 512 KB chip, back to back,
-    with no header, no index and no compression. The file is named by the ASCII
-    romset code (the folder keeps its Korean display name), so the SD/FAT path
-    never carries a non-ASCII filename.
+    """Write the folder's whole chip pool as ONE uncompressed `<game>.cps1` file
+    -- the raw concatenation of every distinct 512 KB chip, back to back, with no
+    header, no index and no compression.
 
     This is the single-file form the device now receives instead of a folder of
     loose `<crc>.bin` chips. Order does not matter and no header is needed because
@@ -381,9 +353,8 @@ def build_container(game_dir: Path) -> Path | None:
     order all_chip_entries() returns, which is deterministic (archive order, then
     member order), but nothing downstream depends on it.
 
-    Idempotent: if any valid `*.cps1` already sits in the folder (via
-    container_path, whatever it was named -- an older folder may still have the
-    game-named one), it is left untouched, so re-uploading or re-running costs
+    Idempotent: a container already present at the right size (distinct chip
+    count x 512 KB) is left untouched, so re-uploading or re-running costs
     nothing. Written to a temp file and renamed into place so a concurrent
     download never sees a half-written container.
 
@@ -395,11 +366,11 @@ def build_container(game_dir: Path) -> Path | None:
     if not entries:
         return None
 
-    existing = container_path(game_dir)           # any valid *.cps1, whatever named
-    if existing is not None:
-        return existing
+    target = _container_target(game_dir)
+    expected = len(entries) * CHIP_SIZE
+    if target.exists() and target.stat().st_size == expected:
+        return target
 
-    target = _container_target(game_dir)          # write as <setname>.cps1
     fd, tmp = None, None
     try:
         fd, tmp = tempfile.mkstemp(prefix=".cps1-", suffix=".tmp", dir=str(game_dir))
@@ -421,23 +392,20 @@ def build_container(game_dir: Path) -> Path | None:
 
 
 def container_path(game_dir: Path) -> Path | None:
-    """The prebuilt `*.cps1` sitting in the folder, or None.
+    """The prebuilt `<game>.cps1` sitting in the folder, or None.
 
-    Returns the FIRST `*.cps1` file directly in the folder whose size is a
-    NONZERO multiple of the chip size, regardless of its exact name: a new
-    folder holds `<setname>.cps1`, an older one may still hold the game-named
-    `<folder>.cps1`, and either is a valid container. A half-written or empty
-    file is not one the device can split into 512 KB blocks, so it reads as
-    absent and the caller rebuilds."""
+    Returns it only when it exists and its size is a NONZERO multiple of the
+    chip size -- a half-written or empty file is not a container the device can
+    split into 512 KB blocks, so it reads as absent and the caller rebuilds."""
     if not game_dir.is_dir():
         return None
-    for p in sorted(game_dir.iterdir()):
-        if not p.is_file() or p.suffix.lower() != ".cps1":
-            continue
-        size = p.stat().st_size
-        if size != 0 and size % CHIP_SIZE == 0:
-            return p
-    return None
+    p = _container_target(game_dir)
+    if not p.is_file():
+        return None
+    size = p.stat().st_size
+    if size == 0 or size % CHIP_SIZE != 0:
+        return None
+    return p
 
 
 @dataclass(frozen=True)

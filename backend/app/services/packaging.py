@@ -150,18 +150,14 @@ def _entry_size(src: Path, member: "str | None") -> int:
 
 
 def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[str] | None"):
-    """Emit each CPS-1 game folder as its single-file `<setname>.cps1` container,
-    NESTED inside the game folder on the card.
+    """Emit each CPS-1 game folder as its single-file `<game>.cps1` container.
 
     A CPS-1 game on the server is /roms/cps1/<game name>/*.zip — the clone's
     archive plus, for a MAME split set, its parent's. The card gets ONE file,
-    /roms/cps1/<game name>/<setname>.cps1, which is the raw concatenation of the
-    folder's distinct 512 KB chips (no header, no index, no compression). The
-    FILE is named by the ASCII romset code so the SD/FAT path never carries a
-    Korean filename, while the FOLDER keeps its Korean display name. That is the
-    only form the firmware can read (see _excluded): it splits the file into
-    512 KB blocks and binds each block to a slot by content hash, treating the
-    game as the folder and opening whatever single *.cps1 sits inside it.
+    /roms/cps1/<game name>.cps1, which is the raw concatenation of the folder's
+    distinct 512 KB chips (no header, no index, no compression). That is the only
+    form the firmware can read (see _excluded): it splits the file into 512 KB
+    blocks and binds each block to a slot by content hash.
 
     Every distinct chip is included, named by nothing — the device identifies by
     CRC alone, never by which romset the packager guessed. Emitting only the set
@@ -187,8 +183,7 @@ def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[st
         container = cps1.container_path(game_dir) or cps1.build_container(game_dir)
         if container is None:            # completes no set → nothing on the card
             continue
-        # Nested: roms/cps1/<game folder>/<setname>.cps1 (ASCII file, Korean folder).
-        yield container, f"{rel}/{container.name}", None
+        yield container, f"{rel}.cps1", None
 
 
 class BuildCancelled(Exception):
