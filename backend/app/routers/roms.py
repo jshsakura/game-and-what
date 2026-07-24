@@ -723,6 +723,8 @@ async def add_rom_file(session_id: str, rom_id: str, file: UploadFile = File(...
 @router.delete("/sessions/{session_id}/roms/{rom_id}/files/{name}")
 def delete_rom_file(session_id: str, rom_id: str, name: str) -> dict:
     """Remove an extra data file from a card (its template .bin is never touched)."""
+    if "/" in name or "\\" in name or name in ("", ".", ".."):
+        raise HTTPException(status_code=400, detail=f"잘못된 파일명: {name}")
     with db.connect() as conn:
         require_session(conn, session_id)
         rom = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
