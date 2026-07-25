@@ -16,12 +16,9 @@ import { X, Maximize2, Minimize2, Monitor, Copy, Check } from "lucide-react";
 import { romFileUrl, cdTrackUrl, extraDownloadUrl } from "./api.js";
 import { BIOS_CATALOG, BIOS_BY_KEY } from "./bios.js";
 
-// extra_files may arrive as a JSON string or array, and its ELEMENT SHAPE
-// differs by who wrote it: CD systems (pcecd/segacd) store {name,size} dicts
-// for their track sidecars, while the cps1 upload endpoint stores bare
-// filename strings for a clone's donor archives (backend/app/routers/roms.py
-// upload_cps1_romsets: `json.dumps(list(game.archives[1:]))`). Handle both so
-// a bare string doesn't silently vanish (`"wof.zip"?.name` is undefined).
+// extra_files may arrive as a JSON string or array. CD systems (pcecd) store
+// {name,size} dicts for their track sidecars; we also tolerate a bare filename
+// string so an unexpected shape doesn't silently vanish (`"x"?.name` is undefined).
 function parseExtraFiles(extra) {
   try {
     const arr = typeof extra === "string" ? JSON.parse(extra) : extra;
@@ -45,12 +42,6 @@ const CORE_MAP = {
   sms: "genesis_plus_gx",
   sg: "genesis_plus_gx",
   md: "genesis_plus_gx",
-  // Sega CD shares the same genesis_plus_gx core (it emulates the CD add-on
-  // too). Needs a region BIOS in the Extra folder (see BIOS below) — games are
-  // region-locked to their BIOS. Single-file .chd boots directly; .cue+.bin
-  // sets need their track sidecars, which the bare /rom endpoint can't supply,
-  // so browser play is .chd-only (marked EXPERIMENTAL, same as pcecd).
-  segacd: "genesis_plus_gx",
   pce: "mednafen_pce_fast",
   // PC Engine CD shares the beetle-pce-fast core (it emulates CD-ROM² too).
   // CD play needs the System Card BIOS (syscard3.pce) — user-uploaded to the
@@ -102,7 +93,7 @@ const CORE_MAP = {
   snes: "snes9x",
   // Sega 32X via picodrive, self-hosted from the same
   // arianrhodsandlot/retroarch-emscripten-build (Nostalgist format, v1.22.2).
-  // NOT genesis_plus_gx (the Sega core for md/sms/gg/sg/segacd) — that one has no
+  // NOT genesis_plus_gx (the Sega core for md/sms/gg/sg) — that one has no
   // 32X support at all; picodrive is the only libretro 32X core. .32x carts boot
   // HLE, no BIOS needed (the 32X boot ROMs are optional; picodrive HLEs them).
   "32x": "picodrive",
@@ -115,24 +106,6 @@ const CORE_MAP = {
   // emscripten core set), so it was compiled from source (emsdk + RetroArch). fuse
   // bundles the 48K/128K system ROMs internally, so no external BIOS is needed.
   zxs: "fuse",
-  // Capcom Play System 1 (arcade) via fbalpha2012_cps1 — a CPS1-ONLY FB Alpha
-  // 2012 split core (not full FBNeo, which also works but is ~7x bigger at
-  // ~36MB since it statically links in hundreds of unrelated arcade drivers).
-  // No prebuilt Nostalgist-format build exists for this core (it's only
-  // distributed via EmulatorJS's npm packages, 7z-compressed and wrapped in
-  // EmulatorJS's own non-ESM loader shim) — the .js here was extracted from
-  // @emulatorjs/core-fbalpha2012_cps1 and had its export tail rewritten from
-  // EmulatorJS's `EJS_Runtime`/CommonJS wrapper to the
-  // `var libretro_<name> = (() => { var _scriptDir = import.meta.url; ...`
-  // ESM shape Nostalgist's patchCoreJs() expects (same shape every other core
-  // here already has) — verified by running Nostalgist's own patch+boot logic
-  // against it in Node: it reaches the same post-boot Module state (WASM
-  // instantiated, Emscripten runtime initialized) as the reference fbneo
-  // build. The rom IS the standard MAME-style .zip romset (matches
-  // core.json's own `"extensions":["zip"]`); the core reads its chip-dump
-  // entries internally, no separate unzip step here. No BIOS needed, every
-  // CPS1 romset is self-contained.
-  cps1: "fbalpha2012_cps1",
 };
 
 // Every core listed above is mirrored under /public/cores/<core>_libretro.{js,wasm}.
@@ -170,19 +143,18 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "videopac", "c64", "zxs", "cps1"]);
+const EXPERIMENTAL = new Set(["pico8", "pcecd", "videopac", "c64", "zxs"]);
 
 // Systems whose extra_files means "sibling files the core needs written next
-// to the primary one" — pcecd/segacd's .cue references its .bin tracks by
-// name, and a CPS-1 clone's zip is missing chips its parent donor zip
-// supplies. Both are handed to Nostalgist as one romArg array so every file
-// lands together in the emulator's virtual filesystem (setupFileSystem writes
-// each array entry to contentDirectory/<name>) — the core's own file lookup
-// (RetroArch's .cue parser, or FBA's own parent-zip search) then finds them
-// exactly like it would find real sibling files on disk. Gated to just these
-// systems because extra_files is a generic column also used for unrelated
-// sidecars (homebrew's smw_assets.dat) that must NOT be bundled into a launch.
-const MULTI_FILE_SYSTEMS = new Set(["pcecd", "segacd", "cps1"]);
+// to the primary one" — pcecd's .cue references its .bin tracks by name. They
+// are handed to Nostalgist as one romArg array so every file lands together in
+// the emulator's virtual filesystem (setupFileSystem writes each array entry to
+// contentDirectory/<name>) — the core's own file lookup (RetroArch's .cue
+// parser) then finds them exactly like it would find real sibling files on
+// disk. Gated to just these systems because extra_files is a generic column
+// also used for unrelated sidecars (homebrew's smw_assets.dat) that must NOT be
+// bundled into a launch.
+const MULTI_FILE_SYSTEMS = new Set(["pcecd"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -191,7 +163,7 @@ const MOBILE_QUERY = "(max-width: 640px)";
 // the rest are 4:3. Atari runs in an iframe and is intentionally left alone.
 const SCREEN_ASPECT = {
   nes: "4 / 3", sms: "4 / 3", sg: "4 / 3", md: "4 / 3", pce: "4 / 3",
-  pcecd: "4 / 3", segacd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
+  pcecd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
   gb: "10 / 9", gbc: "10 / 9",
   pico8: "1 / 1", tama: "1 / 1", wsv: "1 / 1",
   amstrad: "4 / 3",
@@ -209,9 +181,6 @@ const SCREEN_ASPECT = {
   snes: "4 / 3",
   // Sega 32X: 320×224, PAR-corrected to the standard 4:3 CRT shape (same as md).
   "32x": "4 / 3",
-  // CPS1: 384×224 native, but the arcade cabinet's CRT is 4:3 physical — same
-  // PAR-correction story as every console above with a non-4:3 pixel count.
-  cps1: "4 / 3",
 };
 
 // Square-pixel handhelds: PAR is 1:1, so the screen's true shape IS the live
@@ -242,7 +211,6 @@ const KEY_HINTS = {
   sms:   [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }, { k: "Enter", b: "PAUSE" }],
   sg:    [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }],
   md:    [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
-  segacd: [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   pcecd: [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   videopac: [DPAD, { k: "Z", b: "Action" }, { k: "Enter", b: "Reset" }],
@@ -266,12 +234,6 @@ const KEY_HINTS = {
   snes:  [DPAD, ...AB, { k: "A", b: "Y" }, { k: "S", b: "X" }, { k: "Q", b: "L" }, { k: "W", b: "R" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "START" }],
   // Sega 32X uses the standard Genesis 3-button pad (A/B/C + Mode/Start), same as md.
   "32x": [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
-  // CPS1 arcade panels range from 2 buttons (Final Fight, 1941, Strider) to 6
-  // (the Street Fighter II family) and fbneo maps each game's real buttons onto
-  // RetroPad B/A/Y/X/L/R in order — so labeling them "Weak Punch"/"Strong Kick"
-  // etc. would be wrong for most games; generic numbering is honest here. Select
-  // is COIN (arcade credit), not a menu key.
-  cps1: [DPAD, { k: "Z", b: "Button 1" }, { k: "X", b: "Button 2" }, { k: "A", b: "Button 3" }, { k: "S", b: "Button 4" }, { k: "Q", b: "Button 5" }, { k: "W", b: "Button 6" }, { k: "Shift", b: "Coin" }, { k: "Enter", b: "Start" }],
   amstrad: [DPAD, { k: "Space", b: "Fire" }, { k: "Shift", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   msx:    [DPAD, { k: "Space", b: "Fire (Space)" }, { k: "Ctrl", b: "Fire 2" }, { k: "Enter", b: "RETURN" }],
   mini:   [DPAD, { k: "X", b: "A" }, { k: "Z", b: "B" }, { k: "C", b: "C" }, { k: "Enter", b: "START" }],
@@ -413,7 +375,7 @@ export function EmulatorOverlay({ rom, onClose }) {
         const res = await fetch(romFileUrl(rom.id));
         if (!res.ok) throw new Error(t("Failed to load the ROM file."));
         // res.blob() throws "Failed to fetch" on some Chromium builds once the
-        // response passes ~300MB (reproduced on a 338MB Sega CD .chd) — but
+        // response passes ~300MB (reproduced on a 338MB CD .chd) — but
         // res.arrayBuffer() on the SAME response works fine at that size, so we
         // go through that and wrap it, instead of blob() directly.
         const fileContent = new Blob([await res.arrayBuffer()]);
@@ -427,11 +389,10 @@ export function EmulatorOverlay({ rom, onClose }) {
           }
         }
         // Multi-file systems (see MULTI_FILE_SYSTEMS): CD games are a .cue + track
-        // files (the .cue references tracks by name), and a CPS-1 clone's zip needs
-        // its donor's zip sitting beside it (FBA's own parent-zip lookup finds it by
-        // name in the same directory — same as a real filesystem, see cps1.py).
-        // Hand the core the WHOLE set. Fetched ONE AT A TIME so we can show progress
-        // (a big CD takes a while) and keep peak memory down.
+        // files (the .cue references tracks by name), so the core needs every track
+        // sitting beside the .cue. Hand the core the WHOLE set. Fetched ONE AT A
+        // TIME so we can show progress (a big CD takes a while) and keep peak memory
+        // down.
         const tracks = MULTI_FILE_SYSTEMS.has(rom.system_key) ? parseExtraFiles(rom.extra_files) : [];
         let romArg = { fileName: rom.stored_name, fileContent };
         if (tracks.length) {
@@ -457,16 +418,6 @@ export function EmulatorOverlay({ rom, onClose }) {
           rom: romArg,
           ...(bios.length ? { bios } : {}),
           ...(CORE_CONFIG[rom.system_key] ? { retroarchCoreConfig: CORE_CONFIG[rom.system_key] } : {}),
-          // fbalpha2012_cps1 was built for EmulatorJS's own loader, which always
-          // sets Module.parent (the canvas's container, used by its resize/
-          // fullscreen event targeting as the "!parent" specialHTMLTarget).
-          // Nostalgist doesn't know to supply it, so without this the core's
-          // findEventTarget() falls through to document.querySelector("!parent")
-          // and throws ("'!parent' is not a valid selector") the instant it tries
-          // to wire up canvas resize handling — before a single frame renders.
-          ...(rom.system_key === "cps1"
-            ? { emscriptenModule: { parent: canvasRef.current?.parentElement } }
-            : {}),
           element: canvasRef.current,
           respondToGlobalEvents: true,
         });

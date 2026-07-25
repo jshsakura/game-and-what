@@ -19,7 +19,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response, StreamingResponse
 
 from .. import db
-from ..services import cps1, storage, video
+from ..services import storage, video
 from .sessions import require_session
 
 router = APIRouter(prefix="/api", tags=["downloads"])
@@ -62,42 +62,20 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     is_homebrew = Path(rom_rel).parts[1:2] == ("homebrew",) if "/" in rom_rel else False
     rom_abs = session_root / rom_rel
 
-    # CPS-1 downloads in the SAME envelope as every other system: a <game>.zip
-    # whose SD layout is roms/cps1/<game>.cps1 + covers/cps1/<game>.img. The one
-    # difference is WHAT the rom file is -- not the source romset .zip(s) (the
-    # device can't inflate them) but the single uncompressed <game>.cps1
-    # container: the raw concatenation of the folder's distinct 512 KB chips, no
-    # header, split into 512 KB blocks and hashed on device. Pre-built at upload;
-    # composed on the fly for an older folder that predates the container.
-    is_cps1 = rom["system_key"] == "cps1"
-    cps1_container = None
-    cps1_arcname = None
-    if is_cps1:
-        game_dir = rom_abs.parent
-        cps1_container = cps1.container_path(game_dir) or cps1.build_container(game_dir)
-        if cps1_container is None:
-            # The folder completes no runnable set -- same error as everywhere else.
-            raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
-        cps1_arcname = f"{Path(rom_rel).parent}.cps1"   # roms/cps1/<game>.cps1
-
     buf = io.BytesIO()
     added = 0
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        if is_cps1:
-            # The container in place of the source romset zips; same folder shape.
-            zf.write(cps1_container, arcname=cps1_arcname); added += 1
-        else:
-            # Primary ROM file — but a homebrew .bin app lives in the firmware (not
-            # on SD), so skip it unless the user opted it in (matches the SD rule).
-            skip_primary = (is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"])
-            if rom_abs.exists() and not skip_primary:
-                zf.write(rom_abs, arcname=rom_rel); added += 1
-            # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
-            for ef in json.loads(rom["extra_files"] or "[]"):
-                ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
-                ef_abs = session_root / ef_rel
-                if ef_abs.exists():
-                    zf.write(ef_abs, arcname=ef_rel); added += 1
+        # Primary ROM file — but a homebrew .bin app lives in the firmware (not
+        # on SD), so skip it unless the user opted it in (matches the SD rule).
+        skip_primary = (is_homebrew and rom_rel.lower().endswith(".bin") and not rom["sd_include"])
+        if rom_abs.exists() and not skip_primary:
+            zf.write(rom_abs, arcname=rom_rel); added += 1
+        # Extra files attached to the card (e.g. smw_assets.dat) — always travel.
+        for ef in json.loads(rom["extra_files"] or "[]"):
+            ef_rel = f"{Path(rom_rel).parent}/{ef['name']}"
+            ef_abs = session_root / ef_rel
+            if ef_abs.exists():
+                zf.write(ef_abs, arcname=ef_rel); added += 1
         # Cover ships alongside (separate name from the data file) — every system.
         if cover_rel:
             cover_abs = session_root / cover_rel
@@ -107,9 +85,7 @@ def download_rom(session_id: str, rom_id: str) -> Response:
     if added == 0:
         raise HTTPException(status_code=404, detail="Nothing to download for this ROM")
 
-    # Name the download by the game folder for CPS-1 (its stored_name is a romset
-    # code like "wofj"); by the stored file stem for everything else.
-    stem = Path(rom_rel).parent.name if is_cps1 else Path(rom["stored_name"]).stem
+    stem = Path(rom["stored_name"]).stem
     filename = f"{stem}.zip"
     # Korean (non-latin-1) names crash a plain filename="…" header → RFC 5987:
     # ASCII fallback + UTF-8 filename* (HTTP headers are latin-1 only).
@@ -139,12 +115,10 @@ def serve_rom(session_id: str, rom_id: str) -> Response:
         raise HTTPException(status_code=404, detail="ROM file missing from disk")
 
     payload = abs_path.read_bytes()
-    # CPS-1's donor archive (extra_files) is fetched separately via /cdfile and
-    # written alongside this one in the emulator's virtual filesystem (see
-    # MULTI_FILE_SYSTEMS in emulator.jsx) — NOT merged into this response. A
-    # MAME/FBA-style core does its own parent-zip lookup by opening a sibling
-    # archive on disk; a hand-merged zip instead of the real wofj.zip + wof.zip
-    # pair skips that lookup entirely and was never confirmed to boot.
+    # A multi-file game's sibling tracks/files (extra_files) are fetched separately
+    # via /cdfile and written alongside this one in the emulator's virtual
+    # filesystem (see MULTI_FILE_SYSTEMS in emulator.jsx) — NOT merged into this
+    # response, so the core can open each by its real name on disk.
     name = Path(rom["stored_name"]).name
     ascii_name = name.encode("ascii", "ignore").decode() or "game.bin"
     return Response(

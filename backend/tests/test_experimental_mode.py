@@ -38,8 +38,7 @@ def _p(root: Path, rel: str) -> Path:
 def test_experimental_flags_match_upstream_registration():
     assert {s.key for s in SYSTEMS if not s.experimental} == UPSTREAM_OFFICIAL
     assert EXPERIMENTAL_DIRNAMES == {
-        "pcecd", "segacd", "32x", "lynx", "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom", "gba", "snes",
-        "cps1",
+        "pcecd", "32x", "lynx", "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom", "gba", "snes",
     }
 
 

@@ -1,5 +1,6 @@
 """One-off: register the Korean Sega 32X romset (dropped into /roms/32x/ from the
-miyoo-library export) into the DB. Mirrors import_segacd.py, with two differences:
+miyoo-library export) into the DB. Follows the same one-off import pattern used
+for the other library-collection systems, with two differences:
 
   • covers ARE present (covers/32x/<stem>.img, the device .565 image) — link them
     so cover_status='ok' instead of fetching later. Web previews (.webp) are NOT

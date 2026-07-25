@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Gamepad2, Loader2, Upload } from "lucide-react";
-import { getSystems, getLibrary, uploadRomset, uploadCdFolder, uploadCps1, FOLDER_SYSTEMS, coverUrl } from "../api.js";
+import { getSystems, getLibrary, uploadRomset, uploadCdFolder, FOLDER_SYSTEMS, coverUrl } from "../api.js";
 import { Dropzone, SystemSelect, RomCard } from "../components.jsx";
 import { useT } from "../i18n.jsx";
 import { useKoreanMode } from "../config.jsx";
@@ -8,24 +8,13 @@ import { useKoreanMode } from "../config.jsx";
 const COVER_POLL_MS = 3000;
 
 /* Systems whose layout on the card is a FOLDER PER GAME rather than one file,
- * and which therefore need saying so before the user drops anything. All three
+ * and which therefore need saying so before the user drops anything. They
  * fail the same way when the rule is missed — the files land, the entry
- * appears, and the game dies on the device — so none of them may be left to
+ * appears, and the game dies on the device — so it may not be left to
  * discover it there. */
 function UploadGuidance({ systemKey }) {
   const t = useT();
-  if (systemKey === "cps1") {
-    return (
-      <div className="upload-note warn">
-        <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />
-        <div>
-          <b>{t("One arcade game = one folder, and a clone set needs its parent")}</b>
-          {t("A CPS-1 game is a MAME romset: a dozen separate chip dumps that belong together. Upload the .zip as downloaded — but drop EVERY zip the game needs at once, because many romsets are MAME \"split sets\" whose own archive leaves out the chips it shares with its parent. Warriors of Fate (Japan) ships 6 of its 10 chips; the other 4 are in the World set's archive. Upload just the one and the entry appears but the game will not run.")}
-        </div>
-      </div>
-    );
-  }
-  if (systemKey === "pcecd" || systemKey === "segacd") {
+  if (systemKey === "pcecd") {
     return (
       <div className="upload-note warn">
         <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />
@@ -80,10 +69,8 @@ export default function RomTab({ onChanged }) {
   }, [searching, onChanged]);
 
   const current = systems.find((s) => s.key === active);
-  const isCps1 = active === "cps1";              // arcade → romset zips, all at once
   const isFolder = FOLDER_SYSTEMS.has(active);   // CD systems → upload a game folder
-  const accept = isCps1 ? ".zip"
-    : (!isFolder && current?.exts?.length ? current.exts.map((e) => "." + e).join(",") : "");
+  const accept = !isFolder && current?.exts?.length ? current.exts.map((e) => "." + e).join(",") : "";
   const okResults = results.filter((r) => r.ok);
   const failed = results.filter((r) => !r.ok);
   const dups = results.filter((r) => r.error === "duplicate");
@@ -94,11 +81,9 @@ export default function RomTab({ onChanged }) {
     if (!active || !current) return;
     setBusy(true); setError(""); setExtra(null);
     try {
-      const res = isCps1
-        ? await uploadCps1(files, onProgress)
-        : isFolder
-          ? await uploadCdFolder(active, files, onProgress)
-          : await uploadRomset(active, current.exts, files, onProgress);
+      const res = isFolder
+        ? await uploadCdFolder(active, files, onProgress)
+        : await uploadRomset(active, current.exts, files, onProgress);
       setResults(res.results);
       setExtra({ covers: res.covers || 0, skippedAlt: res.skippedAlt || 0 });
       onChanged?.();
@@ -136,9 +121,7 @@ export default function RomTab({ onChanged }) {
         folder={isFolder}
         label={
           <span className="dz-label">
-            <Upload size={16} aria-hidden /> {isCps1
-              ? t("Drag & drop every .zip this game needs — the clone AND its parent set")
-              : isFolder
+            <Upload size={16} aria-hidden /> {isFolder
               ? t("Drag & drop a {name} game folder (.cue + tracks) or use 'Whole folder'", { name: current?.name ?? "" })
               : t("Drag & drop {name} ROMs here or click", { name: current?.name ?? "" })}
           </span>

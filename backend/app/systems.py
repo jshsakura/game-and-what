@@ -52,23 +52,11 @@ SYSTEMS: tuple[System, ...] = (
     System("gg", "Game Gear", "gg", ("gg",)),
     System("sms", "Master System", "sms", ("sms",)),
     System("md", "Genesis", "md", ("md", "gen", "bin")),
-    # Sega CD (a.k.a. Mega-CD). NOT in rg_emulators.c and not a realistic firmware
-    # port — same story as pcecd, but heavier: it's a full Genesis core PLUS a CD
-    # subsystem, nothing the M7 can add on top of what it already spends on `md`.
-    # Library-collection + browser play only, like pcecd. CD images live in the
-    # single /roms/segacd/ folder as .chd (preferred) or .cue (+ .bin sidecars
-    # tracked as extra_files). Booting needs a user-uploaded region BIOS
-    # (bios_CD_U/E/J.bin — see bios.js) since Sega CD games are region-locked to
-    # their BIOS. Browser play reuses genesis_plus_gx (already self-hosted for
-    # md/sms/gg/sg — it emulates the CD add-on too), single-file .chd boots,
-    # .cue/.bin sets need their track sidecars so they're not browser-playable
-    # (see emulator.jsx, same limitation as pcecd).
-    System("segacd", "Sega CD", "segacd", ("chd", "cue"), experimental=True),
     # Sega 32X (Genesis add-on). NOT in rg_emulators.c — the M7 has no headroom for
     # the 32X's twin SH-2s on top of what it already spends on `md`, so it's
-    # library-collection + browser play only, like segacd. Standard extension is
+    # library-collection + browser play only, like pcecd. Standard extension is
     # ".32x" (some dumps are ".bin"). Browser play uses picodrive — the ONLY libretro
-    # 32X core; genesis_plus_gx (md/segacd) has no 32X support (see emulator.jsx).
+    # 32X core; genesis_plus_gx (md) has no 32X support (see emulator.jsx).
     # .32x carts boot HLE, no BIOS needed.
     System("32x", "Sega 32X", "32x", ("32x", "bin"), experimental=True),
     System("sg", "SG-1000", "sg", ("sg",)),
@@ -151,30 +139,6 @@ SYSTEMS: tuple[System, ...] = (
     # them. Zelda3's zelda3.ro rides along the same way.
     System("homebrew", "Homebrew", "homebrew", ("bin", "dat", "xip", "smc"), square=True),
     System("pico8", "PICO-8", "pico8", ("p8", "png"), pico8=True, square=True),
-    # Capcom Play System 1 (arcade). Not in rg_emulators.c — a full arcade board
-    # (68000 + Z80 + custom GA/OBJ/PRI chips), nothing like the handheld cores
-    # above. It now has BOTH consumers, and they want opposite things, which is
-    # why the library stores one form and derives the other:
-    #
-    #   browser  fbalpha2012_cps1 (emulator.jsx) reads a MAME romset .zip's
-    #            entries itself, exactly as desktop RetroArch does. So the .zip
-    #            already IS the native rom — exts=("zip",) is exact, not a
-    #            placeholder, and the firmware's `lzma` wrapper is unrelated
-    #            (that wraps a system's native rom; here the zip is it).
-    #   device   the SD firmware DOES run this board now (Core/Src/porting/cps1).
-    #            It caches each chip into external flash and reads it in place,
-    #            which needs raw chip bytes — it has no inflate in the emulator
-    #            path and nowhere to put 4 MB of decompressed graphics against
-    #            724 KB of RAM. So the card gets /roms/cps1/<game>/<chip> and
-    #            never the zip.
-    #
-    # The zip is therefore the master and services/cps1.py composes the folder at
-    # packaging time; the two are not convertible in the other direction.
-    # Chips are identified by CRC32, NEVER filename — see services/cps1.py and
-    # docs/CPS1_LIBRARY_CONTRACT.md. Many sets are MAME "split sets" whose clone
-    # archive omits the chips it shares with its parent, so ONE game may hold
-    # more than one archive. No external BIOS either way.
-    System("cps1", "CPS1", "cps1", ("zip",), experimental=True),
 )
 # NOTE: "videopac" is commented out (disabled) in rg_emulators.c, so it is NOT a
 # usable SD folder — intentionally excluded.

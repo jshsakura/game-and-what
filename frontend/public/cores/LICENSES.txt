@@ -23,32 +23,11 @@ tamalibretro                  Tamagotchi                         GPLv2          
 handy                         Atari Lynx                         zlib             https://github.com/libretro/libretro-handy
 snes9x                        Super Nintendo                     NON-COMMERCIAL   https://github.com/libretro/snes9x
 picodrive                     Sega 32X                           NON-COMMERCIAL   https://github.com/libretro/picodrive
-fbalpha2012_cps1              CPS1 (Capcom Play System 1)        NON-COMMERCIAL   https://github.com/libretro/fbalpha2012_cps1
 
-IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX, Snes9x, PicoDrive and
-fbalpha2012_cps1 cores are released under non-commercial licenses (PicoDrive
-bundles notaz's Cyclone 68000 and DrZ80, both non-commercial; FB Alpha's own
-license explicitly forbids selling/leasing/renting it or seeking monetary
-profit from it, forbids distributing binaries supporting games with
-copyright dates under 3 years old, and is additionally subject to the MAME
-license for the MAME-derived code it uses). Any distribution that bundles
-them (including this one) may not be used or redistributed for commercial
-purposes.
-
-fbalpha2012_cps1_libretro.js/.wasm came from the npm package
-@emulatorjs/core-fbalpha2012_cps1 (built by the EmulatorJS project from
-https://github.com/libretro/fbalpha2012_cps1, itself a CPS1-only split of the
-old FB Alpha 2012 codebase — much smaller than a full FBNeo/MAME build since
-it links in only the CPS1 driver). That package ships the core 7z-compressed
-and wrapped for EmulatorJS's OWN loader, not as a standalone Nostalgist-
-compatible module, so the .js here has its export tail rewritten from
-EmulatorJS's `EJS_Runtime`/CommonJS wrapper to the plain ESM
-`var libretro_<name> = (() => { var _scriptDir = import.meta.url; ... }`
-shape every other core in this folder already uses — the WASM binary itself
-is untouched. Unlike every core above (extracted as-is from an upstream
-prebuilt bundle) and potator/fuse below (compiled from source via emsdk +
-RetroArch), this one required that manual wrapper rewrite; see
-frontend/src/emulator.jsx for how it was verified to boot correctly.
+IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX, Snes9x and PicoDrive cores are
+released under non-commercial licenses (PicoDrive bundles notaz's Cyclone 68000
+and DrZ80, both non-commercial). Any distribution that bundles them (including
+this one) may not be used or redistributed for commercial purposes.
 
 Full GPL text (v2 / v3) and per-file copyright headers are in each upstream
 repository above.

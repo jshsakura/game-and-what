@@ -19,9 +19,9 @@ ngp.svg (Neo Geo Pocket Color), ws.svg (WonderSwan Color), lynx.svg (Atari
 Lynx), pcecd.svg (PC Engine CD; uses the TurboGrafx-16 console art from tg16.svg,
 to read distinct from the white PC Engine icon), videopac.svg (Magnavox
 Odyssey² / Philips Videopac; from odyssey-2.svg), gba.svg (Game Boy Advance),
-snes.svg (Super Nintendo), segacd.svg (Sega CD; from segacd32.svg) and 32x.svg
-(Sega 32X) are from the RomM project's platform icon set (rommapp/romm,
-frontend/assets/platforms), same Libretro/CC BY 4.0 lineage.
+snes.svg (Super Nintendo) and 32x.svg (Sega 32X) are from the RomM project's
+platform icon set (rommapp/romm, frontend/assets/platforms), same
+Libretro/CC BY 4.0 lineage.
   Source:  https://github.com/rommapp/romm
 
 zxs.png (Sinclair ZX Spectrum) and c64.png (Commodore 64) are converted from the
@@ -35,11 +35,6 @@ vb.svg (Nintendo Virtual Boy) is the full-color console silhouette from the RomM
 project's "systematic" platform icon set (frontend/assets/platforms/systematic/
 virtualboy.svg) — the libretro monochrome VB glyph is a generic gamepad, not the
 console, so the RomM console art is used instead (matches the colored PNG icons).
-  Source:  https://github.com/rommapp/romm
-
-cps1.svg (Capcom Play System 1) is the full-color arcade-cabinet art from the
-same RomM "systematic" platform icon set (frontend/assets/platforms/systematic/
-cps1.svg) — libretro's assets project has no CPS1-specific glyph.
   Source:  https://github.com/rommapp/romm
 
 chip8.svg (CHIP-8) is an original icon made for this project (no attribution

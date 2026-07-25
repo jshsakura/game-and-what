@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .. import config
 from ..systems import EXPERIMENTAL_DIRNAMES
-from . import cps1, pico8core, storage
+from . import pico8core, storage
 
 
 def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | None" = None,
@@ -35,15 +35,6 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
         # set; anything under it goes with it.
         if any("/".join(parts[:i]) in excluded_roms for i in range(1, len(parts))):
             return True
-    # CPS-1 stores MAME romset ZIPs, and the card must not get them: the firmware
-    # caches each chip into external flash and reads it in place, which needs raw
-    # chip bytes -- it has no inflate in the emulator path and nowhere to put 4 MB
-    # of decompressed graphics against 724 KB of RAM. The chips are emitted in
-    # _sd_entries() straight out of these archives instead. (An arcade core in a
-    # browser would want the opposite, the zip, which is why the zip stays the
-    # master here rather than being converted.)
-    if (len(parts) >= 2 and parts[0] == config.ROMS_DIR_NAME and parts[1] == "cps1"):
-        return True
     # An underscore-prefixed FOLDER is ours, not the card's: _trash, _data,
     # _previews, _firmware, _extra — and the _orig_backup of pre-encode source
     # videos. The device reads none of them, so none of them ship. (_firmware and
@@ -119,71 +110,30 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
     root = storage.session_root(session_id)
     for path in sorted(root.rglob("*")):
         if path.is_file() and not _excluded(root, path, include_video, systems, homebrew_roms, excluded_roms):
-            yield path, str(path.relative_to(root)), None
-    yield from _cps1_entries(root, systems, excluded_roms)
+            yield path, str(path.relative_to(root))
     # PICO-8 core (needed to run .p8) when packaging everything or pico8 is selected.
     if systems is None or "pico8" in systems:
         cores = pico8core.ensure_cores_dir()
         if cores and cores.exists():
             for cp in sorted(cores.rglob("*")):
                 if cp.is_file():
-                    yield cp, f"cores/{cp.relative_to(cores)}", None
+                    yield cp, f"cores/{cp.relative_to(cores)}"
     # Extra passthrough files (bios/…) → SD root. Cores can't boot without their
     # BIOS, so ship these with ANY selection (not just the full SD).
     extra = storage.extra_dir(session_id)
     if extra.exists():
         for ep in sorted(extra.rglob("*")):
             if ep.is_file():
-                yield ep, str(ep.relative_to(extra)).replace("\\", "/"), None
+                yield ep, str(ep.relative_to(extra)).replace("\\", "/")
     # Firmware update → SD ROOT, included with ANY download so the card is complete.
     fw = storage.firmware_path(session_id)
     if fw.exists():
-        yield fw, storage.FIRMWARE_FILENAME, None
+        yield fw, storage.FIRMWARE_FILENAME
 
 
-def _entry_size(src: Path, member: "str | None") -> int:
+def _entry_size(src: Path) -> int:
     """Uncompressed bytes this entry contributes to the card."""
-    if member is None:
-        return src.stat().st_size
-    with zipfile.ZipFile(src) as zf:
-        return zf.getinfo(member).file_size
-
-
-def _cps1_entries(root: Path, systems: "set[str] | None", excluded_roms: "set[str] | None"):
-    """Emit each CPS-1 game folder as its single-file `<game>.cps1` container.
-
-    A CPS-1 game on the server is /roms/cps1/<game name>/*.zip — the clone's
-    archive plus, for a MAME split set, its parent's. The card gets ONE file,
-    /roms/cps1/<game name>.cps1, which is the raw concatenation of the folder's
-    distinct 512 KB chips (no header, no index, no compression). That is the only
-    form the firmware can read (see _excluded): it splits the file into 512 KB
-    blocks and binds each block to a slot by content hash.
-
-    Every distinct chip is included, named by nothing — the device identifies by
-    CRC alone, never by which romset the packager guessed. Emitting only the set
-    the packager picks made the card and the device disagree: the same folder was
-    `wofj` here and `wofr1` on the device, which then reported chips absent that
-    were present all along. The whole pool goes in; extra chips are free.
-
-    The container is pre-built at upload (build_container); it is (re)built here
-    on the fly for an older folder that predates it. An INCOMPLETE folder (one
-    that completes NO set) builds nothing and contributes nothing: half a romset
-    is a game that appears in the launcher and dies when opened, worse than one
-    visibly absent and reported as incomplete at upload time.
-    """
-    if systems is not None and "cps1" not in systems:
-        return
-    base = root / config.ROMS_DIR_NAME / "cps1"
-    if not base.is_dir():
-        return
-    for game_dir in sorted(p for p in base.iterdir() if p.is_dir()):
-        rel = f"{config.ROMS_DIR_NAME}/cps1/{game_dir.name}"
-        if excluded_roms and rel in excluded_roms:
-            continue
-        container = cps1.container_path(game_dir) or cps1.build_container(game_dir)
-        if container is None:            # completes no set → nothing on the card
-            continue
-        yield container, f"{rel}.cps1", None
+    return src.stat().st_size
 
 
 class BuildCancelled(Exception):
@@ -201,28 +151,20 @@ def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
     before each file; if it returns True, raises BuildCancelled."""
     entries = list(_sd_entries(session_id, include_video, systems, homebrew_roms, excluded_roms))
     total = 0
-    for abs_path, _, member in entries:
+    for abs_path, _ in entries:
         try:
-            total += _entry_size(abs_path, member)
+            total += _entry_size(abs_path)
         except OSError:
             pass
     done = 0
     if on_progress:
         on_progress(0, total, "")
-    for abs_path, arcname, member in entries:
+    for abs_path, arcname in entries:
         if should_cancel and should_cancel():
             raise BuildCancelled()
-        if member is None:
-            zf.write(abs_path, arcname=arcname)
-        else:
-            # A CPS-1 chip, read out of its romset archive on the way past. No
-            # extracted copy is kept anywhere: composing at build time is what
-            # makes re-uploading safe, since there is no stale folder to
-            # invalidate when the user later supplies a missing parent set.
-            with zipfile.ZipFile(abs_path) as src:
-                zf.writestr(arcname, src.read(member))
+        zf.write(abs_path, arcname=arcname)
         try:
-            done += _entry_size(abs_path, member)
+            done += _entry_size(abs_path)
         except OSError:
             pass
         if on_progress:
@@ -243,13 +185,10 @@ def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[s
     h.update(f"|video={include_video}|sys={sorted(systems) if systems else None}"
              f"|hb={sorted(homebrew_roms) if homebrew_roms else None}"
              f"|ex={sorted(excluded_roms) if excluded_roms else None}|".encode())
-    for abs_path, arcname, member in _sd_entries(session_id, include_video, systems,
-                                                 homebrew_roms, excluded_roms):
+    for abs_path, arcname in _sd_entries(session_id, include_video, systems,
+                                         homebrew_roms, excluded_roms):
         st = abs_path.stat()
-        # For a CPS-1 game the source is its prebuilt <game>.cps1 container, so
-        # the key moves exactly when the container does -- which is when the
-        # folder's chip pool changed and it was rebuilt.
-        h.update(f"{arcname}|{member or ''}|{st.st_size}|{st.st_mtime_ns}\n".encode())
+        h.update(f"{arcname}|{st.st_size}|{st.st_mtime_ns}\n".encode())
     return h.hexdigest()
 
 
@@ -402,14 +341,6 @@ def sd_content_size(session_id: str, include_video: bool = False, systems: "set[
                     total += p.stat().st_size
                 except OSError:
                     pass
-    # CPS-1 romset zips were just excluded above; what the card actually gets is
-    # the chips inside them, which are roughly twice the size. Counting the zips
-    # would under-report the card by half for every arcade game.
-    for _src, _arc, member in _cps1_entries(root, systems, excluded_roms):
-        try:
-            total += _entry_size(_src, member)
-        except (OSError, KeyError):
-            pass
     if systems is None or "pico8" in systems:
         cores = pico8core.ensure_cores_dir()
         if cores and cores.exists():

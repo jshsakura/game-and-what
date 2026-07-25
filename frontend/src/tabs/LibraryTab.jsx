@@ -56,12 +56,11 @@ const shipsToSd = (rom) => !rom.sd_exclude && rom.pico8_compat !== "broken";
 
 const HANGUL_RE = /[가-힣]/;
 // Homebrew / Pico-8 are indie carts with no Korean release → never "missing".
-// Atari Lynx is a US/EU handheld with no Korean releases either; PC Engine CD,
-// Sega CD and the Sega 32X are JP/US formats with no official Korean releases
-// (Samsung localized cartridge Genesis games, never the CD or 32X add-ons);
-// Virtual Boy was a JP/US-only commercial flop, never sold in Korea. CPS1 arcade
-// boards were never officially localized/distributed in Korea either.
-const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "segacd", "32x", "vb", "cps1"]);
+// Atari Lynx is a US/EU handheld with no Korean releases either; PC Engine CD
+// and the Sega 32X are JP/US formats with no official Korean releases (Samsung
+// localized cartridge Genesis games, never the CD or 32X add-ons); Virtual Boy
+// was a JP/US-only commercial flop, never sold in Korea.
+const NO_KOREAN_SYSTEMS = new Set(["homebrew", "pico8", "lynx", "pcecd", "32x", "vb"]);
 // "Needs a Korean title" = no Hangul AND has a real translatable word: a run of
 // 2+ consecutive letters containing a lowercase one. This excludes titles that
 // are only digits/symbols ("1942"), all-caps acronyms ("NBA", "WWF"), and dotted
@@ -394,7 +393,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
           {groups.map((g) => {
             // The big count is the WHOLE library for this system — how many games
             // the user has — not just the SD-shipping subset. A fully
-            // download-excluded system (snes/segacd/32x: every rom sd_exclude=1)
+            // download-excluded system (snes/32x: every rom sd_exclude=1)
             // would otherwise read 0 despite holding thousands of browser-play
             // titles. The SD-excluded tally lives in the footer; the cover/Korean
             // warning badges still track only what ships (incl).
