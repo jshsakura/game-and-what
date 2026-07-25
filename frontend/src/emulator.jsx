@@ -16,14 +16,14 @@ import { X, Maximize2, Minimize2, Monitor, Copy, Check } from "lucide-react";
 import { romFileUrl, cdTrackUrl, extraDownloadUrl } from "./api.js";
 import { BIOS_CATALOG, BIOS_BY_KEY } from "./bios.js";
 
-// extra_files may arrive as a JSON string or array. CD systems (pcecd) store
-// {name,size} dicts for their track sidecars; we also tolerate a bare filename
-// string so an unexpected shape doesn't silently vanish (`"x"?.name` is undefined).
+// extra_files may arrive as a JSON string or array of {name,size} dicts (CD
+// systems like pcecd store their track sidecars that way). Return just the
+// names; anything without one is dropped.
 function parseExtraFiles(extra) {
   try {
     const arr = typeof extra === "string" ? JSON.parse(extra) : extra;
     if (!Array.isArray(arr)) return [];
-    return arr.map((e) => (typeof e === "string" ? e : e?.name)).filter(Boolean);
+    return arr.map((e) => e?.name).filter(Boolean);
   } catch (_) {
     return [];
   }

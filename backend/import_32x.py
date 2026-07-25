@@ -10,8 +10,6 @@ for the other library-collection systems, with two differences:
 
 Idempotent: skips files already in the roms table.
 """
-from pathlib import Path
-
 from app import db
 from app.services import storage, langtag, romtag, name_index
 

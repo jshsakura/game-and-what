@@ -131,11 +131,6 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
         yield fw, storage.FIRMWARE_FILENAME
 
 
-def _entry_size(src: Path) -> int:
-    """Uncompressed bytes this entry contributes to the card."""
-    return src.stat().st_size
-
-
 class BuildCancelled(Exception):
     """Raised inside the zip writer when a caller asks the build to stop."""
 
@@ -150,23 +145,23 @@ def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
     progress, measured in uncompressed input bytes). should_cancel(): polled
     before each file; if it returns True, raises BuildCancelled."""
     entries = list(_sd_entries(session_id, include_video, systems, homebrew_roms, excluded_roms))
-    total = 0
+    # Size every entry once up front (drives the total), then reuse those numbers
+    # to advance progress in the write loop — no second stat() pass per file.
+    sizes = []
     for abs_path, _ in entries:
         try:
-            total += _entry_size(abs_path)
+            sizes.append(abs_path.stat().st_size)
         except OSError:
-            pass
+            sizes.append(0)
+    total = sum(sizes)
     done = 0
     if on_progress:
         on_progress(0, total, "")
-    for abs_path, arcname in entries:
+    for (abs_path, arcname), size in zip(entries, sizes):
         if should_cancel and should_cancel():
             raise BuildCancelled()
         zf.write(abs_path, arcname=arcname)
-        try:
-            done += _entry_size(abs_path)
-        except OSError:
-            pass
+        done += size
         if on_progress:
             # The name of what just went in. Compressing a 4.6 GB library takes minutes,
             # and a bar with no words is indistinguishable from a hang — the one thing the
@@ -331,38 +326,16 @@ def _prune_sd_cache(cache_dir: Path) -> None:
 def sd_content_size(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
                     homebrew_roms: "set[str] | None" = None, excluded_roms: "set[str] | None" = None) -> int:
     """Total bytes of the SD-bound files (roms/covers, +video/+system filters) plus
-    the PICO-8 core — an estimate of what lands on the card."""
-    root = storage.session_root(session_id)
+    the PICO-8 core, extra/bios and firmware — an estimate of what lands on the card.
+
+    Rides _sd_entries (the single source of truth for what the zip contains) so this
+    estimate and the actual build can never drift."""
     total = 0
-    if root.exists():
-        for p in root.rglob("*"):
-            if p.is_file() and not _excluded(root, p, include_video, systems, homebrew_roms, excluded_roms):
-                try:
-                    total += p.stat().st_size
-                except OSError:
-                    pass
-    if systems is None or "pico8" in systems:
-        cores = pico8core.ensure_cores_dir()
-        if cores and cores.exists():
-            for cp in cores.rglob("*"):
-                if cp.is_file():
-                    try:
-                        total += cp.stat().st_size
-                    except OSError:
-                        pass
-    # Extra (bios) ships with any selection → always counted.
-    extra = storage.extra_dir(session_id)
-    if extra.exists():
-        for ep in extra.rglob("*"):
-            if ep.is_file():
-                try:
-                    total += ep.stat().st_size
-                except OSError:
-                    pass
-    # Firmware ships with any download → always counted.
-    fw = storage.firmware_path(session_id)
-    if fw.exists():
-        total += fw.stat().st_size
+    for abs_path, _ in _sd_entries(session_id, include_video, systems, homebrew_roms, excluded_roms):
+        try:
+            total += abs_path.stat().st_size
+        except OSError:
+            pass
     return total
 
 

@@ -120,16 +120,12 @@ def _render_cover(rom: dict, source, crop_box=None) -> bytes:
                                crop_box=crop_box, lang=_rom_lang(rom))
 
 
-def _cover_basename(rom: dict) -> str:
-    """The device cover's .img basename. A system's stored_name stands for the
-    game, so the cover keeps rom-name → .img."""
-    return covers.cover_filename(rom["stored_name"])
-
-
 def _save_cover(session_id: str, rom: dict, cover_bytes: bytes, raw: bytes | None = None) -> str:
     """Write the device cover (186x100 .img). If `raw` (original source bytes) is
-    given, also write the high-res WebP web preview. Returns the .img rel path."""
-    cover_name = _cover_basename(rom)
+    given, also write the high-res WebP web preview. Returns the .img rel path.
+
+    The .img basename tracks the rom's stored_name (which stands for the game)."""
+    cover_name = covers.cover_filename(rom["stored_name"])
     cover_path = storage.covers_dir(session_id, _dirname_of(rom)) / cover_name
     storage.write_bytes(cover_path, cover_bytes)
     if raw:
