@@ -79,7 +79,7 @@ preview with sample data (no backend; uploads/edits are disabled).
   systems no upstream *release* registers yet — **PC Engine CD** and **Atari Lynx**
   (both merged into upstream `main` on 2026-07-05, so they graduate to official the
   moment upstream cuts a release), plus Neo Geo Pocket, WonderSwan, Virtual Boy,
-  Game Boy Advance, Super Nintendo, Sega 32X, Odyssey², ZX Spectrum, C64,
+  Game Boy Advance, Super Nintendo, Odyssey², ZX Spectrum, C64,
   Game.com — the Super Metroid homebrew port, and the MEDIA tab (video → `/video` MJPEG
   `.avi`, music → `/music`, clock backgrounds).
   **Off by default** — everything above stays hidden and the app tracks only what a

@@ -271,14 +271,16 @@ capstone==5.0.7     ← 유일하게 고정됨
 백엔드는 상대적으로 양호하다. 최장 함수는 `db.py:100 _migrate` 224줄인데 선형 마이그레이션
 나열이라 문제 없고, 실질 이상치는 `roms.py:35 upload_roms` 172줄 하나다.
 
-## C-2. `backend/` 루트에 일회성 스크립트 22개, 그중 10개는 참조 0건
+## C-2. `backend/` 루트에 일회성 스크립트 21개, 그중 9개는 참조 0건
 
 코드·문서·CI 어디에서도 언급되지 않는 것들:
 
 ```
 atari_covers.py   a7800_covers.py  cover_vb.py   dedup_hash.py     fill_manual.py
-import_32x.py     import_snes.py   korean_vb.py  recover_covers.py regen_clean_img.py
+import_snes.py    korean_vb.py     recover_covers.py               regen_clean_img.py
 ```
+
+> `import_32x.py`도 이 목록에 있었으나 32X 지원 제거와 함께 삭제되었다.
 
 게다가 `Dockerfile:76`의 `COPY backend/ ./backend/`가 이것들과 `tests/`를 **이미지에 그대로
 싣는다** — `.dockerignore`에 제외 규칙이 없다.
@@ -350,7 +352,7 @@ esbuild 건은 실제 위험이다. Vite 5 → 7 업그레이드로 한 번에 �
 | 5 | requirements 고정 | [B-3](#b-3-python-의존성-미고정). 빌드 재현성 | 20분 |
 | 6 | demo 패리티 테스트 + 드리프트 3건 수정 | [A-1](#a-1-라이브-데모가-잘못된-시스템-정보를-표시-3건). 데모가 거짓 정보 표시 중 | 1시간 |
 | 7 | 에러 `detail` 영어화 + 로케일 패리티 검사 | [A-3](#a-3-백엔드-에러-메시지가-한국어-전용-56135), [A-4](#a-4-한국어-외-11개-로케일이-170개-문자열-뒤처짐) | 반나절 |
-| 8 | 일회성 스크립트 정리 + `.dockerignore` | [C-2](#c-2-backend-루트에-일회성-스크립트-22개-그중-10개는-참조-0건) | 20분 |
+| 8 | 일회성 스크립트 정리 + `.dockerignore` | [C-2](#c-2-backend-루트에-일회성-스크립트-21개-그중-9개는-참조-0건) | 20분 |
 | 9 | lifespan 전환 + `RomCard` 분리 + 중복 헬퍼 정리 | [C-1](#c-1-큰-파일이-곧-변경이-잦은-파일), [C-3](#c-3-중복-보일러플레이트), [C-4](#c-4-fastapi-appon_event-deprecated) | 1일 |
 
 **1~5번은 서로 독립적이고 합쳐서 한 시간 반이면 끝난다.**

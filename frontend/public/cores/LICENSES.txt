@@ -22,11 +22,9 @@ retro8                        PICO-8                             GPLv3          
 tamalibretro                  Tamagotchi                         GPLv2            https://github.com/celerizer/tamalibretro (based on jcrona/tamalib, GPLv2)
 handy                         Atari Lynx                         zlib             https://github.com/libretro/libretro-handy
 snes9x                        Super Nintendo                     NON-COMMERCIAL   https://github.com/libretro/snes9x
-picodrive                     Sega 32X                           NON-COMMERCIAL   https://github.com/libretro/picodrive
 
-IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX, Snes9x and PicoDrive cores are
-released under non-commercial licenses (PicoDrive bundles notaz's Cyclone 68000
-and DrZ80, both non-commercial). Any distribution that bundles them (including
+IMPORTANT — NON-COMMERCIAL: The Genesis Plus GX and Snes9x cores are released
+under non-commercial licenses. Any distribution that bundles them (including
 this one) may not be used or redistributed for commercial purposes.
 
 Full GPL text (v2 / v3) and per-file copyright headers are in each upstream

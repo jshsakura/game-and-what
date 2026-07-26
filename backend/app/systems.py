@@ -52,13 +52,6 @@ SYSTEMS: tuple[System, ...] = (
     System("gg", "Game Gear", "gg", ("gg",)),
     System("sms", "Master System", "sms", ("sms",)),
     System("md", "Genesis", "md", ("md", "gen", "bin")),
-    # Sega 32X (Genesis add-on). NOT in rg_emulators.c — the M7 has no headroom for
-    # the 32X's twin SH-2s on top of what it already spends on `md`, so it's
-    # library-collection + browser play only, like pcecd. Standard extension is
-    # ".32x" (some dumps are ".bin"). Browser play uses picodrive — the ONLY libretro
-    # 32X core; genesis_plus_gx (md) has no 32X support (see emulator.jsx).
-    # .32x carts boot HLE, no BIOS needed.
-    System("32x", "Sega 32X", "32x", ("32x", "bin"), experimental=True),
     System("sg", "SG-1000", "sg", ("sg",)),
     System("pce", "PC Engine", "pce", ("pce",)),
     # PC Engine CD (a.k.a. TurboGrafx-CD). Upstream took it from this fork into main
