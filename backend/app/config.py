@@ -22,8 +22,28 @@ def _load_env_file() -> None:
 
 _load_env_file()
 
+
+def _env(name: str, default: str) -> str:
+    """An env var that is SET BUT EMPTY means "not configured", not "configured as
+    nothing". docker-compose forwards optional keys as `${VAR:-}`, which hands the
+    container an empty string whenever the user has not set one — so without this every
+    such knob would either crash (`int("")`) or silently become a blank setting."""
+    value = os.getenv(name)
+    return value.strip() if value and value.strip() else default
+
+
+def _env_int(name: str, default: int) -> int:
+    """Same, for the byte caps. A malformed value falls back to the default rather than
+    taking the app down at import: a typo in a compose file should not stop the server
+    from booting on a knob nobody is required to set."""
+    try:
+        return int(_env(name, str(default)))
+    except ValueError:
+        return default
+
+
 # Persistent library root — files live here permanently ("날아가면 안 됨").
-DATA_DIR = Path(os.getenv("GNW_DATA_DIR", Path(__file__).resolve().parent.parent / "data"))
+DATA_DIR = Path(_env("GNW_DATA_DIR", str(Path(__file__).resolve().parent.parent / "data")))
 LIBRARY_DIR = DATA_DIR / "library"        # /library/<session>/{roms,covers,media}
 DB_PATH = DATA_DIR / "gnw.db"
 
@@ -72,33 +92,31 @@ TGDB_API_KEY = os.getenv("TGDB_API_KEY", "")
 STEAMGRIDDB_API_KEY = os.getenv("STEAMGRIDDB_API_KEY", "")
 
 # Upload limits.
-MAX_VIDEO_BYTES = int(os.getenv("GNW_MAX_VIDEO_BYTES", str(512 * 1024 * 1024)))
-MAX_ROM_BYTES = int(os.getenv("GNW_MAX_ROM_BYTES", str(64 * 1024 * 1024)))
+MAX_VIDEO_BYTES = _env_int("GNW_MAX_VIDEO_BYTES", 512 * 1024 * 1024)
+MAX_ROM_BYTES = _env_int("GNW_MAX_ROM_BYTES", 64 * 1024 * 1024)
 # CD folder-per-game uploads (PC Engine CD etc.): a single data/audio track or a
 # .chd can dwarf a cartridge, and a full disc is hundreds of MB, so these get
 # their own much larger per-file / per-folder caps.
-MAX_CD_FILE_BYTES = int(os.getenv("GNW_MAX_CD_FILE_BYTES", str(1024 * 1024 * 1024)))
-MAX_CD_TOTAL_BYTES = int(os.getenv("GNW_MAX_CD_TOTAL_BYTES", str(2 * 1024 * 1024 * 1024)))
-MAX_MUSIC_BYTES = int(os.getenv("GNW_MAX_MUSIC_BYTES", str(64 * 1024 * 1024)))
-MAX_FIRMWARE_BYTES = int(os.getenv("GNW_MAX_FIRMWARE_BYTES", str(64 * 1024 * 1024)))
-MAX_EXTRA_BYTES = int(os.getenv("GNW_MAX_EXTRA_BYTES", str(128 * 1024 * 1024)))
+MAX_CD_FILE_BYTES = _env_int("GNW_MAX_CD_FILE_BYTES", 1024 * 1024 * 1024)
+MAX_CD_TOTAL_BYTES = _env_int("GNW_MAX_CD_TOTAL_BYTES", 2 * 1024 * 1024 * 1024)
+MAX_MUSIC_BYTES = _env_int("GNW_MAX_MUSIC_BYTES", 64 * 1024 * 1024)
+MAX_FIRMWARE_BYTES = _env_int("GNW_MAX_FIRMWARE_BYTES", 64 * 1024 * 1024)
+MAX_EXTRA_BYTES = _env_int("GNW_MAX_EXTRA_BYTES", 128 * 1024 * 1024)
 
 # Service ports (3xxxx range; Docker maps these later).
-API_PORT = int(os.getenv("GNW_API_PORT", "38080"))
-FRONTEND_PORT = int(os.getenv("GNW_FRONTEND_PORT", "38081"))
+API_PORT = _env_int("GNW_API_PORT", 38080)
+FRONTEND_PORT = _env_int("GNW_FRONTEND_PORT", 38081)
 
 # CORS origins. Default "*" — this is a private tool on a Tailscale network
 # with no auth/cookies, accessed via varying IPs/hostnames. Override with
 # GNW_CORS_ORIGINS (comma-separated) to lock down.
-CORS_ORIGINS = os.getenv("GNW_CORS_ORIGINS", "*").split(",")
+CORS_ORIGINS = _env("GNW_CORS_ORIGINS", "*").split(",")
 
 
 # Chunked upload settings.
 TMP_DIR = DATA_DIR / "tmp"
-MAX_CHUNK_BYTES = int(os.getenv("GNW_MAX_CHUNK_BYTES", str(10 * 1024 * 1024)))  # 10 MB
-MAX_UPLOAD_TOTAL_BYTES = int(
-    os.getenv("GNW_MAX_UPLOAD_TOTAL_BYTES", str(512 * 1024 * 1024))  # 512 MB
-)
+MAX_CHUNK_BYTES = _env_int("GNW_MAX_CHUNK_BYTES", 10 * 1024 * 1024)  # 10 MB
+MAX_UPLOAD_TOTAL_BYTES = _env_int("GNW_MAX_UPLOAD_TOTAL_BYTES", 512 * 1024 * 1024)
 
 
 def ensure_dirs() -> None:

@@ -551,7 +551,14 @@ class TestSdCacheBudgetYieldsToDisk:
         cache = tmp_path / "_cache"
         cache.mkdir()
         for i, mb in enumerate(sizes_mb):
-            (cache / f"sd-{i:040x}.zip").write_bytes(b"\0" * (mb * 1024 * 1024))
+            # Sparse, not written: these cases go up to a GiB apiece, and
+            # b"\0" * (1 << 30) builds the whole gibibyte in RAM before it ever
+            # reaches the disk — on a Pi that is the spike, and three kept pytest
+            # runs of it filled a 4 GB /tmp. truncate() costs no memory and no
+            # blocks, and the code under test only ever reads st_size
+            # (packaging.py: _cache_budget, _prune_sd_cache), never the contents.
+            with open(cache / f"sd-{i:040x}.zip", "wb") as fh:
+                fh.truncate(mb * 1024 * 1024)
         return packaging, cache
 
     def _disk(self, monkeypatch, packaging, free_gb):

@@ -114,15 +114,17 @@ def serve_rom(session_id: str, rom_id: str) -> Response:
     if not abs_path.exists():
         raise HTTPException(status_code=404, detail="ROM file missing from disk")
 
-    payload = abs_path.read_bytes()
     # A multi-file game's sibling tracks/files (extra_files) are fetched separately
     # via /cdfile and written alongside this one in the emulator's virtual
     # filesystem (see MULTI_FILE_SYSTEMS in emulator.jsx) — NOT merged into this
     # response, so the core can open each by its real name on disk.
     name = Path(rom["stored_name"]).name
     ascii_name = name.encode("ascii", "ignore").decode() or "game.bin"
-    return Response(
-        content=payload,
+    # FileResponse, not read_bytes(): a rom can be 64 MB and this box is a Pi, so the
+    # file is streamed off disk instead of being built in memory first. It also brings
+    # Range support, which the emulator wants for a cart it does not need all of.
+    return FileResponse(
+        abs_path,
         media_type="application/octet-stream",
         headers={
             "Content-Disposition":
@@ -149,8 +151,12 @@ def serve_cd_track(session_id: str, rom_id: str, name: str) -> Response:
     if not target.exists() or not target.is_file():
         raise HTTPException(status_code=404, detail="Track file missing from disk")
 
-    return Response(
-        content=target.read_bytes(),
+    # Streamed, emphatically: a CD track is the biggest single file the library holds
+    # (MAX_CD_FILE_BYTES is 1 GB) and reading one into memory to answer a request is
+    # how a Pi runs out of it. Range support comes with it, which is what lets a core
+    # seek into a disc image instead of pulling the whole thing.
+    return FileResponse(
+        target,
         media_type="application/octet-stream",
         headers={
             "Content-Disposition": f"inline; filename*=UTF-8''{quote(target.name)}",
@@ -213,8 +219,8 @@ def download_music(session_id: str, music_id: str) -> Response:
 
     name = music["original_name"]
     ascii_name = name.encode("ascii", "ignore").decode() or music["stored_name"]
-    return Response(
-        content=abs_path.read_bytes(),
+    return FileResponse(
+        abs_path,
         media_type="audio/mpeg",
         headers={
             "Content-Disposition":

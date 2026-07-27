@@ -35,4 +35,22 @@ services:
       # "Personal lab" mode: fork-firmware extras (systems beyond the upstream
       # sylverb set, the MEDIA tab converters). Off = official feature set only.
       GNW_EXPERIMENTAL_MODE: ${GNW_EXPERIMENTAL_MODE:-false}
+      # The knobs .env.example documents. They have to be listed HERE to have any
+      # effect: the app's own .env loader reads the project-root .env, but
+      # .dockerignore keeps that file out of the image, and compose's auto-loaded
+      # .env only feeds ${...} substitution in THIS file — it is not handed to the
+      # container. Without these lines, setting them did nothing at all in Docker.
+      #
+      # Unset ones arrive as an empty string, which config.py reads as "not
+      # configured" (see _env/_env_int there) — so an absent .env keeps every default.
+      GNW_CORS_ORIGINS: ${GNW_CORS_ORIGINS:-}
+      GNW_MAX_ROM_BYTES: ${GNW_MAX_ROM_BYTES:-}
+      GNW_MAX_VIDEO_BYTES: ${GNW_MAX_VIDEO_BYTES:-}
+      GNW_MAX_MUSIC_BYTES: ${GNW_MAX_MUSIC_BYTES:-}
+      GNW_MAX_FIRMWARE_BYTES: ${GNW_MAX_FIRMWARE_BYTES:-}
+      GNW_MAX_EXTRA_BYTES: ${GNW_MAX_EXTRA_BYTES:-}
+      GNW_MAX_CD_FILE_BYTES: ${GNW_MAX_CD_FILE_BYTES:-}
+      GNW_MAX_CD_TOTAL_BYTES: ${GNW_MAX_CD_TOTAL_BYTES:-}
+      GNW_MAX_CHUNK_BYTES: ${GNW_MAX_CHUNK_BYTES:-}
+      GNW_MAX_UPLOAD_TOTAL_BYTES: ${GNW_MAX_UPLOAD_TOTAL_BYTES:-}
     restart: unless-stopped
