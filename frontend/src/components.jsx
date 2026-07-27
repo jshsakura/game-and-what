@@ -127,11 +127,44 @@ const GBA_FRAME_CYCLES = 280896;
 // property at all. Both stay off the poster.
 const SNES_HEAVY = new Set(["SuperFX", "SA-1"]);
 
-function snesChip(rom) {
-  if (rom.system_key !== "snes") return null;
+// What each chip actually IS, for the detail panel. The corner badge can only carry a
+// name; this is the sentence that makes the name mean something to someone who has not
+// memorised SNES cartridge silicon.
+const SNES_CHIP_NOTE = {
+  SuperFX: "A 10–21 MHz RISC processor that renders the game's graphics itself. Star Fox and Yoshi's Island do not run slowly without it — they do not run.",
+  "SA-1": "A second 65816 clocked at 10.74 MHz, three times the console's own CPU, doing the game's heavy lifting.",
+  "S-DD1": "A decompression chip that unpacks graphics on the fly, so the cart holds more art than its size suggests.",
+  DSP: "A small maths coprocessor for the console's weak arithmetic — Super Mario Kart's and Pilotwings' 3D leans on it.",
+  CX4: "Capcom's maths chip, used for the wireframe effects in Mega Man X2 and X3.",
+  OBC1: "A small sprite-bookkeeping helper. Barely any cost to emulate.",
+  "S-RTC": "A real-time clock, so the cart knows the date between sessions.",
+  Custom: "A less common chip — SPC7110, ST01x or CX4 — which the header does not name precisely.",
+  Other: "Bridging hardware such as the Super Game Boy or Satellaview adapter.",
+};
+
+function snesReading(rom) {
+  if (rom.system_key !== "snes" || !rom.snes_chip) return null;
   const chip = rom.snes_chip;
-  if (!chip || chip === "none" || chip === "unknown") return null;
-  return { name: chip, heavy: SNES_HEAVY.has(chip) };
+  return {
+    // 'unknown' means the header failed its checksum — a fact about the DUMP, not the
+    // cart, so it gets said rather than dressed up as "no chip".
+    unknown: chip === "unknown",
+    chip: chip === "none" || chip === "unknown" ? null : chip,
+    heavy: SNES_HEAVY.has(chip),
+    note: SNES_CHIP_NOTE[chip] || null,
+    map: rom.snes_map || null,
+    romKb: rom.snes_rom_kb || null,
+    // The header declares a size; the file has one. They disagree when a dump was
+    // padded or trimmed, which is worth surfacing where someone is already looking at
+    // why a cart might misbehave.
+    overdumped: rom.snes_rom_kb && rom.size_bytes
+      ? rom.size_bytes > rom.snes_rom_kb * 1024 * 1.5 : false,
+  };
+}
+
+function snesChip(rom) {
+  const r = snesReading(rom);
+  return r && r.chip ? { name: r.chip, heavy: r.heavy } : null;
 }
 
 function gbaReading(rom) {
@@ -1251,6 +1284,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   // has never been checked on a real device.
   const gba = gbaReading(rom);
   const snes = snesChip(rom);
+  const snesInfo = snesReading(rom);
   // The poster's top corner holds EITHER a gauge or the system-icon/favourite chip, never
   // both — a ring already fills that space, and the icon beside it just crowds it. A GBA
   // card's measured rings and a PICO-8 card's code-size ring both count as a gauge; a
@@ -1834,6 +1868,67 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   )}
                 </div>
               )}
+
+              {/* SNES gets the same panel shape as GBA because it answers the same
+                  question — will this run — but it must not borrow GBA's certainty. Every
+                  line here is read off the cart header; none of it is a measurement, and
+                  the panel says so rather than letting the layout imply otherwise. */}
+              {snesInfo && (
+                <div className="gba-detail">
+                  <div className="gba-detail-row">
+                    <span className={`gba-dot ${snesInfo.heavy ? "over" : snesInfo.chip ? "tight" : ""}`} aria-hidden />
+                    <div>
+                      <b>{snesInfo.unknown
+                        ? t("Could not read this cart's header")
+                        : snesInfo.chip
+                          ? t("This cartridge carries a {chip} chip", { chip: snesInfo.chip })
+                          : t("A plain cartridge — no extra chip")}</b>
+                      <p>
+                        {snesInfo.unknown
+                          ? t("Its checksum does not add up, so nothing here can be trusted — usually a bad dump, an overdump, or a hacked ROM. That is a fact about this file, not about the game.")
+                          : snesInfo.chip
+                            ? t(SNES_CHIP_NOTE[snesInfo.chip] || "A coprocessor on the cartridge itself.")
+                            : t("Everything it needs is the console's own hardware, which is the easiest case for any port to support.")}
+                      </p>
+                      {snesInfo.chip && (
+                        <p className="gba-caveat">
+                          {snesInfo.heavy
+                            ? t("A port either implements this chip or the game does not boot — it is not a matter of running slowly. Whether this firmware does is the firmware's business, and this app does not know it.")
+                            : t("Small coprocessors like this are widely supported and are rarely the reason a game will not run.")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {(snesInfo.map || snesInfo.romKb) && (
+                    <div className="gba-detail-row">
+                      <span className="gba-dot skip" aria-hidden />
+                      <div>
+                        <b>{[snesInfo.map, snesInfo.romKb ? `${snesInfo.romKb} KB` : null]
+                          .filter(Boolean).join(" · ")}</b>
+                        <p>
+                          {t("The memory layout the cart asks for, and the size it declares. FastROM means it wants 3.58 MHz access rather than 2.68 — a cart-level choice, not a chip.")}
+                        </p>
+                        {snesInfo.overdumped && (
+                          <p className="gba-caveat">
+                            {t("The file on disk is much larger than the header declares, which usually means an overdump — padded or duplicated data. It generally still runs.")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="gba-detail-row">
+                    <span className="gba-dot" aria-hidden />
+                    <div>
+                      <b>{t("No speed measurement for SNES")}</b>
+                      <p>
+                        {t("GBA cards show a measured CPU figure because the device runs the same instruction stream a probe can count. A SNES frame is split across the 65816, the PPU and the SPC700 sound chip, so a cycle count would not mean the same thing — and there are no SNES timings from the real device to compare one against. What is above is read from the cart, and stops there.")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
                   </div>
                 </div>
                 <IgdbShotsFooter meta={igdbMeta.meta} t={t} />
@@ -1904,8 +1999,13 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       </li>
                     ))}
                   </ul>
+                  {/* Two lines, not one paragraph: the first says what the rule IS and
+                      the second says what to do about it. Run together they read as a
+                      wall and the actionable half gets skimmed past — which is the half
+                      that stops a crash. */}
                   <p className="hb-bin-note">
-                    {t("⚠ The executable (.bin) is paired with its firmware build. Use the .bin extracted from the firmware you flashed to your device — mismatched versions will crash on launch.")}
+                    <b>{t("⚠ The executable (.bin) is paired with its firmware build.")}</b>
+                    <span>{t("Use the .bin extracted from the firmware you flashed to your device — mismatched versions will crash on launch.")}</span>
                   </p>
                   <input ref={dataFileRef} type="file" hidden onChange={addFile} />
                 </div>

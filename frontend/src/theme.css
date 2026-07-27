@@ -701,6 +701,10 @@ body::before {
    Never green: none of this is a measurement that came back good. */
 .cover-corner:has(.idle-tag.chip-heavy) { background: color-mix(in srgb, #e0a72c 90%, #2a1d05); color: #241a02; }
 .cover-corner:has(.idle-tag.chip)       { background: #4a4a55e6; color: #e6e6ee; }
+/* The corner is pointer-events:none so it does not eat clicks meant for the cover, which
+   also means anything inside it gets no hover — and a title= that never fires is a
+   tooltip that does not exist. The rings solved this below; these need it too. */
+.idle-tag.chip, .idle-tag.chip-heavy { pointer-events: auto; cursor: help; }
 /* The measured card: two rings — CPU load, and what the idle skip took back. Just the
    rings: no chip around them. Each carries its OWN round backdrop, so what sits on the
    cover is two discs rather than a box with discs in it.
@@ -1258,12 +1262,18 @@ body::before {
    panel. It used to be dim grey text at 85% opacity directly on the tile, which is
    the one thing a warning must not be. */
 .hb-bin-note {
+  /* Grid rather than a paragraph: the headline and the instruction are two separate
+     lines with a little air between them, so the actionable half is not skimmed past
+     as the tail of a wall of text. */
+  display: grid; gap: 4px;
   margin: 8px 0 0; padding: 9px 11px;
   border-radius: 8px; border-left: 3px solid var(--gold);
   background: #00000040;
   font-family: var(--body-font); font-size: 12px; line-height: 1.55;
   color: var(--card-ink);
 }
+.hb-bin-note b { font-weight: 700; color: var(--gold); }
+.hb-bin-note span { opacity: 0.92; }
 .rename-row { display: flex; gap: 8px; align-items: stretch; }
 /* read-only ROM path shown in front of the filename so the destination is clear */
 .path-prefix {

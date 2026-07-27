@@ -13,7 +13,12 @@ from .routers import clock, covers, data, downloads, events, extra, firmware, ga
 from .services.video import ffmpeg_available
 from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.11.6")
+app = FastAPI(title="gnw-retro-manager", version="1.11.7")
+
+# How many missing covers one boot goes back for (see _resume_covers). A page, not the
+# backlog: each is two or three provider round-trips, and the remainder is picked up by
+# the next restart rather than paid for all at once.
+_RESUME_COVER_LIMIT = 200
 
 # No cookies/auth, so wildcard origins are fine (credentials must be off with "*").
 app.add_middleware(
@@ -121,6 +126,13 @@ def _startup() -> None:
     # A cover autofill only lives in memory (background task), so a restart mid-run
     # strands its roms on cover_status='pending' — a spinner that never resolves and
     # a library that polls forever. Nothing is in flight at boot: clear them.
+    #
+    # Clearing is only half the answer, and for a long time it was the whole of it. The
+    # spinner stopped, but the WORK was thrown away: a rom went to 'none', which reads
+    # as "this has no cover", and nothing ever looked at it again. Uploading 2,281 snes
+    # roms and restarting the container a few times during a release left 953 of them —
+    # 42% of the system, Final Fantasy V and F-Zero among them — permanently blank, with
+    # art sitting on IGDB the whole time. _resume_covers below is the other half.
     with db.connect() as conn:
         stranded = conn.execute(
             "UPDATE roms SET cover_status = 'none' WHERE cover_status = 'pending'").rowcount
@@ -173,6 +185,49 @@ async def _resume_gba_probes() -> None:
     if rows:
         print(f"[startup] resuming {len(rows)} unfinished GBA measurement(s)")
         asyncio.create_task(_probe_gba(config.SHARED_SESSION_ID, rows))
+
+
+@app.on_event("startup")
+async def _resume_covers() -> None:
+    """Go back for the covers a restart abandoned.
+
+    The prober got this treatment and the cover fetcher did not, which is the whole bug.
+    Both queues live only in memory; both are emptied by a restart. A stranded probe was
+    re-queued because the answer was worth having, while a stranded cover was flipped to
+    'none' and forgotten — and 'none' is indistinguishable from "this game has no art
+    anywhere", so nothing ever tried again. A library uploaded in bulk and restarted a
+    few times ends up permanently half-covered, which is exactly what happened here.
+
+    Bounded on purpose. It walks a page at a time rather than the whole backlog, because
+    every rom here is two or three network round-trips to IGDB/TheGamesDB and a boot
+    should not turn into a thousand of them. Each restart takes another bite and the
+    remainder shrinks; a converged library finds nothing and costs one query.
+
+    Never touches a rom that already has art, and autofill itself leaves a hand-set
+    cover alone — this only ever fills blanks.
+    """
+    from .routers.covers import autofill_rom
+
+    with db.connect() as conn:
+        rows = [dict(r) for r in conn.execute(
+            "SELECT * FROM roms WHERE session_id = ? AND cover_status = 'none' "
+            "AND system_key != 'pico8' ORDER BY created_at DESC LIMIT ?",
+            (config.SHARED_SESSION_ID, _RESUME_COVER_LIMIT))]
+    if not rows:
+        return
+
+    async def _fill(items: list[dict]) -> None:
+        done = 0
+        for rom in items:
+            try:
+                if await autofill_rom(config.SHARED_SESSION_ID, rom):
+                    done += 1
+            except Exception as exc:                       # one bad rom must not stop the rest
+                print(f"[covers] {rom.get('stored_name')}: {exc}")
+        print(f"[startup] filled {done} of {len(items)} missing cover(s)")
+
+    print(f"[startup] resuming {len(rows)} missing cover(s)")
+    asyncio.create_task(_fill(rows))
 
 
 @app.get("/api/health")

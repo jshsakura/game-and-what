@@ -314,6 +314,22 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # a failure to look must never be recorded as an answer. NULL = never read.
         conn.execute("ALTER TABLE roms ADD COLUMN snes_chip TEXT")
 
+    if "snes_map" not in cols:
+        # The rest of what the same header read already had in hand and used to throw
+        # away: the memory layout the cart wants ('LoROM', 'HiROM', 'ExHiROM', with
+        # ' · FastROM' when it asks for 3.58 MHz access) and the size it declares in KB.
+        #
+        # They belong beside snes_chip for the same reason it is here — a port implements
+        # a mapper or it does not — and because the declared size disagreeing with the
+        # file on disk is how an overdump shows itself. NULL when the header failed its
+        # checksum: those bytes are the ones we just refused to trust.
+        conn.execute("ALTER TABLE roms ADD COLUMN snes_map TEXT")
+        conn.execute("ALTER TABLE roms ADD COLUMN snes_rom_kb INTEGER")
+        # Existing snes rows were stamped by the older read that only took the chip.
+        # Clearing snes_chip puts them back in the backfill's sights on the next boot,
+        # which is the whole recovery path — one query, and it converges again.
+        conn.execute("UPDATE roms SET snes_chip = NULL WHERE system_key = 'snes'")
+
     # The library grid's query — every rom for the session, newest first — is the
     # heaviest thing this database does, and it had no index that could serve both halves
     # of it: session_id came off idx_roms_hash and then the whole result was sorted in a

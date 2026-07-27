@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""snes_hdr.read_chip() — which coprocessor a SNES cart declares in its header.
+"""snes_hdr.read_header() — which coprocessor a SNES cart declares in its header.
 
 Pins the three things that make the answer trustworthy: the checksum test (a random
 stretch of ROM must not read as a header), the 'unknown' vs 'none' distinction (a
@@ -21,7 +21,7 @@ def _cart(tmp_path, *, offset=0x7FC0, map_mode=0x20, rom_type=0x00,
     hdr[0x00:0x15] = name.ljust(0x15, b" ")[:0x15]
     hdr[0x15] = map_mode
     hdr[0x16] = rom_type
-    hdr[0x17] = 0x0A                                   # rom size, unused by read_chip
+    hdr[0x17] = 0x0A                                   # rom size, unused by the chip read
     complement, checksum = 0x1234, (0x1234 ^ 0xFFFF) if valid_checksum else 0x0000
     hdr[0x1C:0x1E] = complement.to_bytes(2, "little")
     hdr[0x1E:0x20] = checksum.to_bytes(2, "little")
@@ -42,11 +42,11 @@ def _cart(tmp_path, *, offset=0x7FC0, map_mode=0x20, rom_type=0x00,
 # --- no coprocessor -----------------------------------------------------
 
 def test_plain_lorom_reads_as_none(tmp_path):
-    assert snes_hdr.read_chip(_cart(tmp_path)) == "none"
+    assert snes_hdr.read_header(_cart(tmp_path))["chip"] == "none"
 
 
 def test_plain_hirom_at_its_own_offset(tmp_path):
-    assert snes_hdr.read_chip(_cart(tmp_path, offset=0xFFC0, map_mode=0x21)) == "none"
+    assert snes_hdr.read_header(_cart(tmp_path, offset=0xFFC0, map_mode=0x21))["chip"] == "none"
 
 
 # --- coprocessors -------------------------------------------------------
@@ -58,20 +58,20 @@ def test_plain_hirom_at_its_own_offset(tmp_path):
 def test_rom_type_high_nibble_names_the_chip(tmp_path, high_nibble, expected):
     # Low nibble 0x3 = "ROM + coprocessor"; only then is the high nibble a chip id.
     cart = _cart(tmp_path, rom_type=(high_nibble << 4) | 0x3)
-    assert snes_hdr.read_chip(cart) == expected
+    assert snes_hdr.read_header(cart)["chip"] == expected
 
 
 def test_low_nibble_without_coprocessor_is_not_a_chip(tmp_path):
     """0x02 is ROM+RAM+battery. Its high nibble is 0, which would read as 'DSP' if the
     low nibble were ignored — the commonest way to get this wrong."""
-    assert snes_hdr.read_chip(_cart(tmp_path, rom_type=0x02)) == "none"
+    assert snes_hdr.read_header(_cart(tmp_path, rom_type=0x02))["chip"] == "none"
 
 
 @pytest.mark.parametrize("map_mode", [0x23, 0x33])
 def test_sa1_declared_only_in_map_mode(tmp_path, map_mode):
     """Some SA-1 carts carry an ordinary-looking rom type and say SA-1 at 0x15 alone.
     Missing this silently files a second 65816 as a plain cart."""
-    assert snes_hdr.read_chip(_cart(tmp_path, map_mode=map_mode, rom_type=0x00)) == "SA-1"
+    assert snes_hdr.read_header(_cart(tmp_path, map_mode=map_mode, rom_type=0x00))["chip"] == "SA-1"
 
 
 @pytest.mark.parametrize("map_mode", [0x22, 0x32])
@@ -79,14 +79,14 @@ def test_sdd1_map_mode_is_not_sa1(tmp_path, map_mode):
     """0x32 is S-DD1's FastROM spelling and sits one below SA-1's 0x33. Reading it as
     SA-1 filed Star Ocean — an S-DD1 cart — as carrying a second 65816, which is how
     this was caught: against the real library, not the fixtures."""
-    assert snes_hdr.read_chip(_cart(tmp_path, map_mode=map_mode, rom_type=0x00)) == "S-DD1"
+    assert snes_hdr.read_header(_cart(tmp_path, map_mode=map_mode, rom_type=0x00))["chip"] == "S-DD1"
 
 
 def test_rom_type_beats_map_mode(tmp_path):
     """Map mode only fills in for carts that leave the rom-type byte blank. A cart that
     names its chip properly must never be overridden by the coarser signal."""
     cart = _cart(tmp_path, map_mode=0x23, rom_type=0x13)   # map says SA-1, type says GSU
-    assert snes_hdr.read_chip(cart) == "SuperFX"
+    assert snes_hdr.read_header(cart)["chip"] == "SuperFX"
 
 
 # --- unknown is not 'none' ----------------------------------------------
@@ -94,23 +94,23 @@ def test_rom_type_beats_map_mode(tmp_path):
 def test_bad_checksum_is_unknown_not_none(tmp_path):
     """The whole point of the distinction: a dump we could not read must not be
     recorded as a cart we read and found empty."""
-    assert snes_hdr.read_chip(_cart(tmp_path, valid_checksum=False)) == "unknown"
+    assert snes_hdr.read_header(_cart(tmp_path, valid_checksum=False))["chip"] == "unknown"
 
 
 def test_garbage_file_is_unknown(tmp_path):
     p = tmp_path / "garbage.sfc"
     p.write_bytes(b"\xAA" * 0x20000)
-    assert snes_hdr.read_chip(p) == "unknown"
+    assert snes_hdr.read_header(p)["chip"] == "unknown"
 
 
 def test_file_too_small_for_any_header_is_unknown(tmp_path):
     p = tmp_path / "tiny.sfc"
     p.write_bytes(b"\x00" * 64)
-    assert snes_hdr.read_chip(p) == "unknown"
+    assert snes_hdr.read_header(p)["chip"] == "unknown"
 
 
 def test_missing_file_is_unknown(tmp_path):
-    assert snes_hdr.read_chip(tmp_path / "nope.sfc") == "unknown"
+    assert snes_hdr.read_header(tmp_path / "nope.sfc")["chip"] == "unknown"
 
 
 # --- copier header ------------------------------------------------------
@@ -119,7 +119,7 @@ def test_copier_header_is_skipped(tmp_path):
     """A .smc from a copier puts 512 bytes of its own in front. Not skipping them
     shifts every candidate offset and the header is never found."""
     cart = _cart(tmp_path, rom_type=0x13, copier=True)   # 0x1_ = SuperFX
-    assert snes_hdr.read_chip(cart) == "SuperFX"
+    assert snes_hdr.read_header(cart)["chip"] == "SuperFX"
 
 
 # --- reading is header-only ---------------------------------------------
@@ -143,7 +143,7 @@ def test_does_not_read_the_whole_cart(tmp_path, monkeypatch):
         return fh
 
     monkeypatch.setattr(type(cart), "open", spy_open)
-    assert snes_hdr.read_chip(cart) == "SA-1"
+    assert snes_hdr.read_header(cart)["chip"] == "SA-1"
     assert reads, "expected the header to be read"
     assert all(n == 0x30 for n in reads), f"non-header-sized read: {reads}"
 
@@ -183,9 +183,45 @@ def test_upload_of_a_non_snes_rom_leaves_the_column_null(client, session_id):
     assert rom["snes_chip"] is None
 
 
-def test_heavy_names_match_what_read_chip_returns(tmp_path):
-    """HEAVY is matched against read_chip()'s output by the UI, so a rename in one
+def test_heavy_names_match_what_the_reader_returns(tmp_path):
+    """HEAVY is matched against read_header()'s output by the UI, so a rename in one
     place and not the other would quietly stop flagging the heaviest carts."""
-    produced = {snes_hdr.read_chip(_cart(tmp_path, rom_type=(n << 4) | 0x3))
+    produced = {snes_hdr.read_header(_cart(tmp_path, rom_type=(n << 4) | 0x3))["chip"]
                 for n in (0x1, 0x3)}
     assert produced == set(snes_hdr.HEAVY)
+
+
+# --- mapper and declared size -------------------------------------------
+
+@pytest.mark.parametrize("map_mode,expected", [
+    (0x20, "LoROM"), (0x21, "HiROM"), (0x25, "ExHiROM"),
+    (0x30, "LoROM · FastROM"), (0x31, "HiROM · FastROM"),
+    (0x22, "LoROM"),                      # S-DD1 carts reuse the LoROM shape
+    (0x23, "LoROM"),                      # so do SA-1 carts
+])
+def test_map_mode_names_the_layout_and_flags_fastrom(tmp_path, map_mode, expected):
+    """FastROM is bit 4 of the same byte, so every layout has two spellings. The panel
+    prints this verbatim; getting the bit wrong would label half the library wrong."""
+    assert snes_hdr.read_header(_cart(tmp_path, map_mode=map_mode))["map"] == expected
+
+
+def test_declared_rom_size_is_read(tmp_path):
+    """Byte 0x17 is log2 of the size in KB — 0x0A is 1024 KB, the commonest cart here."""
+    assert snes_hdr.read_header(_cart(tmp_path))["rom_kb"] == 1024
+
+
+def test_absurd_declared_size_is_dropped(tmp_path):
+    """A header can say anything. Quoting "33554432 KB" at the user because a byte was
+    garbage is worse than saying nothing, so out-of-range exponents become None."""
+    cart = _cart(tmp_path)
+    raw = bytearray(cart.read_bytes())
+    raw[0x7FC0 + 0x17] = 0x19             # 2^25 KB — not a cartridge
+    cart.write_bytes(bytes(raw))
+    assert snes_hdr.read_header(cart)["rom_kb"] is None
+
+
+def test_unreadable_header_reports_nothing_else(tmp_path):
+    """map and rom_kb come off the same bytes the checksum just rejected. Returning
+    them anyway would be quoting a source we have declared untrustworthy."""
+    h = snes_hdr.read_header(_cart(tmp_path, valid_checksum=False))
+    assert h == {"chip": "unknown", "map": None, "rom_kb": None}

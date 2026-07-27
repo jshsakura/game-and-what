@@ -63,6 +63,10 @@ _MAP_SA1 = (0x23, 0x33)
 _MAP_SDD1 = (0x22, 0x32)
 _MAP_KNOWN = (0x20, 0x21, 0x22, 0x23, 0x25, 0x30, 0x31, 0x32, 0x33, 0x35)
 
+# The low nibble names the layout; S-DD1 and SA-1 carts reuse the LoROM/HiROM shapes,
+# so they map back to those rather than to a fourth name.
+_MAP_LAYOUT = {0x0: "LoROM", 0x1: "HiROM", 0x2: "LoROM", 0x3: "LoROM", 0x5: "ExHiROM"}
+
 # The chips that are not merely "extra silicon" but a different order of work: one is a
 # RISC drawing every polygon, the other a second main CPU at three times the speed.
 HEAVY = ("SuperFX", "SA-1")
@@ -85,13 +89,21 @@ def _score(hdr: bytes) -> int:
     return score
 
 
-def read_chip(path: str | Path) -> str:
-    """The cart's coprocessor, or 'none' when there is none and 'unknown' when the
-    header cannot be trusted (a bad dump, an overdump, a hacked ROM).
+def read_header(path: str | Path) -> dict:
+    """What the cart declares about itself:
 
-    'unknown' is deliberately NOT 'none': saying a cart is plain because we failed to
-    read it would be inventing an answer, and the two need to stay tellable apart —
-    the same reason the GBA probe carries `idle_hunted` (see db.py).
+        {"chip": str, "map": str | None, "rom_kb": int | None}
+
+    `chip` is the coprocessor, 'none' when there is none, and 'unknown' when the header
+    cannot be trusted (a bad dump, an overdump, a hacked ROM). 'unknown' is deliberately
+    NOT 'none': saying a cart is plain because we failed to read it would be inventing an
+    answer, and the two need to stay tellable apart — the same reason the GBA probe
+    carries `idle_hunted` (see db.py). When chip is 'unknown' the rest is None, because
+    it came off the same bytes we just said we do not trust.
+
+    `map` is the memory layout the cart wants — 'LoROM', 'HiROM', 'ExHiROM', each with
+    ' · FastROM' appended when the cart asks for 3.58 MHz access. It matters for the same
+    reason the chip does: a port implements a mapper or it does not.
     """
     p = Path(path)
     try:
@@ -111,35 +123,58 @@ def read_chip(path: str | Path) -> str:
                 if sc > best:
                     best, best_hdr = sc, hdr
     except OSError:
-        return "unknown"
+        return {"chip": "unknown", "map": None, "rom_kb": None}
 
     # Below the checksum test we are guessing, and a guessed coprocessor is worse than
     # an admitted blank.
     if best_hdr is None or best < 8:
-        return "unknown"
+        return {"chip": "unknown", "map": None, "rom_kb": None}
 
     # The rom-type byte is the primary source; map mode only fills in for carts that
     # leave it blank, so a cart that names its chip properly is never overridden here.
     rom_type = best_hdr[0x16]
-    if (rom_type & 0x0F) not in _HAS_COPROC:
-        if best_hdr[0x15] in _MAP_SA1:
-            return "SA-1"
-        if best_hdr[0x15] in _MAP_SDD1:
-            return "S-DD1"
-        return "none"
-    return _COPROC.get(rom_type >> 4, "Custom")
+    if (rom_type & 0x0F) in _HAS_COPROC:
+        chip = _COPROC.get(rom_type >> 4, "Custom")
+    elif best_hdr[0x15] in _MAP_SA1:
+        chip = "SA-1"
+    elif best_hdr[0x15] in _MAP_SDD1:
+        chip = "S-DD1"
+    else:
+        chip = "none"
+
+    # Byte 0x15 again, this time for the layout. Bit 4 is the FastROM flag, so each
+    # layout has a slow and a fast spelling and the low nibble is what names it.
+    mode = best_hdr[0x15]
+    layout = _MAP_LAYOUT.get(mode & 0x0F)
+    mapping = f"{layout} · FastROM" if layout and (mode & 0x10) else layout
+
+    # Byte 0x17 is log2 of the size in KB. Sane carts land between 256 KB and 48 Mbit;
+    # anything outside that is a header we should not be quoting figures from.
+    exp = best_hdr[0x17]
+    rom_kb = (1 << exp) if 8 <= exp <= 13 else None
+
+    return {"chip": chip, "map": mapping, "rom_kb": rom_kb}
+
+
+def read_chip(path: str | Path) -> str:
+    """Just the coprocessor. Kept because that is what the roms table stores and what
+    the upload path and backfill below both want."""
+    return read_header(path)["chip"]
 
 
 def backfill(conn, session_root: Path) -> int:
-    """Stamp `snes_chip` onto snes roms that have never been read. Idempotent: a row
-    only qualifies while the column is NULL, so a converged library costs one query at
+    """Stamp the header fields onto snes roms that have never been read. Idempotent: a
+    row only qualifies while snes_chip is NULL, so a converged library costs one query at
     startup and nothing else. Returns how many rows were filled."""
     rows = conn.execute(
         "SELECT id, rom_path FROM roms WHERE system_key = 'snes' AND snes_chip IS NULL"
     ).fetchall()
     filled = 0
     for r in rows:
-        chip = read_chip(session_root / r["rom_path"])
-        conn.execute("UPDATE roms SET snes_chip = ? WHERE id = ?", (chip, r["id"]))
+        h = read_header(session_root / r["rom_path"])
+        conn.execute(
+            "UPDATE roms SET snes_chip = ?, snes_map = ?, snes_rom_kb = ? WHERE id = ?",
+            (h["chip"], h["map"], h["rom_kb"], r["id"]),
+        )
         filled += 1
     return filled
