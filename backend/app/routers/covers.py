@@ -242,13 +242,13 @@ async def upload_cover(
     # Reject oversized uploads before slurping the whole thing into memory when
     # the client gave us a size; otherwise check after read as a backstop.
     if file.size is not None and file.size > _MAX_COVER_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="이미지가 너무 큽니다 (최대 40MB)")
+        raise HTTPException(status_code=413, detail="Image too large (40 MB max)")
 
     raw = await file.read()
     if not raw:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(raw) > _MAX_COVER_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="이미지가 너무 큽니다 (최대 40MB)")
+        raise HTTPException(status_code=413, detail="Image too large (40 MB max)")
 
     crop_box = _parse_crop(crop)
     try:
@@ -259,7 +259,7 @@ async def upload_cover(
         log.info("cover render failed for rom %s: %s", rom_id, exc)
         raise HTTPException(
             status_code=422,
-            detail="이미지를 읽을 수 없습니다 — 지원하지 않는 형식이거나 손상된 파일입니다",
+            detail="Could not read the image — unsupported format, or a damaged file",
         ) from exc
 
     cover_rel = _save_cover(session_id, rom, cover_bytes, raw)
@@ -636,19 +636,19 @@ def recrop_cover(session_id: str, rom_id: str, payload: dict = Body(default={}))
         require_session(conn, session_id)
         rom = _require_rom(conn, session_id, rom_id)
     if rom["cover_status"] != "ok":
-        raise HTTPException(status_code=400, detail="먼저 커버를 설정하세요")
+        raise HTTPException(status_code=400, detail="Set a cover first")
 
     preview = _preview_path(session_id, rom)
     cover_abs = _cover_abs(session_id, rom)
     src_path = preview if preview.exists() else cover_abs
     if src_path is None or not src_path.exists():
-        raise HTTPException(status_code=404, detail="원본 이미지를 찾을 수 없습니다")
+        raise HTTPException(status_code=404, detail="Original image not found")
     src = src_path.read_bytes()
 
     try:
         cover_bytes = _render_cover(rom, src, crop_box=crop)
     except covers.CoverError as exc:
-        raise HTTPException(status_code=422, detail=f"이미지 처리 실패: {exc}") from exc
+        raise HTTPException(status_code=422, detail=f"Image processing failed: {exc}") from exc
 
     cover_rel = _save_cover(session_id, rom, cover_bytes)   # device .img ONLY; preview untouched
     with db.connect() as conn:
@@ -665,12 +665,12 @@ def set_cover_flag(session_id: str, rom_id: str, payload: dict = Body(...)) -> d
     it. Re-bakes the device .img so the baked flag updates; the web preview /
     original is never touched."""
     if "cover_flag" not in payload:
-        raise HTTPException(status_code=400, detail="cover_flag 값이 필요합니다")
+        raise HTTPException(status_code=400, detail="cover_flag is required")
     raw = payload["cover_flag"]
     flag = (raw or "").strip().lower() or None
     if flag is not None and flag not in covers.FLAG_CODES:
         raise HTTPException(status_code=400,
-                            detail=f"지원하지 않는 국기: {flag} (가능: {sorted(covers.FLAG_CODES)})")
+                            detail=f"Unsupported flag: {flag} (available: {sorted(covers.FLAG_CODES)})")
     with db.connect() as conn:
         require_session(conn, session_id)
         rom = _require_rom(conn, session_id, rom_id)
@@ -694,12 +694,12 @@ async def cover_from_url(session_id: str, rom_id: str, payload: dict = Body(...)
 
     raw = await artfetch.fetch_image(url)
     if not raw:
-        raise HTTPException(status_code=422, detail="이미지를 가져오지 못했습니다")
+        raise HTTPException(status_code=422, detail="Could not fetch the image")
     crop_box = _parse_crop(payload.get("crop"))
     try:
         cover_bytes = _render_cover(rom, raw, crop_box=crop_box)
     except covers.CoverError as exc:
-        raise HTTPException(status_code=422, detail=f"이미지 처리 실패: {exc}") from exc
+        raise HTTPException(status_code=422, detail=f"Image processing failed: {exc}") from exc
 
     cover_rel = _save_cover(session_id, rom, cover_bytes, raw)
     with db.connect() as conn:
@@ -717,7 +717,7 @@ async def fetch_igdb_meta(session_id: str, rom_id: str) -> dict:
         row = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
                             (rom_id, session_id)).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         rom = dict(row)
 
     meta = None
@@ -730,7 +730,7 @@ async def fetch_igdb_meta(session_id: str, rom_id: str) -> dict:
             meta = hit[1]
             break
     if meta is None:
-        raise HTTPException(status_code=404, detail="IGDB에서 정보를 찾지 못했습니다")
+        raise HTTPException(status_code=404, detail="Nothing found on IGDB")
 
     with db.connect() as conn:
         conn.execute("UPDATE roms SET igdb_meta=? WHERE id=?",
@@ -747,7 +747,7 @@ def get_igdb_meta(session_id: str, rom_id: str) -> dict:
         row = conn.execute("SELECT igdb_meta FROM roms WHERE id=? AND session_id=?",
                             (rom_id, session_id)).fetchone()
     if row is None:
-        raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+        raise HTTPException(status_code=404, detail="ROM not found")
     try:
         return json.loads(row[0]) if row[0] else {}
     except (ValueError, TypeError):

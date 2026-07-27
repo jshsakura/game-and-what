@@ -37,7 +37,7 @@ def download_firmware(session_id: str) -> Response:
         require_session(conn, session_id)
     p = storage.firmware_path(session_id)
     if not p.exists():
-        raise HTTPException(status_code=404, detail="펌웨어 파일이 없습니다")
+        raise HTTPException(status_code=404, detail="No firmware file")
     return Response(content=p.read_bytes(), media_type="application/octet-stream",
                     headers={"Content-Disposition": f'attachment; filename="{storage.FIRMWARE_FILENAME}"',
                              "Cache-Control": "no-store"})
@@ -60,13 +60,13 @@ async def upload_firmware(session_id: str, file: UploadFile = File(...)) -> dict
 
     name = storage.nfc(file.filename) or "firmware.bin"
     if Path(name).suffix.lower() not in _ALLOWED_SUFFIXES:
-        raise HTTPException(status_code=400, detail=".bin 파일만 지원합니다 (retro-go_update.bin)")
+        raise HTTPException(status_code=400, detail="Only .bin files are supported (retro-go_update.bin)")
 
     data = await file.read()
     if not data:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(data) > config.MAX_FIRMWARE_BYTES:
-        raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+        raise HTTPException(status_code=413, detail="File too large")
 
     storage.write_bytes(storage.firmware_path(session_id), data)
     return {**_info(session_id), "original_name": name}

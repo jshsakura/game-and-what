@@ -15,7 +15,7 @@ def require_korean_mode() -> None:
     """Block Korea-specific endpoints when the deploy isn't in Korean mode
     (GNW_KOREAN_MODE). Keeps the international/public image free of 한글 features."""
     if not config.KOREAN_MODE:
-        raise HTTPException(status_code=403, detail="한국어 모드에서만 사용할 수 있는 기능입니다")
+        raise HTTPException(status_code=403, detail="This feature is only available in Korean mode")
 
 
 def require_experimental_mode() -> None:

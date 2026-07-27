@@ -45,21 +45,21 @@ def restore_event(session_id: str, event_id: str) -> dict:
         require_session(conn, session_id)
         ev = events.get(conn, session_id, event_id)
         if ev is None or ev["event_type"] != "rom_delete":
-            raise HTTPException(status_code=404, detail="복구할 삭제 기록이 없습니다")
+            raise HTTPException(status_code=404, detail="No deletion to restore")
         meta = ev["meta"] or {}
         if meta.get("restored"):
-            raise HTTPException(status_code=409, detail="이미 복구되었습니다")
+            raise HTTPException(status_code=409, detail="Already restored")
         if not ev["within_window"]:
-            raise HTTPException(status_code=410, detail="복구 보관 기간(30일)이 지났습니다")
+            raise HTTPException(status_code=410, detail="Past the 30-day recovery window")
         snap = meta.get("snapshot")
         if not snap or not snap.get("id"):
-            raise HTTPException(status_code=410, detail="복구 정보가 없습니다")
+            raise HTTPException(status_code=410, detail="No recovery information was kept")
         if conn.execute("SELECT 1 FROM roms WHERE id = ?", (snap["id"],)).fetchone():
-            raise HTTPException(status_code=409, detail="이미 라이브러리에 있습니다")
+            raise HTTPException(status_code=409, detail="Already in the library")
 
         # Move the ROM file back first (the cover is best-effort).
         if not storage.restore_from_trash(session_id, snap.get("rom_path")):
-            raise HTTPException(status_code=410, detail="휴지통에서 파일을 찾을 수 없습니다 (보관 기간 만료)")
+            raise HTTPException(status_code=410, detail="The file is no longer in the trash (recovery window expired)")
         storage.restore_from_trash(session_id, snap.get("cover_path"))
         # Bring co-located sidecars (CD .bin tracks, homebrew .dat) back too.
         parent = Path(snap["rom_path"]).parent

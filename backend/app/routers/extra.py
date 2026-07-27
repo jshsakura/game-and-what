@@ -60,12 +60,12 @@ async def upload_extra(session_id: str, file: UploadFile = File(...),
 
     rel = safe_rel_path(path)
     if not rel:
-        raise HTTPException(status_code=400, detail="SD 경로를 입력하세요 (예: bios/nes/disksys.rom)")
+        raise HTTPException(status_code=400, detail="Enter an SD path (e.g. bios/nes/disksys.rom)")
     data = await file.read()
     if not data:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(data) > config.MAX_EXTRA_BYTES:
-        raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+        raise HTTPException(status_code=413, detail="File too large")
 
     storage.write_bytes(storage.extra_dir(session_id) / rel, data)
     return {"path": rel, "size_bytes": len(data)}
@@ -78,7 +78,7 @@ def download_extra(session_id: str, path: str) -> Response:
     rel = safe_rel_path(path)
     abs_path = storage.extra_dir(session_id) / rel
     if not rel or not abs_path.exists():
-        raise HTTPException(status_code=404, detail="파일이 없습니다")
+        raise HTTPException(status_code=404, detail="File not found")
     name = Path(rel).name
     from urllib.parse import quote
     ascii_name = name.encode("ascii", "ignore").decode() or "file"

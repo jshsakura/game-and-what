@@ -55,7 +55,7 @@ def rename_rom(
     AND its cover (.img) together so they stay a set. Updates the DB paths."""
     raw = (payload.get("name") or "").strip()
     if not raw:
-        raise HTTPException(status_code=400, detail="파일명을 입력하세요")
+        raise HTTPException(status_code=400, detail="Enter a filename")
 
     with db.connect() as conn:
         require_session(conn, session_id)

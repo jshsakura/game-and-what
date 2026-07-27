@@ -14,6 +14,32 @@ export function useToast() {
 const ICONS = { success: CheckCircle2, error: XCircle, info: Info, warn: AlertTriangle };
 const TTL = { success: 3500, info: 3500, warn: 5000, error: 6000 };
 
+// Toast text is translated HERE rather than at each call site, because most error
+// toasts carry `err.message`, and that message came from the API — where the source
+// language is English, exactly like every t() key in the app. Translating at the one
+// place they all pass through is what lets a 400 from the backend read Korean for a
+// Korean user and German for a German one, without threading t() through api.js.
+//
+// Calling t() on an already-translated string is harmless: it misses the dictionary
+// and comes back unchanged.
+//
+// The ": " rule is for messages that carry a value — a filename, an ffmpeg error. The
+// whole string can never be a key (the value differs every time), so the part before
+// the colon is looked up and the value is pasted back on. Backend messages are written
+// to put the variable last for this reason (see routers/*.py).
+function translateMessage(t, message) {
+  if (typeof message !== "string" || !message) return message;
+  const direct = t(message);
+  if (direct !== message) return direct;
+  const at = message.indexOf(": ");
+  if (at > 0) {
+    const stem = message.slice(0, at);
+    const translated = t(stem);
+    if (translated !== stem) return `${translated}: ${message.slice(at + 2)}`;
+  }
+  return message;
+}
+
 let seq = 0;
 
 export function ToastProvider({ children }) {
@@ -59,7 +85,7 @@ export function ToastProvider({ children }) {
           return (
             <div key={toast.id} className={`toast toast-${toast.type}`} role="status" onClick={() => remove(toast.id)}>
               <Icon size={15} strokeWidth={2.5} aria-hidden />
-              <span>{toast.message}</span>
+              <span>{translateMessage(t, toast.message)}</span>
             </div>
           );
         })}

@@ -341,7 +341,7 @@ async def upload_cd_folder(
     if primary_i is None:
         primary_i = next((i for i, n in enumerate(names) if _ext(n) == "chd"), None)
     if primary_i is None:
-        raise HTTPException(status_code=400, detail="폴더에 .cue 또는 .chd가 없습니다")
+        raise HTTPException(status_code=400, detail="The folder has no .cue or .chd")
 
     # Game folder = the dropped folder's top dir; fall back to the primary's stem.
     def _top(rel: str) -> str:
@@ -364,7 +364,7 @@ async def upload_cd_folder(
         for i, upload in enumerate(files):
             name = names[i]
             if "/" in name or "\\" in name or name in ("", ".", ".."):
-                raise HTTPException(status_code=400, detail=f"잘못된 파일명: {name}")
+                raise HTTPException(status_code=400, detail=f"Invalid filename: {name}")
             target = stage_dir / name
             size = 0
             with target.open("wb") as out:
@@ -375,9 +375,9 @@ async def upload_cd_folder(
                     size += len(chunk)
                     total += len(chunk)
                     if size > config.MAX_CD_FILE_BYTES:
-                        raise HTTPException(status_code=413, detail=f"파일이 너무 큽니다: {name}")
+                        raise HTTPException(status_code=413, detail=f"File too large: {name}")
                     if total > config.MAX_CD_TOTAL_BYTES:
-                        raise HTTPException(status_code=413, detail="폴더가 너무 큽니다")
+                        raise HTTPException(status_code=413, detail="Folder too large")
                     out.write(chunk)
                     if i == primary_i:
                         h.update(chunk)
@@ -458,7 +458,7 @@ async def add_cd_tracks(
         row = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
                            (rom_id, session_id)).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         rom = dict(row)
 
     base = storage.session_root(session_id) / Path(rom["rom_path"]).parent
@@ -469,7 +469,7 @@ async def add_cd_tracks(
     for upload in files:
         name = _basename(upload.filename)
         if "/" in name or "\\" in name or name in ("", ".", ".."):
-            raise HTTPException(status_code=400, detail=f"잘못된 파일명: {name}")
+            raise HTTPException(status_code=400, detail=f"Invalid filename: {name}")
         if name == primary_name:
             continue                                   # never clobber the .cue/.chd
         target = base / name
@@ -482,7 +482,7 @@ async def add_cd_tracks(
                 size += len(chunk)
                 if size > config.MAX_CD_FILE_BYTES:
                     out.close(); target.unlink(missing_ok=True)
-                    raise HTTPException(status_code=413, detail=f"파일이 너무 큽니다: {name}")
+                    raise HTTPException(status_code=413, detail=f"File too large: {name}")
                 out.write(chunk)
         extra = [e for e in extra if e.get("name") != name]   # replace if re-sent
         extra.append({"name": name, "size": size})
@@ -512,13 +512,13 @@ async def replace_rom_file(
     sys_obj = get_system(rom["system_key"])
     upload_name = storage.nfc(file.filename) or "rom"
     if not accepts_extension(sys_obj, upload_name):
-        raise HTTPException(status_code=400, detail=f"{sys_obj.name}에 맞지 않는 확장자입니다")
+        raise HTTPException(status_code=400, detail=f"Extension not accepted for this system: {sys_obj.name}")
 
     data = await file.read()
     if not data:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(data) > config.MAX_ROM_BYTES:
-        raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+        raise HTTPException(status_code=413, detail="File too large")
 
     # Move the OLD file to _trash first (recoverable) — never destroy in place,
     # then write the new bytes at the same path (keep the stored filename + ext).
@@ -553,21 +553,21 @@ async def add_rom_file(session_id: str, rom_id: str, file: UploadFile = File(...
         rom = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
                            (rom_id, session_id)).fetchone()
         if rom is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         rom = dict(rom)
 
     data = await file.read()
     if not data:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(data) > config.MAX_ROM_BYTES:
-        raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+        raise HTTPException(status_code=413, detail="File too large")
 
     name = storage.safe_name(storage.nfc(file.filename or "file"))
     parts = Path(rom["rom_path"]).parts          # ('roms', '<dir>', '<file>')
     dirname = parts[1] if len(parts) >= 3 else "homebrew"
     rel = f"{config.ROMS_DIR_NAME}/{dirname}/{name}"
     if name == Path(rom["stored_name"]).name:
-        raise HTTPException(status_code=400, detail="기본(템플릿) 파일과 같은 이름은 쓸 수 없습니다")
+        raise HTTPException(status_code=400, detail="That is a stock (template) file name and cannot be reused")
 
     storage.write_bytes(storage.session_root(session_id) / rel, data)
     extra = [e for e in _extra_list(rom) if e.get("name") != name]   # replace if same name
@@ -581,13 +581,13 @@ async def add_rom_file(session_id: str, rom_id: str, file: UploadFile = File(...
 def delete_rom_file(session_id: str, rom_id: str, name: str) -> dict:
     """Remove an extra data file from a card (its template .bin is never touched)."""
     if "/" in name or "\\" in name or name in ("", ".", ".."):
-        raise HTTPException(status_code=400, detail=f"잘못된 파일명: {name}")
+        raise HTTPException(status_code=400, detail=f"Invalid filename: {name}")
     with db.connect() as conn:
         require_session(conn, session_id)
         rom = conn.execute("SELECT * FROM roms WHERE id=? AND session_id=?",
                            (rom_id, session_id)).fetchone()
         if rom is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         rom = dict(rom)
     parts = Path(rom["rom_path"]).parts
     dirname = parts[1] if len(parts) >= 3 else "homebrew"

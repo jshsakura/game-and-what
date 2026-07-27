@@ -28,7 +28,7 @@ def set_sd_include(session_id: str, rom_id: str, payload: dict = Body(...)) -> d
             "SELECT id FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         conn.execute("UPDATE roms SET sd_include = ? WHERE id = ?", (int(include), rom_id))
     return {"rom_id": rom_id, "sd_include": include}
 
@@ -45,7 +45,7 @@ def set_sd_exclude(session_id: str, rom_id: str, payload: dict = Body(...)) -> d
             "SELECT stored_name, system_key FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         conn.execute("UPDATE roms SET sd_exclude = ? WHERE id = ?", (int(exclude), rom_id))
         events.log(conn, session_id, "sd_exclude", rom_id=rom_id,
                    rom_name=row["stored_name"], system_key=row["system_key"],
@@ -59,7 +59,7 @@ def set_sd_exclude_bulk(session_id: str, payload: dict = Body(...)) -> dict:
     "exclude": true|false}. Used to slim a bloated set in one call."""
     rom_ids = payload.get("rom_ids")
     if not isinstance(rom_ids, list) or not rom_ids:
-        raise HTTPException(status_code=400, detail="rom_ids가 필요합니다")
+        raise HTTPException(status_code=400, detail="rom_ids is required")
     exclude = bool(payload.get("exclude"))
     with db.connect() as conn:
         require_session(conn, session_id)
@@ -84,7 +84,7 @@ def set_favorite(session_id: str, rom_id: str, payload: dict = Body(...)) -> dic
             "SELECT id FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         conn.execute("UPDATE roms SET favorite = ? WHERE id = ?", (int(favorite), rom_id))
     return {"rom_id": rom_id, "favorite": favorite}
 
@@ -102,9 +102,9 @@ def set_idle_loop(session_id: str, rom_id: str, payload: dict = Body(...)) -> di
             "SELECT system_key FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         if row["system_key"] != "gba":
-            raise HTTPException(status_code=400, detail="idle_loop은 GBA 전용입니다")
+            raise HTTPException(status_code=400, detail="idle_loop is GBA-only")
         conn.execute("UPDATE roms SET idle_loop = ? WHERE id = ?", (int(idle_loop), rom_id))
     return {"rom_id": rom_id, "idle_loop": idle_loop}
 
@@ -119,16 +119,16 @@ def set_pico8_compat(session_id: str, rom_id: str, payload: dict = Body(...)) ->
     to untested. Display-only — it does not affect what ships in the SD package."""
     status = payload.get("status")
     if status is not None and status not in PICO8_COMPAT_VALUES:
-        raise HTTPException(status_code=400, detail="알 수 없는 호환 상태입니다")
+        raise HTTPException(status_code=400, detail="Unknown compatibility status")
     with db.connect() as conn:
         require_session(conn, session_id)
         row = conn.execute(
             "SELECT system_key, stored_name FROM roms WHERE id = ? AND session_id = ?", (rom_id, session_id)
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         if row["system_key"] != "pico8":
-            raise HTTPException(status_code=400, detail="PICO-8 롬에만 설정할 수 있습니다")
+            raise HTTPException(status_code=400, detail="This can only be set on a PICO-8 rom")
         conn.execute("UPDATE roms SET pico8_compat = ? WHERE id = ?", (status, rom_id))
         events.log(conn, session_id, "pico8_compat", rom_id=rom_id,
                    rom_name=row["stored_name"], system_key="pico8",

@@ -21,7 +21,7 @@ def set_lang(session_id: str, rom_id: str, payload: dict = Body(...)) -> dict:
     a later scan won't revert it. Body: {"is_korean_patched": true|false}.
     (Generic "user patch applied" toggle — not gated to Korean deploys.)"""
     if "is_korean_patched" not in payload:
-        raise HTTPException(status_code=400, detail="is_korean_patched 값이 필요합니다")
+        raise HTTPException(status_code=400, detail="is_korean_patched is required")
     patched = bool(payload["is_korean_patched"])
     with db.connect() as conn:
         require_session(conn, session_id)
@@ -31,7 +31,7 @@ def set_lang(session_id: str, rom_id: str, payload: dict = Body(...)) -> dict:
             (rom_id, session_id),
         ).fetchone()
         if row is None:
-            raise HTTPException(status_code=404, detail="ROM을 찾을 수 없습니다")
+            raise HTTPException(status_code=404, detail="ROM not found")
         base = langtag.LangInfo(
             orig_lang=row["orig_lang"], play_lang=row["play_lang"],
             is_korean_patched=bool(row["is_korean_patched"]),

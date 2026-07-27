@@ -1154,7 +1154,7 @@ def test_download_data_missing_file_404s(client, session_id):
     resp = client.get(f"/api/sessions/{session_id}/data/nope.txt/download")
 
     assert resp.status_code == 404
-    assert resp.json()["detail"] == "파일이 없습니다"
+    assert resp.json()["detail"] == "File not found"
 
 
 def test_data_endpoints_unknown_session_404s(client):

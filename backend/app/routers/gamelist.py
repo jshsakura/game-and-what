@@ -22,7 +22,7 @@ def _resolve(session_id: str, filename: str) -> Path:
         for p in base.iterdir():
             if p.is_file() and unicodedata.normalize("NFC", p.name) == want:
                 return p
-    raise HTTPException(status_code=404, detail="gamelist 파일을 찾을 수 없습니다 (DATA에 먼저 올리세요)")
+    raise HTTPException(status_code=404, detail="No gamelist file — upload one under DATA first")
 
 
 @router.post("/sessions/{session_id}/gamelist/preview")
@@ -37,7 +37,7 @@ def preview(session_id: str, payload: dict = Body(...)) -> dict:
         try:
             result = gamelist.build_plan(conn, session_id, path, system)
         except Exception as exc:  # malformed XML, etc.
-            raise HTTPException(status_code=400, detail=f"gamelist 파싱 실패: {exc}") from exc
+            raise HTTPException(status_code=400, detail=f"Could not parse the gamelist: {exc}") from exc
     return {"matched": len(result["plan"]), "system": result["system"], "plan": result["plan"][:300]}
 
 
@@ -53,7 +53,7 @@ def apply(session_id: str, payload: dict = Body(...)) -> dict:
         try:
             result = gamelist.build_plan(conn, session_id, path, system)
         except Exception as exc:
-            raise HTTPException(status_code=400, detail=f"gamelist 파싱 실패: {exc}") from exc
+            raise HTTPException(status_code=400, detail=f"Could not parse the gamelist: {exc}") from exc
         plan = result["plan"]
 
         renamed = 0

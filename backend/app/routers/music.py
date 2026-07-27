@@ -17,9 +17,9 @@ router = APIRouter(prefix="/api", tags=["music"])
 def _store_mp3(session_id: str, original: str, data: bytes) -> dict:
     """Persist MP3 bytes under /music + record the row."""
     if not data:
-        raise HTTPException(status_code=400, detail="빈 파일입니다")
+        raise HTTPException(status_code=400, detail="The file is empty")
     if len(data) > config.MAX_MUSIC_BYTES:
-        raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+        raise HTTPException(status_code=413, detail="File too large")
 
     stored_name = storage.safe_name(Path(original).stem) + ".mp3"
     dst = storage.music_dir(session_id) / stored_name
@@ -58,11 +58,11 @@ async def upload_music(session_id: str, file: UploadFile = File(...)) -> dict:
     else:
         # Anything else (video / other audio) → extract the audio track to MP3.
         if not video.ffmpeg_available():
-            raise HTTPException(status_code=503, detail="ffmpeg가 없어 영상에서 추출할 수 없습니다")
+            raise HTTPException(status_code=503, detail="Cannot extract audio from video without ffmpeg")
         if not data:
-            raise HTTPException(status_code=400, detail="빈 파일입니다")
+            raise HTTPException(status_code=400, detail="The file is empty")
         if len(data) > config.MAX_VIDEO_BYTES:
-            raise HTTPException(status_code=413, detail="파일이 너무 큽니다")
+            raise HTTPException(status_code=413, detail="File too large")
 
         music = storage.music_dir(session_id)
         src = music / f".src_{storage.new_id()}{suffix or '.bin'}"
@@ -72,7 +72,7 @@ async def upload_music(session_id: str, file: UploadFile = File(...)) -> dict:
             await video.extract_mp3(src, out)
             mp3_bytes = out.read_bytes()
         except video.VideoEncodeError as exc:
-            raise HTTPException(status_code=502, detail=f"오디오 추출 실패: {exc}")
+            raise HTTPException(status_code=502, detail=f"Audio extraction failed: {exc}")
         finally:
             src.unlink(missing_ok=True)
             out.unlink(missing_ok=True)

@@ -20,7 +20,7 @@ def _safe_target(session_id: str, name: str) -> Path:
     base = storage.scratch_dir(session_id).resolve()
     target = (base / storage.safe_name(name)).resolve()
     if base not in target.parents:
-        raise HTTPException(status_code=400, detail="잘못된 파일명")
+        raise HTTPException(status_code=400, detail="Invalid filename")
     return target
 
 
@@ -67,7 +67,7 @@ def download_data(session_id: str, name: str) -> Response:
         require_session(conn, session_id)
     target = _safe_target(session_id, name)
     if not target.exists():
-        raise HTTPException(status_code=404, detail="파일이 없습니다")
+        raise HTTPException(status_code=404, detail="File not found")
     # A Korean filename can't live in a plain latin-1 `filename="…"` header — it
     # breaks, the browser gets no name and saves the URL tail ("download") as
     # "download.txt". RFC 5987: ASCII fallback + UTF-8 filename* (same as the ROM
