@@ -473,3 +473,24 @@ def test_render_pico8_preview_raises_without_a_label(tmp_path):
     path.write_text("no label section here", encoding="utf-8")
     with pytest.raises(CoverError):
         render_pico8_preview(path)
+
+
+def test_rom_terms_falls_back_to_the_snes_cart_title():
+    """A Korean-only filename gives the cover search nothing latin — both the stored and
+    original names are Hangul and get rejected as unsearchable. The cart's own header
+    name is the only thing left, and without it these roms can never get art."""
+    from app.routers.covers import _rom_terms
+    rom = {"stored_name": "혼두라 스피릿츠.smc", "original_name": "혼두라 스피릿츠",
+           "korean_name": None, "snes_title": "CONTRA SPIRITS"}
+    assert "CONTRA SPIRITS" in _rom_terms(rom)
+
+
+def test_rom_terms_prefers_the_curated_filename_over_the_cart_title():
+    """The filename is what the user curated. The header name is a fallback, not a
+    replacement — a cart whose internal name is a stub must not outrank a good title."""
+    from app.routers.covers import _rom_terms
+    rom = {"stored_name": "혼두라 스피릿츠 (Contra Spirits).smc",
+           "original_name": "혼두라 스피릿츠 (Contra Spirits)",
+           "korean_name": None, "snes_title": "CONTRA SPIRITS"}
+    terms = _rom_terms(rom)
+    assert terms[0] == "Contra Spirits", terms

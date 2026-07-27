@@ -330,6 +330,19 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # which is the whole recovery path — one query, and it converges again.
         conn.execute("UPDATE roms SET snes_chip = NULL WHERE system_key = 'snes'")
 
+    if "snes_title" not in cols:
+        # The 21-byte name the cart calls ITSELF, off the same header read. It is here for
+        # the cover search: a rom named '혼두라 스피릿츠.smc' offers a provider nothing to
+        # match on — IGDB and TheGamesDB index English and romaji, and asking them in
+        # Korean returns nothing at all. The header answers 'CONTRA SPIRITS', and
+        # '힘내라!고에몽' answers 'GANBARE GOEMON'. 194 snes roms here have Korean-only
+        # filenames and no cover; this is the only Latin name they carry.
+        #
+        # NULL when the field is Shift-JIS, padding, or too short to be a name. See
+        # services/snes_hdr._internal_title.
+        conn.execute("ALTER TABLE roms ADD COLUMN snes_title TEXT")
+        conn.execute("UPDATE roms SET snes_chip = NULL WHERE system_key = 'snes'")
+
     # The library grid's query — every rom for the session, newest first — is the
     # heaviest thing this database does, and it had no index that could serve both halves
     # of it: session_id came off idx_roms_hash and then the whole result was sorted in a

@@ -224,4 +224,34 @@ def test_unreadable_header_reports_nothing_else(tmp_path):
     """map and rom_kb come off the same bytes the checksum just rejected. Returning
     them anyway would be quoting a source we have declared untrustworthy."""
     h = snes_hdr.read_header(_cart(tmp_path, valid_checksum=False))
-    assert h == {"chip": "unknown", "map": None, "rom_kb": None}
+    assert h == {"chip": "unknown", "map": None, "rom_kb": None, "title": None}
+
+
+# --- internal cart title (the cover search's last resort) ----------------
+
+def test_internal_title_is_read(tmp_path):
+    """The only Latin name a Korean-titled rom carries. Without it the cover search has
+    literally nothing to ask a provider for."""
+    assert snes_hdr.read_header(_cart(tmp_path, name=b"CONTRA SPIRITS"))["title"] == "CONTRA SPIRITS"
+
+
+def test_title_padding_is_trimmed(tmp_path):
+    """The field is 21 bytes, space- or NUL-padded. Searching for 'R-TYPE 3\\x00\\x00' is
+    searching for nothing."""
+    cart = _cart(tmp_path, name=b"R-TYPE 3\x00\x00\x00")
+    assert snes_hdr.read_header(cart)["title"] == "R-TYPE 3"
+
+
+def test_shift_jis_title_is_dropped(tmp_path):
+    """Japanese carts often fill this field with Shift-JIS. Those bytes are not a search
+    term in any useful sense, and feeding them to a provider is noise."""
+    assert snes_hdr.read_header(_cart(tmp_path, name=b"\x83\x8d\x83b\x83N\x83}\x83\x93"))["title"] is None
+
+
+def test_title_too_short_to_be_a_name_is_dropped(tmp_path):
+    """Padding and stubs would search as confidently as they are useless."""
+    assert snes_hdr.read_header(_cart(tmp_path, name=b"A1"))["title"] is None
+
+
+def test_unreadable_header_has_no_title_either(tmp_path):
+    assert snes_hdr.read_header(_cart(tmp_path, valid_checksum=False))["title"] is None

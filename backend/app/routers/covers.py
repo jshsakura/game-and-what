@@ -427,6 +427,12 @@ def _rom_terms(rom: dict) -> list[str]:
             out.append(t)
     add(_search_term(rom.get("korean_name"), rom["stored_name"]))
     add(_clean_original(rom.get("original_name") or ""))
+    # The name the SNES cart calls itself, from its header (services/snes_hdr). Last,
+    # because the filename is what the user curated and should win when it is usable —
+    # but for a Korean-only name the two candidates above are both Hangul, `add` rejects
+    # them as unsearchable, and this is the only Latin string the rom has. 194 roms here
+    # were in exactly that state: no cover, and nothing to ask a provider for.
+    add(rom.get("snes_title") or "")
     for base in list(out):
         for v in _term_variants(base):
             add(v)

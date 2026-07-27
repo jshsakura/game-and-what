@@ -28,6 +28,7 @@ firmware's business, and that answer is not in this repo.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 # Header candidates, in the cart address space AFTER any copier header is dropped.
@@ -123,12 +124,12 @@ def read_header(path: str | Path) -> dict:
                 if sc > best:
                     best, best_hdr = sc, hdr
     except OSError:
-        return {"chip": "unknown", "map": None, "rom_kb": None}
+        return {"chip": "unknown", "map": None, "rom_kb": None, "title": None}
 
     # Below the checksum test we are guessing, and a guessed coprocessor is worse than
     # an admitted blank.
     if best_hdr is None or best < 8:
-        return {"chip": "unknown", "map": None, "rom_kb": None}
+        return {"chip": "unknown", "map": None, "rom_kb": None, "title": None}
 
     # The rom-type byte is the primary source; map mode only fills in for carts that
     # leave it blank, so a cart that names its chip properly is never overridden here.
@@ -153,7 +154,39 @@ def read_header(path: str | Path) -> dict:
     exp = best_hdr[0x17]
     rom_kb = (1 << exp) if 8 <= exp <= 13 else None
 
-    return {"chip": chip, "map": mapping, "rom_kb": rom_kb}
+    return {"chip": chip, "map": mapping, "rom_kb": rom_kb,
+            "title": _internal_title(best_hdr)}
+
+
+# A cart title has to be worth searching for. Two letters and a digit is not a game
+# name, and neither is a row of padding.
+_TITLE_MIN_LETTERS = 3
+
+
+def _internal_title(hdr: bytes) -> str | None:
+    """The 21-byte name the cart calls itself, at offset 0x00.
+
+    This is the only LATIN name a Korean-titled rom carries. A file named
+    '혼두라 스피릿츠.smc' gives a cover search nothing to work with — IGDB and
+    TheGamesDB index English and romaji, and asking them in Korean returns nothing at
+    all (measured: five such titles, five misses). The header answers in ASCII:
+    'R-타입III' is 'R-TYPE 3' in here, 'GP-1 래피드 스트림' is 'GP-1 Rapid Stream'.
+
+    Japanese carts often fill this field with Shift-JIS, which is not a search term in
+    any useful sense, so anything that does not survive as ASCII is dropped. So is
+    padding and boilerplate too short to be a name — several SD Gundam data carts all
+    say 'ADD-ON BASE CASSETE', which would search as confidently as it is useless.
+    Nothing downstream trusts this blindly: it is one more candidate term, and the
+    title-match guard still has to agree before any art is stamped.
+    """
+    raw = hdr[0x00:0x15]
+    text = raw.decode("ascii", "ignore")
+    # \x00 padding, and the 0x20-padded field's trailing run.
+    text = re.sub(r"[^\x20-\x7E]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if sum(c.isalpha() for c in text) < _TITLE_MIN_LETTERS:
+        return None
+    return text
 
 
 def read_chip(path: str | Path) -> str:
@@ -173,8 +206,9 @@ def backfill(conn, session_root: Path) -> int:
     for r in rows:
         h = read_header(session_root / r["rom_path"])
         conn.execute(
-            "UPDATE roms SET snes_chip = ?, snes_map = ?, snes_rom_kb = ? WHERE id = ?",
-            (h["chip"], h["map"], h["rom_kb"], r["id"]),
+            "UPDATE roms SET snes_chip = ?, snes_map = ?, snes_rom_kb = ?, "
+            "snes_title = ? WHERE id = ?",
+            (h["chip"], h["map"], h["rom_kb"], h["title"], r["id"]),
         )
         filled += 1
     return filled

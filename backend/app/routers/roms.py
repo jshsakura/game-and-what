@@ -21,11 +21,11 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["roms"])
 
 
-def _snes_header(rom_path: Path) -> tuple[str | None, str | None, int | None]:
-    """The three snes_* columns, in the order the INSERT below binds them. A tuple
-    rather than three calls so the header is read once."""
+def _snes_header(rom_path: Path) -> tuple[str | None, str | None, int | None, str | None]:
+    """The four snes_* columns, in the order the INSERT below binds them. A tuple
+    rather than four calls so the header is read once."""
     h = snes_hdr.read_header(rom_path)
-    return h["chip"], h["map"], h["rom_kb"]
+    return h["chip"], h["map"], h["rom_kb"], h["title"]
 
 
 def _pico8_cover(rom_path: Path) -> bytes | None:
@@ -163,8 +163,8 @@ async def upload_roms(
                        stored_name, korean_name, rom_path, cover_path, cover_status,
                        orig_lang, play_lang, is_korean_patched, lang_source, region, cover_flag,
                        content_hash, crc32, pico8_compat, pico8_mem_hint, patch_ver, probe_status,
-                       snes_chip, snes_map, snes_rom_kb)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                       snes_chip, snes_map, snes_rom_kb, snes_title)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (rom_id, session_id, sys_obj.key, storage.nfc(meta.original_name), stored_name,
                  storage.nfc(meta.korean_name), storage.relative_to_session(session_id, rom_path),
                  cover_rel, cover_status,
@@ -173,7 +173,7 @@ async def upload_roms(
                  pico8_compat.lookup(stored_name) if sys_obj.pico8 else None,
                  pico8_memhint.estimate(rom_path) if sys_obj.pico8 else None,
                  patchver.parse(original), probe_status,
-                 *(_snes_header(rom_path) if sys_obj.key == "snes" else (None, None, None))),
+                 *(_snes_header(rom_path) if sys_obj.key == "snes" else (None, None, None, None))),
             )
             events.log(conn, session_id, "rom_upload", rom_id=rom_id,
                        rom_name=stored_name, system_key=sys_obj.key)
