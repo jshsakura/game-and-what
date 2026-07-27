@@ -702,4 +702,14 @@ export default {
   "A real-time clock, so the cart knows the date between sessions.": "실시간 시계입니다. 카트가 전원을 꺼도 날짜를 압니다.",
   "A less common chip — SPC7110, ST01x or CX4 — which the header does not name precisely.": "덜 흔한 칩입니다 — SPC7110, ST01x, CX4 중 하나이며 헤더가 정확히 이름을 밝히지 않습니다.",
   "Bridging hardware such as the Super Game Boy or Satellaview adapter.": "슈퍼 게임보이나 사테라뷰 어댑터 같은 연결 하드웨어입니다.",
+
+  // ── SNES 프로세서 부하 ──────────────────────────────────
+  "Processor load: {factor}× a plain cartridge": "프로세서 부하: 순수 카트의 {factor}배",
+  "{mhz} MHz of processor to emulate, against 2.68 for a plain SlowROM cart.": "에뮬레이션해야 할 프로세서 {mhz} MHz. 순수 SlowROM 카트는 2.68입니다.",
+  "Computed from clock rates, which are hardware facts — but it counts silicon, not how hard the game works it, and the PPU is not in it at all.": "클럭에서 계산한 값이라 추측이 아닙니다. 다만 실리콘의 양을 셀 뿐 게임이 그걸 얼마나 굴리는지는 반영하지 않고, PPU는 아예 빠져 있습니다.",
+  "{mhz} MHz of processor for an emulator to keep up with: the console's {base} MHz 65816 plus the cart's own {extra} MHz. Clock rates are hardware facts, so this part is arithmetic rather than an estimate.": "에뮬레이터가 따라가야 할 프로세서 {mhz} MHz — 본체의 65816 {base} MHz에 카트 자체의 {extra} MHz가 더해집니다. 클럭은 하드웨어 사실이라 이 부분은 추정이 아니라 산수입니다.",
+  "{mhz} MHz of processor for an emulator to keep up with. FastROM means the cart drives the 65816 at 3.58 MHz instead of 2.68 — a third more work per second, and a cart-level choice rather than a chip.": "에뮬레이터가 따라가야 할 프로세서 {mhz} MHz. FastROM은 카트가 65816을 2.68이 아니라 3.58 MHz로 돌린다는 뜻으로, 초당 작업량이 3분의 1 늘어납니다. 칩이 아니라 카트 수준의 선택입니다.",
+  "It counts silicon, not how hard the game works it — a SuperFX game that idles its chip costs less than this says — and the PPU is not in it at all, because mode 7, HDMA and layer count cannot be read off a header. Treat it as a ranking between carts, not a device figure.": "실리콘의 양을 셀 뿐 게임이 그걸 얼마나 굴리는지는 모릅니다 — 칩을 놀리는 SuperFX 게임은 이 수치보다 가볍습니다. PPU도 빠져 있습니다. 모드7·HDMA·레이어 수는 헤더로 알 수 없기 때문입니다. 기기 수치가 아니라 카트끼리의 순위로 보시면 됩니다.",
+  "Why there is no measured percentage": "측정된 퍼센트가 없는 이유",
+  "GBA cards show a measured CPU figure because the device runs the same instruction stream a probe can count, and one timing on real hardware turns those cycles into a share of a frame. Neither half exists for SNES here: nothing in this project runs a SNES rom to count its work, and there are no SNES timings from the device to divide by. The figure above is what the cart demands, not what the device can give.": "GBA는 기기가 프로브로 셀 수 있는 것과 같은 명령 스트림을 돌리고, 실기 측정 한 번이 그 사이클을 프레임 대비 비율로 바꿔줍니다. SNES는 두 조각 다 없습니다 — 이 프로젝트에 SNES 롬을 돌려 작업량을 세는 도구가 없고, 나눌 실기 측정치도 없습니다. 위 수치는 카트가 요구하는 양이지 기기가 낼 수 있는 양이 아닙니다.",
 };

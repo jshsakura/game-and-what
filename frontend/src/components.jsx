@@ -142,10 +142,46 @@ const SNES_CHIP_NOTE = {
   Other: "Bridging hardware such as the Super Game Boy or Satellaview adapter.",
 };
 
+// How much processor an emulator has to keep up with, in MHz, for one second of this
+// cart running. Clock rates are HARDWARE FACTS, not estimates — which is what makes this
+// a number worth printing when a measured device figure does not exist.
+//
+// Read it for what it is and nothing more: it says how much silicon has to be emulated,
+// not how fast the result will be. Duty cycle is not in it — a SuperFX game that idles
+// its GSU costs less than this implies — and neither is the PPU, whose per-frame cost
+// varies with mode 7, HDMA and layer count and cannot be read off a header at all. It
+// ranks carts against each other honestly, and it does not pretend to be a percentage
+// of a budget the way the GBA rings legitimately are.
+const SNES_CPU_SLOW = 2.68;      // 65816 at 2.68 MHz — the baseline every cart starts at
+const SNES_CPU_FAST = 3.58;      // FastROM: the cart asks for the 3.58 MHz bus, +33% work
+
+// Only GENERAL-PURPOSE processors are added. DSP-1, CX4, S-DD1 and OBC1 are small
+// fixed-function units whose duty cycle is a rounding error next to a second CPU;
+// counting their headline clock would say a Mario Kart cart is heavier than Star Fox,
+// which is false. They show in the panel as a chip, just not in this figure.
+const SNES_COPROC_MHZ = {
+  "SA-1": 10.74,     // a second 65816, and it does the game's real work
+  SuperFX: 10.74,    // GSU-1. Yoshi's Island and Doom carry a GSU-2 at 21.4 — the header
+                     // does not distinguish them, so this is the conservative reading.
+};
+
+function snesLoad(rom) {
+  const base = (rom.snes_map || "").includes("FastROM") ? SNES_CPU_FAST : SNES_CPU_SLOW;
+  const extra = SNES_COPROC_MHZ[rom.snes_chip] || 0;
+  return {
+    mhz: +(base + extra).toFixed(2),
+    base,
+    extra,
+    // Against a plain SlowROM cart, which is the floor of what this system asks for.
+    factor: +((base + extra) / SNES_CPU_SLOW).toFixed(1),
+  };
+}
+
 function snesReading(rom) {
   if (rom.system_key !== "snes" || !rom.snes_chip) return null;
   const chip = rom.snes_chip;
   return {
+    load: chip === "unknown" ? null : snesLoad(rom),
     // 'unknown' means the header failed its checksum — a fact about the DUMP, not the
     // cart, so it gets said rather than dressed up as "no chip".
     unknown: chip === "unknown",
@@ -221,7 +257,10 @@ function arcPath(cx, cy, r, a, b) {
   return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 }
 
-function Ring({ pct, tone, title, size = 24 }) {
+// `pct` always drives the fill. `label` only replaces the text in the middle, for a
+// reading that is not a percentage — the SNES ring carries a multiplier ("5.0×"), and
+// printing 500 there would claim a share of a budget that does not exist.
+function Ring({ pct, tone, title, size = 24, label }) {
   const lit = Math.round((Math.min(pct, 100) / 100) * RING_TICKS);
   const state = tone === "skip" ? "skip" : tone === "audio" ? "audio"
     : pct > 100 ? "over" : pct > 80 ? "tight" : "";
@@ -239,7 +278,7 @@ function Ring({ pct, tone, title, size = 24 }) {
       <svg className={`load-ring ${state}`} width={size} height={size} viewBox="0 0 20 20" aria-hidden>
         {ticks}
       </svg>
-      <b>{pct}</b>
+      <b>{label ?? pct}</b>
     </span>
   );
 }
@@ -1607,6 +1646,22 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 {snes.name}
               </em>
             )}
+            {/* The processor-load ring, in the corner GBA uses for the same job. Shown
+                only where it says something a plain cart does not — a FastROM bus or a
+                second CPU. 1.0× on 871 plain carts would be a ring meaning "normal",
+                which is noise on every poster in the grid. */}
+            {snesInfo?.load && snesInfo.load.factor > 1 && (
+              <em className="idle-tag gauge">
+                <Ring pct={Math.min(100, Math.round((snesInfo.load.factor / 6) * 100))}
+                  tone={snesInfo.load.factor >= 4 ? "over" : "tight"}
+                  label={`${snesInfo.load.factor}×`}
+                  title={[
+                    t("Processor load: {factor}× a plain cartridge", { factor: snesInfo.load.factor }),
+                    t("{mhz} MHz of processor to emulate, against 2.68 for a plain SlowROM cart.", { mhz: snesInfo.load.mhz }),
+                    t("Computed from clock rates, which are hardware facts — but it counts silicon, not how hard the game works it, and the PPU is not in it at all."),
+                  ].join("\n")} />
+              </em>
+            )}
             {/* PICO-8: the same ring, the same corner. It used to be a hairline bar across
                 the bottom of the poster, which said "some amount of something" and could not
                 carry its own number. Code size is a fraction of a budget — the same shape of
@@ -1918,12 +1973,31 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                     </div>
                   )}
 
+                  {snesInfo.load && (
+                    <div className="gba-detail-row">
+                      <span className={`gba-dot ${snesInfo.load.factor >= 4 ? "over" : snesInfo.load.factor > 1 ? "tight" : ""}`} aria-hidden />
+                      <div>
+                        <b>{t("Processor load: {factor}× a plain cartridge", { factor: snesInfo.load.factor })}</b>
+                        <p>
+                          {snesInfo.load.extra
+                            ? t("{mhz} MHz of processor for an emulator to keep up with: the console's {base} MHz 65816 plus the cart's own {extra} MHz. Clock rates are hardware facts, so this part is arithmetic rather than an estimate.",
+                              { mhz: snesInfo.load.mhz, base: snesInfo.load.base, extra: snesInfo.load.extra })
+                            : t("{mhz} MHz of processor for an emulator to keep up with. FastROM means the cart drives the 65816 at 3.58 MHz instead of 2.68 — a third more work per second, and a cart-level choice rather than a chip.",
+                              { mhz: snesInfo.load.mhz })}
+                        </p>
+                        <p className="gba-caveat">
+                          {t("It counts silicon, not how hard the game works it — a SuperFX game that idles its chip costs less than this says — and the PPU is not in it at all, because mode 7, HDMA and layer count cannot be read off a header. Treat it as a ranking between carts, not a device figure.")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="gba-detail-row">
                     <span className="gba-dot" aria-hidden />
                     <div>
-                      <b>{t("No speed measurement for SNES")}</b>
+                      <b>{t("Why there is no measured percentage")}</b>
                       <p>
-                        {t("GBA cards show a measured CPU figure because the device runs the same instruction stream a probe can count. A SNES frame is split across the 65816, the PPU and the SPC700 sound chip, so a cycle count would not mean the same thing — and there are no SNES timings from the real device to compare one against. What is above is read from the cart, and stops there.")}
+                        {t("GBA cards show a measured CPU figure because the device runs the same instruction stream a probe can count, and one timing on real hardware turns those cycles into a share of a frame. Neither half exists for SNES here: nothing in this project runs a SNES rom to count its work, and there are no SNES timings from the device to divide by. The figure above is what the cart demands, not what the device can give.")}
                       </p>
                     </div>
                   </div>
