@@ -393,6 +393,13 @@ export default {
     "VBlank 대기 루프를 못 찾아서, 기다리는 시간이 작업량으로 계산됐습니다. 측정 실패이지 무거운 게임이라는 뜻이 아닙니다.",
   "It may well run fine. Finding the loop would settle it.":
     "잘 돌아갈 수도 있습니다. 루프를 찾으면 판정됩니다.",
+  "This cartridge carries its own chip: {chip}": "이 카트리지에는 자체 칩이 들어 있습니다: {chip}",
+  "A port has to implement it — without it the game does not run at all, rather than running slowly.":
+    "포팅이 이 칩을 구현해야 합니다. 없으면 느리게 도는 게 아니라 아예 실행되지 않습니다.",
+  "A small coprocessor. Usually supported, and rarely what stops a game.":
+    "작은 보조 프로세서입니다. 보통은 지원되며, 이것 때문에 게임이 안 되는 경우는 드뭅니다.",
+  "Read from the cart header — not a speed measurement.":
+    "카트 헤더에서 읽은 값입니다 — 속도 측정치가 아닙니다.",
   "Too heavy for the real device: {pct}% of the CPU budget it has per frame.":
     "실기에 너무 무겁습니다: 프레임당 CPU 예산의 {pct}%",
   "gpSP skips this game's VBlank wait at {pc}.":

@@ -293,6 +293,22 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # and saying "not measured" forever would hide it.
         conn.execute("ALTER TABLE roms ADD COLUMN idle_hunted INTEGER NOT NULL DEFAULT 0")
 
+    if "snes_chip" not in cols:
+        # SNES only. Which coprocessor the CARTRIDGE carries, read from its header at
+        # upload (services/snes_hdr.py). Not a speed figure and not a verdict: a SNES
+        # frame's cost is split across the 65816, the PPU and the SPC700, so a cycle
+        # count would not mean here what exec_cycles means for `gba` — and this repo has
+        # no SNES device timings to calibrate one against anyway.
+        #
+        # What it IS, is the fact that decides whether a port can run the game at all.
+        # Star Fox without a GSU does not run slowly, it does not run. 91 of this
+        # library's 2,281 snes roms carry something; 50 of those carry SuperFX or SA-1.
+        #
+        # 'none' = read, plain cart. 'unknown' = header failed its checksum, so we do not
+        # know — kept distinct from 'none' for the same reason idle_hunted exists above:
+        # a failure to look must never be recorded as an answer. NULL = never read.
+        conn.execute("ALTER TABLE roms ADD COLUMN snes_chip TEXT")
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by

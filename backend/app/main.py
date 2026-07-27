@@ -106,6 +106,13 @@ def _startup() -> None:
     with db.connect() as conn:
         langfill.backfill(conn)
         langfill.backfill_region(conn)
+        # Same shape for snes: which coprocessor a cart carries is read from its header,
+        # and a library imported before that existed has never been read. Header-only
+        # (seeks, no full-file reads), and idempotent — NULL is the only thing it fills.
+        from .services import snes_hdr
+        chipped = snes_hdr.backfill(conn, storage.session_root(config.SHARED_SESSION_ID))
+        if chipped:
+            print(f"[startup] read the cart header of {chipped} snes rom(s)")
         # Seed the activity feed from the existing library (one upload event per
         # ROM that lacks one). Idempotent — no-ops once converged.
         seeded = events.seed_uploads(conn, config.SHARED_SESSION_ID)

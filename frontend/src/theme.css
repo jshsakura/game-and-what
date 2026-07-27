@@ -695,6 +695,12 @@ body::before {
 /* Not measured — its idle loop was never found, so the wait got counted as work. Grey,
    deliberately: red would say "heavy game", and that is exactly what this is NOT. */
 .cover-corner:has(.idle-tag.unknown) { background: #4a4a55e6; color: #e6e6ee; }
+/* A SNES cart's own coprocessor. Amber for SuperFX/SA-1 — not "slow", but "a port must
+   implement this or the game will not boot", which is the same weight of warning the
+   tight CPU budget carries. Grey for the small helpers, which are a fact, not a caution.
+   Never green: none of this is a measurement that came back good. */
+.cover-corner:has(.idle-tag.chip-heavy) { background: color-mix(in srgb, #e0a72c 90%, #2a1d05); color: #241a02; }
+.cover-corner:has(.idle-tag.chip)       { background: #4a4a55e6; color: #e6e6ee; }
 /* The measured card: two rings — CPU load, and what the idle skip took back. Just the
    rings: no chip around them. Each carries its OWN round backdrop, so what sits on the
    cover is two discs rather than a box with discs in it.

@@ -112,6 +112,28 @@ const GBA_FRAME_CYCLES = 280896;
 // frame of work is the GAME's answer, not the probe's — the Classic NES carts have no
 // wait loop because they spend the frame emulating a NES, and calling them "not
 // measured" forever would be hiding a real verdict behind a kinder one.
+// What a SNES cart carries besides ROM, read from its header at upload
+// (services/snes_hdr.py). Deliberately NOT the GBA treatment — no ring, no percentage.
+//
+// The GBA rings are fractions of a measured budget. There is no such number for snes:
+// its frame cost is split across the 65816, the PPU and the SPC700, so a cycle count
+// would not mean what exec_cycles means, and this project has no SNES device timings to
+// calibrate one against. What the header DOES give is categorical and decisive — a cart
+// with a GSU does not run slowly without one, it does not run — so it is stated as the
+// fact it is and nothing more.
+//
+// 'none' is the overwhelming majority (2,168 of 2,281 here) and says nothing worth the
+// grid's attention; 'unknown' is a dump we could not read, which is not the cart's
+// property at all. Both stay off the poster.
+const SNES_HEAVY = new Set(["SuperFX", "SA-1"]);
+
+function snesChip(rom) {
+  if (rom.system_key !== "snes") return null;
+  const chip = rom.snes_chip;
+  if (!chip || chip === "none" || chip === "unknown") return null;
+  return { name: chip, heavy: SNES_HEAVY.has(chip) };
+}
+
 function gbaReading(rom) {
   if (rom.system_key !== "gba" || !rom.exec_cycles) return null;
   const unknown = !rom.idle_pc && !rom.idle_hunted
@@ -1228,6 +1250,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   // hardware leaves the CPU — a number, not a promise: it is a cycle model, and it
   // has never been checked on a real device.
   const gba = gbaReading(rom);
+  const snes = snesChip(rom);
   // The poster's top corner holds EITHER a gauge or the system-icon/favourite chip, never
   // both — a ring already fills that space, and the icon beside it just crowds it. A GBA
   // card's measured rings and a PICO-8 card's code-size ring both count as a gauge; a
@@ -1531,6 +1554,23 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   t("It may well run fine. Finding the loop would settle it."),
                 ].join("\n")}>
                 {t("Not measured")}
+              </em>
+            )}
+            {/* The cart's own silicon. Amber for a GSU or an SA-1 because those are not
+                "a bit heavier" — one is a RISC that draws the game, the other a second
+                main CPU at three times the speed, and a port either implements them or
+                the game does not boot. Grey for the small helpers (DSP, CX4…), which are
+                worth knowing about and rarely the thing that stops a game. */}
+            {snes && (
+              <em className={`idle-tag ${snes.heavy ? "chip-heavy" : "chip"}`}
+                title={[
+                  t("This cartridge carries its own chip: {chip}", { chip: snes.name }),
+                  snes.heavy
+                    ? t("A port has to implement it — without it the game does not run at all, rather than running slowly.")
+                    : t("A small coprocessor. Usually supported, and rarely what stops a game."),
+                  t("Read from the cart header — not a speed measurement."),
+                ].join("\n")}>
+                {snes.name}
               </em>
             )}
             {/* PICO-8: the same ring, the same corner. It used to be a hairline bar across
