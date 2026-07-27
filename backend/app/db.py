@@ -87,6 +87,11 @@ def connect() -> Iterator[sqlite3.Connection]:
     conn = sqlite3.connect(config.DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # Writers still serialise under WAL; this is what makes them WAIT for their turn
+    # instead of failing on the spot. The default is 0 — no wait at all — so a cover
+    # autofill and a probe finishing at the same moment could raise "database is
+    # locked" at whichever one lost, on a write that had nothing wrong with it.
+    conn.execute("PRAGMA busy_timeout = 5000")
     try:
         yield conn
         conn.commit()
@@ -309,6 +314,17 @@ def _migrate(conn: sqlite3.Connection) -> None:
         # a failure to look must never be recorded as an answer. NULL = never read.
         conn.execute("ALTER TABLE roms ADD COLUMN snes_chip TEXT")
 
+    # The library grid's query — every rom for the session, newest first — is the
+    # heaviest thing this database does, and it had no index that could serve both halves
+    # of it: session_id came off idx_roms_hash and then the whole result was sorted in a
+    # temp B-tree. One composite index answers both. Measured on 5,019 roms: 74.8 ms →
+    # 57.7 ms, and the plan loses its "USE TEMP B-TREE FOR ORDER BY" line. What is left is
+    # materialising 5,019 wide rows, which no index can help with.
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_roms_session_created "
+        "ON roms (session_id, created_at DESC)"
+    )
+
     # Videos moved from media/ to video/ (the folder the firmware actually browses),
     # so the stored relative paths have to follow. Idempotent: after the first run no
     # row starts with the legacy prefix. The files themselves are moved by
@@ -342,6 +358,19 @@ def _migrate(conn: sqlite3.Connection) -> None:
 def init_db() -> None:
     config.ensure_dirs()
     with connect() as conn:
+        # WAL, set once — the mode lives in the file header, so this is a no-op on every
+        # boot after the first. It is here for what the app actually does: a cover autofill
+        # or a GBA probe writes in the background while the library grid polls. Under the
+        # default rollback journal that write locks the whole database and the poll waits
+        # behind it; measured on this library (5,019 roms), reads during a write went from
+        # 1.36 ms median / 3.42 ms worst to 0.30 / 0.89.
+        #
+        # Safe here and not everywhere: WAL needs every reader on the same machine as the
+        # file, which holds for one container on a local bind mount. It would not on NFS.
+        # It also means gnw.db is no longer the whole story on disk — a copy taken without
+        # its -wal sidecar can miss the newest commits, so use `sqlite3 .backup` (or stop
+        # the container) rather than `cp` if you ever snapshot it.
+        conn.execute("PRAGMA journal_mode = WAL")
         conn.executescript(_SCHEMA)
         _migrate(conn)
         # The shared workspace always exists (single common library).
@@ -349,6 +378,13 @@ def init_db() -> None:
             "INSERT OR IGNORE INTO sessions (id, label) VALUES (?, 'shared')",
             (config.SHARED_SESSION_ID,),
         )
+        # This database had NO planner statistics at all — every index choice was made off
+        # sqlite's built-in guesses. `optimize` is the cheap form of fixing that: it runs
+        # ANALYZE only on tables whose shape has actually moved since the last one, so a
+        # settled library pays nothing for it on subsequent boots. Deliberately not VACUUM
+        # — the file is 6 MB with 1.5% free pages, so a rewrite would reclaim about 90 kB
+        # and is not worth the pause.
+        conn.execute("PRAGMA optimize")
 
 
 def row_to_dict(row: sqlite3.Row | None) -> dict | None:

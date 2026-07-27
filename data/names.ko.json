@@ -1,7 +1,7 @@
 {
  "format": 1,
  "lang": "ko",
- "count": 1908,
+ "count": 2003,
  "names": [
   {
    "hash": "004ec2d356f44dca69082788517dce3fcdb44558d9b6bcf351c6ed7385f9ddc2",
@@ -6493,6 +6493,615 @@
    "source": "localize-2026-06"
   },
   {
+   "hash": "024e02a287e78916915ad9db81a84ab264fab617aa457ff4e1750e0ed5936271",
+   "system": "gba",
+   "name": "하지메의 일보 - 더 파이팅 (Hajime no Ippo - The Fighting!)",
+   "original_name": "Hajime no Ippo - The Fighting! (Korea-patch J-K v20060429)",
+   "source": "tistory"
+  },
+  {
+   "hash": "04e83bc53d62970131443cb114ac0d302877b31900b4dc26213b070d1faa9069",
+   "system": "gba",
+   "name": "유희왕! 듀얼 몬스터즈 익스퍼트 2006 (Yu-Gi-Oh! Duel Monsters Expert 2006)",
+   "original_name": "Yu-Gi-Oh! Duel Monsters Expert 2006 (Korea-patch J-K v20110731 v0.93)",
+   "source": "tistory"
+  },
+  {
+   "hash": "072b78f0b79a402b50b0cdef863b2585718b5415a33fef967d1d81614b10578a",
+   "system": "gba",
+   "name": "아즈망가 대왕 어드밴스 (Azumanga Daiou Advance)",
+   "original_name": "Azumanga Daiou Advance (Korea-patch J-K v20071031)",
+   "source": "tistory"
+  },
+  {
+   "hash": "099a8d2c607de8e197aafbbf0507dac6de6c7a9c90d00295bff6233924c680f9",
+   "system": "gba",
+   "name": "악마성 드라큘라 - 효월의 원무곡 (Castlevania - Byakuya no Concerto)",
+   "original_name": "Castlevania - Byakuya no Concerto (Korea-patch J-K v20220129)",
+   "source": "tistory"
+  },
+  {
+   "hash": "09bb954da9fd1543e56a831e575955840982e18228fbc2df9c6453842f6352fd",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 오리지널 제너레이션 2 (Super Robot Taisen - Original Generation 2)",
+   "original_name": "Super Robot Taisen - Original Generation 2 (Korea-patch J-K v20101001 v1.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "0b3670f3a08bd763d153ece802fedf71d03df40d0b2e004de2835856266586c3",
+   "system": "gba",
+   "name": "킹덤하츠 기억의 체인 (Kingdom Hearts - Chain of Memories)",
+   "original_name": "Kingdom Hearts - Chain of Memories (Korea-patch J-K v20060313 v0.98)",
+   "source": "tistory"
+  },
+  {
+   "hash": "11d6cc3c2a8f34bdc2d36573c3dc55f7cd39121de740b01ca34a3fe8a469c5f7",
+   "system": "gba",
+   "name": "블랙 매트릭스 제로 (Black Matrix Zero)",
+   "original_name": "Black Matrix Zero (Korea-patch J-K v20031001 v2.01)",
+   "source": "tistory"
+  },
+  {
+   "hash": "15e29063405e9b23b44ef99c825b15e2a45209abfe7a628a5cefd33eb7f02f7e",
+   "system": "gba",
+   "name": "카마이타치의 밤 (Kamaitachi no Yoru Advance)",
+   "original_name": "Kamaitachi no Yoru Advance (Korea-patch J-K v20100304 v1.01)",
+   "source": "tistory"
+  },
+  {
+   "hash": "190e40dd365769c60a240485bdc86b23807c7dc5b8a7b490d7e0160d7d7e38ae",
+   "system": "gba",
+   "name": "리듬 천국 (Rhythm Tengoku)",
+   "original_name": "Rhythm Tengoku (Korea-patch J-K v20200417 v1.32)",
+   "source": "tistory"
+  },
+  {
+   "hash": "1a00461d0c92bcc40d9485a906efdfab99a5d001d3067ee0b9acf14a400277a8",
+   "system": "gba",
+   "name": "슈퍼 스트리트 파이터 2 X 리바이벌 (Super Street Fighter II X - Revival)",
+   "original_name": "Super Street Fighter II X - Revival (Korea-patch J-K v20061227 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "1b6c0151dc905b94aab5815a7f8a8b2041b0bcd298b5bcb4c54964022c90b3d7",
+   "system": "gba",
+   "name": "디지몬 배틀 스피릿 2 (Digimon - Battle Spirit 2)",
+   "original_name": "Digimon - Battle Spirit 2 (Korea-patch J-K v20090901 v0.92)",
+   "source": "tistory"
+  },
+  {
+   "hash": "1ca4f54bd1acc042fde82f4e02f1c90aea650b7b93b1fb377f82496493510ba7",
+   "system": "gba",
+   "name": "진 여신전생 Ver 1.5 (Shin Megami Tensei)",
+   "original_name": "Shin Megami Tensei (Korea-patch J-K v20111014 v1.5)",
+   "source": "tistory"
+  },
+  {
+   "hash": "1db38a36a2bb7395457e335a6ddfd2ad43546f60dc196466abc120fce85bdcdb",
+   "system": "gba",
+   "name": "테니스의 왕자 지니어스 보이즈 아카데미 (Tennis no Ouji-sama - Genius Boys Academy)",
+   "original_name": "Tennis no Ouji-sama - Genius Boys Academy (Korea-patch J-K v20071031)",
+   "source": "tistory"
+  },
+  {
+   "hash": "1eec4af696ff22a1f0e4f42b53c4d563bd88e838889a0f6ffeed2077d80a3848",
+   "system": "gba",
+   "name": "모두의 소프트 시리즈 - 모두의 장기 (Minna no Soft Series - Minna no Shougi)",
+   "original_name": "Minna no Soft Series - Minna no Shougi (Korea-patch J-K v20070616 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "2a7fa32ebba7a87d1070a6d44750bf2fbcdd22fe396026df945efb24244a1cb4",
+   "system": "gba",
+   "name": "우에키의 법칙 배틀짱 (Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle)",
+   "original_name": "Ueki no Housoku - Jingi Sakuretsu! Nouryokusha Battle (Korea-patch J-K v20060815 v0.94)",
+   "source": "tistory"
+  },
+  {
+   "hash": "2b9f40a48b0bd1bbab96267c5aeaa6abc0a059e711e01c3d24f6db9cc9a479ff",
+   "system": "gba",
+   "name": "마더 1 + 2 (Mother 1+2)",
+   "original_name": "Mother 1+2 (Korea-patch J-K v20190929 v1.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "2ba5740252115157d616deb10368bec6e218833cef7bff27a9552ea53c27f4bd",
+   "system": "gba",
+   "name": "캐슬베니아 백야의 협주곡 (Castlevania - Akatsuki no Minuet)",
+   "original_name": "Castlevania - Akatsuki no Minuet (Korea-patch J-K v20220129)",
+   "source": "tistory"
+  },
+  {
+   "hash": "2bd9d1a89880221ef5814259a499230b4822b8537d42d05fc3942998d48119b8",
+   "system": "gba",
+   "name": "댄싱 소드 섬광 (Dancing Sword - Senkou)",
+   "original_name": "Dancing Sword - Senkou (Korea-patch J-K v20060921 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "2d6ce1804a4839d88861276a284c29b87a5278f41c0d0d9075a83bf386516084",
+   "system": "gba",
+   "name": "역전재판 (Gyakuten Saiban)",
+   "original_name": "Gyakuten Saiban (Korea-patch J-K v20031231)",
+   "source": "tistory"
+  },
+  {
+   "hash": "344b4c16e321ec06b3e1c772abef8c1a5ffe7d6db81aaf7b80c37edf953e3491",
+   "system": "gba",
+   "name": "샤이닝 소울 2 (Shining Soul II)",
+   "original_name": "Shining Soul II (Korea-patch J-K ver.Proto)",
+   "source": "tistory"
+  },
+  {
+   "hash": "3ac73f221fc2a2e691c4d0a8f182831f730c3a0fb211f1f5b5f3f64463956e8f",
+   "system": "gba",
+   "name": "메트로이드 - 제로 미션 (Metroid - Zero Mission)",
+   "original_name": "Metroid - Zero Mission (Korea-patch J-K v20090823 v1.02)",
+   "source": "tistory"
+  },
+  {
+   "hash": "420bbf8580e46275de317afada2d14840ece3487781c9f8bd3b43c728dcb802b",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 R (Super Robot Taisen R)",
+   "original_name": "Super Robot Taisen R (Korea-patch J-K v20110220 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "427a90ab3ab2a64a8107110694613feb6335c1c1eda98780786861ef9a731d46",
+   "system": "gba",
+   "name": "나루토 - 최강닌자 대결전 2 (Naruto - Saikyou Ninja Daikesshuu 2)",
+   "original_name": "Naruto - Saikyou Ninja Daikesshuu 2 (Korea-patch J-K v20090829)",
+   "source": "tistory"
+  },
+  {
+   "hash": "43e4ea6ce0dbdb85d6ea30e8078ea225ce522f8922db1b473d69e42df8411299",
+   "system": "gba",
+   "name": "탐정 진구지 사부로 - 하얀 그림자의 소녀 (Tantei Jinguuji Saburou - Shiroi Kage no Shoujo)",
+   "original_name": "Tantei Jinguuji Saburou - Shiroi Kage no Shoujo (Korea-patch J-K v20070401 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "49339d0efddded83b8604e22fb2bdd01295e072f2c7dd830d0cdeba700450107",
+   "system": "gba",
+   "name": "원피스 고잉 베이스볼 해적 야구 (One Piece - Going Baseball - Haejeok Yaku)",
+   "original_name": "One Piece - Going Baseball - Haejeok Yaku (Korea)",
+   "source": "tistory"
+  },
+  {
+   "hash": "4c2b8d4087e474d55de724f70c6c789a4bfe30ac93a077cd9284bc74cb14c8e1",
+   "system": "gba",
+   "name": "약속의 땅 리비에라 (Riviera - Yakusoku no Chi Riviera)",
+   "original_name": "Riviera - Yakusoku no Chi Riviera (Korea-patch J-K v20100617 v0.98c)",
+   "source": "tistory"
+  },
+  {
+   "hash": "537d962a28a0876b93248ad9c43bc61cb2ed746f9d7a0db31b0590ebea8045f2",
+   "system": "gba",
+   "name": "마리오 카트 어드밴스 (Mario Kart Advance)",
+   "original_name": "Mario Kart Advance (Korea-patch J-K v20110322)",
+   "source": "tistory"
+  },
+  {
+   "hash": "55a825e7665b5a8648ee5f81f4471cfd204623bf020803c4c0ff1ec29edb465b",
+   "system": "gba",
+   "name": "건스타 슈퍼 히어로즈 (Gunstar Super Heroes)",
+   "original_name": "Gunstar Super Heroes (Korea-patch J-K v20131130)",
+   "source": "tistory"
+  },
+  {
+   "hash": "56355069bb4f7a7fac46ea38e66be51b9a703d0f5aca5f88f73ea6d7cb63d521",
+   "system": "gba",
+   "name": "겟백커스 - 지옥의 스크람슈 (GetBackers Dakkanya - Jigoku no Scaramouche)",
+   "original_name": "GetBackers Dakkanya - Jigoku no Scaramouche (Korea-patch J-K v20041130 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "56735645434ecfda2fa9f85f1d98ba019a54e2b5b6c13419489ff79a06e54fc1",
+   "system": "gba",
+   "name": "파이날 파이트 원 (Final Fight One)",
+   "original_name": "Final Fight One (Korea-patch J-K v20161208 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "596aec1825607f9bd7c358b341c10d79e296189bf22776899e9f6c6d3342e4a3",
+   "system": "gba",
+   "name": "파이날 판타지 1 & 2 다운 오브 소울즈 (어드밴스) (Final Fantasy I, II Advance)",
+   "original_name": "Final Fantasy I, II Advance (Korea-patch J-K v20060131 only.FF1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "59cd75dfb871c3d7bf77f12537f96a1a0909e6b6ecc8c34ac2da29260aa0ffb3",
+   "system": "gba",
+   "name": "유희왕! 듀얼 몬스터즈 인터네셔날 2 (Yu-Gi-Oh! Duel Monsters International 2)",
+   "original_name": "Yu-Gi-Oh! Duel Monsters International 2 (Korea-patch J-K v20120215 v1.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "5b497f0827efde4bd580247b59e550aeb56d42e29d674ac444e72bf0d2343e2e",
+   "system": "gba",
+   "name": "젤다의 전설 - 이상한 모자 (Zelda no Densetsu - Fushigi no Boushi)",
+   "original_name": "Zelda no Densetsu - Fushigi no Boushi (Korea-patch J-K v20091230 v0.3a)",
+   "source": "tistory"
+  },
+  {
+   "hash": "5d1b10ac3c4fd21da416d2282356787ec1d80f52dd857e18aea591a50e9b9be9",
+   "system": "gba",
+   "name": "테니스의 왕자 2003 패션 레드 (Tennis no Ouji-sama 2003 - Passion Red)",
+   "original_name": "Tennis no Ouji-sama 2003 - Passion Red (Korea-patch J-K v20071031 v.Beta)",
+   "source": "tistory"
+  },
+  {
+   "hash": "5eaa8302704b2f085f0ab4faaa67b87e74942358a434f69b69b29109898f063f",
+   "system": "gba",
+   "name": "더블 드래곤 어드밴스 (Double Dragon Advance)",
+   "original_name": "Double Dragon Advance (Korea-patch J-K v20090506 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "6272e0a85e62f89fc20be4ddf88e502fed0dcc792205fa8e532bbfb3329d6730",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 D (Super Robot Taisen D)",
+   "original_name": "Super Robot Taisen D (Korea-patch J-K v20140305 v0.9.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "627bd6c422368c5c14a9d31b956c0f723bdc53c10bcae06888667d3be9a9bbae",
+   "system": "gba",
+   "name": "피안화 (Higanbana)",
+   "original_name": "Higanbana (Korea-patch J-K v20140815)",
+   "source": "tistory"
+  },
+  {
+   "hash": "6908263777350e05df6667e94aebd54fe082a18b96105c420a20a44cb009033b",
+   "system": "gba",
+   "name": "록맨 제로 3 (Rockman Zero 3)",
+   "original_name": "Rockman Zero 3 (Korea-patch J-K v20220228 type.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "69cb61cca67484a4380f5bbddd645339ea57c942bc27e23c854b90bd793cb32a",
+   "system": "gba",
+   "name": "철권전사 아이언 키드 (Iron Kid)",
+   "original_name": "Iron Kid (Korea)",
+   "source": "tistory"
+  },
+  {
+   "hash": "72140f287c08bab65d3083dfd63d0580b76b5872f83447782fa94d2d1deb9fce",
+   "system": "gba",
+   "name": "브레스 오브 파이어 - 용의 전사 (Breath of Fire - Ryuu no Senshi)",
+   "original_name": "Breath of Fire - Ryuu no Senshi (Korea-patch J-K v20090823)",
+   "source": "tistory"
+  },
+  {
+   "hash": "7284e01900e4c56f8afe43dfc197ff65001073873484be5d2f1ed5871888bf1d",
+   "system": "gba",
+   "name": "버블 보블 - 올드 & 뉴 (Bubble Bobble - Old & New)",
+   "original_name": "Bubble Bobble - Old & New (Korea-patch J-K v20120421)",
+   "source": "tistory"
+  },
+  {
+   "hash": "7406cddc6b5c5a97aa9df5b89122ecee34eee05eb21568d7d89ce361939d2183",
+   "system": "gba",
+   "name": "유희왕 - 듀얼 몬스터즈 익스퍼트 3 (Yu-Gi-Oh! Duel Monsters Expert 3)",
+   "original_name": "Yu-Gi-Oh! Duel Monsters Expert 3 (Korea-patch J-K v20040506 v0.98)",
+   "source": "tistory"
+  },
+  {
+   "hash": "78a1a262cbba78a6505f1577b84edab33a6741549dfcf48f6f8594dd832547df",
+   "system": "gba",
+   "name": "유그드라 유니온 (Yggdra Union)",
+   "original_name": "Yggdra Union (Korea-patch J-K v20140201 v0.99)",
+   "source": "tistory"
+  },
+  {
+   "hash": "7e526bf91dcff2d1ee24e132e4040ccfaf8ba260741c46d001cef67a8260b001",
+   "system": "gba",
+   "name": "역전재판 2 (Gyakuten Saiban 2)",
+   "original_name": "Gyakuten Saiban 2 (Korea-patch J-K v20031231)",
+   "source": "tistory"
+  },
+  {
+   "hash": "8418096f923bed329ac0a21f88c3a85151ee9212469b63ad43770420c43b4cc9",
+   "system": "gba",
+   "name": "역전재판 3 (Gyakuten Saiban 3)",
+   "original_name": "Gyakuten Saiban 3 (Korea-patch J-K v0.5)",
+   "source": "tistory"
+  },
+  {
+   "hash": "84748bc385e54677cd9507ff66efc497c7d9d4a59f694b0f11b6b3b7aa7a5467",
+   "system": "gba",
+   "name": "파이어 엠블렘 - 봉인의 검 (Fire Emblem - Fuuin no Tsurugi)",
+   "original_name": "Fire Emblem - Fuuin no Tsurugi (Korea-patch J-K v20221010 v0.63)",
+   "source": "tistory"
+  },
+  {
+   "hash": "89961e8c07a606650e375339a1171d3296faf541a69a82c960aa9c95a7e1c0b4",
+   "system": "gba",
+   "name": "목장 이야기 - 미네랄 타운의 친구들 (Bokujou Monogatari - Mineral Town no Nakama-tachi)",
+   "original_name": "Bokujou Monogatari - Mineral Town no Nakama-tachi (Korea-patch J-K v20060220 v0.9a)",
+   "source": "tistory"
+  },
+  {
+   "hash": "8bd1f03b00a52ed3e0b9e3e4abe192ee1d75f698c8b508676a10a6da6789a2a9",
+   "system": "gba",
+   "name": "킹 오브 파이터즈 EX - 네오 블러드 (King of Fighters EX, The - NeoBlood)",
+   "original_name": "King of Fighters EX, The - NeoBlood (Korea-patch J-K v20120302 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "8c1a1a460a34568c3010aaa1e07ef106fd3a0ba9fce9c0cfb2ac4703068bf3ab",
+   "system": "gba",
+   "name": "유희왕! 듀얼 몬스터즈 6 익스퍼트 2 (Yu-Gi-Oh! Duel Monsters 6 Expert 2)",
+   "original_name": "Yu-Gi-Oh! Duel Monsters 6 Expert 2 (Korea-patch J-K v0.65)",
+   "source": "tistory"
+  },
+  {
+   "hash": "8f40707772c5615524238d346632e820f43cef802145f03732ba61eb6d327bf9",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 A (Super Robot Taisen A)",
+   "original_name": "Super Robot Taisen A (Korea-patch J-k v20061107 v0.83)",
+   "source": "tistory"
+  },
+  {
+   "hash": "947efd1bf71ca67c0f95111d5429b32cff83044790f057638b7697f932996fc0",
+   "system": "gba",
+   "name": "마더 3 (Mother 3)",
+   "original_name": "Mother 3 (Korea-patch J-K v20190301)",
+   "source": "tistory"
+  },
+  {
+   "hash": "9dbe155b2bb42c6ff0bf73f26cf73cee14b1a39b49fda4a970dfb3f72197dbb9",
+   "system": "gba",
+   "name": "샤이닝 소울 (Shining Soul)",
+   "original_name": "Shining Soul (Korea-patch J-K v20161203 v1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "9df3e5c2c28032d8783e544b6fbb9ca5009243517d61ff1fbd1bd519197d8d97",
+   "system": "gba",
+   "name": "대전략 For 게임보이 어드밴스 (Daisenryaku for Game Boy Advance)",
+   "original_name": "Daisenryaku for Game Boy Advance (Korea-patch J-K v20141222 v.01)",
+   "source": "tistory"
+  },
+  {
+   "hash": "a1459d767e5e04b51c9427ddd908dadd1833a347b1cc1402e2a3e0b899ae99e2",
+   "system": "gba",
+   "name": "메달 오브 아너 - 인필트레이터 (Medal of Honor Advance)",
+   "original_name": "Medal of Honor Advance (Korea-patch J-K v20170911 v.095)",
+   "source": "tistory"
+  },
+  {
+   "hash": "a8269f2a45b90eceb5f234d6c965d3153865a6c851ad9151f9462d1496bb6c42",
+   "system": "gba",
+   "name": "신약 성검전설 (Shinyaku Seiken Densetsu)",
+   "original_name": "Shinyaku Seiken Densetsu (Korea-patch J-K v20040601 v2.02)",
+   "source": "tistory"
+  },
+  {
+   "hash": "a8c6d6c5b8acf56b978ff5b9d413089e8a5da15ce76a31a131bf0c8b830cc216",
+   "system": "gba",
+   "name": "라라 크로프트 툼 레이더 - 프로퍼시 (Lara Croft Tomb Raider - The Prophecy)",
+   "original_name": "Lara Croft Tomb Raider - The Prophecy (Korea-patch J-K v20170901 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "a9e76fce2743368703c11985473766c8eb525dda5849cb26ee504c46ad22a073",
+   "system": "gba",
+   "name": "브레스 오브 파이어 2 - 사명의 아이 (Breath of Fire II)",
+   "original_name": "Breath of Fire II (Korea-patch J-K v20160618)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ad30cdfcc5507887239b1f36cf9479480cf9627eda992350f956374c1cc24954",
+   "system": "gba",
+   "name": "톨네코의 대모험 2 이상한 던전 (Dragon Quest Characters - Torneko no Daibouken 2 Advance - Fushigi no Dungeon)",
+   "original_name": "Dragon Quest Characters - Torneko no Daibouken 2 Advance - Fushigi no Dungeon (Korea-patch J-K v20131115)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b61ab80cdeaa8376cff6b304b32f6806a4376b969d6f1d7b6ccd20cae120e52a",
+   "system": "gba",
+   "name": "원피스 일곱섬의 대보물 (One Piece - Ilgop Seomui Debomool)",
+   "original_name": "One Piece - Ilgop Seomui Debomool (Korea)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b65a1cfcf13f56cf37d438d8233cbcb26f71734bec8f74f553f0f79ec914fa36",
+   "system": "gba",
+   "name": "메트로이드 퓨전 (Metroid Fusion)",
+   "original_name": "Metroid Fusion (Korea-patch J-K v20040521 v1.0)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b887b65b9f1644646f4176032f2c216c36ac99459a207af4d5fd56f727aa9e66",
+   "system": "gba",
+   "name": "메탈 슬러그 어드밴스 (Metal Slug Advance)",
+   "original_name": "Metal Slug Advance (K)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b8a1618aff126d2e1bda9f82ab4c70f8f57f8d55bd216234686df0c9ef26c4d1",
+   "system": "gba",
+   "name": "모두의 사육 시리즈 3 나의 장수풍뎅이 사슴벌레 (Minna no Shiiku Series - Boku no Kabuto, Kuwagata)",
+   "original_name": "Minna no Shiiku Series - Boku no Kabuto, Kuwagata (Korea-patch J-K v20140723)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b9699f3df3a715e474952ea2c608bd63de6b0b92d1e6671ac6363090f9d45198",
+   "system": "gba",
+   "name": "타워 SP (Tower SP, The)",
+   "original_name": "Tower SP, The (Korea-patch J-K v20140218)",
+   "source": "tistory"
+  },
+  {
+   "hash": "b9dc86841a68748e14701b438cbc0e05147437a21dcd24849535e6955b5df973",
+   "system": "gba",
+   "name": "황금의 태양 - 열려진 봉인 (Ougon no Taiyou - Hirakareshi Fuuin)",
+   "original_name": "Ougon no Taiyou - Hirakareshi Fuuin (Korea-patch J-K v20151004 ver.A_2)",
+   "source": "tistory"
+  },
+  {
+   "hash": "baf8882706c7dabbaf52a36e8b7c62188d10196bc0f7831fdeefc775266f51ac",
+   "system": "gba",
+   "name": "록맨 제로 2 (Rockman Zero 2)",
+   "original_name": "Rockman Zero 2 (Korea-patch J-K v20220228)",
+   "source": "tistory"
+  },
+  {
+   "hash": "bb75cf601650760407fdfae63e6fc07410701e94f722e9d63c7ed8dd398faf29",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 오리지널 제너레이션 (Super Robot Taisen - Original Generation)",
+   "original_name": "Super Robot Taisen - Original Generation (Korea-patch J-K v20101001 v1.2)",
+   "source": "tistory"
+  },
+  {
+   "hash": "bbff86cf10ac34afc2dc16ce2fcd7c2fc75dee7e7bc563d3fabdd218a096dfd0",
+   "system": "gba",
+   "name": "드래곤볼 어드밴스 어드벤처 (Dragon Ball - Advance Adventure)",
+   "original_name": "Dragon Ball - Advance Adventure (Korea)",
+   "source": "tistory"
+  },
+  {
+   "hash": "c09d502f439d0cba186191335f525eb90ed4e9754b2ce6148d7350c2bddb989b",
+   "system": "gba",
+   "name": "황금의 태양 2 - 잃어버린 시대 (Ougon no Taiyou - Ushinawareshi Toki) (2)",
+   "original_name": "Ougon no Taiyou - Ushinawareshi Toki (Korea-patch J-K v20151004 ver.AB_1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "c57d37403301057bde02d01788291b9b79b4221d7e5fc273e033d8d7e84b50bf",
+   "system": "gba",
+   "name": "파워 프로군 포켓 1 (Power Pro Kun Pocket 1, 2)",
+   "original_name": "Power Pro Kun Pocket 1, 2 (Korea-patch J-K v20150802 v0.4.4beta)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ccd8ff5aa3f863c9bcceb60edc3089d4ebafc86d61eacb4a72191a9d480e83b1",
+   "system": "gba",
+   "name": "소닉 어드밴스 2 (Sonic Advance 2)",
+   "original_name": "Sonic Advance 2 (Korea-patch J-K v20201008 v0.2)",
+   "source": "tistory"
+  },
+  {
+   "hash": "cd7749cfe5279a2036e1a857647411a48d5bef3329b4a3e81b799065ea017157",
+   "system": "gba",
+   "name": "소닉 어드밴스 (Sonic Advance)",
+   "original_name": "Sonic Advance (Korea-patch J-K v20201019 v0.1)",
+   "source": "tistory"
+  },
+  {
+   "hash": "d0ebc7735b5d18a750e9dfabca90b8d8f81f8074b9aad3d1c09a6ec7d94ee89a",
+   "system": "gba",
+   "name": "마리오 & 루이지 RPG (Mario & Luigi RPG)",
+   "original_name": "Mario & Luigi RPG (Korea-patch J-K v20160109)",
+   "source": "tistory"
+  },
+  {
+   "hash": "d3a0bf8d0d26b6df58b6d4f5299d7ce96e91f071a2b193869240155b090f57ec",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 J (Super Robot Taisen J)",
+   "original_name": null,
+   "source": "replace"
+  },
+  {
+   "hash": "d41c9793055ccac137d257c9e92626f3321a11f110268a5285725194f360e061",
+   "system": "gba",
+   "name": "삼국지 (Sangokushi)",
+   "original_name": "Sangokushi (Korea-patch J-K v20110125 v0.75)",
+   "source": "tistory"
+  },
+  {
+   "hash": "d64e9cacc8372e85176ff344cd970c15b1c91eb52962a5e298674ae1a1f6c877",
+   "system": "gba",
+   "name": "록맨 제로 (Rockman Zero)",
+   "original_name": "Rockman Zero (Korea-patch J-K v20220228)",
+   "source": "tistory"
+  },
+  {
+   "hash": "d891cf788ae10cd1d98150ccc22f61772a2ef0d52162f2091761594d3640c316",
+   "system": "gba",
+   "name": "칼쵸비트 (Calciobit)",
+   "original_name": "Calciobit (Korea-patch J-K v20140611 v0.9)",
+   "source": "tistory"
+  },
+  {
+   "hash": "dd18cb1047a194ab41ffdffdd51e70bf87ef4b6034f5326a4307eac3c844f2b4",
+   "system": "gba",
+   "name": "파워 프로군 포켓 5 (Power Pro Kun Pocket 5)",
+   "original_name": "Power Pro Kun Pocket 5 (Korea-patch J-K ver.Proto)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ea8eb6787c2f8ba6ec888a8f2e22026a8d5f9d21255c5fb511da79a5f40168fd",
+   "system": "gba",
+   "name": "귀무자 택틱스 (Onimusha Tactics)",
+   "original_name": "Onimusha Tactics (Korea-patch J-K v20131113)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ec696be4f5392b42b0868f7dedad7ea519f189468662775028ca02eb3ef044b9",
+   "system": "gba",
+   "name": "마리 (Marie, Elie & Anis no Atelier - Soyokaze kara no Dengon)",
+   "original_name": "Marie, Elie & Anis no Atelier - Soyokaze kara no Dengon (Korea-patch J-K v20200817 v0.91)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ec90ebe2d42969babf191feeced5c54b2150d265c9aae83b1ebbf9158971b945",
+   "system": "gba",
+   "name": "히카루의 바둑 (Hikaru no Go)",
+   "original_name": "Hikaru no Go (Korea-patch J-K v20050907 v0.85_debug3)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ef2644981b8c0df7b35741274be8ffcbc5a8bf32f6bfd4ce130a098560c86306",
+   "system": "gba",
+   "name": "젤다의 전설 - 신들의 트라이 포스 & 4개의 검 (Zelda no Densetsu - Kamigami no Triforce & 4tsu no Tsurugi)",
+   "original_name": "Zelda no Densetsu - Kamigami no Triforce & 4tsu no Tsurugi (Korea-patch J-K v20220710 Type.A)",
+   "source": "tistory"
+  },
+  {
+   "hash": "ef9fde37ca7df4d0133cc6b5db67b294c53dd42e7077dbc7bd036b2e5cf9f0bd",
+   "system": "gba",
+   "name": "테니스의 왕자 2003 쿨 블루 (Tennis no Ouji-sama 2003 - Cool Blue)",
+   "original_name": "Tennis no Ouji-sama 2003 - Cool Blue (Korea-patch J-K v20071031 v.Beta)",
+   "source": "tistory"
+  },
+  {
+   "hash": "f0b0bf4c3dde3c06cbe8e74742f5499483f4a1de4ad5b891849dc86f5be3f25e",
+   "system": "gba",
+   "name": "별의 커비 - 거울의 대미궁 (Hoshi no Kirby - Kagami no Daimeikyuu)",
+   "original_name": "Hoshi no Kirby - Kagami no Daimeikyuu (Korea-patch J-K v20221213)",
+   "source": "tistory"
+  },
+  {
+   "hash": "f34ce8862ddf7f56d603b90dee10c3c82db3319ac946c8d630b2680c6b23a3dd",
+   "system": "gba",
+   "name": "테일즈 오브 더 월드 나리키리 던전 2 (Tales of the World - Narikiri Dungeon 2)",
+   "original_name": "Tales of the World - Narikiri Dungeon 2 (Korea-patch J-K v20071102)",
+   "source": "tistory"
+  },
+  {
+   "hash": "f74e6a680eeafcd4ddd033174e312a957c98f782b5d150a5d071a179a000e39f",
+   "system": "gba",
+   "name": "악마성 드라큘라 서클 오브 더 문 (Akumajou Dracula - Circle of the Moon)",
+   "original_name": "Akumajou Dracula - Circle of the Moon (Korea-patch J-K v20040327 v0.01)",
+   "source": "tistory"
+  },
+  {
+   "hash": "fc3762980b092621ba6d3cd981d3aaf199d4a7da5d466c8e8e7d297e7fef9308",
+   "system": "gba",
+   "name": "어드밴스 가디언 히어로즈 (Advance Guardian Heroes)",
+   "original_name": "Advance Guardian Heroes (Korea-patch J-K v20041111 v0.92)",
+   "source": "tistory"
+  },
+  {
+   "hash": "fea42393627783e6145a9ed4f5e50ab5b7f70765c218260a77dddaec289f8ef2",
+   "system": "gba",
+   "name": "슈퍼 로봇대전 J (Super Robot Taisen J)",
+   "original_name": "Super Robot Taisen J (Korea-patch J-K ver.Proto)",
+   "source": "tistory"
+  },
+  {
    "hash": "012b403b3642ec5659b840c888003bd702decd924baf86fc58c5b617f49621fa",
    "system": "gbc",
    "name": "포켓몬스터 크리스탈 (Pocket Monsters - Crystal Version)",
@@ -7970,6 +8579,13 @@
    "source": "localize-2026-06"
   },
   {
+   "hash": "49e53b6e68ba3211b4dea6ed66870bb927aebc23686559a150fb4f048c538387",
+   "system": "md",
+   "name": "원더 보이 인 몬스터 월드 (Wonder Boy in Monster World)",
+   "original_name": null,
+   "source": "replace"
+  },
+  {
    "hash": "4a92e86dcbe71d4e175908eb634a2b255336ad68175166d86678e1968a0fcea2",
    "system": "md",
    "name": "몽환전사 바리스 (Mugen Senshi Valis)",
@@ -8150,6 +8766,13 @@
    "name": "알렉스 키드 - 천공마성 (Alex Kidd - Cheongong Maseong)",
    "original_name": "Alex Kidd - Cheongong Maseong (Korea)",
    "source": "localize-2026-06"
+  },
+  {
+   "hash": "cba829e5f975aeccf8cdce390e6141cf8d3fafad3d071c245c88193b17fee108",
+   "system": "md",
+   "name": "북두의 권 (Hokuto no Ken)",
+   "original_name": "Hokuto no Ken (Korea-patch J-K v20260716 v1.0)",
+   "source": "manual"
   },
   {
    "hash": "e6582de38ae5eccae976b2a0d497bb548967e3280a95e7dfdf24719d0fe35d7b",
@@ -10035,6 +10658,13 @@
    "source": "localize-2026-06"
   },
   {
+   "hash": "0c6caf36ba4c57b15bc9dbd292a9cb800e1a1b9db21237d89c789d2ba7297630",
+   "system": "nes",
+   "name": "푸얀 (Pooyan) (원본)",
+   "original_name": "Pooyan (J)",
+   "source": "manual"
+  },
+  {
    "hash": "0d45759cb5375a3e799a5da6b9a4f3431501350b524901b4f987a48bc2280659",
    "system": "nes",
    "name": "카발 (Cabal)",
@@ -10301,6 +10931,13 @@
    "source": "localize-2026-06"
   },
   {
+   "hash": "50156a293aae7e7526400427761ac4e6849180ced0a070b08f443e71ecc00604",
+   "system": "nes",
+   "name": "열혈 고교 돗지볼부 (Nekketsu Koukou Dodgeball-bu)",
+   "original_name": "Nekketsu Koukou Dodgeball-bu (Korea-patch J-K v20260714 v1.0)",
+   "source": "manual"
+  },
+  {
    "hash": "51a6172cbdb7d27af4150268e1635676e37950782fdc0c59bce319c757022076",
    "system": "nes",
    "name": "다운타운 열혈 이야기 (Downtown Nekketsu Monogatari)",
@@ -10453,6 +11090,13 @@
    "name": "드래곤볼 - 대마왕 부활 (Dragon Ball - Daimaou Fukkatsu)",
    "original_name": "한글_드래곤볼 2 대마왕 부활",
    "source": "localize-2026-06"
+  },
+  {
+   "hash": "72fce2a76b602d96268a4800e2b981f8d44c761fb7bf2d83f1dd486d17dc075f",
+   "system": "nes",
+   "name": "카게의 전설 (Kage no Densetsu) (원본)",
+   "original_name": "Kage no Densetsu (J)",
+   "source": "manual"
   },
   {
    "hash": "747eb3dbd23c506f7d73fefda0ab082d4e8c08994d8a7b0dde9250baad689075",
@@ -10665,6 +11309,13 @@
    "source": "localize-2026-06"
   },
   {
+   "hash": "aff4adf2d95b7f97db9feaf09ec835ea557b34429d58b99c5c587e506870bda1",
+   "system": "nes",
+   "name": "쌍용전 II (Sou Setsu Ryuu II - The Revenge)",
+   "original_name": "Sou Setsu Ryuu II - The Revenge (Korea-patch J-K v20260717 v1.0)",
+   "source": "manual"
+  },
+  {
    "hash": "b0111c5cdecde685c3589b43564f01eb378eda934648079a37a703195bec2ca5",
    "system": "nes",
    "name": "구니스 2 (The Goonies II)",
@@ -10866,6 +11517,20 @@
    "name": "이카리 3 (Ikari III - The Rescue)",
    "original_name": "이카리 3",
    "source": "localize-2026-06"
+  },
+  {
+   "hash": "ea2b475b4e5214640be897c9fb2e374cf550088fb617c57550f085a1dc47ea24",
+   "system": "nes",
+   "name": "타카하시 명인의 모험도 IV (Takahashi Meijin no Bouken Jima IV)",
+   "original_name": null,
+   "source": "replace"
+  },
+  {
+   "hash": "eac7b8443e1061197f9d85a99ed16c45208645af1567ed8b95b73f6f861b49f8",
+   "system": "nes",
+   "name": "틴에이지 뮤턴트 닌자 터틀스 2 (Teenage Mutant Ninja Turtles 2 - The Manhattan Project)",
+   "original_name": "Teenage Mutant Ninja Turtles 2 - The Manhattan Project (Japan)",
+   "source": "manual"
   },
   {
    "hash": "eb79dac1d772154a67bf01cee644d0cf21d21da2e9f3edf044559cd54ca81823",
