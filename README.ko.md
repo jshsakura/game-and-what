@@ -73,11 +73,13 @@ ROM·영상·음악을 올리면 이름과 기기 규격 커버를 자동으로 
   관련 필터. **기본 비활성**(국제판 이미지).
 - **선택형 실험 모드** (`GNW_EXPERIMENTAL_MODE=true`) — 개인 실험실.
   [jshsakura 포크 펌웨어](https://github.com/jshsakura/game-and-watch-retro-go-sd)
-  전용 기능을 켭니다: 아직 업스트림 *릴리즈*에 없는 기종 — **PC 엔진 CD**와
-  **아타리 링스**(둘 다 2026-07-05에 업스트림 `main`에 병합됨 → 릴리즈가 나오는 순간
-  공식으로 승격), 그리고 네오지오 포켓, 원더스완, 버추얼보이, 게임보이 어드밴스,
-  슈퍼 패미컴, 오디세이², ZX 스펙트럼, C64, Game.com — 슈퍼 메트로이드
+  전용 기능을 켭니다: 아직 업스트림 *릴리즈*에 없는 기종 — 네오지오 포켓, 원더스완,
+  버추얼보이, 슈퍼 패미컴, 오디세이², ZX 스펙트럼, C64, Game.com — 슈퍼 메트로이드
   홈브루 포팅, MEDIA 탭(영상 → `/video` MJPEG `.avi`, 음악 → `/music`, 시계 배경).
+  *(**PC 엔진 CD**·**아타리 링스**·**게임보이 어드밴스**가 여기 있었습니다. 업스트림
+  [v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)이
+  셋 다 등록해서 순정 펌웨어가 읽습니다 → 공식으로 승격. 업스트림은 여전히
+  베타/실험으로 표기하지만, 그건 성숙도 얘기지 포크가 필요하다는 뜻이 아닙니다.)*
   **기본 비활성** — 꺼져 있으면 지금 실제로 플래시할 수 있는 펌웨어가 지원하는
   범위만 보입니다.
 - 레트로 **픽셀아트 UI**, Zelda ↔ Mario 에디션 토글.
@@ -224,7 +226,8 @@ docker rm -f game-and-what
 |------|----------------------|------|------|
 | 패미컴 디스크 시스템 | `bios/nes/disksys.rom` | 8 KB | `.fds` 디스크 이미지에만 필요, `.nes` 카트리지는 불필요. |
 | 콜레코비전 | `bios/coleco/coleco.bin` | 8 KB | 시스템 롬 — 모든 게임에 필요. |
-| PC엔진 CD | `bios/pce/syscard3.pce` | 256 KB | 시스템 카드 3.0 — 사실상 모든 CD 게임 구동. |
+| PC엔진 CD | `bios/pce/syscard3.pce` | 256 KB | 시스템 카드 3.0 — 사실상 모든 CD 게임 구동. 펌웨어가 덤프를 검사합니다: md5 `38179df8f4ac870017db21ebcbf53114`. |
+| 게임보이 어드밴스 | `bios/gba/gba_bios.bin` | 16 KB | **기기 전용.** gpSP가 오픈소스 BIOS를 내장해 폴백하지만 [업스트림 v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)은 권장하지 않습니다 — 일부 게임이 대체 BIOS에서 오작동합니다. 브라우저 재생은 mGBA라 HLE로 부팅하며 이 파일이 필요 없습니다. |
 | 오디세이² / 비디오팩 | `bios/videopac/o2rom.bin` | 1 KB | o2em 코어용 o2rom 시스템 BIOS. |
 | 코모도어 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | C64 시스템 롬 3종 (© Commodore). |
 | 타이거 Game.com | `bios/gamecom/internal.bin`, `bios/gamecom/external.bin` | 4 / 256 KB | 내부 OS + 외부/커널 롬 (© Tiger). |

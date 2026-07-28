@@ -39,11 +39,25 @@ export const BIOS_CATALOG = [
   },
   {
     key: "pcecd",
-    experimental: true,
     label: "PC Engine CD",
-    note: "System Card 3.0 — boots essentially the entire CD library.",
+    note: "System Card 3.0 — boots essentially the entire CD library. The firmware checks the dump: md5 38179df8f4ac870017db21ebcbf53114.",
     files: [
       { sdPath: "bios/pce/syscard3.pce", coreName: "syscard3.pce", size: "256 KB" },
+    ],
+  },
+  {
+    // DEVICE ONLY — deliberately no `coreName`. The firmware's gpSP wants a real BIOS
+    // (upstream v1.4.0: "open source bios is included but it's not recommended as it
+    // could cause some bugs in some games"), while the browser runs mGBA, which boots
+    // .gba HLE and needs nothing. Giving this a coreName would make a missing file
+    // block browser play for a system that has never required one — see the BIOS map
+    // in emulator.jsx.
+    key: "gba",
+    tag: "device only",
+    label: "Game Boy Advance",
+    note: "gpSP on the device ships an open-source BIOS and falls back to it, but upstream recommends the real one — some games misbehave on the substitute. Browser play never needs it.",
+    files: [
+      { sdPath: "bios/gba/gba_bios.bin", size: "16 KB" },
     ],
   },
   {

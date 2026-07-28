@@ -76,12 +76,15 @@ preview with sample data (no backend; uploads/edits are disabled).
   "Korean-patched" flag, and related filters. **Off by default** (international image).
 - **Optional experimental mode** (`GNW_EXPERIMENTAL_MODE=true`) — a "personal
   lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
-  systems no upstream *release* registers yet — **PC Engine CD** and **Atari Lynx**
-  (both merged into upstream `main` on 2026-07-05, so they graduate to official the
-  moment upstream cuts a release), plus Neo Geo Pocket, WonderSwan, Virtual Boy,
-  Game Boy Advance, Super Nintendo, Odyssey², ZX Spectrum, C64,
-  Game.com — the Super Metroid homebrew port, and the MEDIA tab (video → `/video` MJPEG
-  `.avi`, music → `/music`, clock backgrounds).
+  systems no upstream *release* registers yet — Neo Geo Pocket, WonderSwan, Virtual Boy,
+  Super Nintendo, Odyssey², ZX Spectrum, C64, Game.com — the Super Metroid homebrew
+  port, and the MEDIA tab (video → `/video` MJPEG `.avi`, music → `/music`, clock
+  backgrounds).
+  *(**PC Engine CD**, **Atari Lynx** and **Game Boy Advance** used to live here.
+  Upstream [v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)
+  registers all three, so a stock firmware reads them and they are official now —
+  upstream still labels them beta/experimental, but that is about maturity, not about
+  needing the fork.)*
   **Off by default** — everything above stays hidden and the app tracks only what a
   firmware you can actually flash today supports.
 - Retro **pixel-art UI** with a Zelda ↔ Mario edition toggle.
@@ -234,7 +237,8 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 |--------|-------------------------|------|-------|
 | Famicom Disk System | `bios/nes/disksys.rom` | 8 KB | Only `.fds` disk images need it; `.nes` carts boot without. |
 | ColecoVision | `bios/coleco/coleco.bin` | 8 KB | System ROM — every game needs it. |
-| PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. |
+| PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. The firmware checks the dump: md5 `38179df8f4ac870017db21ebcbf53114`. |
+| Game Boy Advance | `bios/gba/gba_bios.bin` | 16 KB | **Device only.** gpSP embeds an open-source BIOS and falls back to it, but [upstream v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0) does not recommend that — some games misbehave on the substitute. Browser play uses mGBA, which boots HLE and never needs it. |
 | Odyssey² / Videopac | `bios/videopac/o2rom.bin` | 1 KB | o2rom system BIOS for the o2em core. |
 | Commodore 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | The three C64 system ROMs (© Commodore). |
 | Tiger Game.com | `bios/gamecom/internal.bin`, `bios/gamecom/external.bin` | 4 / 256 KB | Internal OS + external/kernel ROM (© Tiger). |

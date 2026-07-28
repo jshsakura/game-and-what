@@ -55,15 +55,16 @@ SYSTEMS: tuple[System, ...] = (
     System("sg", "SG-1000", "sg", ("sg",)),
     System("pce", "PC Engine", "pce", ("pce",)),
     # PC Engine CD (a.k.a. TurboGrafx-CD). Upstream took it from this fork into main
-    # on 2026-07-05, but the newest upstream RELEASE (v1.3.2, 2026-06-13) predates
-    # that — so no firmware anyone can flash registers /roms/pcecd yet, and it stays
-    # experimental until upstream cuts a release with it. CD images live in the
+    # on 2026-07-05, and upstream v1.4.0 (2026-07-27) shipped it — so a stock firmware
+    # registers /roms/pcecd and this is OFFICIAL now. Upstream calls it beta; that is a
+    # maturity label, not a "you need the fork" gate, which is what this flag means.
+    # CD images live in the
     # single /roms/pcecd/ folder as .chd (preferred) or .cue (+ .bin sidecars tracked
     # as extra_files); the firmware registers ".cue" only. Booting needs a
     # user-uploaded System Card BIOS (syscard3.pce). Browser play uses beetle-pce-fast:
     # single-file .chd boots, .cue/.bin sets need their track sidecars so they're
     # not browser-playable (see emulator.jsx).
-    System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue"), experimental=True),
+    System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue")),
     System("col", "Coleco Vision", "col", ("col",)),
     System("msx", "MSX", "msx", ("dsk", "rom", "mx1", "mx2", "cdk")),
     System("a2600", "Atari 2600", "a2600", ("a26", "bin")),
@@ -77,24 +78,29 @@ SYSTEMS: tuple[System, ...] = (
     # as ONE combined folder per family (NOT split like gb/gbc).
     System("ngp", "NEOGEO Pocket", "ngp", ("ngp", "ngc", "ngpc"), experimental=True),
     System("ws", "WonderSwan", "ws", ("ws", "wsc"), experimental=True),
-    # Atari Lynx (handy-go core). Same story as pcecd: registered in upstream main
-    # on 2026-07-05, but not in the newest upstream RELEASE (v1.3.2), so a stock
-    # firmware still ignores /roms/lynx. Experimental until that release lands.
-    # Standard extension is ".lnx".
-    System("lynx", "Atari Lynx", "lynx", ("lnx",), experimental=True),
+    # Atari Lynx (handy-go core). Same story as pcecd, and the same ending: upstream
+    # v1.4.0 (2026-07-27) registers /roms/lynx, so a stock firmware reads it and this is
+    # OFFICIAL. Standard extension is ".lnx".
+    System("lynx", "Atari Lynx", "lynx", ("lnx",)),
     # Nintendo Virtual Boy — NOT in rg_emulators.c (no SD core); added as a
     # library-collection system with original No-Intro names. Standard extension
     # is ".vb". Browser play works via the mednafen_vb (beetle-vb) core; .vb files
     # are headerless but the core boots them HLE, so no BIOS is needed.
     System("vb", "Virtual Boy", "vb", ("vb",), experimental=True),
-    # Game Boy Advance — NOT in rg_emulators.c. The firmware would need a gpSP
-    # port, and gpSP only reaches full speed on a game whose VBlank busy-wait it
-    # can skip; that skip is driven by a hand-maintained table of loop addresses
-    # (gba_over.h), keyed on the 4-char code in the cart header. A game missing
-    # from that table never skips at all. scripts/gba_idle_match.py reads the
-    # header of each ROM and reports which ones the table covers — that is what
-    # the idle_loop flag records. Browser play uses mGBA (see emulator.jsx).
-    System("gba", "Game Boy Advance", "gba", ("gba",), experimental=True),
+    # Game Boy Advance — OFFICIAL as of upstream v1.4.0 (2026-07-27), which ships the
+    # gpSP port this used to be waiting on (SD-card only; upstream warns sound is choppy
+    # and speed depends on the game).
+    #
+    # gpSP only reaches full speed on a game whose VBlank busy-wait it can skip, and that
+    # skip is driven by a hand-maintained table of loop addresses (gba_over.h), keyed on
+    # the 4-char code in the cart header. A game missing from that table never skips at
+    # all. scripts/gba_idle_match.py reads each ROM's header and reports which ones the
+    # table covers — that is what the idle_loop flag records.
+    #
+    # The device wants a real BIOS at /bios/gba/gba_bios.bin: gpSP embeds an open-source
+    # one and falls back to it, but upstream does not recommend leaning on that. Browser
+    # play uses mGBA, which boots HLE and needs no BIOS at all (see bios.js).
+    System("gba", "Game Boy Advance", "gba", ("gba",)),
     # Super Nintendo — NOT in rg_emulators.c and not realistically portable to it:
     # the M7 has no headroom for a 65816+SPC700+PPU emulator (SNES is a bigger ask
     # than GBA's ARM7, which already only reaches full speed via the idle-loop

@@ -20,11 +20,15 @@ from app.services.packaging import _excluded
 from app.systems import EXPERIMENTAL_DIRNAMES, SYSTEMS, available_systems, get_system
 
 
-# rg_emulators.c as of the newest upstream RELEASE (v1.3.2), verbatim.
+# rg_emulators.c as of the newest upstream RELEASE (v1.4.0, 2026-07-27), verbatim.
+# v1.4.0 added pcecd, lynx and gba — upstream labels them beta/experimental, but this
+# flag is not a maturity rating: it means "needs the jshsakura fork". A stock firmware
+# reads these folders now, so they are official here.
 UPSTREAM_OFFICIAL = {
     "nes", "gb", "gbc", "gg", "sms", "md", "sg", "pce", "col", "msx",
     "a2600", "a7800", "amstrad", "wsv", "tama", "mini", "gw",
     "homebrew", "pico8",
+    "pcecd", "lynx", "gba",          # v1.4.0
 }
 
 
@@ -38,7 +42,7 @@ def _p(root: Path, rel: str) -> Path:
 def test_experimental_flags_match_upstream_registration():
     assert {s.key for s in SYSTEMS if not s.experimental} == UPSTREAM_OFFICIAL
     assert EXPERIMENTAL_DIRNAMES == {
-        "pcecd", "lynx", "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom", "gba", "snes",
+        "ngp", "ws", "vb", "videopac", "zxs", "c64", "gamecom", "snes",
     }
 
 

@@ -236,10 +236,18 @@ const DEFAULT_HINTS = [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b
 // for the SD firmware); `fileName` is what the libretro CORE looks for — they
 // can differ (gearcoleco wants "colecovision.rom", not the SD's "coleco.bin").
 // NES is excluded here because FDS is disk-conditional (see FDS_BIOS below).
+//
+// A catalog file with NO `coreName` is one the DEVICE needs and the browser does not —
+// GBA is the case: the firmware's gpSP wants a real bios_rom, while mGBA in the browser
+// boots HLE and needs nothing. Those are dropped here, because loadBios() below treats
+// an absent BIOS as a hard stop, and a user who never had a reason to supply one would
+// otherwise lose browser play for a system that never needed it.
 const BIOS = Object.fromEntries(
   BIOS_CATALOG
     .filter((b) => b.key !== "nes")
-    .map((b) => [b.key, b.files.map((f) => ({ fileName: f.coreName, path: f.sdPath }))]),
+    .map((b) => [b.key, b.files.filter((f) => f.coreName)
+      .map((f) => ({ fileName: f.coreName, path: f.sdPath }))])
+    .filter(([, files]) => files.length),
 );
 // Famicom Disk System: only .fds disk images need disksys.rom (not .nes carts).
 const FDS_BIOS = (() => {
