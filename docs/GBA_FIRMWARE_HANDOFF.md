@@ -237,12 +237,11 @@ gpSP's static memory, as shipped:
    the `bios_rom[16K]` BSS array (`libretro.c:1200,1213`). `open_gba_bios_rom` is only ever
    a memcpy **source** — never written. Move it to `.rodata`, point the 0x0 region straight
    at it, drop the BSS copy: **−32 KB**.
-   *(gpSP embeds `bios/open_gba_bios.bin` via `.incbin` and falls back to it
-   automatically. **Superseded as advice by upstream v1.4.0 (2026-07-27)**, which asks
-   for a real dump at `/bios/gba/gba_bios.bin` — "open source bios is included but it's
-   not recommended as it could cause some bugs in some games". The fallback still exists,
-   so this lever's −32 KB is unaffected; what changed is that the user now has a file to
-   supply after all, like pcecd/videopac/c64. See the BIOS table in the README.)*
+   *(gpSP embeds `bios/open_gba_bios.bin` via `.incbin` and uses it by default, so the
+   BIOS is never a hard requirement and this lever's −32 KB is unaffected. Since upstream
+   v1.4.0 (2026-07-27) the original is **recommended** at `/bios/gba/gba_bios.bin` —
+   optional, unlike pcecd/videopac/c64 where nothing boots without one. See the BIOS
+   table in the README.)*
 
 2. **Save → SD.** `gamepak_backup` is 128 KB. AHB SRAM is 120 KB, so it does not fit there;
    it has to stream. **−128 KB**.

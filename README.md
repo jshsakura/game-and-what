@@ -238,7 +238,7 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 | Famicom Disk System | `bios/nes/disksys.rom` | 8 KB | Only `.fds` disk images need it; `.nes` carts boot without. |
 | ColecoVision | `bios/coleco/coleco.bin` | 8 KB | System ROM — every game needs it. |
 | PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. The firmware checks the dump: md5 `38179df8f4ac870017db21ebcbf53114`. |
-| Game Boy Advance | `bios/gba/gba_bios.bin` | 16 KB | **Device only.** gpSP embeds an open-source BIOS and falls back to it, but [upstream v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0) does not recommend that — some games misbehave on the substitute. Browser play uses mGBA, which boots HLE and never needs it. |
+| Game Boy Advance | `bios/gba/gba_bios.bin` | 16 KB | **Device only.** gpSP has an open-source BIOS built in and uses it by default; [upstream](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0) recommends the original. Browser play uses mGBA, which boots HLE and never needs it. |
 | Odyssey² / Videopac | `bios/videopac/o2rom.bin` | 1 KB | o2rom system BIOS for the o2em core. |
 | Commodore 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | The three C64 system ROMs (© Commodore). |
 | Tiger Game.com | `bios/gamecom/internal.bin`, `bios/gamecom/external.bin` | 4 / 256 KB | Internal OS + external/kernel ROM (© Tiger). |

@@ -97,9 +97,9 @@ SYSTEMS: tuple[System, ...] = (
     # all. scripts/gba_idle_match.py reads each ROM's header and reports which ones the
     # table covers — that is what the idle_loop flag records.
     #
-    # The device wants a real BIOS at /bios/gba/gba_bios.bin: gpSP embeds an open-source
-    # one and falls back to it, but upstream does not recommend leaning on that. Browser
-    # play uses mGBA, which boots HLE and needs no BIOS at all (see bios.js).
+    # BIOS: gpSP has an open-source one built in and uses it by default, so nothing is
+    # required — upstream recommends the original at /bios/gba/gba_bios.bin. Browser play
+    # uses mGBA, which boots HLE and needs no BIOS at all (see bios.js).
     System("gba", "Game Boy Advance", "gba", ("gba",)),
     # Super Nintendo — NOT in rg_emulators.c and not realistically portable to it:
     # the M7 has no headroom for a 65816+SPC700+PPU emulator (SNES is a bigger ask

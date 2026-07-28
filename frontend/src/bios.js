@@ -46,16 +46,18 @@ export const BIOS_CATALOG = [
     ],
   },
   {
-    // DEVICE ONLY — deliberately no `coreName`. The firmware's gpSP wants a real BIOS
-    // (upstream v1.4.0: "open source bios is included but it's not recommended as it
-    // could cause some bugs in some games"), while the browser runs mGBA, which boots
-    // .gba HLE and needs nothing. Giving this a coreName would make a missing file
-    // block browser play for a system that has never required one — see the BIOS map
-    // in emulator.jsx.
+    // DEVICE ONLY — deliberately no `coreName`, and OPTIONAL unlike every other entry
+    // here. gpSP has an open-source BIOS built in and uses it by default; upstream
+    // v1.4.0 recommends the original, it does not require it. The browser runs mGBA,
+    // which boots .gba HLE and wants nothing at all.
+    //
+    // Giving this a coreName would make a missing file block browser play for a system
+    // that has never required one — loadBios() treats absence as a hard stop, so files
+    // without a coreName are dropped from the browser map (see emulator.jsx).
     key: "gba",
     tag: "device only",
     label: "Game Boy Advance",
-    note: "gpSP on the device ships an open-source BIOS and falls back to it, but upstream recommends the real one — some games misbehave on the substitute. Browser play never needs it.",
+    note: "An open-source BIOS is built in and used by default; the original is recommended. Browser play never needs it.",
     files: [
       { sdPath: "bios/gba/gba_bios.bin", size: "16 KB" },
     ],
