@@ -19,7 +19,7 @@ Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck. MP3 mono 96k is
 ~12 KB/s and reuses the device's existing minimp3 decoder (shared with the
 music app) — no new audio path. The device downmixes/resamples to its 48kHz
 mono output internally, so source channels/rate don't matter. Video is
-320x240 MJPEG q17 @ 20fps (peak <100 KB/s, scene-complexity-flattened); the
+320x240 MJPEG q17 @ 30fps (peak <100 KB/s, scene-complexity-flattened); the
 on-device player drops video frames when the SD can't keep up so audio stays
 locked in sync. Screen is 320x240.
 """
@@ -38,7 +38,8 @@ from pathlib import Path
 #   ----------------- --------- ----------------------------------------------
 #   -q:v N            17        MJPEG quality 2(best)–31(worst); lower = sharper
 #                               + bigger files (more SD reads)
-#   fps=N  (in -vf)   20        frame rate; lower = fewer SD reads (the bottleneck)
+#   fps=N  (in -vf)   30        frame rate. SD reads were the bottleneck and are
+#                               not any more (block reads + the 340 MHz boost)
 #   -c:a libmp3lame   mono MP3  audio; firmware expects MP3 (reuses minimp3)
 #   -ac 1
 #   resolution        320×240   the screen — fixed
@@ -64,10 +65,29 @@ VIDEO_QSCALE = 17         # Quality anchor (used as -qmin). MJPEG is intra-only,
                           # (An earlier note here said -b:v "does not help" — that was
                           # plain -b:v without qmin/bufsize; the VBV form does bound
                           # the peaks, verified per-frame with ffprobe.)
-VIDEO_BITRATE = "1600k"   # VBV target/ceiling: ~200 KB/s. Sits above q17's typical
+VIDEO_BITRATE = "2400k"   # VBV target/ceiling: ~300 KB/s, raised with FRAME_RATE:
+                          # at 30fps the old 1600k would make rate control raise q on
+                          # ordinary scenes, buying smoothness by spending sharpness.
+                          # 2400k keeps per-frame quality and lets the extra frames
+                          # cost extra bytes — which is what the faster read path is
+                          # for. Was: ~200 KB/s. Sits above q17's typical
                           # ~100 KB/s, so RC only intervenes in the top complexity band.
 VIDEO_VBV_BUF = "320k"    # ~40 KB VBV window -> worst frames bounded near it.
-FRAME_RATE = 20           # fps=20 — fewer frames/s = fewer SD reads. per-read latency
+FRAME_RATE = 30           # fps=30. Raised from 20 because the reason for 20 is gone:
+                          # 20 was chosen when per-read latency WAS the bottleneck — the
+                          # firmware read each 512-byte SD block ONE BYTE AT A TIME, which
+                          # capped reads near 243 KB/s whatever the SPI clock was. That loop
+                          # now does one block transfer per block (~8-10x; rd= went from
+                          # ~32 ms/frame to single digits), and the player now takes the
+                          # 340 MHz overclock, which speeds up the SPI loop itself. At 30fps
+                          # with the ceiling below the load is ~300 KB/s against a path that
+                          # does megabytes. Smoothness is the most visible improvement left,
+                          # because nothing else about a 320x240 screen can get better.
+                          # If a device disagrees: the player's debug HUD shows dec=/v=
+                          # (decoded vs seen — they should track) and rd= (blocking read ms
+                          # — should stay near zero, work showing in pf=). Falling back is
+                          # one line: set this to 20, VIDEO_BITRATE to 1600k, re-upload.
+                          # --- the note this replaces, kept for the reasoning: per-read latency
                           # is the bottleneck, so fps↓ (read count) + q↑ (sectors/read)
                           # both cut SD load directly. 20fps (down from 24) trims ~17%
                           # of the read count for noticeably smoother playback on slow

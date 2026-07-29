@@ -106,9 +106,9 @@ def test_build_command_default_fit_mode_matches_documented_contract(tmp_path):
         "ffmpeg", "-hide_banner", "-y",
         "-i", str(src),
         "-c:v", "mjpeg",
-        "-b:v", "1600k", "-maxrate", "1600k", "-bufsize", "320k",
+        "-b:v", "2400k", "-maxrate", "2400k", "-bufsize", "320k",
         "-qmin", "17", "-qmax", "31",
-        "-vf", "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20",
+        "-vf", "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=30",
         "-c:a", "libmp3lame", "-ac", "1", "-b:a", "96k", "-ar", "48000",
         str(dst),
     ]
@@ -118,14 +118,14 @@ def test_build_command_fill_mode_scales_up_and_crops_to_cover(tmp_path):
     cmd = video.build_command(tmp_path / "in.mp4", tmp_path / "out.avi", mode="fill")
 
     vf = cmd[cmd.index("-vf") + 1]
-    assert vf == "scale=320:240:force_original_aspect_ratio=increase,crop=320:240,fps=20"
+    assert vf == "scale=320:240:force_original_aspect_ratio=increase,crop=320:240,fps=30"
 
 
 def test_build_command_stretch_mode_distorts_to_exact_screen_size(tmp_path):
     cmd = video.build_command(tmp_path / "in.mp4", tmp_path / "out.avi", mode="stretch")
 
     vf = cmd[cmd.index("-vf") + 1]
-    assert vf == "scale=320:240,fps=20"
+    assert vf == "scale=320:240,fps=30"
 
 
 def test_build_command_unknown_mode_falls_back_to_fit(tmp_path):
