@@ -865,6 +865,12 @@ export function sdFilterCount(f) {
 
 function packageQuery(system, filter) {
   const p = new URLSearchParams();
+  // /video ships too. The server defaults it OFF (video is an "extra" for API
+  // callers), and the UI never asked for it — so an encoded .avi sat in the
+  // library and could not reach the card by any button in the app. On a whole-SD
+  // download that is just a missing folder; the server still drops it on an
+  // official (non-fork) deploy, where the device has no Video app to read it.
+  if (!system) p.set("video", "1");
   if (system) p.set("system", system);
   if (filter?.flags?.length) p.set("flags", filter.flags.join(","));
   if (filter?.maxMb) p.set("max_mb", String(filter.maxMb));
