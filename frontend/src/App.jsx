@@ -221,7 +221,7 @@ export default function App() {
   useEffect(() => {
     getLibrary()
       .then((l) => {
-        setCount(l.roms.length + l.videos.length + (l.music?.length || 0));
+        setCount(l.roms.length + l.videos.length + (l.music?.length || 0) + (l.clock_files?.length || 0));
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
         setRoms(l.roms);
       })

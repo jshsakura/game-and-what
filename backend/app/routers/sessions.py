@@ -99,7 +99,7 @@ def require_session(conn, session_id: str) -> None:
 
 @router.get("/sessions/{session_id}/library")
 def get_library(session_id: str) -> dict:
-    """All ROMs and videos stored in this session."""
+    """All ROMs, videos, music and clock backgrounds stored in this session."""
     with db.connect() as conn:
         require_session(conn, session_id)
         roms = [
@@ -133,4 +133,15 @@ def get_library(session_id: str) -> dict:
                 (session_id,),
             ).fetchall()
         ]
-    return {"session_id": session_id, "roms": roms, "videos": videos, "music": music}
+        clock_files = [
+            dict(r)
+            for r in conn.execute(
+                # rowid breaks the tie: a batch of album photos (or convert,
+                # tweak the crop, convert again) lands in the same second, and
+                # created_at alone would let their order flip between reloads.
+                "SELECT * FROM clock_files WHERE session_id = ? ORDER BY created_at DESC, rowid DESC",
+                (session_id,),
+            ).fetchall()
+        ]
+    return {"session_id": session_id, "roms": roms, "videos": videos, "music": music,
+            "clock_files": clock_files}

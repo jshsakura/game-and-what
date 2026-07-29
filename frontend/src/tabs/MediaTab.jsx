@@ -12,12 +12,14 @@ import { useT } from "../i18n.jsx";
 // sub-tabs; each owns its own upload tool + storage list.
 export default function MediaTab({ onChanged }) {
   const t = useT();
-  const [media, setMedia] = useState({ videos: [], music: [] });
-  const [sub, setSub] = useState("video"); // "video" | "music"
+  const [media, setMedia] = useState({ videos: [], music: [], clock: [] });
+  const [sub, setSub] = useState("video"); // "video" | "music" | "clock"
 
   const reload = useCallback(() => {
     getLibrary()
-      .then((l) => setMedia({ videos: l.videos || [], music: l.music || [] }))
+      .then((l) => setMedia({
+        videos: l.videos || [], music: l.music || [], clock: l.clock_files || [],
+      }))
       .catch(() => {});
   }, []);
   useEffect(() => { reload(); }, [reload]);
@@ -38,6 +40,7 @@ export default function MediaTab({ onChanged }) {
         </button>
         <button className={`media-subtab ${sub === "clock" ? "on" : ""}`} onClick={() => setSub("clock")}>
           <Clock size={14} strokeWidth={2.5} aria-hidden /> {t("Clock")}
+          {media.clock.length > 0 && <span className="media-count">{media.clock.length}</span>}
         </button>
       </div>
 
@@ -59,7 +62,7 @@ export default function MediaTab({ onChanged }) {
       )}
       {sub === "clock" && (
         <section className="media-section">
-          <ClockBgTab />
+          <ClockBgTab files={media.clock} onChanged={refresh} />
         </section>
       )}
     </div>

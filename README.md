@@ -79,7 +79,7 @@ preview with sample data (no backend; uploads/edits are disabled).
   systems no upstream *release* registers yet — Neo Geo Pocket, WonderSwan, Virtual Boy,
   Super Nintendo, Odyssey², ZX Spectrum, C64, Game.com — the Super Metroid homebrew
   port, and the MEDIA tab (video → `/video` MJPEG `.avi`, music → `/music`, clock
-  backgrounds).
+  backgrounds/photos/alarms → `/clock`, all kept in the library like the rest).
   *(**PC Engine CD**, **Atari Lynx** and **Game Boy Advance** used to live here.
   Upstream [v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)
   registers all three, so a stock firmware reads them and they are official now —

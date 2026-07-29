@@ -337,6 +337,59 @@ export async function uploadClockBackground(file, onProgress, { mode = "fit", cr
   return xhrUploadBlob("/api/clock/background", form, onProgress);
 }
 
+// Clock library — /clock/<kind> (gif | album | alarm). A gif is converted by the
+// server; album photos (.565) and alarm clips (.mp3) are converted in the browser
+// and uploaded as-is. All three are kept in the library and ship in the SD zip.
+// Resolves the stored row (id/stored_name/size…), not a blob.
+export async function saveClockFile(kind, file, onProgress, { mode = "fit", crop = "", name = "", seconds = 0 } = {}) {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("mode", mode);
+  if (crop) form.append("crop", crop);
+  if (name) form.append("name", name);
+  if (seconds) form.append("seconds", String(seconds));
+  return xhrUpload(`/api/sessions/${SESSION_ID}/clock/${kind}`, form, onProgress);
+}
+
+// The stored file itself. A gif is its own preview (320×240, animated) and an
+// alarm feeds the <audio> player; an album photo is raw RGB565, so its preview
+// is a PNG the server renders (clockPreviewUrl).
+export function clockFileUrl(kind, fileId) {
+  const sid = getSessionId();
+  return sid ? `/api/sessions/${sid}/clock/${kind}/${fileId}/file` : null;
+}
+
+export function clockPreviewUrl(kind, fileId) {
+  const sid = getSessionId();
+  if (!sid) return null;
+  return kind === "album"
+    ? `/api/sessions/${sid}/clock/${kind}/${fileId}/preview`
+    : clockFileUrl(kind, fileId);
+}
+
+export function downloadClockFileUrl(kind, fileId) {
+  const sid = getSessionId();
+  return sid ? `/api/sessions/${sid}/clock/${kind}/${fileId}/download` : null;
+}
+
+export async function renameClockFile(kind, fileId, name) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/clock/${kind}/${fileId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    }));
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "Rename failed");
+  return res.json();
+}
+
+export async function deleteClockFile(kind, fileId) {
+  const res = await withSession((sid) =>
+    fetch(`/api/sessions/${sid}/clock/${kind}/${fileId}`, { method: "DELETE" }));
+  if (!res.ok) throw new Error("Failed to delete");
+  return res.json();
+}
+
 
 export async function uploadCover(romId, file, crop) {
   const res = await withSession((sid) => {

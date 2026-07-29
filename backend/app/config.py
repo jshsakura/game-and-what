@@ -81,6 +81,12 @@ COVERS_DIR_NAME = "covers"
 MEDIA_DIR_NAME = "video"
 LEGACY_MEDIA_DIR_NAME = "media"
 MUSIC_DIR_NAME = "music"   # firmware Music app scans /music (MP3 played directly)
+# The firmware Clock app's own media folders: /clock/gif holds the background
+# GIFs (any .gif in there is pickable; bg.gif is only the default), /clock/album
+# the .565 photos and /clock/alarm the alarm sounds. The subfolder name IS the
+# `kind` used by the API and the clock_files table.
+CLOCK_DIR_NAME = "clock"
+CLOCK_KINDS = ("gif", "album", "alarm")
 
 # External metadata/art providers — keys via env only (security rule).
 IGDB_CLIENT_ID = os.getenv("IGDB_CLIENT_ID", "")
@@ -100,6 +106,10 @@ MAX_ROM_BYTES = _env_int("GNW_MAX_ROM_BYTES", 64 * 1024 * 1024)
 MAX_CD_FILE_BYTES = _env_int("GNW_MAX_CD_FILE_BYTES", 1024 * 1024 * 1024)
 MAX_CD_TOTAL_BYTES = _env_int("GNW_MAX_CD_TOTAL_BYTES", 2 * 1024 * 1024 * 1024)
 MAX_MUSIC_BYTES = _env_int("GNW_MAX_MUSIC_BYTES", 64 * 1024 * 1024)
+# Clock album photos arrive ALREADY converted by the browser (a 320×240 .565 is
+# exactly 150 KB, a 32-bit BMP of the same frame ~300 KB), so this cap only has
+# to stop something that isn't a screen-sized picture at all.
+MAX_CLOCK_IMAGE_BYTES = _env_int("GNW_MAX_CLOCK_IMAGE_BYTES", 8 * 1024 * 1024)
 MAX_FIRMWARE_BYTES = _env_int("GNW_MAX_FIRMWARE_BYTES", 64 * 1024 * 1024)
 MAX_EXTRA_BYTES = _env_int("GNW_MAX_EXTRA_BYTES", 128 * 1024 * 1024)
 

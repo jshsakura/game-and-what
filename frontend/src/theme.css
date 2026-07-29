@@ -1347,6 +1347,61 @@ body::before {
 }
 .clock-file-row .scope-btn { flex: 0 0 auto; }
 
+/* Clock sub-tabs (GIF / 앨범 / 알람) sit INSIDE the MEDIA sub-tabs, so they read a
+   step quieter: same keys, smaller. */
+.clock-subtabs .media-subtab { font-size: 12px; padding: 9px 10px; }
+
+/* Stored clock backgrounds — a sticky 1:1 stage over a picked-row list. The GIF
+   is 320×240 and already the device output, so it IS the preview: no thumbnail
+   pipeline, the rows just animate. */
+.clock-gif-lib { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.clock-gif-stage {
+  display: flex; flex-direction: column; gap: 8px; align-items: stretch;
+  padding: 10px 11px; border-radius: 10px;
+  background: #161a0d; border: 2px solid var(--accent); box-shadow: 0 4px 12px #00000055;
+}
+.clock-gif-big {
+  width: 320px; height: 240px; max-width: 100%; align-self: center;
+  object-fit: contain; display: block; border-radius: 8px; background: #000;
+  border: 2px solid #00000077; image-rendering: auto;
+}
+.clock-gif-stage-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; font-size: 11px; }
+.clock-gif-origin { flex: 1 1 120px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clock-gif-badge {
+  display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto;
+  font-family: var(--pixel); font-size: 7px; color: #fff;
+  background: #00000066; border: 1px solid #ffffff26; border-radius: 4px; padding: 4px 6px;
+}
+.clock-gif-stage .rename-row .text-input { min-width: 0; }
+.clock-gif-list { display: flex; flex-direction: column; gap: 4px; }
+.clock-gif-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 6px 10px; border-radius: 8px; cursor: pointer;
+  background: #00000026; border: 1px solid #00000033; transition: background 0.1s;
+}
+.clock-gif-row:hover { background: #00000040; }
+.clock-gif-row.on { background: color-mix(in srgb, var(--accent) 26%, transparent); border-color: var(--accent); }
+.clock-gif-row-thumb {
+  flex: 0 0 auto; width: 56px; height: 42px; border-radius: 5px;
+  overflow: hidden; background: #000; display: inline-flex;
+}
+.clock-gif-row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* an alarm has no picture — the bell fills the same box the photos/GIFs use */
+.clock-gif-row-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; color: var(--accent-2);
+}
+.clock-gif-row-name {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--card-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.clock-gif-default {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 3px;
+  font-family: var(--pixel); font-size: 7px; color: var(--lcd-ink);
+  background: var(--gold); border-radius: 4px; padding: 3px 5px;
+}
+.clock-gif-row .icon-btn { flex: 0 0 auto; }
+
 /* Clock (alarm) trimmer: label · slider · read-out. One grid for BOTH rows
    (rows are display:contents) so the columns size to the widest label and the
    two slider tracks stay aligned in every language — "Länge"/"Startpunkt" and

@@ -108,6 +108,7 @@ const LIBRARY = {
   roms: Array.from({ length: 12 }, (_, i) => fakeRom(i)),
   videos: [],
   music: [],
+  clock_files: [],
 };
 LIBRARY.roms.forEach((r) => { COVER_BY_ROM_ID[r.id] = coverSvg(r.display_name); });
 

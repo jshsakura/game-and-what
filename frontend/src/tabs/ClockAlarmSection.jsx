@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BellRing, Upload, Loader, Info, Download, Play, Square, X } from "lucide-react";
-import { formatBytes } from "../api.js";
+import { BellRing, Upload, Loader, Info, Download, Play, Save, Square, X } from "lucide-react";
+import { formatBytes, saveClockFile } from "../api.js";
 import {
   convertToAlarmMp3, downloadBlob, alarmName, alarmBytesPerSec, preloadEncoder,
   ALARM_KBPS, ALARM_MAX_S,
@@ -8,6 +8,7 @@ import {
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
+import ClockFileList from "./ClockFileList.jsx";
 
 // Clock alarm sound: any song/video → a short mono MP3 in /clock/alarm/.
 // The firmware rings for 60s, LOOPING the file, so a few seconds of the good part
@@ -24,7 +25,7 @@ function timecode(sec) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-export default function ClockAlarmSection() {
+export default function ClockAlarmSection({ sounds = [], onChanged }) {
   const t = useT();
   const toast = useToast();
   const audioRef = useRef(null);
@@ -135,6 +136,27 @@ export default function ClockAlarmSection() {
     }
   }
 
+  // Same clip, kept in the library (/clock/alarm) instead of downloaded — it is
+  // then listed below, playable, and travels with the SD ZIP.
+  async function keep() {
+    if (!src || busy) return;
+    stop();
+    setBusy(true);
+    setResult(null);
+    try {
+      const blob = await convertToAlarmMp3(src.file, { start, duration: clipLen });
+      const row = await saveClockFile("alarm", new File([blob], outName, { type: "audio/mpeg" }),
+                                      null, { seconds: clipLen });
+      clearSrc();
+      onChanged?.();
+      toast.success(t("Saved as {name} — it stays here and ships in the SD ZIP", { name: row.stored_name }));
+    } catch (e) {
+      toast.error(e.message || t("Convert failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="stack">
       <div className="muted">
@@ -142,7 +164,7 @@ export default function ClockAlarmSection() {
       </div>
       <div className="vtab-safe">
         <Info size={13} strokeWidth={2.5} aria-hidden />
-        <span>{t("Converted in your browser (nothing is uploaded) to a mono 48 kHz MP3 — the exact format the device plays, so it never resamples your alarm — and turned up to a standard loudness, so a quiet song still wakes you. Copy it into")} <b>/clock/alarm</b> {t("on the SD card, then pick it under Settings → Alarm sound.")}</span>
+        <span>{t("Converted in your browser to a mono 48 kHz MP3 — the exact format the device plays, so it never resamples your alarm — and turned up to a standard loudness, so a quiet song still wakes you. Keep it here and it ships in the SD ZIP, or download it and copy it into")} <b>/clock/alarm</b> {t("on the SD card, then pick it under Settings → Alarm sound.")}</span>
       </div>
 
       <Dropzone
@@ -234,14 +256,19 @@ export default function ClockAlarmSection() {
             <button type="button" className="scope-btn" onClick={clearSrc} disabled={busy} aria-label={t("Remove")} title={t("Remove")}>
               <X size={14} strokeWidth={2.5} aria-hidden />
             </button>
-            <button type="button" className="scope-btn on" onClick={convert} disabled={busy}>
+            <button type="button" className="scope-btn" onClick={convert} disabled={busy} title={t("Nothing is stored on the server")}>
+              <Download size={14} strokeWidth={2.5} aria-hidden /> {t("Download only")}
+            </button>
+            <button type="button" className="scope-btn on" onClick={keep} disabled={busy}>
               {busy
                 ? <><Loader size={14} strokeWidth={2.5} className="spin" aria-hidden /> {t("Converting…")}</>
-                : <><Download size={14} strokeWidth={2.5} aria-hidden /> {t("Convert & download")}</>}
+                : <><Save size={14} strokeWidth={2.5} aria-hidden /> {t("Convert & keep")}</>}
             </button>
           </div>
         </div>
       )}
+
+      <ClockFileList kind="alarm" files={sounds} onChanged={onChanged} />
     </div>
   );
 }

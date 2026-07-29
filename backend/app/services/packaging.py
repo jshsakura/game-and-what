@@ -48,6 +48,9 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
     # /music (fork Music app) likewise stays off the card on an official deploy.
     if not config.EXPERIMENTAL_MODE and config.MUSIC_DIR_NAME in parts:
         return True
+    # /clock (fork Clock app's background GIFs) — same deal.
+    if not config.EXPERIMENTAL_MODE and parts[0] == config.CLOCK_DIR_NAME:
+        return True
     # Official mode: drop fork-only system folders (roms/<dir>, covers/<dir>) even
     # if the library still holds files from an earlier experimental deploy.
     if (not config.EXPERIMENTAL_MODE and len(parts) >= 2

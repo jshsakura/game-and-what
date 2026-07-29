@@ -44,6 +44,20 @@ CREATE TABLE IF NOT EXISTS music (
     size_bytes   INTEGER NOT NULL DEFAULT 0,
     created_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS clock_files (
+    id           TEXT PRIMARY KEY,
+    session_id   TEXT NOT NULL REFERENCES sessions(id),
+    kind         TEXT NOT NULL,       -- gif|album|alarm = the /clock subfolder it lives in
+    original_name TEXT NOT NULL,      -- the source the user dropped in
+    stored_name  TEXT NOT NULL,       -- on-SD filename: /clock/<kind>/<stored_name>
+    file_path    TEXT NOT NULL,       -- relative path under the session root
+    size_bytes   INTEGER NOT NULL DEFAULT 0,
+    source_bytes INTEGER NOT NULL DEFAULT 0,   -- size of the source, for the '−82%' read-out
+    fit_mode     TEXT,                -- gif/album: fit|fill|stretch|custom, as framed
+    animated     INTEGER NOT NULL DEFAULT 0,   -- gif: 0 = single-frame (still) background
+    duration_s   REAL,                -- alarm: clip length the device will loop
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
 CREATE TABLE IF NOT EXISTS uploads (
     id           TEXT PRIMARY KEY,
     session_id   TEXT NOT NULL REFERENCES sessions(id),
@@ -76,6 +90,7 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE INDEX IF NOT EXISTS idx_roms_session ON roms(session_id);
 CREATE INDEX IF NOT EXISTS idx_videos_session ON videos(session_id);
 CREATE INDEX IF NOT EXISTS idx_music_session ON music(session_id);
+CREATE INDEX IF NOT EXISTS idx_clock_files_session ON clock_files(session_id, kind);
 CREATE INDEX IF NOT EXISTS idx_uploads_session ON uploads(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, created_at DESC);
 """

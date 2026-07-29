@@ -115,6 +115,29 @@ def music_dir(session_id: str) -> Path:
     return session_root(session_id) / config.MUSIC_DIR_NAME
 
 
+def clock_dir(session_id: str, kind: str) -> Path:
+    """/clock/<kind> — the Clock app's own media folders (gif / album / alarm).
+    Real SD folders, so they ship in the zip."""
+    return session_root(session_id) / config.CLOCK_DIR_NAME / kind
+
+
+def clock_preview_path(session_id: str, file_id: str) -> Path:
+    """Web-only PNG render of a stored clock file (the .565 photos have no format
+    a browser can show). Under _previews → never ships to the card."""
+    return previews_dir(session_id, "clock") / f"{file_id}.png"
+
+
+def unique_name(directory: Path, stem: str, suffix: str) -> str:
+    """`stem+suffix`, or `stem_2`, `stem_3`… if that name is taken in `directory`.
+    Keeps a second convert of the same source from silently replacing the first."""
+    name = f"{stem}{suffix}"
+    n = 2
+    while (directory / name).exists():
+        name = f"{stem}_{n}{suffix}"
+        n += 1
+    return name
+
+
 # Scratch / reference uploads ("DATA"). Lives under "_data" — NOT a real SD
 # folder, and explicitly EXCLUDED from the SD package zip.
 SCRATCH_DIR_NAME = "_data"

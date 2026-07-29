@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Clock, Upload, Info, Download, ImageOff, X } from "lucide-react";
+import { Clock, Upload, Info, Download, ImageOff, Loader, Save, X } from "lucide-react";
 import { downloadBlob } from "../localencode.js";
 import { buildZip } from "../zip.js";
+import { saveClockFile } from "../api.js";
 import { Dropzone } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useT } from "../i18n.jsx";
+import ClockFileList from "./ClockFileList.jsx";
 import {
   FitSelect, CropStage, drawFitted, drawCustomCrop, canvasToRgb565,
 } from "./clockShared.jsx";
@@ -46,12 +48,16 @@ function outputNames(items, stamp) {
 
 // Clock photo album: convert photos (multiple at once) into 320×240 .565 files.
 // Each photo keeps its own fit mode / crop; the custom mode is the shared drag &
-// zoom cropper. Fully client-side — no upload, exact pixels.
-export default function ClockAlbumSection() {
+// zoom cropper. The conversion is fully client-side — exact pixels, nothing
+// re-encoded — and the result can either be downloaded or KEPT in the library
+// (/clock/album, listed below, shipped in the SD zip). Keeping is the default:
+// a photo that only ever reached the Downloads folder is one you lose.
+export default function ClockAlbumSection({ photos = [], onChanged }) {
   const t = useT();
   const toast = useToast();
   const [items, setItems] = useState([]);        // { id, name, url, el, mode, crop, zoom, areaPx }
   const [selectedId, setSelectedId] = useState(null);
+  const [busy, setBusy] = useState(false);
   const canvasRef = useRef(null);
   const idRef = useRef(0);
   const stampRef = useRef(null);
@@ -114,6 +120,51 @@ export default function ClockAlbumSection() {
     toast.success(t("Saved .565 — copy it into /clock/album on the SD card"));
   }
 
+  // The rendered .565 goes to the library as-is (the server stores the bytes;
+  // it never re-encodes them). Kept photos leave the staging strip — they are
+  // now rows in the list below.
+  function fileFor(item, i) {
+    return new File([renderBytes(item)], names[i], { type: "application/octet-stream" });
+  }
+
+  function dropItems(gone) {
+    const ids = new Set(gone.map((it) => it.id));
+    gone.forEach((it) => URL.revokeObjectURL(it.url));
+    const next = items.filter((it) => !ids.has(it.id));
+    setItems(next);
+    if (ids.has(selectedId)) setSelectedId(next[0]?.id ?? null);
+  }
+
+  async function keepSelected() {
+    if (!selected || busy) return;
+    setBusy(true);
+    try {
+      const row = await saveClockFile("album", fileFor(selected, selectedIndex), null, { mode: selected.mode });
+      dropItems([selected]);
+      onChanged?.();
+      toast.success(t("Saved as {name} — it stays here and ships in the SD ZIP", { name: row.stored_name }));
+    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
+  }
+
+  async function keepAll() {
+    if (busy || !items.length) return;
+    setBusy(true);
+    const done = [];
+    try {
+      for (const [i, item] of items.entries()) {
+        await saveClockFile("album", fileFor(item, i), null, { mode: item.mode });
+        done.push(item);
+      }
+      toast.success(t("Saved {n} photos — they stay here and ship in the SD ZIP", { n: done.length }));
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      dropItems(done);          // whatever made it in leaves the strip, failures stay
+      onChanged?.();
+      setBusy(false);
+    }
+  }
+
   // One ZIP for the whole batch — N separate downloads trip the browser's
   // multi-download blocking and shred filenames.
   function downloadAll() {
@@ -129,7 +180,7 @@ export default function ClockAlbumSection() {
       </div>
       <div className="vtab-safe">
         <Info size={13} strokeWidth={2.5} aria-hidden />
-        <span>{t("Converted right here in your browser (nothing is uploaded). Download the .565 and copy it into")} <b>/clock/album</b> {t("on the SD card, then pick “Photo Album” as the clock background. Add as many as you like.")}</span>
+        <span>{t("Converted right here in your browser — exact pixels. Keep it and it ships in the SD ZIP, or download the .565 and copy it into")} <b>/clock/album</b> {t("on the SD card, then pick “Photo Album” as the clock background. Add as many as you like.")}</span>
       </div>
       <div className="muted" style={{ fontSize: 11 }}>
         {t("Already have 320×240 24/32-bit BMPs? The clock reads those from /clock/album too — no conversion needed. Anything else, convert it here.")}
@@ -191,23 +242,35 @@ export default function ClockAlbumSection() {
             <span className="muted clock-file-name" title={`${selected.name} → ${names[selectedIndex]}`}>
               {selected.name} → <b>{names[selectedIndex]}</b> (320×240)
             </span>
-            <button type="button" className="scope-btn on" onClick={downloadSelected}>
+            <button type="button" className="scope-btn" onClick={downloadSelected} disabled={busy} title={t("Nothing is stored on the server")}>
               <Download size={14} strokeWidth={2.5} aria-hidden /> {t("Download .565")}
             </button>
             {items.length > 1 && (
-              <button type="button" className="scope-btn" onClick={downloadAll}>
+              <button type="button" className="scope-btn" onClick={downloadAll} disabled={busy}>
                 <Download size={14} strokeWidth={2.5} aria-hidden /> {t("Download all ({n})", { n: items.length })}
+              </button>
+            )}
+            <button type="button" className="scope-btn on" onClick={keepSelected} disabled={busy}>
+              {busy
+                ? <><Loader size={14} strokeWidth={2.5} className="spin" aria-hidden /> {t("Converting…")}</>
+                : <><Save size={14} strokeWidth={2.5} aria-hidden /> {t("Convert & keep")}</>}
+            </button>
+            {items.length > 1 && (
+              <button type="button" className="scope-btn on" onClick={keepAll} disabled={busy}>
+                <Save size={14} strokeWidth={2.5} aria-hidden /> {t("Convert & keep all ({n})", { n: items.length })}
               </button>
             )}
           </div>
         </div>
       )}
 
-      {items.length === 0 && (
+      {items.length === 0 && photos.length === 0 && (
         <div className="muted" style={{ textAlign: "center", opacity: 0.6 }}>
           <ImageOff size={14} aria-hidden /> {t("No photo yet — drop one above to preview the crop.")}
         </div>
       )}
+
+      <ClockFileList kind="album" files={photos} onChanged={onChanged} />
     </div>
   );
 }

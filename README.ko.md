@@ -75,7 +75,8 @@ ROM·영상·음악을 올리면 이름과 기기 규격 커버를 자동으로 
   [jshsakura 포크 펌웨어](https://github.com/jshsakura/game-and-watch-retro-go-sd)
   전용 기능을 켭니다: 아직 업스트림 *릴리즈*에 없는 기종 — 네오지오 포켓, 원더스완,
   버추얼보이, 슈퍼 패미컴, 오디세이², ZX 스펙트럼, C64, Game.com — 슈퍼 메트로이드
-  홈브루 포팅, MEDIA 탭(영상 → `/video` MJPEG `.avi`, 음악 → `/music`, 시계 배경).
+  홈브루 포팅, MEDIA 탭(영상 → `/video` MJPEG `.avi`, 음악 → `/music`,
+  시계 배경·사진·알람 → `/clock`, 나머지와 똑같이 보관됨).
   *(**PC 엔진 CD**·**아타리 링스**·**게임보이 어드밴스**가 여기 있었습니다. 업스트림
   [v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)이
   셋 다 등록해서 순정 펌웨어가 읽습니다 → 공식으로 승격. 업스트림은 여전히
