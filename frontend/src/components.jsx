@@ -1324,11 +1324,14 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const gba = gbaReading(rom);
   const snes = snesChip(rom);
   const snesInfo = snesReading(rom);
+  // The SNES processor-load ring, on the same terms as the GBA rings: only where it
+  // says something a plain cart does not (see the render site).
+  const snesGauge = snesInfo?.load != null && snesInfo.load.factor > 1;
   // The poster's top corner holds EITHER a gauge or the system-icon/favourite chip, never
   // both — a ring already fills that space, and the icon beside it just crowds it. A GBA
-  // card's measured rings and a PICO-8 card's code-size ring both count as a gauge; a
-  // favourited rom still shows its star over the top.
-  const hasGauge = (gba != null && !gba.unknown)
+  // card's measured rings, a SNES card's load ring and a PICO-8 card's code-size ring all
+  // count as a gauge; a favourited rom still shows its star over the top.
+  const hasGauge = (gba != null && !gba.unknown) || snesGauge
     || (rom.system_key === "pico8" && rom.pico8_mem_hint != null);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("info");   // detail popup: "info" | "settings"
@@ -1650,7 +1653,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 only where it says something a plain cart does not — a FastROM bus or a
                 second CPU. 1.0× on 871 plain carts would be a ring meaning "normal",
                 which is noise on every poster in the grid. */}
-            {snesInfo?.load && snesInfo.load.factor > 1 && (
+            {snesGauge && (
               <em className="idle-tag gauge">
                 <Ring pct={Math.min(100, Math.round((snesInfo.load.factor / 6) * 100))}
                   tone={snesInfo.load.factor >= 4 ? "over" : "tight"}
