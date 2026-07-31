@@ -7,7 +7,7 @@
 ## The fact the whole cleanup turns on
 
 **Not one pair of files was byte-identical.** Every `content_hash` in the library is
-unique — across all 4,923 roms, not just SNES. So "duplicate" here never meant a file
+unique — across all 4,882 roms, not just SNES. So "duplicate" here never meant a file
 copied twice; `backend/dedup_hash.py` already collapses that case and it found nothing.
 
 What it meant was this:
@@ -67,7 +67,7 @@ version number, or a competition cart: those pairs exist **on purpose**.
 
 ## What was removed (2026-07-31)
 
-The library went **2,281 → 2,187** SNES entries in four passes, all through the API, so
+The library went **2,281 → 2,146** SNES entries in five passes, all through the API, so
 every file is in `_trash` and the activity feed can restore it for 30 days. DB backup:
 `backend/data/gnw.db.bak.20260730`.
 
@@ -77,6 +77,7 @@ every file is in `_trash` and the activity feed can restore it for 30 days. DB b
 | `(2)` / `(3)` re-upload suffixes | 14 | same name, same size (or an unparsable header) |
 | same cart, transliteration only | 43 | one curated entry, bare-name copies dropped |
 | same cart, same region (this tool's default) | 23 | one dump per region kept, best name wins |
+| one entry per region group, by hand | 41 | the Korean-named entry stays; raw English dumps go |
 
 Plus 7 renames where the `(n)` suffix outlived its sibling, and 3 Odyssey² rows whose
 files had gone missing (`videopac` 94 → 91, matching the folder exactly).
@@ -89,10 +90,10 @@ header answers questions the filename only guesses at; ask it first.
 
 ## What is still there
 
-**59 groups / 123 entries**, and the tool proposes nothing further: what is left is one
-dump per region (34 groups), the 한글패치 pair, 12 hack/competition groups, and 21
-same-region groups whose names read like different games — every one of those needs a
-person, not a rule. Re-run any time:
+**22 groups / 45 entries**, and none of it should be deleted by a rule: 13 hack/competition
+groups, the 한글패치 pair, 3 groups that are simply different games under one cartridge
+header, and 6 region pairs whose Korean names are both real titles (a Japanese release name
+vs its US one) — those last are a taste call, not a duplicate. Re-run any time:
 
 ```bash
 docker exec game-and-what sh -c 'cd /app/backend && python3 snes_dupes.py'
@@ -132,9 +133,24 @@ differ only by extension (`.smc` / `.sfc`) share one `.img`. It comes back with
 missing = [r for r in rows if r["cover_path"] and not (root / r["cover_path"]).exists()]
 ```
 
+## The keeper rule, in the owner's words
+
+"지역판은 한글판만 남기면 된다" — for a Korean library the entry worth keeping is the one
+that is *named* in Korean, and where a Korean patch exists it is the point of the pair.
+So the by-hand pass kept exactly one entry per region group: the Korean-named one, which
+in practice deleted the raw `Prince of Persia 2 - The Shadow & The Flame (U).smc`-style
+dumps that had never been renamed.
+
+Four groups were held back rather than swept, and the check that caught them is worth
+keeping: compare the English title in the filename against the cart's own header title,
+and stop when they do not agree. `MUSYA` vs `Gousou Jinrai Densetsu - Musha`,
+`GOOF TROOP` vs `Goofy to Max - Kaizoku-jima no Daibouken` — a Japanese release name never
+matches the header, and that is exactly the case where a rule should hand back to a person
+instead of guessing.
+
 ## Notes for the next sweep
 
-- SNES is not shipping to the card anyway: 2,185 of 2,187 entries are `sd_exclude=1`. This
+- SNES is not shipping to the card anyway: 2,144 of 2,146 entries are `sd_exclude=1`. This
   is library hygiene, not SD content — the zip is unchanged by all of it.
 - `(2)`-style suffixes exist **only** on SNES. Every other system was clean, and the one
   GBC hit (`1942 (1942).gbc`) is a real title whose English name is a number.
