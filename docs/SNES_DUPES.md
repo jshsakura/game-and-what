@@ -7,7 +7,7 @@
 ## The fact the whole cleanup turns on
 
 **Not one pair of files was byte-identical.** Every `content_hash` in the library is
-unique — across all 4,946 roms, not just SNES. So "duplicate" here never meant a file
+unique — across all 4,923 roms, not just SNES. So "duplicate" here never meant a file
 copied twice; `backend/dedup_hash.py` already collapses that case and it found nothing.
 
 What it meant was this:
@@ -67,7 +67,7 @@ version number, or a competition cart: those pairs exist **on purpose**.
 
 ## What was removed (2026-07-31)
 
-The library went **2,281 → 2,210** SNES entries in three passes, all through the API, so
+The library went **2,281 → 2,187** SNES entries in four passes, all through the API, so
 every file is in `_trash` and the activity feed can restore it for 30 days. DB backup:
 `backend/data/gnw.db.bak.20260730`.
 
@@ -76,6 +76,7 @@ every file is in `_trash` and the activity feed can restore it for 30 days. DB b
 | raw English dump beside its Korean-named twin | 14 | `Aladdin (U) [!].smc` → the `알라딘 (Aladdin).smc` entry stays |
 | `(2)` / `(3)` re-upload suffixes | 14 | same name, same size (or an unparsable header) |
 | same cart, transliteration only | 43 | one curated entry, bare-name copies dropped |
+| same cart, same region (this tool's default) | 23 | one dump per region kept, best name wins |
 
 Plus 7 renames where the `(n)` suffix outlived its sibling, and 3 Odyssey² rows whose
 files had gone missing (`videopac` 94 → 91, matching the folder exactly).
@@ -88,8 +89,10 @@ header answers questions the filename only guesses at; ask it first.
 
 ## What is still there
 
-**78 groups / 165 entries**, because they need a person: 26 are same-region duplicates the
-tool would drop, and the rest are region variants, patches and hacks. Re-run any time:
+**59 groups / 123 entries**, and the tool proposes nothing further: what is left is one
+dump per region (34 groups), the 한글패치 pair, 12 hack/competition groups, and 21
+same-region groups whose names read like different games — every one of those needs a
+person, not a rule. Re-run any time:
 
 ```bash
 docker exec game-and-what sh -c 'cd /app/backend && python3 snes_dupes.py'
@@ -102,9 +105,36 @@ Deleting goes through the app, never the DB directly — that is what puts the f
 curl -X DELETE localhost:38081/api/sessions/public/roms/<id>
 ```
 
+## What the last pass taught the tool
+
+The first draft of the same-region default proposed 26 deletions and three of them were
+wrong. Each became a rule, which is the only reason to write the tool down at all:
+
+- **`스타폭스 (Star Fox)` was going to be deleted for `스타폭스 슈퍼 위켄드 콤페티션`** — a
+  competition cart, kept because its name is longer. `콤페티션`/`위켄드` and a homebrew's
+  `by <author>` credit now read as hack markers, the same as `competition` did.
+- **`센서블 사커 (Sensible Soccer - European Champions)` was going to be deleted for
+  `센서블 사커 - 인터내셔널 에디션`** — two different releases under one header. A Korean
+  name can shorten a title to nothing, so where both names carry an English title, that
+  has to agree too.
+- **`슈퍼 메트로이드 (Super Metroid).sfc` was going to be deleted** — the one SNES entry the
+  user had put ON the card (`sd_exclude=0`), losing to a `.smc` copy that was not. An entry
+  bound for the SD now outranks everything else as the keeper.
+
+One more, from the pass before: `&amp;` in a filename is corruption carried in from the
+source list, not a title, so `록맨 &amp; 포르테` loses to `록맨 & 포르테`.
+
+Deleting a duplicate can also take a cover the survivor was using: two entries whose names
+differ only by extension (`.smc` / `.sfc`) share one `.img`. It comes back with
+`storage.restore_from_trash()`, and it is worth checking for after any sweep:
+
+```python
+missing = [r for r in rows if r["cover_path"] and not (root / r["cover_path"]).exists()]
+```
+
 ## Notes for the next sweep
 
-- SNES is not shipping to the card anyway: 2,208 of 2,210 entries are `sd_exclude=1`. This
+- SNES is not shipping to the card anyway: 2,185 of 2,187 entries are `sd_exclude=1`. This
   is library hygiene, not SD content — the zip is unchanged by all of it.
 - `(2)`-style suffixes exist **only** on SNES. Every other system was clean, and the one
   GBC hit (`1942 (1942).gbc`) is a real title whose English name is a number.

@@ -35,8 +35,11 @@ DUMP_TAG = re.compile(r"\((?:U|E|J|JU|UE|K|KP|F|G|S|I|Ch|UK|A|B|PD|H\d?|M\d|"
 # An entry marked this way is NOT a redundant copy — it is the thing the pair
 # exists for. A Korean patch needs its original; a hack is its own game.
 PATCH = re.compile(r"korea-patch|한글|패치|\(K\)", re.I)
-HACK = re.compile(r"\bv\d|\bV\d|베타|beta|hack|데모|demo|프로토|proto|자가제|\+|"
-                  r"익스퍼트|expert|competition|컴피티션|\d\.\d", re.I)
+HACK = re.compile(r"\bv\d|\bV\d|V\.\d|베타|beta|hack|데모|demo|프로토|proto|자가제|\+|"
+                  # a competition/event cart is a different release of the game, and a
+                  # homebrew credits its author ('… by SpctrmXD') — neither is a copy
+                  r"익스퍼트|expert|competition|컴피티션|콤페티션|위켄드|weekend|"
+                  r"\bby\s+[A-Za-z]|\d\.\d", re.I)
 # Header titles too generic to identify anything: every Mario World hack says
 # SUPER MARIOWORLD, and a stack of Sufami Turbo carts all say ADD-ON BASE CASSETE.
 GENERIC = {"SFC", "SFX 1", "SFC 2", "ADD-ON BASE CASSETE", "SUPER MARIOWORLD"}
@@ -112,7 +115,7 @@ def scan() -> list[dict]:
     with db.connect() as conn:
         rows = [dict(r) for r in conn.execute(
             "SELECT id,stored_name,rom_path,snes_rom_kb,snes_title,crc32,is_korean_patched,"
-            "cover_status,created_at FROM roms WHERE system_key='snes' AND session_id=?",
+            "cover_status,sd_exclude,created_at FROM roms WHERE system_key='snes' AND session_id=?",
             (SESSION,))]
 
     by_title: dict[str, list[dict]] = defaultdict(list)
@@ -129,11 +132,14 @@ def scan() -> list[dict]:
             if len(same) < 2 or not size:
                 continue
             kind = classify(same)
-            # Best first: a cover, then a name that carries the English title, then
-            # one without a '(다른 덤프)'-style note, then the longer (more
-            # informative) one.
+            # Best first: the entry the user put ON the card, then a cover, then a
+            # name that carries the English title, then a name free of '&amp;' (an
+            # HTML entity in a filename is corruption from the source list, not a
+            # title), then one without a '(다른 덤프)'-style note, then the longer
+            # (more informative) one.
             order = sorted(same, key=lambda r: (
-                r["cover_status"] != "ok", english_title(r["stored_name"]) is None,
+                bool(r["sd_exclude"]), r["cover_status"] != "ok",
+                english_title(r["stored_name"]) is None, "&amp;" in r["stored_name"],
                 has_note(r["stored_name"]), -len(stem(r["stored_name"])), r["created_at"]))
             regions = {r["id"]: region_of(root / r["rom_path"]) for r in same}
 
@@ -141,12 +147,21 @@ def scan() -> list[dict]:
             # name reads like a different game — a bootleg reskin keeps the host
             # cart's header, so the header alone cannot tell them apart.
             best = korean_part(order[0]["stored_name"])
+            best_en = norm(english_title(order[0]["stored_name"]) or "")
             kept, rec, caution = set(), {}, set()
             for r in order:
                 reg = regions[r["id"]] or f"?{r['id'][:4]}"
                 k = korean_part(r["stored_name"])
                 like_best = (k in best or best in k
                              or difflib.SequenceMatcher(None, k, best).ratio() >= 0.35)
+                # Where BOTH names carry an English title, it has to agree too. A
+                # Korean name can shorten a title to nothing ('센서블 사커' covers both
+                # European Champions and International … World Champions, which are
+                # two different releases of one cart).
+                en = norm(english_title(r["stored_name"]) or "")
+                if like_best and en and best_en:
+                    like_best = (en in best_en or best_en in en
+                                 or difflib.SequenceMatcher(None, en, best_en).ratio() >= 0.7)
                 if kind in ("subtitle", "unclear") and reg in kept and like_best:
                     rec[r["id"]] = "drop"
                 else:
