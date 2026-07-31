@@ -110,28 +110,49 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
     Cover .img files already carry their baked-in language flag (applied at
     render_cover time), so they are copied as-is.
     """
+    # One arcname, one file. Three sources can land on the same on-card path — the
+    # bundled PICO-8 core and a copy the user uploaded under _extra/cores/ both want
+    # cores/pico8.bin — and a zip holding the same name twice unpacks to whichever
+    # entry came last, having carried both. First writer wins here, which is the
+    # order below: the library, then the core, then _extra, then the firmware.
+    taken: set[str] = set()
+
+    def once(path, arcname):
+        if arcname in taken:
+            return None
+        taken.add(arcname)
+        return path, arcname
+
     root = storage.session_root(session_id)
     for path in sorted(root.rglob("*")):
         if path.is_file() and not _excluded(root, path, include_video, systems, homebrew_roms, excluded_roms):
-            yield path, str(path.relative_to(root))
+            entry = once(path, str(path.relative_to(root)))
+            if entry:
+                yield entry
     # PICO-8 core (needed to run .p8) when packaging everything or pico8 is selected.
     if systems is None or "pico8" in systems:
         cores = pico8core.ensure_cores_dir()
         if cores and cores.exists():
             for cp in sorted(cores.rglob("*")):
                 if cp.is_file():
-                    yield cp, f"cores/{cp.relative_to(cores)}"
+                    entry = once(cp, f"cores/{cp.relative_to(cores)}")
+                    if entry:
+                        yield entry
     # Extra passthrough files (bios/…) → SD root. Cores can't boot without their
     # BIOS, so ship these with ANY selection (not just the full SD).
     extra = storage.extra_dir(session_id)
     if extra.exists():
         for ep in sorted(extra.rglob("*")):
             if ep.is_file():
-                yield ep, str(ep.relative_to(extra)).replace("\\", "/")
+                entry = once(ep, str(ep.relative_to(extra)).replace("\\", "/"))
+                if entry:
+                    yield entry
     # Firmware update → SD ROOT, included with ANY download so the card is complete.
     fw = storage.firmware_path(session_id)
     if fw.exists():
-        yield fw, storage.FIRMWARE_FILENAME
+        entry = once(fw, storage.FIRMWARE_FILENAME)
+        if entry:
+            yield entry
 
 
 class BuildCancelled(Exception):

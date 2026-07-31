@@ -601,3 +601,38 @@ class TestSdCacheBudgetYieldsToDisk:
 
         # free + held - reserve: the zips it holds are not spent, they are spendable.
         assert budget == free + held - packaging._SD_CACHE_DISK_RESERVE
+
+
+def test_an_extra_copy_of_the_core_does_not_ship_twice(env, monkeypatch, tmp_path):
+    """A user who uploads the PICO-8 core as an _extra passthrough gets the same
+    on-card path the bundled core claims (cores/pico8.gnw). A zip may legally hold
+    that name twice, but unpacking keeps whichever came last — after carrying both."""
+    sid = env
+    _write(storage.roms_dir(sid, "pico8") / "Game.p8")
+    cores = tmp_path / "fake_cores"
+    _write(cores / "pico8.gnw", b"bundled-core")
+    monkeypatch.setattr(pico8core, "ensure_cores_dir", lambda force=False: cores)
+    _write(storage.extra_dir(sid) / "cores" / "pico8.gnw", b"uploaded-copy")
+
+    names = [arc for _, arc in packaging._sd_entries(sid, False, None, None)]
+
+    assert names.count("cores/pico8.gnw") == 1
+    path, _ = packaging.build_sd_zip_cached(sid)
+    with zipfile.ZipFile(path) as zf:          # namelist, not _names: a set would
+        written = zf.namelist()                 # hide the very duplicate we're testing
+    assert written.count("cores/pico8.gnw") == 1
+
+
+def test_every_arcname_in_the_zip_is_unique(env, monkeypatch, tmp_path):
+    sid = env
+    _write(storage.roms_dir(sid, "nes") / "Game.nes")
+    cores = tmp_path / "fake_cores"
+    _write(cores / "pico8.gnw", b"core")
+    monkeypatch.setattr(pico8core, "ensure_cores_dir", lambda force=False: cores)
+    _write(storage.extra_dir(sid) / "cores" / "pico8.gnw", b"dupe")
+    _write(storage.extra_dir(sid) / "bios" / "nes" / "disksys.rom", b"bios")
+    _write(storage.firmware_path(sid), b"fw")
+
+    names = [arc for _, arc in packaging._sd_entries(sid, False, None, None)]
+
+    assert len(names) == len(set(names))
