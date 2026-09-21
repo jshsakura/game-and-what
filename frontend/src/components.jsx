@@ -317,7 +317,7 @@ const iconExtsFor = (dirname) => (PNG_ICON_SYSTEMS.has(dirname) ? ["png", "svg"]
 // so a browser/Cloudflare cache serves the OLD file after we swap an icon (no
 // Cache-Control on the origin → CF caches .svg by default). Bump this whenever a
 // shipped icon changes so the URL differs and clients refetch.
-const ICON_VER = "20260921a";
+const ICON_VER = "20260921b";
 export function SystemIcon({ dirname, size = 16 }) {
   const [extIdx, setExtIdx] = useState(0);
   const imgRef = useRef(null);
