@@ -39,7 +39,7 @@ export function isNewRom(rom) {
 // never look identical).
 const SYS_ABBREV = {
   nes: "NES", gb: "GB", gbc: "GBC", gg: "GG", sms: "SMS", md: "MD", sg: "SG",
-  pce: "PCE", pcecd: "PCD", col: "COL", msx: "MSX", a2600: "A26", a7800: "A78", amstrad: "CPC",
+  pce: "PCE", pcecd: "PCD", segacd: "SCD", "32x": "32X", col: "COL", msx: "MSX", a2600: "A26", a7800: "A78", amstrad: "CPC",
   wsv: "WSV", tama: "TAM", mini: "MIN", gw: "GW", homebrew: "HB", pico8: "P8",
   lynx: "LNX", videopac: "ODY", zxs: "ZX", c64: "C64", gamecom: "GCM", vb: "VB",
   gba: "GBA", snes: "SNES",
@@ -61,7 +61,7 @@ const SYS_PALETTE = {
   a2600: "#cb22e6", a7800: "#e6ab67", amstrad: "#3f8c6d", wsv: "#45e67a",
   tama: "#22cbe6", mini: "#e622a4", gw: "#e6be22", homebrew: "#6b7280", pico8: "#e67067",
   lynx: "#588c2a", videopac: "#8c3f82", zxs: "#b0e645", c64: "#3e2a8c", gamecom: "#1f9e8c",
-  vb: "#a01730", gba: "#5b45c9", snes: "#5c7a99",
+  vb: "#a01730", gba: "#5b45c9", snes: "#5c7a99", segacd: "#9e7a3d", "32x": "#a34a1f",
 };
 
 // What the Game & Watch's M7 leaves the GBA core per frame, in GBA cycles. A game
@@ -317,7 +317,7 @@ const iconExtsFor = (dirname) => (PNG_ICON_SYSTEMS.has(dirname) ? ["png", "svg"]
 // so a browser/Cloudflare cache serves the OLD file after we swap an icon (no
 // Cache-Control on the origin → CF caches .svg by default). Bump this whenever a
 // shipped icon changes so the URL differs and clients refetch.
-const ICON_VER = "20260721a";
+const ICON_VER = "20260921a";
 export function SystemIcon({ dirname, size = 16 }) {
   const [extIdx, setExtIdx] = useState(0);
   const imgRef = useRef(null);

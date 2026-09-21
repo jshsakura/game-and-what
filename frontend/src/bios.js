@@ -14,6 +14,8 @@
 //
 // Entries with `experimental: true` belong to fork-only systems and are
 // hidden from the INFO table when the deploy isn't in experimental mode.
+// `anyOf: true` means one matching file is enough (Sega CD region BIOSes);
+// otherwise every listed browser-core file is required.
 //
 // BIOS files are copyrighted and must be supplied by the user — we never ship
 // them. Sizes are the standard No-Intro/redump sizes so users can sanity-check
@@ -43,6 +45,18 @@ export const BIOS_CATALOG = [
     note: "System Card 3.0 — boots essentially the entire CD library. The firmware checks the dump: md5 38179df8f4ac870017db21ebcbf53114.",
     files: [
       { sdPath: "bios/pce/syscard3.pce", coreName: "syscard3.pce", size: "256 KB" },
+    ],
+  },
+  {
+    key: "segacd",
+    experimental: true,
+    anyOf: true,
+    label: "Sega CD",
+    note: "Region BIOS — games are region-locked to it, so US/EU/JP discs each need their own.",
+    files: [
+      { sdPath: "bios/segacd/bios_CD_U.bin", coreName: "bios_CD_U.bin", size: "128 KB" },
+      { sdPath: "bios/segacd/bios_CD_E.bin", coreName: "bios_CD_E.bin", size: "128 KB" },
+      { sdPath: "bios/segacd/bios_CD_J.bin", coreName: "bios_CD_J.bin", size: "128 KB" },
     ],
   },
   {

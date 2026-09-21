@@ -414,6 +414,25 @@ def test_cdfolder_stores_cue_plus_track_as_one_rom_with_extra_files(client, sess
     assert (root / "roms/pcecd/MyGame/track01.bin").read_bytes() == b"track-bytes"
 
 
+def test_cdfolder_stores_segacd_cue_plus_track_in_segacd_folder(
+    client, session_id, monkeypatch,
+):
+    monkeypatch.setattr(config, "EXPERIMENTAL_MODE", True)
+    r = _upload_cdfolder(
+        client, session_id, "segacd",
+        ["SonicCD/SonicCD.cue", "SonicCD/track01.bin"],
+        [("SonicCD.cue", b"cue-bytes"), ("track01.bin", b"track-bytes")],
+    )
+    assert r.status_code == 200
+    result = r.json()["results"][0]
+    rom = _fetch_rom(result["id"])
+    assert rom["system_key"] == "segacd"
+    assert rom["rom_path"] == "roms/segacd/SonicCD/SonicCD.cue"
+    assert json.loads(rom["extra_files"]) == [
+        {"name": "track01.bin", "size": len(b"track-bytes")},
+    ]
+
+
 def test_cdfolder_selects_chd_as_primary_when_no_cue_present(client, session_id):
     r = _upload_cdfolder(
         client, session_id, "pcecd", ["GameB/GameB.chd"], [("GameB.chd", b"chd-bytes")]

@@ -249,7 +249,7 @@ export async function uploadCdFolder(systemKey, files, onProgress) {
 /* Folder-per-game systems: the entry on the card is a DIRECTORY, so the upload
  * has to carry every file in it — the .cue is an index and its tracks live
  * beside it (/roms/cdfolder is generic, not system-specific). */
-export const FOLDER_SYSTEMS = new Set(["pcecd"]);
+export const FOLDER_SYSTEMS = new Set(["pcecd", "segacd"]);
 
 // Goodtools/No-Intro alt-or-bad dump tags ([a1]/[b1]/[h1]/[o1]/[t1]/[f1]/[p1]).
 const ALT_DUMP_RE = /\[(?:a|b|h|o|t|f|p)\d*\]/i;

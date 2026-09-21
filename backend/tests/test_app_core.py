@@ -87,6 +87,8 @@ def test_list_systems_experimental_mode_includes_fork_only_systems(client, monke
     assert by_key["ngp"]["experimental"] is True
     assert by_key["ngp"]["dirname"] == "ngp"
     assert "ngp" in by_key["ngp"]["exts"] or "ngc" in by_key["ngp"]["exts"]
+    assert by_key["segacd"]["exts"] == ["chd", "cue"]
+    assert by_key["32x"]["exts"] == ["32x", "bin"]
 
 
 def test_list_systems_entry_shape(client, monkeypatch):

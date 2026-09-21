@@ -14,7 +14,7 @@ const COVER_POLL_MS = 3000;
  * discover it there. */
 function UploadGuidance({ systemKey }) {
   const t = useT();
-  if (systemKey === "pcecd") {
+  if (systemKey === "pcecd" || systemKey === "segacd") {
     return (
       <div className="upload-note warn">
         <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />

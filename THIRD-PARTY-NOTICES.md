@@ -9,7 +9,9 @@ MIT license above. This file documents each bundled component, its upstream
 source (the "corresponding source" for the GPL'd binaries), and its license.
 
 > **Important — non-commercial restriction.** This distribution bundles the
-> **Genesis Plus GX** core, which is released under a **non-commercial** license.
+> **Genesis Plus GX, Snes9x and PicoDrive** cores, which are released under
+> **non-commercial** licenses. PicoDrive includes the non-commercial Cyclone 68000
+> and DrZ80 components.
 > As assembled and distributed (image + repo), this project as a whole therefore
 > **may not be used or redistributed for commercial purposes.** The MIT grant
 > applies to the author's own code in isolation; it does **not** override the
@@ -30,7 +32,9 @@ repository listed.
 | `gambatte` | Game Boy / GB Color | GPLv2 | https://github.com/libretro/gambatte-libretro |
 | `mednafen_pce_fast` | PC Engine | GPLv2 | https://github.com/libretro/beetle-pce-fast-libretro |
 | `gearcoleco` | ColecoVision | GPLv3 | https://github.com/libretro/gearcoleco |
-| `genesis_plus_gx` | Genesis/MD, Master System, Game Gear, SG-1000 | **Non-commercial** | https://github.com/libretro/Genesis-Plus-GX |
+| `genesis_plus_gx` | Genesis/MD, Sega CD, Master System, Game Gear, SG-1000 | **Non-commercial** | https://github.com/libretro/Genesis-Plus-GX |
+| `picodrive` | Sega 32X | **Non-commercial** | https://github.com/libretro/picodrive |
+| `snes9x` | Super Nintendo | **Non-commercial** | https://github.com/libretro/snes9x |
 | `gw_libretro` | Game & Watch (Handheld Electronic Game) | zlib | https://github.com/libretro/gw-libretro |
 | `potator` | Watara Supervision | Public Domain | https://github.com/libretro/potator |
 | `retro8` | PICO-8 | GPLv3 | https://github.com/libretro/retro8 |

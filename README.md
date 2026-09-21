@@ -65,20 +65,21 @@ preview with sample data (no backend; uploads/edits are disabled).
   badge on the cover) so you can judge quality at a glance, and a per-ROM
   **"Exclude from SD"** toggle drops a ROM from the SD download while keeping it in
   the library — slim the device menu without deleting anything.
-- **All 19 officially supported systems** — everything the latest upstream
+- **All 22 officially supported systems** — everything the latest upstream
   [sylverb firmware](https://github.com/sylverb/game-and-watch-retro-go-sd)
   **release** registers: NES, Game Boy / GB Color, Game Gear, Master System,
-  Genesis, SG-1000, PC Engine, ColecoVision, MSX, Atari 2600 / 7800, Amstrad CPC,
-  Supervision, Tamagotchi, Pokémon Mini, Game & Watch, Homebrew, PICO-8.
+  Genesis, SG-1000, PC Engine / PC Engine CD, ColecoVision, MSX, Atari 2600 / 7800,
+  Atari Lynx, Amstrad CPC, Supervision, Game Boy Advance, Tamagotchi, Pokémon Mini,
+  Game & Watch, Homebrew, PICO-8.
 - **11-language UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) with
   per-locale CJK/Cyrillic fonts lazy-loaded on demand.
 - **Optional Korean mode** (`GNW_KOREAN_MODE=true`) — Korean auto-naming, the
   "Korean-patched" flag, and related filters. **Off by default** (international image).
 - **Optional experimental mode** (`GNW_EXPERIMENTAL_MODE=true`) — a "personal
   lab" for the [jshsakura fork firmware](https://github.com/jshsakura/game-and-watch-retro-go-sd):
-  systems no upstream *release* registers yet — Neo Geo Pocket, WonderSwan, Virtual Boy,
-  Super Nintendo, Odyssey², ZX Spectrum, C64, Game.com — the Super Metroid homebrew
-  port, and the MEDIA tab (video → `/video` MJPEG `.avi`, music → `/music`, clock
+  systems no upstream *release* registers yet — Sega CD, Sega 32X, Neo Geo Pocket,
+  WonderSwan, Virtual Boy, Super Nintendo, Odyssey², ZX Spectrum, C64, Game.com —
+  the Super Metroid homebrew port, and the MEDIA tab (video → `/video` MJPEG `.avi`, music → `/music`, clock
   backgrounds/photos/alarms → `/clock`, all kept in the library like the rest).
   *(**PC Engine CD**, **Atari Lynx** and **Game Boy Advance** used to live here.
   Upstream [v1.4.0](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)
@@ -238,6 +239,7 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 | Famicom Disk System | `bios/nes/disksys.rom` | 8 KB | Only `.fds` disk images need it; `.nes` carts boot without. |
 | ColecoVision | `bios/coleco/coleco.bin` | 8 KB | System ROM — every game needs it. |
 | PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. The firmware checks the dump: md5 `38179df8f4ac870017db21ebcbf53114`. |
+| Sega CD *(fork only)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 128 KB each | Region BIOS files for US, Europe and Japan; use the BIOS matching the disc region. |
 | Game Boy Advance | `bios/gba/gba_bios.bin` | 16 KB | **Device only.** gpSP has an open-source BIOS built in and uses it by default; [upstream](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0) recommends the original. Browser play uses mGBA, which boots HLE and never needs it. |
 | Odyssey² / Videopac | `bios/videopac/o2rom.bin` | 1 KB | o2rom system BIOS for the o2em core. |
 | Commodore 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | The three C64 system ROMs (© Commodore). |
@@ -409,7 +411,7 @@ It **bundles third-party components** (libretro emulator cores under
 **[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)** for the full per-component list
 and corresponding-source links.
 
-> ⚠️ **Non-commercial as distributed.** The bundled **Genesis Plus GX** core
-> (Genesis/MD, Master System, Game Gear, SG-1000) is under a **non-commercial**
-> license. The project **as assembled and distributed** therefore may not be used
+> ⚠️ **Non-commercial as distributed.** The bundled **Genesis Plus GX, Snes9x,
+> and PicoDrive** cores (including Sega CD and Sega 32X browser play) are under
+> **non-commercial** licenses. The project **as assembled and distributed** therefore may not be used
 > or redistributed commercially. The MIT grant covers the author's own code only.

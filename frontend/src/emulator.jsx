@@ -17,7 +17,7 @@ import { romFileUrl, cdTrackUrl, extraDownloadUrl } from "./api.js";
 import { BIOS_CATALOG, BIOS_BY_KEY } from "./bios.js";
 
 // extra_files may arrive as a JSON string or array of {name,size} dicts (CD
-// systems like pcecd store their track sidecars that way). Return just the
+// systems like pcecd/segacd store their track sidecars that way). Return just the
 // names; anything without one is dropped.
 function parseExtraFiles(extra) {
   try {
@@ -32,8 +32,8 @@ import { useT } from "./i18n.jsx";
 
 // system_key → libretro core. We SELF-HOST every core in /public/cores/ (see
 // resolveCoreJs/Wasm in launch) so we never depend on an external CDN staying up.
-// genesis_plus_gx is the one-stop Sega core: Game Gear, Master System, SG-1000
-// and Genesis/Mega Drive all load through it.
+// genesis_plus_gx is the one-stop Sega core: Game Gear, Master System, SG-1000,
+// Genesis/Mega Drive and Sega CD all load through it.
 const CORE_MAP = {
   nes: "fceumm",
   gb: "gambatte",
@@ -42,12 +42,15 @@ const CORE_MAP = {
   sms: "genesis_plus_gx",
   sg: "genesis_plus_gx",
   md: "genesis_plus_gx",
+  // Sega CD uses the same core's CD subsystem. A region-matched BIOS from the
+  // Extra folder is required (see bios.js). Both single-file CHD and CUE sets
+  // work; CUE track sidecars are loaded through MULTI_FILE_SYSTEMS below.
+  segacd: "genesis_plus_gx",
   pce: "mednafen_pce_fast",
   // PC Engine CD shares the beetle-pce-fast core (it emulates CD-ROM² too).
   // CD play needs the System Card BIOS (syscard3.pce) — user-uploaded to the
-  // Extra folder, see BIOS below. Single-file .chd boots directly; .cue+.bin
-  // sets need their track sidecars, which the bare /rom endpoint can't supply,
-  // so browser play is .chd-only (marked EXPERIMENTAL).
+  // Extra folder, see BIOS below. Single-file CHD and CUE sets both work; CUE
+  // track sidecars are loaded through MULTI_FILE_SYSTEMS below.
   pcecd: "mednafen_pce_fast",
   // Magnavox Odyssey² / Videopac via o2em (libretro), self-hosted from the same
   // arianrhodsandlot/retroarch-emscripten-build set. Needs the o2rom.bin BIOS in
@@ -91,6 +94,9 @@ const CORE_MAP = {
   // did for GBA, and there's no device firmware to match speed-for-speed against.
   // .sfc (headerless) and .smc (copier-headered) both boot HLE, no BIOS needed.
   snes: "snes9x",
+  // Sega 32X needs PicoDrive; Genesis Plus GX does not emulate the add-on.
+  // Standard .32x and .bin dumps boot without an external BIOS.
+  "32x": "picodrive",
   // NOTE: Atari 2600/7800, Amstrad CPC, MSX, Pokémon Mini have no Nostalgist-compatible
   // core, so they run via a self-hosted JS engine in an iframe instead (see JS_ENGINE —
   // Amstrad uses CPCEC, MSX uses WebMSX, Poké Mini uses the webRcade PokeMini core).
@@ -137,10 +143,10 @@ export function jsEngineFor(systemKey) { return JS_ENGINE[systemKey] || null; }
 
 // Cores that exist but whose ROM format may differ from retro-go's packaging —
 // best-effort, may fail to boot. The overlay warns before launching.
-const EXPERIMENTAL = new Set(["pico8", "pcecd", "videopac", "c64", "zxs"]);
+const EXPERIMENTAL = new Set(["pico8", "pcecd", "segacd", "32x", "videopac", "c64", "zxs"]);
 
 // Systems whose extra_files means "sibling files the core needs written next
-// to the primary one" — pcecd's .cue references its .bin tracks by name. They
+// to the primary one" — pcecd/segacd .cue files reference their tracks by name. They
 // are handed to Nostalgist as one romArg array so every file lands together in
 // the emulator's virtual filesystem (setupFileSystem writes each array entry to
 // contentDirectory/<name>) — the core's own file lookup (RetroArch's .cue
@@ -148,7 +154,7 @@ const EXPERIMENTAL = new Set(["pico8", "pcecd", "videopac", "c64", "zxs"]);
 // disk. Gated to just these systems because extra_files is a generic column
 // also used for unrelated sidecars (homebrew's smw_assets.dat) that must NOT be
 // bundled into a launch.
-const MULTI_FILE_SYSTEMS = new Set(["pcecd"]);
+const MULTI_FILE_SYSTEMS = new Set(["pcecd", "segacd"]);
 
 const MOBILE_QUERY = "(max-width: 640px)";
 
@@ -157,7 +163,7 @@ const MOBILE_QUERY = "(max-width: 640px)";
 // the rest are 4:3. Atari runs in an iframe and is intentionally left alone.
 const SCREEN_ASPECT = {
   nes: "4 / 3", sms: "4 / 3", sg: "4 / 3", md: "4 / 3", pce: "4 / 3",
-  pcecd: "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
+  pcecd: "4 / 3", segacd: "4 / 3", "32x": "4 / 3", videopac: "4 / 3", c64: "4 / 3", zxs: "4 / 3", col: "4 / 3", gw: "4 / 3", gg: "4 / 3",
   gb: "10 / 9", gbc: "10 / 9",
   pico8: "1 / 1", tama: "1 / 1", wsv: "1 / 1",
   amstrad: "4 / 3",
@@ -203,6 +209,8 @@ const KEY_HINTS = {
   sms:   [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }, { k: "Enter", b: "PAUSE" }],
   sg:    [DPAD, { k: "Z", b: "1" }, { k: "X", b: "2" }],
   md:    [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
+  segacd: [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
+  "32x": [DPAD, { k: "A", b: "A" }, { k: "Z", b: "B" }, { k: "X", b: "C" }, { k: "Shift", b: "MODE" }, { k: "Enter", b: "START" }],
   pce:   [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   pcecd: [DPAD, { k: "Z", b: "II" }, { k: "X", b: "I" }, { k: "Shift", b: "SELECT" }, { k: "Enter", b: "RUN" }],
   videopac: [DPAD, { k: "Z", b: "Action" }, { k: "Enter", b: "Reset" }],
@@ -245,9 +253,12 @@ const DEFAULT_HINTS = [DPAD, ...AB, { k: "Shift", b: "SELECT" }, { k: "Enter", b
 const BIOS = Object.fromEntries(
   BIOS_CATALOG
     .filter((b) => b.key !== "nes")
-    .map((b) => [b.key, b.files.filter((f) => f.coreName)
-      .map((f) => ({ fileName: f.coreName, path: f.sdPath }))])
-    .filter(([, files]) => files.length),
+    .map((b) => [b.key, {
+      anyOf: Boolean(b.anyOf),
+      files: b.files.filter((f) => f.coreName)
+        .map((f) => ({ fileName: f.coreName, path: f.sdPath })),
+    }])
+    .filter(([, entry]) => entry.files.length),
 );
 // Famicom Disk System: only .fds disk images need disksys.rom (not .nes carts).
 const FDS_BIOS = (() => {
@@ -259,7 +270,8 @@ const FDS_BIOS = (() => {
 // boot without their BIOS, so we report which are MISSING and the launcher shows a
 // clear "upload it" message instead of failing cryptically.
 async function loadBios(rom) {
-  const needed = [...(BIOS[rom.system_key] || [])];
+  const entry = BIOS[rom.system_key];
+  const needed = [...(entry?.files || [])];
   if (rom.system_key === "nes" && /\.fds$/i.test(rom.stored_name)) needed.push(FDS_BIOS);
   const files = [];
   const missing = [];
@@ -270,7 +282,9 @@ async function loadBios(rom) {
       else missing.push(b);
     } catch (_) { missing.push(b); }
   }
-  return { files, missing };
+  // Sega CD lists three region BIOSes, but a game needs only the one matching its
+  // disc. Pass every available dump to the core and block only when none exist.
+  return { files, missing: entry?.anyOf && files.length ? [] : missing };
 }
 
 export function coreFor(systemKey) {

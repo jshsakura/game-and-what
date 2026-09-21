@@ -64,9 +64,9 @@ SHARED_SESSION_ID = "public"
 KOREAN_MODE = os.getenv("GNW_KOREAN_MODE", "false").strip().lower() in ("1", "true", "yes", "on")
 
 # "Personal lab" mode. The public image tracks ONLY what the upstream firmware
-# (github.com/sylverb/game-and-watch-retro-go-sd) officially supports — systems
-# up to Atari Lynx, no media extras. Everything that needs the jshsakura fork
-# firmware (extra systems like NGP/WonderSwan/PCE-CD/Virtual Boy…, the MEDIA
+# (github.com/sylverb/game-and-watch-retro-go-sd) officially supports, with no
+# media extras. Everything that needs the jshsakura fork firmware (extra systems
+# like Sega CD/32X/NGP/WonderSwan/Virtual Boy…, the MEDIA
 # tab's video/music/clock converters, the experimental-releases link) is gated
 # behind this flag. OFF by default; a fork-firmware deploy sets
 # GNW_EXPERIMENTAL_MODE=true. Exposed to the frontend via GET /api/config.

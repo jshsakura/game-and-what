@@ -52,6 +52,16 @@ SYSTEMS: tuple[System, ...] = (
     System("gg", "Game Gear", "gg", ("gg",)),
     System("sms", "Master System", "sms", ("sms",)),
     System("md", "Genesis", "md", ("md", "gen", "bin")),
+    # Sega CD / Mega-CD support lives in the jshsakura fork. Disc images are kept
+    # as one folder per game: .chd is self-contained, while .cue entries keep their
+    # .bin/.iso/.wav tracks as sidecars. Region-matched BIOS files are user-supplied
+    # under /bios/segacd (see frontend/src/bios.js). Browser preview shares the
+    # Genesis Plus GX core used by Genesis/Master System/Game Gear/SG-1000.
+    System("segacd", "Sega CD", "segacd", ("chd", "cue"), experimental=True),
+    # Sega 32X is likewise a fork-only device target. Standard cartridge dumps use
+    # .32x; some sets use .bin. Browser preview uses PicoDrive because Genesis Plus
+    # GX does not emulate the 32X add-on. No BIOS is required.
+    System("32x", "Sega 32X", "32x", ("32x", "bin"), experimental=True),
     System("sg", "SG-1000", "sg", ("sg",)),
     System("pce", "PC Engine", "pce", ("pce",)),
     # PC Engine CD (a.k.a. TurboGrafx-CD). Upstream took it from this fork into main

@@ -14,7 +14,7 @@ export default function ExtraTab({ onChanged }) {
   const toast = useToast();
   const t = useT();
   const experimental = useExperimentalMode();
-  // Official deploys don't list fork-only systems' BIOS paths (pcecd, c64, …).
+  // Official deploys don't list fork-only systems' BIOS paths (segacd, c64, …).
   const biosEntries = BIOS_CATALOG.filter((b) => experimental || !b.experimental);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);

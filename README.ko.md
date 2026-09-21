@@ -62,19 +62,21 @@ ROM·영상·음악을 올리면 이름과 기기 규격 커버를 자동으로 
 - **비대해진 세트 큐레이션.** 각 ROM에 **IGDB 평점**(0–100, 커버 위 색상 단계 배지)이
   표시되어 품질을 한눈에 판단할 수 있고, ROM별 **"SD에서 제외"** 토글로 라이브러리에는
   남긴 채 SD 다운로드에서만 빼서 — 삭제 없이 기기 메뉴를 슬림하게.
-- **공식 지원 19개 시스템 전부** — 업스트림
+- **공식 지원 22개 시스템 전부** — 업스트림
   [sylverb 펌웨어](https://github.com/sylverb/game-and-watch-retro-go-sd) **최신
   릴리즈**가 등록하는 기종 전체: NES, 게임보이 / GB 컬러, 게임기어, 마스터시스템,
-  제네시스, SG-1000, PC 엔진, 콜레코비전, MSX, 아타리 2600 / 7800, 암스트라드 CPC,
-  와타라, 다마고치, 포켓몬 미니, Game & Watch, 홈브루, PICO-8.
+  제네시스, SG-1000, PC 엔진 / PC 엔진 CD, 콜레코비전, MSX, 아타리 2600 / 7800,
+  아타리 링스, 암스트라드 CPC, 와타라, 게임보이 어드밴스, 다마고치, 포켓몬 미니,
+  Game & Watch, 홈브루, PICO-8.
 - **11개국어 UI** (ko, en, ja, zh-CN, zh-TW, de, es, fr, it, pt, ru, no) — 로케일별
   CJK/키릴 폰트를 필요할 때 지연 로드.
 - **선택형 한국어 모드** (`GNW_KOREAN_MODE=true`) — 한글 자동 명명, "한글패치" 플래그,
   관련 필터. **기본 비활성**(국제판 이미지).
 - **선택형 실험 모드** (`GNW_EXPERIMENTAL_MODE=true`) — 개인 실험실.
   [jshsakura 포크 펌웨어](https://github.com/jshsakura/game-and-watch-retro-go-sd)
-  전용 기능을 켭니다: 아직 업스트림 *릴리즈*에 없는 기종 — 네오지오 포켓, 원더스완,
-  버추얼보이, 슈퍼 패미컴, 오디세이², ZX 스펙트럼, C64, Game.com — 슈퍼 메트로이드
+  전용 기능을 켭니다: 아직 업스트림 *릴리즈*에 없는 기종 — 세가 CD, 세가 32X,
+  네오지오 포켓, 원더스완, 버추얼보이, 슈퍼 패미컴, 오디세이², ZX 스펙트럼,
+  C64, Game.com — 슈퍼 메트로이드
   홈브루 포팅, MEDIA 탭(영상 → `/video` MJPEG `.avi`, 음악 → `/music`,
   시계 배경·사진·알람 → `/clock`, 나머지와 똑같이 보관됨).
   *(**PC 엔진 CD**·**아타리 링스**·**게임보이 어드밴스**가 여기 있었습니다. 업스트림
@@ -228,6 +230,7 @@ docker rm -f game-and-what
 | 패미컴 디스크 시스템 | `bios/nes/disksys.rom` | 8 KB | `.fds` 디스크 이미지에만 필요, `.nes` 카트리지는 불필요. |
 | 콜레코비전 | `bios/coleco/coleco.bin` | 8 KB | 시스템 롬 — 모든 게임에 필요. |
 | PC엔진 CD | `bios/pce/syscard3.pce` | 256 KB | 시스템 카드 3.0 — 사실상 모든 CD 게임 구동. 펌웨어가 덤프를 검사합니다: md5 `38179df8f4ac870017db21ebcbf53114`. |
+| 세가 CD *(포크 전용)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 각각 128 KB | 미국·유럽·일본용 지역 BIOS. 디스크 지역에 맞는 BIOS를 사용합니다. |
 | 게임보이 어드밴스 | `bios/gba/gba_bios.bin` | 16 KB | **기기 전용.** gpSP에 오픈소스 BIOS가 내장돼 기본으로 쓰이며, [업스트림](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)은 오리지널 BIOS를 권장합니다. 브라우저 재생은 mGBA라 HLE로 부팅하며 이 파일이 필요 없습니다. |
 | 오디세이² / 비디오팩 | `bios/videopac/o2rom.bin` | 1 KB | o2em 코어용 o2rom 시스템 BIOS. |
 | 코모도어 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | C64 시스템 롬 3종 (© Commodore). |
@@ -388,6 +391,6 @@ npm run dev
 CC BY 4.0)를 유지합니다. 컴포넌트별 전체 목록과 대응 소스 링크는
 **[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)** 참조.
 
-> ⚠️ **배포물 기준 비상업.** 번들된 **Genesis Plus GX** 코어(제네시스/MD, 마스터시스템,
-> 게임기어, SG-1000)는 **비상업** 라이선스입니다. 따라서 **조립·배포된 형태의** 본
+> ⚠️ **배포물 기준 비상업.** 번들된 **Genesis Plus GX, Snes9x, PicoDrive** 코어
+> (세가 CD·세가 32X 브라우저 재생 포함)는 **비상업** 라이선스입니다. 따라서 **조립·배포된 형태의** 본
 > 프로젝트는 상업적으로 사용·재배포할 수 없습니다. MIT는 저작자 자체 코드에만 적용됩니다.
