@@ -384,7 +384,9 @@ export function EmulatorOverlay({ rom, onClose }) {
         if (cancelled) return;
 
         setLoadMsg(t("Loading ROM…"));
-        const res = await fetch(romFileUrl(rom.id));
+        // Conversion retains the row ID: change the cache key with the filename
+        // so an earlier cached CHD cannot be fed to the core as a CUE.
+        const res = await fetch(`${romFileUrl(rom.id)}?v=${encodeURIComponent(rom.stored_name)}`);
         if (!res.ok) throw new Error(t("Failed to load the ROM file."));
         // res.blob() throws "Failed to fetch" on some Chromium builds once the
         // response passes ~300MB (reproduced on a 338MB CD .chd) — but

@@ -20,7 +20,7 @@ function UploadGuidance({ systemKey }) {
         <AlertTriangle size={16} strokeWidth={2.5} aria-hidden />
         <div>
           <b>{t("One disc game = one folder — send the whole folder, not the .cue alone")}</b>
-          {t("A .cue is only an index: the audio and data live in the .bin/.iso tracks beside it, and the device needs all of them in the game's own folder. Use 'Whole folder' (or drag the folder itself) so the tracks come along. A single .chd holds everything and can be dropped on its own.")}
+          {t("A .cue is only an index: upload its BIN tracks together using 'Whole folder' or drag the folder itself. You can also upload a single CHD: the server converts it to CUE and raw BIN tracks for the device. Allow roughly three times the CHD size on the SD card.")}
         </div>
       </div>
     );

@@ -11,12 +11,13 @@ Small files can still use the direct upload endpoints (roms / videos).
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 
 from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile
 
 from .. import config, db
-from ..services import artfetch, covers, covers_pico8, jobs, metadata, storage, video
+from ..services import cdrom, artfetch, covers, covers_pico8, jobs, metadata, storage, video
 from ..systems import accepts_extension, get_system
 from .sessions import require_experimental_mode, require_session, require_system_enabled
 
@@ -54,10 +55,11 @@ def init_upload(
     """Initialise a chunked upload.  Returns upload_id to use in subsequent calls."""
     if kind not in _VALID_KINDS:
         raise HTTPException(status_code=400, detail=f"kind must be one of {sorted(_VALID_KINDS)}")
-    if total_size <= 0 or total_size > config.MAX_UPLOAD_TOTAL_BYTES:
+    total_limit = max(config.MAX_UPLOAD_TOTAL_BYTES, config.MAX_CD_FILE_BYTES) if kind == "rom" and system in cdrom.CD_SYSTEMS else config.MAX_UPLOAD_TOTAL_BYTES
+    if total_size <= 0 or total_size > total_limit:
         raise HTTPException(
             status_code=400,
-            detail=f"total_size must be 1..{config.MAX_UPLOAD_TOTAL_BYTES}",
+            detail=f"total_size must be 1..{total_limit}",
         )
     if kind == "rom":
         if not system:
@@ -69,7 +71,7 @@ def init_upload(
         require_system_enabled(sys_obj)
         if not accepts_extension(sys_obj, filename):
             raise HTTPException(status_code=400, detail="File extension not accepted for system")
-        if total_size > config.MAX_ROM_BYTES:
+        if total_size > (config.MAX_CD_FILE_BYTES if system in cdrom.CD_SYSTEMS else config.MAX_ROM_BYTES):
             raise HTTPException(status_code=400, detail="ROM exceeds maximum allowed size")
     if kind == "video":
         # Chunked video uploads bypass the (gated) videos router, so gate here too:
@@ -276,6 +278,18 @@ async def complete_upload(session_id: str, upload_id: str) -> dict:
 
     kind: str = upload["kind"]
 
+    if kind == "rom" and upload["system_key"] in cdrom.CD_SYSTEMS and upload["filename"].lower().endswith(".chd"):
+        # Extraction can outlast the proxy's response timeout. Return a job now;
+        # the client polls while chdman works, rather than holding the request open.
+        job_id = storage.new_id()
+        with db.connect() as conn:
+            claimed = conn.execute("UPDATE uploads SET status='processing' WHERE id=? AND status='receiving'", (upload_id,))
+            if claimed.rowcount != 1:
+                raise HTTPException(status_code=409, detail="Upload is already processing")
+        jobs.create(job_id, "cd_extract")
+        asyncio.create_task(_run_cd_extract(job_id, session_id, upload, tmp_path))
+        return {"job_id": job_id, "status": "processing", "upload_id": upload_id}
+
     try:
         if kind == "rom":
             result = await _finalise_rom(session_id, upload, tmp_path)
@@ -294,10 +308,35 @@ async def complete_upload(session_id: str, upload_id: str) -> dict:
     return result
 
 
+async def _run_cd_extract(job_id: str, session_id: str, upload: dict, tmp_path: Path) -> None:
+    jobs.update(job_id, status="running", message="Converting CHD to CUE/BIN")
+    try:
+        result = await _finalise_rom(session_id, upload, tmp_path)
+        with db.connect() as conn:
+            conn.execute("UPDATE uploads SET status='complete' WHERE id=?", (upload["id"],))
+        jobs.update(job_id, status="done", progress=1.0, result=result)
+    except Exception as exc:
+        message = str(exc.detail) if isinstance(exc, HTTPException) else str(exc)
+        with db.connect() as conn:
+            conn.execute("UPDATE uploads SET status='failed' WHERE id=?", (upload["id"],))
+        jobs.update(job_id, status="failed", message=message)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
 async def _finalise_rom(session_id: str, upload: dict, tmp_path: Path) -> dict:
     original: str = upload["filename"]
     system_key: str = upload["system_key"]
     sys_obj = get_system(system_key)
+
+    if sys_obj.key in cdrom.CD_SYSTEMS:
+        from .roms import upload_cd_folder
+        with tmp_path.open("rb") as source:
+            result = await upload_cd_folder(session_id, system=system_key,
+                paths=json.dumps([original]),
+                files=[UploadFile(file=source, filename=original)])
+        entry = result["results"][0]
+        return {**result, "rom_id": entry.get("id"), **entry}
 
     meta = metadata.resolve_metadata(sys_obj.key, original)
     stored_name = _rom_stored_name(meta, original)

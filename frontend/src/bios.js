@@ -52,7 +52,7 @@ export const BIOS_CATALOG = [
     experimental: true,
     anyOf: true,
     label: "Sega CD",
-    note: "Region BIOS — games are region-locked to it, so US/EU/JP discs each need their own.",
+    note: "Region BIOS — the firmware reads the disc's region and loads only that BIOS, so US/EU/JP discs each need their own. All tested Korean releases are Japanese-region: they need bios_CD_J.bin.",
     files: [
       { sdPath: "bios/segacd/bios_CD_U.bin", coreName: "bios_CD_U.bin", size: "128 KB" },
       { sdPath: "bios/segacd/bios_CD_E.bin", coreName: "bios_CD_E.bin", size: "128 KB" },

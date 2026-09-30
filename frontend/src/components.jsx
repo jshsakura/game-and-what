@@ -12,7 +12,7 @@ import {
   uploadCover, coverUrl, deviceCoverUrl, originalCoverUrl, coverDownloadUrl, downloadRomUrl, downloadVideoUrl, downloadMusicUrl,
   videoThumbUrl, videoPreviewUrl, musicCoverUrl, streamMusicUrl, deleteRom, deleteVideo, deleteMusic,
   renameRom, igdbSearch, tgdbSearch, sgdbSearch, libretroSearch, setCoverFromUrl, deleteCover, recropCover, replaceRomFile, formatBytes, setRomLang, setSdInclude, setSdExclude,
-  setFavorite, addRomFile, deleteRomFile, setPico8Compat, setCoverFlag,
+  convertChd, setFavorite, addRomFile, deleteRomFile, setPico8Compat, setCoverFlag,
   getIgdbMeta, fetchIgdbMeta,
 } from "./api.js";
 import { useToast } from "./toast.jsx";
@@ -1379,6 +1379,20 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   const title = rom.display_name || romBase;
   const runnable = canPlay(rom.system_key);
 
+  async function splitChd() {
+    setBusy(true);
+    try {
+      await convertChd(rom.id);
+      onChanged?.();
+      setOpen(false);
+      toast.success(t("Converted to CUE/BIN; CHD removed"));
+    } catch (err) {
+      toast.error(err.message || t("CHD conversion failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function launch() {
     if (isExperimental(rom.system_key)) {
       const ok = await toast.confirm(t("Run '{title}' (experimental support)", { title }), {
@@ -2049,6 +2063,16 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {["segacd", "pcecd"].includes(rom.system_key) && romExt.toLowerCase() === ".chd" && (
+                <div className="file-list">
+                  <p>{t("Convert this CHD to CUE and raw BIN tracks for the device. The CHD is removed after success. Allow roughly three times its size.")}</p>
+                  <button className="btn ghost" disabled={busy} onClick={splitChd}>
+                    {busy ? <Loader size={13} className="spin" /> : <Files size={13} />}
+                    {busy ? t("Converting CHD…") : t("Convert to CUE/BIN")}
+                  </button>
                 </div>
               )}
 

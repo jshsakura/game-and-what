@@ -40,7 +40,7 @@ def _excluded(root: Path, path: Path, include_video: bool, systems: "set[str] | 
     # videos. The device reads none of them, so none of them ship. (_firmware and
     # _extra are re-added at the SD ROOT below, under their real names.) Only
     # folder names are tested: a rom may legitimately be called "_Test.nes".
-    if any(part.startswith("_") for part in parts[:-1]):
+    if any(part.startswith("_") or part.startswith(".incoming-") for part in parts[:-1]):
         return True
     # /media exists only on the fork firmware — never ship it on an official deploy.
     if (not include_video or not config.EXPERIMENTAL_MODE) and config.MEDIA_DIR_NAME in parts:

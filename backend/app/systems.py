@@ -4,7 +4,8 @@ Systems usable in game-and-watch-retro-go-sd.
 AUTHORITATIVE source: the SD firmware's own registration in
 `Core/Src/retro-go/rg_emulators.c` (add_emulator(system, dirname, ext, ...)).
 The device shows "Place roms in folder: /roms/<dirname>" + accepted extensions,
-so dirname/exts below are taken verbatim from that file — only systems the SD
+so dirnames below match that file. Extensions describe upload inputs; CD CHD
+inputs are converted to the firmware's CUE format. Only systems the SD
 build actually registers appear here (Homebrew tab is excluded: it's for the
 bundled apps, not user uploads).
 
@@ -25,7 +26,7 @@ class System:
     key: str               # internal id (== dirname)
     name: str              # label as shown by the firmware
     dirname: str           # /roms/<dirname> and /covers/<dirname>
-    exts: tuple[str, ...]  # accepted rom extensions (lowercase, no dot)
+    exts: tuple[str, ...]  # accepted upload extensions (lowercase, no dot)
     pico8: bool = False    # special cover handling (.p8 / .p8.png label)
     square: bool = False   # 1:1 label-style art instead of 3:4 box art
     experimental: bool = False  # NOT in upstream sylverb rg_emulators.c — needs the fork firmware
@@ -43,7 +44,7 @@ COVER_SQUARE: tuple[int, int] = (100, 100)  # 1:1
 # Firmware also accepts these as a compression wrapper on any rom.
 COMPRESSED_EXT = "lzma"
 
-# Verbatim from Core/Src/retro-go/rg_emulators.c (SD build).
+# Based on Core/Src/retro-go/rg_emulators.c (SD build), plus upload conversions.
 # `name` = short common label for UI buttons. `dirname` = exact firmware folder.
 SYSTEMS: tuple[System, ...] = (
     System("nes", "NES", "nes", ("nes", "fds", "nsf")),
@@ -52,11 +53,10 @@ SYSTEMS: tuple[System, ...] = (
     System("gg", "Game Gear", "gg", ("gg",)),
     System("sms", "Master System", "sms", ("sms",)),
     System("md", "Genesis", "md", ("md", "gen", "bin")),
-    # Sega CD / Mega-CD support lives in the jshsakura fork. Disc images are kept
-    # as one folder per game: .chd is self-contained, while .cue entries keep their
-    # .bin/.iso/.wav tracks as sidecars. Region-matched BIOS files are user-supplied
-    # under /bios/segacd (see frontend/src/bios.js). Browser preview shares the
-    # Genesis Plus GX core used by Genesis/Master System/Game Gear/SG-1000.
+    # CD exts describe UPLOAD inputs: the firmware registers only cue. CHD is
+    # extracted server-side to CUE + raw split BIN tracks (never sector-patched),
+    # stored one folder per game, with only the CUE registered in the library.
+    # Region-matched BIOS files are user-supplied under /bios/segacd.
     System("segacd", "Sega CD", "segacd", ("chd", "cue"), experimental=True),
     # Sega 32X is likewise a fork-only device target. Standard cartridge dumps use
     # .32x; some sets use .bin. Browser preview uses PicoDrive because Genesis Plus
@@ -68,12 +68,8 @@ SYSTEMS: tuple[System, ...] = (
     # on 2026-07-05, and upstream v1.4.0 (2026-07-27) shipped it — so a stock firmware
     # registers /roms/pcecd and this is OFFICIAL now. Upstream calls it beta; that is a
     # maturity label, not a "you need the fork" gate, which is what this flag means.
-    # CD images live in the
-    # single /roms/pcecd/ folder as .chd (preferred) or .cue (+ .bin sidecars tracked
-    # as extra_files); the firmware registers ".cue" only. Booting needs a
-    # user-uploaded System Card BIOS (syscard3.pce). Browser play uses beetle-pce-fast:
-    # single-file .chd boots, .cue/.bin sets need their track sidecars so they're
-    # not browser-playable (see emulator.jsx).
+    # Same folder-per-game CUE/BIN layout and CHD conversion as Sega CD.
+    # Booting needs syscard3.pce. Browser play loads the CUE and track sidecars.
     System("pcecd", "PC Engine CD", "pcecd", ("chd", "cue")),
     System("col", "Coleco Vision", "col", ("col",)),
     System("msx", "MSX", "msx", ("dsk", "rom", "mx1", "mx2", "cdk")),
@@ -192,4 +188,6 @@ def accepts_extension(system: System, filename: str) -> bool:
     if system.pico8:
         return lower.endswith(".p8") or lower.endswith(".p8.png") or lower.endswith(".png")
     suffix = lower.rsplit(".", 1)[-1] if "." in lower else ""
+    if system.key in {"pcecd", "segacd"}:
+        return suffix in system.exts
     return suffix in system.exts or suffix == COMPRESSED_EXT

@@ -19,11 +19,12 @@ jobs:
   # ── Gate: backend unit tests must pass before we build/publish ──────────────
   test:
     runs-on: ubuntu-latest
+    # Match production: trixie supplies chdman with --splitbin support.
+    container: python:3.12-slim-trixie
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Install chdman for CD conversion tests
+        run: apt-get update && apt-get install -y --no-install-recommends mame-tools
       - name: Install backend deps + pytest
         run: |
           python -m pip install --upgrade pip

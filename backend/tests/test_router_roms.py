@@ -433,7 +433,17 @@ def test_cdfolder_stores_segacd_cue_plus_track_in_segacd_folder(
     ]
 
 
-def test_cdfolder_selects_chd_as_primary_when_no_cue_present(client, session_id):
+def test_cdfolder_converts_chd_when_no_cue_present(client, session_id, monkeypatch):
+    from app.services import cdrom
+
+    async def extract(source, output):
+        assert source.read_bytes() == b"chd-bytes"
+        output.write_text('FILE "GameB (Track 01).bin" BINARY\n')
+        track = output.parent / "GameB (Track 01).bin"
+        track.write_bytes(b"x" * 2352)
+        return [{"name": track.name, "size": 2352}]
+
+    monkeypatch.setattr(cdrom, "extract_chd", extract)
     r = _upload_cdfolder(
         client, session_id, "pcecd", ["GameB/GameB.chd"], [("GameB.chd", b"chd-bytes")]
     )
@@ -441,7 +451,8 @@ def test_cdfolder_selects_chd_as_primary_when_no_cue_present(client, session_id)
     result = r.json()["results"][0]
     assert result["ok"] is True
     rom = _fetch_rom(result["id"])
-    assert rom["rom_path"].endswith("GameB.chd")
+    assert rom["rom_path"] == "roms/pcecd/GameB/GameB.cue"
+    assert json.loads(rom["extra_files"]) == [{"name": "GameB (Track 01).bin", "size": 2352}]
 
 
 def test_cdfolder_exact_duplicate_of_primary_content_is_rejected(client, session_id):
@@ -470,7 +481,7 @@ def test_cdfolder_reuploading_same_game_name_gets_a_numbered_folder(client, sess
     body2 = r2.json()
     assert body2["results"][0]["ok"] is True
     rom2 = _fetch_rom(body2["results"][0]["id"])
-    assert rom2["rom_path"] == "roms/pcecd/GameD (2)/GameD.cue"
+    assert rom2["rom_path"] == "roms/pcecd/GameD (2)/GameD (2).cue"
 
 
 def test_cdfolder_rejects_a_track_with_an_unsafe_filename(client, session_id):

@@ -238,12 +238,31 @@ are user-supplied — grab your own dumps; the sizes below are the standard ones
 |--------|-------------------------|------|-------|
 | Famicom Disk System | `bios/nes/disksys.rom` | 8 KB | Only `.fds` disk images need it; `.nes` carts boot without. |
 | ColecoVision | `bios/coleco/coleco.bin` | 8 KB | System ROM — every game needs it. |
-| PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. The firmware checks the dump: md5 `38179df8f4ac870017db21ebcbf53114`. |
-| Sega CD *(fork only)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 128 KB each | Region BIOS files for US, Europe and Japan; use the BIOS matching the disc region. |
+| PC Engine CD | `bios/pce/syscard3.pce` | 256 KB | System Card 3.0 — boots essentially the whole CD library. The firmware checks the dump: md5 `38179df8f4ac870017db21ebcbf53114`. **CD format: CUE + BIN (CHD cannot run directly on the device).** |
+| Sega CD *(fork only)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 128 KB each | Region BIOS for US, Europe and Japan. The firmware reads the region from the disc and loads that one BIOS, so a Japanese-region disc needs `bios_CD_J.bin` — Korean releases included (every Korean title tested was Japanese-region). Upload all three if you are unsure. |
+| Sega 32X *(fork only)* | — | — | **No BIOS needed.** The core performs the 32X boot ROMs' work itself; there is no file to upload. |
 | Game Boy Advance | `bios/gba/gba_bios.bin` | 16 KB | **Device only.** gpSP has an open-source BIOS built in and uses it by default; [upstream](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0) recommends the original. Browser play uses mGBA, which boots HLE and never needs it. |
 | Odyssey² / Videopac | `bios/videopac/o2rom.bin` | 1 KB | o2rom system BIOS for the o2em core. |
 | Commodore 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | The three C64 system ROMs (© Commodore). |
 | Tiger Game.com | `bios/gamecom/internal.bin`, `bios/gamecom/external.bin` | 4 / 256 KB | Internal OS + external/kernel ROM (© Tiger). |
+
+Sega CD and PC Engine CD use one folder per game: `/roms/<system>/<slug>/<slug>.cue`
+and BIN track sidecars. CHD uploads are converted on the server with
+`chdman extractcd -f -i <game>.chd -o <slug>/<slug>.cue --splitbin` (install
+`mame-tools` with `--splitbin` support, e.g. chdman 0.265+, for a local server;
+included in Docker). Output tracks use raw
+2352-byte sectors and names such as `<slug> (Track 01).bin`; only the CUE is a
+library entry. Allow roughly **3× the CHD size** on the server and SD card.
+CUE/BIN uploads must include all tracks. Conversion never patches sector 0 or
+security blocks: keep Japanese-region discs intact and supply `bios_CD_J.bin`
+for Sega CD, including the 12 verified Korean releases.
+
+Existing CHDs can also be split later from the library card's Settings →
+**Convert to CUE/BIN**. Both systems share the action, preserving IDs, covers and
+favorites; the CHD is removed after the DB update succeeds. Converted CUE/BIN
+sets also support browser play with the required BIOS. For server-side cleanup,
+run `GNW_DATA_DIR=<data-root> python backend/convert_cd_library.py --apply`
+(omit `--apply` to list candidates).
 
 > The browser core may look for a slightly different filename than the SD stores
 > (e.g. ColecoVision's core wants `colecovision.rom` for the same bytes) — the app

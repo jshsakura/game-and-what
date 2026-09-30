@@ -130,7 +130,11 @@ async function uploadRomChunked(systemKey, file, onProgress) {
 
   const done = await fetch(`/api/sessions/${sid}/uploads/${id}/complete`, { method: "POST" });
   if (!done.ok) throw new Error((await done.json().catch(() => ({}))).detail || "Upload failed");
-  return done.json();
+  const result = await done.json();
+  if (result.job_id && result.status === "processing") {
+    return waitForCdConversion(result.job_id);
+  }
+  return result;
 }
 
 // Batches that respect BOTH caps. A file bigger than the byte cap goes on its own — one
@@ -161,8 +165,9 @@ function postRomBatch(systemKey, files, onProgress) {
 
 export async function uploadRoms(systemKey, files, onProgress) {
   const arr = Array.from(files);
-  const batches = uploadBatches(arr);
-  if (batches.length <= 1 && arr.every((f) => f.size <= UPLOAD_BATCH_BYTES)) {
+  const batches = FOLDER_SYSTEMS.has(systemKey) ? arr.map((f) => [f]) : uploadBatches(arr);
+  const convertsChd = (f) => FOLDER_SYSTEMS.has(systemKey) && EXT(f.name) === "chd";
+  if (batches.length <= 1 && arr.every((f) => f.size <= UPLOAD_BATCH_BYTES && !convertsChd(f))) {
     return postRomBatch(systemKey, arr, onProgress);
   }
   // Upload in sequential batches; progress = files completed / total.
@@ -172,7 +177,7 @@ export async function uploadRoms(systemKey, files, onProgress) {
   const results = [];
   for (const chunk of batches) {
     // A single file too big for one request goes up in chunks instead.
-    if (chunk.length === 1 && chunk[0].size > UPLOAD_BATCH_BYTES) {
+    if (chunk.length === 1 && (chunk[0].size > UPLOAD_BATCH_BYTES || convertsChd(chunk[0]))) {
       try {
         const res = await uploadRomChunked(systemKey, chunk[0], (loaded, totalBytes) => {
           onProgress?.(done + (totalBytes ? loaded / totalBytes : 0), total);
@@ -199,7 +204,7 @@ export async function uploadRoms(systemKey, files, onProgress) {
 }
 
 // Folder-per-game upload for CD systems (PC Engine CD): a game is a .cue + many
-// track files (or a single .chd), stored intact as ONE library entry.
+// track files, stored as ONE library entry. CHD is extracted by the server.
 //
 // Each file is sent in its OWN request: the public tunnel (Cloudflare) caps a
 // single request body at ~100 MB, but a whole CD is hundreds of MB. So we POST
@@ -218,6 +223,11 @@ export async function uploadCdFolder(systemKey, files, onProgress) {
   if (primIdx < 0) primIdx = arr.findIndex((f) => EXT(f.name) === "chd");
   if (primIdx < 0) throw new Error("No .cue or .chd found in the folder");
 
+  if (arr.filter((f) => ["cue", "chd"].includes(EXT(f.name))).length !== 1 ||
+      (EXT(arr[primIdx].name) === "chd" && arr.length !== 1)) {
+    throw new Error("Upload exactly one disc per folder; upload a CHD on its own");
+  }
+
   const totalBytes = arr.reduce((s, f) => s + (f.size || 0), 0);
   let doneBytes = 0;
   const report = (loaded) => onProgress?.(doneBytes + loaded, totalBytes);
@@ -228,7 +238,9 @@ export async function uploadCdFolder(systemKey, files, onProgress) {
   form.append("system", systemKey);
   form.append("files", primary);
   form.append("paths", JSON.stringify([primary.webkitRelativePath || primary.name]));
-  const created = await xhrUpload(`/api/sessions/${sid}/roms/cdfolder`, form, report);
+  const created = EXT(primary.name) === "chd" || primary.size > UPLOAD_BATCH_BYTES
+    ? await uploadRomChunked(systemKey, primary, report)
+    : await xhrUpload(`/api/sessions/${sid}/roms/cdfolder`, form, report);
   doneBytes += primary.size || 0;
   const res = created.results?.[0];
   if (!res?.ok) return created;   // duplicate / error → nothing more to send
@@ -242,7 +254,7 @@ export async function uploadCdFolder(systemKey, files, onProgress) {
     doneBytes += arr[i].size || 0;
   }
   onProgress?.(totalBytes, totalBytes);
-  return { ...created, results: [{ ...res, tracks: arr.length - 1 }] };
+  return { ...created, results: [{ ...res, tracks: EXT(primary.name) === "chd" ? res.tracks : arr.length - 1 }] };
 }
 
 // Systems managed as a folder-per-game (disc images: .cue + tracks, or .chd).
@@ -921,4 +933,23 @@ export function formatBytes(n) {
   let i = 0;
   while (v >= 1024 && i < units.length - 1) { v /= 1024; i += 1; }
   return `${v >= 100 ? Math.round(v) : v.toFixed(1)} ${units[i]}`;
+}
+
+
+async function waitForCdConversion(jobId) {
+  while (true) {
+    const job = await getJob(jobId);
+    if (job.status === "done") return job.result;
+    if (job.status === "failed" || job.status === "cancelled") {
+      throw new Error(job.message || "CHD conversion failed");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
+
+export async function convertChd(romId) {
+  if (DEMO) throw new Error("Demo mode — install via Docker to enable uploads.");
+  const res = await fetch(`/api/sessions/${getSessionId()}/roms/${romId}/convert-chd`, { method: "POST" });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "CHD conversion failed");
+  return waitForCdConversion((await res.json()).job_id);
 }

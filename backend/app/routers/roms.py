@@ -13,7 +13,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from .. import config, db
 from ..systems import accepts_extension, get_system
-from ..services import covers, covers_pico8, events, gamelist, gba_probe, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, snes_hdr, storage
+from ..services import cdrom, covers, covers_pico8, events, gamelist, gba_probe, jobs, langtag, metadata, name_index, patchver, pico8_compat, pico8_memhint, romcheck, romtag, snes_hdr, storage
 from .sessions import require_session, require_system_enabled
 
 log = logging.getLogger(__name__)
@@ -54,6 +54,21 @@ async def upload_roms(
 
     with db.connect() as conn:
         require_session(conn, session_id)
+
+    if sys_obj.key in cdrom.CD_SYSTEMS:
+        results = []
+        for upload in files:
+            original = storage.nfc(upload.filename) or "rom"
+            if not accepts_extension(sys_obj, original) or _ext(original) not in {"cue", "chd"}:
+                results.append({"name": original, "ok": False, "error": "extension not accepted"})
+                continue
+            try:
+                result = await upload_cd_folder(session_id, system=system,
+                    paths=json.dumps([original]), files=[upload])
+                results.extend(result["results"])
+            except HTTPException as exc:
+                results.append({"name": original, "ok": False, "error": exc.detail})
+        return {"session_id": session_id, "stored": sum(bool(r.get("ok")) for r in results), "results": results}
 
     # Auto-naming source: cached 꿀렁 lists for this system (re-parsed only when
     # DATA changes — keeps repeated uploads cheap).
@@ -317,9 +332,9 @@ async def upload_cd_folder(
 ) -> dict:
     """Folder-per-game upload for CD systems (e.g. PC Engine CD).
 
-    The whole game folder is stored INTACT under roms/<dir>/<game>/ — a .cue plus
-    its track files (.bin/.iso/.wav…), or a single .chd. One rom row is created:
-    rom_path → the .cue/.chd, extra_files → the co-located tracks. The SD packager
+    A .cue plus its tracks is stored under roms/<dir>/<game>/. CHD input is
+    extracted to raw split BIN tracks first. One rom row is created:
+    rom_path → the .cue, extra_files → the co-located tracks. The SD packager
     (tree walk) and per-rom download (parent-dir derivation) then ship the folder
     as-is. Track files keep their EXACT names so the .cue's FILE refs stay valid;
     everything is streamed to disk (CD images are large)."""
@@ -328,6 +343,8 @@ async def upload_cd_folder(
     except KeyError:
         raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
     require_system_enabled(sys_obj)
+    if sys_obj.key not in cdrom.CD_SYSTEMS:
+        raise HTTPException(status_code=400, detail="Not a CD system")
     with db.connect() as conn:
         require_session(conn, session_id)
 
@@ -349,6 +366,12 @@ async def upload_cd_folder(
         primary_i = next((i for i, n in enumerate(names) if _ext(n) == "chd"), None)
     if primary_i is None:
         raise HTTPException(status_code=400, detail="The folder has no .cue or .chd")
+
+    primaries = [n for n in names if _ext(n) in {"cue", "chd"}]
+    if len(primaries) != 1 or len(names) != len(set(names)):
+        raise HTTPException(status_code=400, detail="Upload exactly one disc per folder with unique filenames")
+    if _ext(names[primary_i]) == "chd" and len(names) != 1:
+        raise HTTPException(status_code=400, detail="Upload a CHD on its own")
 
     # Game folder = the dropped folder's top dir; fall back to the primary's stem.
     def _top(rel: str) -> str:
@@ -409,6 +432,17 @@ async def upload_cd_folder(
         while final_dir.exists():
             final_dir = roms_root / f"{game_dir} ({n})"
             n += 1
+        # The final slug also names the primary CUE, including collision suffixes.
+        primary_target = f"{final_dir.name}.cue"
+        if _ext(primary_name) == "chd":
+            extra = await cdrom.extract_chd(stage_dir / primary_name, stage_dir / primary_target)
+            (stage_dir / primary_name).unlink()
+            written = [{"name": primary_target, "size": (stage_dir / primary_target).stat().st_size}] + extra
+            primary_i = 0
+        else:
+            (stage_dir / primary_name).rename(stage_dir / primary_target)
+            written[primary_i]["name"] = primary_target
+        primary_name = primary_target
         os.rename(stage_dir, final_dir)
         game_dir = final_dir.name
     except BaseException:
@@ -521,6 +555,9 @@ async def replace_rom_file(
     if not accepts_extension(sys_obj, upload_name):
         raise HTTPException(status_code=400, detail=f"Extension not accepted for this system: {sys_obj.name}")
 
+    if sys_obj.key in cdrom.CD_SYSTEMS and _ext(upload_name) != "cue":
+        raise HTTPException(status_code=400, detail="Upload CHD as a new CD game so it can be converted")
+
     data = await file.read()
     if not data:
         raise HTTPException(status_code=400, detail="The file is empty")
@@ -570,9 +607,7 @@ async def add_rom_file(session_id: str, rom_id: str, file: UploadFile = File(...
         raise HTTPException(status_code=413, detail="File too large")
 
     name = storage.safe_name(storage.nfc(file.filename or "file"))
-    parts = Path(rom["rom_path"]).parts          # ('roms', '<dir>', '<file>')
-    dirname = parts[1] if len(parts) >= 3 else "homebrew"
-    rel = f"{config.ROMS_DIR_NAME}/{dirname}/{name}"
+    rel = str(Path(rom["rom_path"]).parent / name)
     if name == Path(rom["stored_name"]).name:
         raise HTTPException(status_code=400, detail="That is a stock (template) file name and cannot be reused")
 
@@ -596,10 +631,43 @@ def delete_rom_file(session_id: str, rom_id: str, name: str) -> dict:
         if rom is None:
             raise HTTPException(status_code=404, detail="ROM not found")
         rom = dict(rom)
-    parts = Path(rom["rom_path"]).parts
-    dirname = parts[1] if len(parts) >= 3 else "homebrew"
-    storage.move_to_trash(session_id, f"{config.ROMS_DIR_NAME}/{dirname}/{name}")
+    storage.move_to_trash(session_id, str(Path(rom["rom_path"]).parent / name))
     extra = [e for e in _extra_list(rom) if e.get("name") != name]
     with db.connect() as conn:
         conn.execute("UPDATE roms SET extra_files=? WHERE id=?", (json.dumps(extra), rom_id))
     return {"rom_id": rom_id, "extra_files": extra}
+
+
+# Existing CHD entries can be converted later, with the same ID and artwork.
+_cd_conversion_jobs: dict[str, str] = {}
+
+
+async def _run_library_cd_conversion(job_id: str, session_id: str, rom_id: str) -> None:
+    jobs.update(job_id, status="running", message="Converting CHD to CUE/BIN")
+    try:
+        result = await cdrom.convert_library_chd(session_id, rom_id)
+        jobs.update(job_id, status="done", progress=1.0, result=result)
+    except Exception as exc:
+        message = str(exc.detail) if isinstance(exc, HTTPException) else str(exc)
+        jobs.update(job_id, status="failed", message=message)
+
+
+@router.post("/sessions/{session_id}/roms/{rom_id}/convert-chd")
+async def convert_uploaded_chd(session_id: str, rom_id: str) -> dict:
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        row = conn.execute("SELECT system_key, rom_path FROM roms WHERE id=? AND session_id=?", (rom_id, session_id)).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="ROM not found")
+        require_system_enabled(get_system(row["system_key"]))
+        if row["system_key"] not in cdrom.CD_SYSTEMS or Path(row["rom_path"]).suffix.lower() != ".chd":
+            raise HTTPException(status_code=400, detail="This entry is not a CD CHD")
+    key = f"{session_id}:{rom_id}"
+    previous = jobs.get(_cd_conversion_jobs.get(key, ""))
+    if previous and previous.status in {"queued", "running"}:
+        return {"job_id": previous.id, "status": "processing"}
+    job_id = storage.new_id()
+    _cd_conversion_jobs[key] = job_id
+    jobs.create(job_id, "cd_extract")
+    asyncio.create_task(_run_library_cd_conversion(job_id, session_id, rom_id))
+    return {"job_id": job_id, "status": "processing"}

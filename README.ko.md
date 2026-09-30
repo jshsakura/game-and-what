@@ -229,12 +229,30 @@ docker rm -f game-and-what
 |------|----------------------|------|------|
 | 패미컴 디스크 시스템 | `bios/nes/disksys.rom` | 8 KB | `.fds` 디스크 이미지에만 필요, `.nes` 카트리지는 불필요. |
 | 콜레코비전 | `bios/coleco/coleco.bin` | 8 KB | 시스템 롬 — 모든 게임에 필요. |
-| PC엔진 CD | `bios/pce/syscard3.pce` | 256 KB | 시스템 카드 3.0 — 사실상 모든 CD 게임 구동. 펌웨어가 덤프를 검사합니다: md5 `38179df8f4ac870017db21ebcbf53114`. |
-| 세가 CD *(포크 전용)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 각각 128 KB | 미국·유럽·일본용 지역 BIOS. 디스크 지역에 맞는 BIOS를 사용합니다. |
+| PC엔진 CD | `bios/pce/syscard3.pce` | 256 KB | 시스템 카드 3.0 — 사실상 모든 CD 게임 구동. 펌웨어가 덤프를 검사합니다: md5 `38179df8f4ac870017db21ebcbf53114`. **CD 형식은 CUE + BIN입니다(실기에서 CHD 직접 실행 불가).** |
+| 세가 CD *(포크 전용)* | `bios/segacd/bios_CD_U.bin`, `bios/segacd/bios_CD_E.bin`, `bios/segacd/bios_CD_J.bin` | 각각 128 KB | 미국·유럽·일본용 지역 BIOS입니다. 펌웨어가 디스크에서 지역을 읽어 그 BIOS 하나만 쓰므로, 일본 지역 디스크는 `bios_CD_J.bin`이 있어야 합니다. 한국판도 여기에 해당합니다(확인한 한국판은 모두 일본 지역이었습니다). 잘 모르겠으면 세 개를 모두 올리세요. |
+| 세가 32X *(포크 전용)* | — | — | **BIOS가 필요 없습니다.** 코어가 32X 부트 ROM이 하는 일을 직접 처리하므로 올릴 파일이 없습니다. |
 | 게임보이 어드밴스 | `bios/gba/gba_bios.bin` | 16 KB | **기기 전용.** gpSP에 오픈소스 BIOS가 내장돼 기본으로 쓰이며, [업스트림](https://github.com/sylverb/game-and-watch-retro-go-sd/releases/tag/v1.4.0)은 오리지널 BIOS를 권장합니다. 브라우저 재생은 mGBA라 HLE로 부팅하며 이 파일이 필요 없습니다. |
 | 오디세이² / 비디오팩 | `bios/videopac/o2rom.bin` | 1 KB | o2em 코어용 o2rom 시스템 BIOS. |
 | 코모도어 64 | `bios/c64/basic.bin`, `bios/c64/kernal.bin`, `bios/c64/chargen.bin` | 8 / 8 / 4 KB | C64 시스템 롬 3종 (© Commodore). |
 | 타이거 Game.com | `bios/gamecom/internal.bin`, `bios/gamecom/external.bin` | 4 / 256 KB | 내부 OS + 외부/커널 롬 (© Tiger). |
+
+세가 CD와 PC엔진 CD는 게임당 폴더 하나로 저장합니다:
+`/roms/<system>/<slug>/<slug>.cue` + BIN 트랙 sidecar.
+CHD를 올리면 서버에서
+`chdman extractcd -f -i <game>.chd -o <slug>/<slug>.cue --splitbin`으로 변환합니다
+(로컬 서버는 `--splitbin`을 지원하는 `mame-tools` 필요, 예: chdman 0.265 이상; Docker에는 포함).
+트랙은 2352바이트 raw 섹터이며 `<slug> (Track 01).bin` 같은 이름을 사용합니다.
+DB·게임 목록에는 CUE 하나만 등록합니다. 서버와 SD 카드에 **CHD 용량의 약 3배**를
+확보하세요. CUE/BIN 업로드는 모든 트랙을 함께 올려야 합니다.
+섹터 0·보안 블록은 패치하지 않습니다. 일본 지역 디스크는 원본 그대로 두고,
+세가 CD는 `bios_CD_J.bin`을 사용하세요(확인한 한국판 12개도 일본 지역).
+
+기존 CHD는 라이브러리 카드의 설정에서 **CUE/BIN으로 변환**을 누르면 나중에도
+분할할 수 있습니다. 두 시스템 모두 같은 기능을 쓰며 ID·커버·즐겨찾기를 보존하고,
+DB 갱신 성공 후 CHD를 정리합니다. 변환된 CUE/BIN도 BIOS와 함께 웹 실행할 수 있습니다.
+서버에서 일괄 정리하려면 `GNW_DATA_DIR=<data-root> python backend/convert_cd_library.py --apply`를
+실행하세요(`--apply` 없이 실행하면 대상만 확인합니다).
 
 > 브라우저 코어가 SD 저장명과 다른 파일명을 찾을 수 있는데(예: 콜레코비전 코어는
 > 같은 바이트를 `colecovision.rom`으로 요구), 앱이 자동으로 매핑해 줍니다. 원본

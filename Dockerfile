@@ -58,12 +58,13 @@ RUN cd mgba/build && \
 
 
 # ── Stage 3: Python backend + built frontend ──────────────────────────────────
-FROM python:3.12-slim
+FROM python:3.12-slim-trixie
 
 # ffmpeg for video encoding; gifsicle for the clock bg.gif lossy shrink pass.
+# chdman (mame-tools) extracts CD uploads to raw CUE/BIN.
 # libpng/zlib are what idlefind links against.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg gifsicle libpng16-16 zlib1g && \
+    apt-get install -y --no-install-recommends ffmpeg gifsicle mame-tools libpng16-16 zlib1g && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
