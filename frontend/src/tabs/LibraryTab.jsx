@@ -391,8 +391,8 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
       {!loading && !(searching && searchAll) && (
         <div className="lib-chips">
           {groups.map((g) => {
-            // The main badge counts the collection. Show the SD subset separately
-            // so excluded games remain visible as choices in the library.
+            // The badge counts the collection, including excluded games.
+            // SD selection totals are shown in the download controls.
             // Cover/Korean warnings still describe only what ships.
             const incl = g.roms.filter(shipsToSd);
             const miss = incl.filter((r) => r.cover_status !== "ok").length;
@@ -402,6 +402,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
               key={g.key}
               className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"} ${dropped(g.key) ? "no-ko" : ""}`}
               style={{ "--sys": systemColor(g.key) }}
+              title={t("{total} in library · {included} on SD", { total: g.roms.length, included: incl.length })}
               onClick={() => setActive(g.key)}
             >
               {/* One issue badge at most (avoid 3-up crowding): cover-missing has
@@ -429,7 +430,6 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
                 </span>
               )}
               <SystemIcon dirname={g.system.dirname} size={30} />
-              <span className="lib-chip-sd-count" title={t("Included in SD download")}>SD {incl.length}</span>
               <span className="lib-chip-name">{g.system.name}</span>
             </button>
           );})}
