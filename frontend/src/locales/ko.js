@@ -4,6 +4,8 @@
 export default {
   "IGDB info": "IGDB 정보",
   "Game info": "게임 정보",
+  "{n} in library": "라이브러리 보유 {n}개",
+  "Included in SD download": "SD에 포함되는 게임 수",
   "Miyoo gamelist": "미요 게임목록",
   "Rating": "평점",
   "IGDB rating": "평점",

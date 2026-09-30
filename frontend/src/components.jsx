@@ -688,7 +688,7 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
   return (
     <div className="igdb-meta">
       <div className="igdb-meta-head">
-        <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {local ? t("Game info") : t("IGDB info")}{local && <> · {t("Miyoo gamelist")}</>}</span>
+        <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {local ? t("Game info") : t("IGDB info")}{local && <> · {t("Miyoo gamelist")}{meta.igdb_id && " + IGDB"}</>}</span>
         <button type="button" className="btn ghost" disabled={loading} onClick={refresh}>
           {loading ? <Loader size={13} className="spin" /> : <RefreshCw size={13} strokeWidth={2.5} />}
           {t("Refresh")}
