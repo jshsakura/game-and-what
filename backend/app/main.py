@@ -14,7 +14,7 @@ from .routers import clock, covers, data, downloads, events, extra, firmware, ga
 from .services.video import ffmpeg_available
 from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.14.11")
+app = FastAPI(title="gnw-retro-manager", version="1.14.12")
 
 # How many missing covers one boot goes back for (see _resume_covers). A page, not the
 # backlog: each is two or three provider round-trips, and the remainder is picked up by

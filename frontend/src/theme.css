@@ -3000,6 +3000,21 @@ body::before {
 
 .set-info .rom-info-row > th { white-space: normal; line-height: 1.45; }
 
-.system-visibility-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #ffffff14; }
-.system-visibility-row .btn { display: inline-flex; align-items: center; gap: 6px; min-width: 82px; justify-content: center; }
+/* Compact platform settings, scoped so other dialogs keep their spacing. */
+.header-settings { padding: 0; }
+.header-settings > svg { display: block; flex: 0 0 auto; }
+.system-settings-modal { width: 540px; }
+.system-settings-modal .modal-head { padding: 8px 12px; }
+.system-settings-modal .modal-body { padding: 10px 12px; gap: 8px; }
+.system-settings-help { margin: 0; font-size: 12px; line-height: 1.5; }
+.system-visibility-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.system-visibility-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; border-bottom: 1px solid #ffffff14; font-size: 12px; }
+.system-visibility-name { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
+.system-visibility-name > span { min-width: 0; overflow-wrap: anywhere; }
+.system-visibility-name .sys-ico, .system-visibility-name .sys-mono { width: 20px; height: 20px; flex: 0 0 auto; }
+.system-visibility-row .btn { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; min-width: 54px; height: 25px; padding: 2px 6px; border-radius: 6px; font-size: 11px; justify-content: center; }
+.system-visibility-row .btn > svg { width: 12px; height: 12px; flex: 0 0 auto; }
 .system-visibility-row [aria-checked="false"] { opacity: .65; }
+@media (max-width: 480px) {
+  .system-visibility-grid { grid-template-columns: minmax(0, 1fr); }
+}
