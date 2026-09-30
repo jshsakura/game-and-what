@@ -1,5 +1,10 @@
 // Simplified Chinese dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "设置",
+  "Platform visibility": "平台显示与隐藏",
+  "Hidden platforms are excluded from the library and SD downloads.": "隐藏的平台不会显示在游戏库中，也不会包含在 SD 下载中。",
+  "Show": "显示",
+  "Hide": "隐藏",
   "Works": "OK",
   "Library": "库",
   "Extra": "额外",

@@ -1,5 +1,10 @@
 // German dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "Einstellungen",
+  "Platform visibility": "Plattformen ein-/ausblenden",
+  "Hidden platforms are excluded from the library and SD downloads.": "Ausgeblendete Plattformen werden in der Bibliothek und beim SD-Download ausgeschlossen.",
+  "Show": "Sichtbar",
+  "Hide": "Ausgeblendet",
   "Works": "OK",
   "Library": "Bibliothek",
   "Extra": "Extra",

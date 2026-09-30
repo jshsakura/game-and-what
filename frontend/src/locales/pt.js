@@ -1,5 +1,10 @@
 // Portuguese dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "Configurações",
+  "Platform visibility": "Visibilidade das plataformas",
+  "Hidden platforms are excluded from the library and SD downloads.": "As plataformas ocultas são excluídas da biblioteca e dos downloads para o cartão SD.",
+  "Show": "Visível",
+  "Hide": "Oculta",
   "Works": "OK",
   "Library": "Biblioteca",
   "Extra": "Extra",

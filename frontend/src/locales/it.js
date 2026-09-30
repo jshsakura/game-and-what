@@ -1,5 +1,10 @@
 // Italian dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "Impostazioni",
+  "Platform visibility": "Visibilità delle piattaforme",
+  "Hidden platforms are excluded from the library and SD downloads.": "Le piattaforme nascoste sono escluse dalla libreria e dai download per la scheda SD.",
+  "Show": "Visibile",
+  "Hide": "Nascosta",
   "Works": "OK",
   "Library": "Libreria",
   "Extra": "Extra",

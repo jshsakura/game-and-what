@@ -1,5 +1,10 @@
 // Russian dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "Настройки",
+  "Platform visibility": "Видимость платформ",
+  "Hidden platforms are excluded from the library and SD downloads.": "Скрытые платформы исключаются из библиотеки и загрузок для SD-карты.",
+  "Show": "Видна",
+  "Hide": "Скрыта",
   "Works": "OK",
   "Library": "Библиотека",
   "Extra": "Дополнительно",

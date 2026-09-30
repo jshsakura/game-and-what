@@ -1,5 +1,10 @@
 // Traditional Chinese dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "設定",
+  "Platform visibility": "平台顯示與隱藏",
+  "Hidden platforms are excluded from the library and SD downloads.": "隱藏的平台不會顯示在遊戲庫中，也不會包含在 SD 下載中。",
+  "Show": "顯示",
+  "Hide": "隱藏",
   "Works": "OK",
   "Library": "庫",
   "Extra": "額外",

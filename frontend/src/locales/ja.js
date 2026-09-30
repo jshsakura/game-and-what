@@ -1,5 +1,10 @@
 // Japanese dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "設定",
+  "Platform visibility": "機種の表示・非表示",
+  "Hidden platforms are excluded from the library and SD downloads.": "非表示の機種はライブラリ画面とSDダウンロードから除外されます。",
+  "Show": "表示",
+  "Hide": "非表示",
   "Works": "OK",
   "Library": "ライブラリ",
   "Extra": "その他",

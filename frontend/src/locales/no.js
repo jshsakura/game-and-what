@@ -1,5 +1,10 @@
 // Norwegian dictionary. Keys are the English SOURCE strings.
 export default {
+  "Settings": "Innstillinger",
+  "Platform visibility": "Vis eller skjul plattformer",
+  "Hidden platforms are excluded from the library and SD downloads.": "Skjulte plattformer utelates fra biblioteket og nedlastinger til SD-kortet.",
+  "Show": "Synlig",
+  "Hide": "Skjult",
   "Works": "OK",
   "Library": "Bibliotek",
   "Extra": "Ekstra",
