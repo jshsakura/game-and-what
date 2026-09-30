@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS sessions (
     label       TEXT,
     created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS hidden_systems (
+    session_id TEXT NOT NULL REFERENCES sessions(id),
+    system_key TEXT NOT NULL,
+    PRIMARY KEY (session_id, system_key)
+);
 CREATE TABLE IF NOT EXISTS roms (
     id           TEXT PRIMARY KEY,
     session_id   TEXT NOT NULL REFERENCES sessions(id),

@@ -5,6 +5,7 @@ import MediaTab from "./tabs/MediaTab.jsx";
 import LibraryTab from "./tabs/LibraryTab.jsx";
 import DataTab from "./tabs/DataTab.jsx";
 import HelpTab from "./tabs/HelpTab.jsx";
+import SystemSettings from "./SystemSettings.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
 import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages, Loader2 } from "lucide-react";
 import { getLibrary, packageSize, formatBytes, EMPTY_SD_FILTER, sdFilterCount } from "./api.js";
@@ -209,6 +210,7 @@ export default function App() {
   const [libKeys, setLibKeys] = useState([]);        // system keys that have roms (selectable)
   const [selected, setSelected] = useState(() => new Set()); // checked systems for download
   const [selSize, setSelSize] = useState(null);
+  const [hiddenSystems, setHiddenSystems] = useState([]);
   const [roms, setRoms] = useState([]);           // the library, for counting what a filter would ship
   const [sdFilter, setSdFilter] = useState(EMPTY_SD_FILTER);   // SD ZIP 상세 조건
   const dl = useDownload();
@@ -224,6 +226,7 @@ export default function App() {
         setCount(l.roms.length + l.videos.length + (l.music?.length || 0) + (l.clock_files?.length || 0));
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
         setRoms(l.roms);
+        setHiddenSystems(l.hidden_systems || []);
       })
       .catch(() => { setCount(0); setLibKeys([]); setRoms([]); })
       .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
@@ -234,16 +237,16 @@ export default function App() {
   // would ship nothing, and count what a selection actually contains, without a
   // round-trip per keystroke. Homebrew is exempt there and here.
   const passes = useMemo(() => (rom) => {
+    if (hiddenSystems.includes(rom.system_key) || rom.sd_exclude || rom.pico8_compat === "broken") return false;
     if (ALWAYS_SHIPPED.has(rom.system_key)) return true;
-    if (rom.sd_exclude || rom.pico8_compat === "broken") return false;
     if (sdFilter.flags.length && !sdFilter.flags.includes(rom.cover_flag || "none")) return false;
     if (sdFilter.patched && !rom.is_korean_patched) return false;
     if (sdFilter.favorite && !rom.favorite) return false;
-    if (sdFilter.minScore != null && !(rom.igdb_score >= sdFilter.minScore)) return false;
+    if (sdFilter.minScore != null && (rom.igdb_score == null || rom.igdb_score < sdFilter.minScore)) return false;
     if (sdFilter.maxMb && rom.size_bytes != null
         && rom.size_bytes > sdFilter.maxMb * 1024 * 1024) return false;
     return true;
-  }, [sdFilter]);
+  }, [sdFilter, hiddenSystems]);
 
   // Per-flag ROM counts for the panel — so a condition that would ship nothing reads
   // as zero before you pick it.
@@ -344,6 +347,7 @@ export default function App() {
             <>
               <LangToggle />
               <ThemeToggle theme={theme} onToggle={toggleTheme} />
+              <SystemSettings hiddenSystems={hiddenSystems} onChanged={(keys) => { setHiddenSystems(keys); bumpLibrary(); }} />
               <ActivityFeed pulse={reloadKey} onChanged={bumpLibrary} />
             </>
           )}
@@ -427,7 +431,7 @@ export default function App() {
           {tab === "media" && experimental && <MediaTab onChanged={bumpLibrary} />}
           {tab === "library" && <LibraryTab onChanged={bumpLibrary} selected={selected}
             onToggleSel={toggleSel} passes={passes} keepKeys={keepKeys}
-            filtered={filterCount > 0} alwaysKeys={ALWAYS_SHIPPED} />}
+            filtered={filterCount > 0} alwaysKeys={ALWAYS_SHIPPED} hiddenSystems={hiddenSystems} />}
           {tab === "data" && <DataTab onChanged={bumpLibrary} />}
           {tab === "help" && <HelpTab />}
         </div>

@@ -953,3 +953,13 @@ export async function convertChd(romId) {
   if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || "CHD conversion failed");
   return waitForCdConversion((await res.json()).job_id);
 }
+
+export async function setSystemVisibility(key, hidden) {
+  if (DEMO) throw new Error("Demo mode — install via Docker to change settings.");
+  const res = await withSession((sid) => fetch(`/api/sessions/${sid}/systems/${encodeURIComponent(key)}/visibility`, {
+    method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hidden }),
+  }));
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.detail || "Failed to save settings");
+  return body.hidden_systems;
+}

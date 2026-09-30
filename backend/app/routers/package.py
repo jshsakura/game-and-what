@@ -12,7 +12,7 @@ from starlette.concurrency import run_in_threadpool
 
 from .. import db
 from ..services import events, jobs, packaging, storage
-from .sessions import require_session
+from .sessions import require_session, _enrich_rom
 
 router = APIRouter(prefix="/api", tags=["package"])
 
@@ -232,14 +232,19 @@ def _excluded_roms(conn, session_id: str, sd_filter: SdFilter | None = None) -> 
         "SELECT rom_path, cover_path FROM roms WHERE session_id = ? "
         "AND (sd_exclude = 1 OR pico8_compat = 'broken')",
         (session_id,)).fetchall())
+    from ..systems import get_system
+    for row in conn.execute("SELECT system_key FROM hidden_systems WHERE session_id = ?", (session_id,)):
+        dirname = get_system(row[0]).dirname
+        excluded.update({f"roms/{dirname}", f"covers/{dirname}"})
+        if row[0] == "pico8":
+            excluded.add("cores/pico8.bin")
     if not sd_filter or not sd_filter.active:
         return excluded
 
     rows = conn.execute(
-        "SELECT rom_path, cover_path, cover_flag, is_korean_patched, favorite, igdb_score "
+        "SELECT * "
         "FROM roms WHERE session_id = ? AND system_key != 'homebrew'",
         (session_id,)).fetchall()
-    root = storage.session_root(session_id)
     rejected = []
     for r in rows:
         if sd_filter.flags is not None:
@@ -260,7 +265,8 @@ def _excluded_roms(conn, session_id: str, sd_filter: SdFilter | None = None) -> 
                 continue
         if sd_filter.max_bytes is not None:
             try:
-                if (root / r["rom_path"]).stat().st_size > sd_filter.max_bytes:
+                size = _enrich_rom(dict(r), session_id)["size_bytes"]
+                if size is not None and size > sd_filter.max_bytes:
                     rejected.append(r)
                     continue
             except OSError:

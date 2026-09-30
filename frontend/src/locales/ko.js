@@ -2,9 +2,13 @@
 // Keys must EXACTLY equal the in-code English literal (including punctuation/ellipsis/{placeholders}).
 // Missing keys fall back to the English key (which is the source language).
 export default {
+  "Platform visibility": "기종별 보임·숨김",
+  "Hidden platforms are excluded from the library and SD downloads.": "숨긴 기종은 라이브러리 화면과 SD 다운로드에서 제외됩니다.",
+  "Show": "보임",
+  "Hide": "숨김",
   "IGDB info": "IGDB 정보",
   "Game info": "게임 정보",
-  "{n} in library": "라이브러리 보유 {n}개",
+  "{n} included on SD": "SD 포함 {n}개",
   "{total} in library · {included} on SD": "{total}개 보유 · SD 포함 {included}개",
   "Miyoo gamelist": "미요 게임목록",
   "Rating": "평점",

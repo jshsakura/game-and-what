@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, StrictBool
+from ..systems import get_system
 
 from .. import config, db
 from ..services import romtag, storage
@@ -132,6 +134,9 @@ def get_library(session_id: str) -> dict:
                 (session_id,),
             ).fetchall()
         ]
+        hidden_systems = [r[0] for r in conn.execute(
+            "SELECT system_key FROM hidden_systems WHERE session_id = ? ORDER BY system_key",
+            (session_id,))]
         videos = []
         for r in conn.execute(
             # only finished encodes — in-progress/failed ones aren't playable and
@@ -167,4 +172,28 @@ def get_library(session_id: str) -> dict:
             ).fetchall()
         ]
     return {"session_id": session_id, "roms": roms, "videos": videos, "music": music,
-            "clock_files": clock_files}
+            "clock_files": clock_files, "hidden_systems": hidden_systems}
+
+
+class SystemVisibility(BaseModel):
+    hidden: StrictBool
+
+
+@router.patch("/sessions/{session_id}/systems/{system_key}/visibility")
+def set_system_visibility(session_id: str, system_key: str, body: SystemVisibility) -> dict:
+    try:
+        get_system(system_key)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Unknown platform")
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        if body.hidden:
+            conn.execute("INSERT OR IGNORE INTO hidden_systems VALUES (?, ?)",
+                         (session_id, system_key))
+        else:
+            conn.execute("DELETE FROM hidden_systems WHERE session_id = ? AND system_key = ?",
+                         (session_id, system_key))
+        hidden = [r[0] for r in conn.execute(
+            "SELECT system_key FROM hidden_systems WHERE session_id = ? ORDER BY system_key",
+            (session_id,))]
+    return {"hidden_systems": hidden}

@@ -2999,3 +2999,7 @@ body::before {
 }
 
 .set-info .rom-info-row > th { white-space: normal; line-height: 1.45; }
+
+.system-visibility-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #ffffff14; }
+.system-visibility-row .btn { display: inline-flex; align-items: center; gap: 6px; min-width: 82px; justify-content: center; }
+.system-visibility-row [aria-checked="false"] { opacity: .65; }

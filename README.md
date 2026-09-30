@@ -193,6 +193,8 @@ No API keys are required — cover search is just limited without them (see
 > [BIOS / system ROMs](#-bios--system-roms) — upload it once and it rides along in
 > the ZIP at the right path.
 
+Platform badges count games included in the SD download, after exclusions and SD conditions. Use the header **Settings** menu to show or hide platforms. Hidden platforms are omitted from the library view and SD ZIP (including CD tracks and covers); showing them again preserves each game’s SD exclusion setting. Settings are saved in the shared library.
+
 ### 4. Updating to a new version
 
 Your data lives in the mounted volume, so upgrades are safe:

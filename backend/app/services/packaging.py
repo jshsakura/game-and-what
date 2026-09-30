@@ -118,7 +118,8 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
     taken: set[str] = set()
 
     def once(path, arcname):
-        if arcname in taken:
+        if arcname in taken or any(arcname == prefix or arcname.startswith(prefix + "/")
+                                    for prefix in (excluded_roms or ())):
             return None
         taken.add(arcname)
         return path, arcname
@@ -130,7 +131,7 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
             if entry:
                 yield entry
     # PICO-8 core (needed to run .p8) when packaging everything or pico8 is selected.
-    if systems is None or "pico8" in systems:
+    if (systems is None or "pico8" in systems) and "roms/pico8" not in (excluded_roms or set()):
         cores = pico8core.ensure_cores_dir()
         if cores and cores.exists():
             for cp in sorted(cores.rglob("*")):

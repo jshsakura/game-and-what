@@ -91,7 +91,7 @@ function usePageSize() {
 // conditions empty out is not selectable and says so, instead of taking a check that
 // silently produces an empty folder. `passes(rom)` mirrors the server's SdFilter.
 export default function LibraryTab({ onChanged, selected, onToggleSel,
-                                     passes, keepKeys, filtered = false, alwaysKeys }) {
+                                     passes, keepKeys, filtered = false, alwaysKeys, hiddenSystems = [] }) {
   const toast = useToast();
   const { t, lang } = useI18n();
   const koreanMode = useKoreanMode();
@@ -229,12 +229,12 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
     [selected, bySystem, goesOnCard]
   );
 
-  // ALL supported systems show as chips (don't omit any) — empty ones are dimmed
-  // with a 0 count so the full supported lineup is always visible. Chips are
+  // Visible supported systems show as chips; empty ones have a 0 count. Chips are
   // ordered by system name; each system's roms by display name (Korean-aware).
   const groups = useMemo(() => systems
+    .filter((s) => !hiddenSystems.includes(s.key))
     .map((s) => ({ key: s.key, system: s, roms: [...(bySystem[s.key] ?? [])].sort(sortCmp) }))
-    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, sortCmp]);
+    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, sortCmp, hiddenSystems]);
   const nonEmpty = useMemo(() => groups.filter((g) => g.roms.length), [groups]);
 
   // Media (videos + music) is managed in the MEDIA tab, not here — LIBRARY is roms only.
@@ -251,7 +251,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
   // Search scope: the selected system by default, or ALL when 전체 is chosen.
-  const searchPool = searchAll ? lib.roms : (activeGroup?.roms ?? []);
+  const searchPool = searchAll ? lib.roms.filter((r) => !hiddenSystems.includes(r.system_key)) : (activeGroup?.roms ?? []);
   const matchName = (r) =>
     (r.stored_name || r.original_name || "").toLowerCase().includes(q);
   let items = searching
@@ -391,10 +391,9 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
       {!loading && !(searching && searchAll) && (
         <div className="lib-chips">
           {groups.map((g) => {
-            // The badge counts the collection, including excluded games.
-            // SD selection totals are shown in the download controls.
+            // Count only games that can ship to SD; keep all games browsable.
             // Cover/Korean warnings still describe only what ships.
-            const incl = g.roms.filter(shipsToSd);
+            const incl = g.roms.filter(goesOnCard);
             const miss = incl.filter((r) => r.cover_status !== "ok").length;
             const koMiss = incl.filter(needsKorean).length;
             return (
@@ -408,7 +407,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
               {/* One issue badge at most (avoid 3-up crowding): cover-missing has
                   priority; the 한글제목 badge only shows once covers are done. */}
               <span className="lib-chip-badges">
-                <span className="lib-chip-count" title={t("{n} in library", { n: g.roms.length })}>{g.roms.length}</span>
+                <span className="lib-chip-count" title={t("{n} included on SD", { n: incl.length })}>{incl.length}</span>
                 {always(g.key) && (
                   <span className="lib-chip-always"
                     title={t("Always on the card — the firmware's built-in apps need these files, whatever the conditions")}>!</span>
