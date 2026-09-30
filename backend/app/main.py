@@ -14,7 +14,7 @@ from .routers import clock, covers, data, downloads, events, extra, firmware, ga
 from .services.video import ffmpeg_available
 from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.14.8")
+app = FastAPI(title="gnw-retro-manager", version="1.14.9")
 
 # How many missing covers one boot goes back for (see _resume_covers). A page, not the
 # backlog: each is two or three provider round-trips, and the remainder is picked up by
@@ -42,7 +42,19 @@ async def _cross_origin_isolation(request, call_next):
     response.headers["Cross-Origin-Embedder-Policy"] = "credentialless"
     return response
 
-app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=3)
+class _TextGZipMiddleware(GZipMiddleware):
+    async def __call__(self, scope, receive, send):
+        path = scope.get("path", "")
+        # Compress the large list and frontend text, while file/ZIP/media streams
+        # retain their original bytes, range support and download throughput.
+        if (scope["type"] == "http" and (path.endswith("/library") or path == "/"
+                or (path.startswith("/assets/") and path.endswith((".js", ".css", ".svg"))))):
+            await super().__call__(scope, receive, send)
+        else:
+            await self.app(scope, receive, send)
+
+
+app.add_middleware(_TextGZipMiddleware, minimum_size=1000, compresslevel=3)
 
 # API routers — must be registered BEFORE the SPA catch-all below.
 # videos/clock/music are fork-firmware features (avi media player, clock bg.gif,

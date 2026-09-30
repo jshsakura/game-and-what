@@ -13,10 +13,10 @@ const PAGE_SIZE_MOBILE = 20;
 const MOBILE_QUERY = "(max-width: 640px)";
 
 // Sort roms by display name (Korean title if present, else filename), Korean-aware.
-const byName = (a, b) =>
-  (a.korean_name || a.stored_name || "").localeCompare(
-    b.korean_name || b.stored_name || "", "ko", { numeric: true }
-  );
+const nameCollator = new Intl.Collator("ko", { numeric: true });
+const byName = (a, b) => nameCollator.compare(
+  a.korean_name || a.stored_name || "", b.korean_name || b.stored_name || ""
+);
 
 // Favorites (★) bubble to the front; ties broken by display name.
 // Favorites are always pinned to the top; the chosen sort orders the rest.
@@ -233,8 +233,8 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   // ordered by system name; each system's roms by display name (Korean-aware).
   const groups = useMemo(() => systems
     .filter((s) => !hiddenSystems.includes(s.key))
-    .map((s) => ({ key: s.key, system: s, roms: [...(bySystem[s.key] ?? [])].sort(sortCmp) }))
-    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, sortCmp, hiddenSystems]);
+    .map((s) => ({ key: s.key, system: s, roms: bySystem[s.key] ?? [] }))
+    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, hiddenSystems]);
   const nonEmpty = useMemo(() => groups.filter((g) => g.roms.length), [groups]);
 
   // Media (videos + music) is managed in the MEDIA tab, not here — LIBRARY is roms only.
@@ -247,6 +247,9 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   useEffect(() => { setPage(1); }, [current]);
 
   const activeGroup = groups.find((g) => g.key === current);
+  // Sort only the platform on screen, reusing one collator for name comparisons.
+  const sortedGroup = useMemo(() => [...(activeGroup?.roms ?? [])].sort(sortCmp),
+    [activeGroup?.roms, sortCmp]);
 
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
@@ -256,7 +259,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
     (r.stored_name || r.original_name || "").toLowerCase().includes(q);
   let items = searching
     ? searchPool.filter(matchName).sort(sortCmp)
-    : (activeGroup?.roms ?? []);
+    : sortedGroup;
   // 커버 누락 필터: 커버 없는 롬만
   if (missingOnly) items = items.filter((r) => r.cover_status !== "ok");
   // 한글명 아님 필터: 한글 없는 번역대상 롬만 (숫자전용 '1942'류 제외 — 칩 배지와 동일 기준)

@@ -55,3 +55,14 @@ def test_manifest_prunes_excluded_and_private_folders(session_id, monkeypatch):
     names = {name for _, name in packaging._sd_entries(session_id, False, None, None, {"roms/segacd/hidden"})}
     assert names == {"roms/nes/game.nes"}
     assert not any(name.endswith("/hidden") or "/_previews" in name for name in visited)
+
+
+def test_rom_download_retains_original_zip_transport(client, make_rom, session_id):
+    import io
+    import zipfile
+    rom = make_rom(content=b"original ROM bytes" * 1000)
+    response = client.get(f"/api/sessions/{session_id}/roms/{rom['id']}/download", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == 200
+    assert "Content-Encoding" not in response.headers
+    with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+        assert any(archive.read(name) == b"original ROM bytes" * 1000 for name in archive.namelist())
