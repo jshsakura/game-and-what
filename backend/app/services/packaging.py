@@ -118,8 +118,9 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
     taken: set[str] = set()
 
     def once(path, arcname):
-        if arcname in taken or any(arcname == prefix or arcname.startswith(prefix + "/")
-                                    for prefix in (excluded_roms or ())):
+        parts = arcname.split("/")
+        if arcname in taken or (excluded_roms and any(
+                "/".join(parts[:i]) in excluded_roms for i in range(1, len(parts) + 1))):
             return None
         taken.add(arcname)
         return path, arcname
