@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Library, Inbox, ChevronLeft, ChevronRight, ImageOff, Languages, Search, Upload, Check, X, HardDriveDownload, StarOff } from "lucide-react";
-import { getLibrary, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
+import { getLibrary, getLibraryStart, afterLibraryPaint, getSystems, coverUrl, uploadRoms, uploadCdFolder, FOLDER_SYSTEMS } from "../api.js";
 import { RomCard, SystemIcon, systemColor, Dropzone, Pico8CompatFilter, GbaLoadFilter, gbaBucket, SortSelect } from "../components.jsx";
 import { useToast } from "../toast.jsx";
 import { useExperimentalMode, useKoreanMode } from "../config.jsx";
@@ -130,19 +130,27 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   // Download selection is owned by App (전체 선택 + 다운로드 live in the top bar);
   // here we just render each chip's checkbox from the `selected` prop.
 
+  const fetchGeneration = useRef(0);
   const reload = useCallback(() => {
+    const generation = ++fetchGeneration.current;
     setLoading(true);
-    getLibrary()
-      .then(setLib)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    (async () => {
+      const first = await getLibraryStart();
+      if (generation !== fetchGeneration.current) return;
+      setLib(first); setLoading(false);
+      await afterLibraryPaint();
+      const full = await getLibrary();
+      if (generation === fetchGeneration.current) setLib(full);
+    })().catch((e) => { if (generation === fetchGeneration.current) setError(e.message); })
+      .finally(() => { if (generation === fetchGeneration.current) setLoading(false); });
   }, []);
 
   // Re-fetch WITHOUT the loading skeleton — for post-edit refreshes (toggle
   // broken/exclude/favorite, rename…) so the chip counts update in place
   // instead of flashing the whole library back to skeletons.
   const reloadSilent = useCallback(() => {
-    getLibrary({ fresh: true }).then(setLib).catch(() => {});
+    const generation = ++fetchGeneration.current;
+    getLibrary({ fresh: true }).then((next) => { if (generation === fetchGeneration.current) setLib(next); }).catch(() => {});
   }, []);
 
   // Mount-only: `reloadKey` bumps from this tab's own edits (rename, cover
@@ -225,20 +233,20 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   // platforms would promise a card several times the one you'd actually get.
   const goesOnCard = passes || shipsToSd;
   const selectedFileCount = useMemo(
-    () => [...selected].reduce((n, k) => n + (bySystem[k]?.filter(goesOnCard).length || 0), 0),
-    [selected, bySystem, goesOnCard]
+    () => [...selected].reduce((n, k) => n + (lib.partial ? lib.overview.systems[k]?.sd || 0 : bySystem[k]?.filter(goesOnCard).length || 0), 0),
+    [selected, bySystem, goesOnCard, lib.partial, lib.overview]
   );
 
   // Visible supported systems show as chips; empty ones have a 0 count. Chips are
   // ordered by system name; each system's roms by display name (Korean-aware).
   const groups = useMemo(() => systems
     .filter((s) => !hiddenSystems.includes(s.key))
-    .map((s) => ({ key: s.key, system: s, roms: bySystem[s.key] ?? [] }))
-    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, hiddenSystems]);
-  const nonEmpty = useMemo(() => groups.filter((g) => g.roms.length), [groups]);
+    .map((s) => ({ key: s.key, system: s, roms: bySystem[s.key] ?? [], total: lib.partial ? lib.overview.systems[s.key]?.total || 0 : (bySystem[s.key]?.length || 0) }))
+    .sort((a, b) => a.system.name.localeCompare(b.system.name, "en")), [systems, bySystem, hiddenSystems, lib.partial, lib.overview]);
+  const nonEmpty = useMemo(() => groups.filter((g) => g.total), [groups]);
 
   // Media (videos + music) is managed in the MEDIA tab, not here — LIBRARY is roms only.
-  const empty = lib.roms.length === 0;
+  const empty = (lib.overview?.total_roms ?? lib.roms.length) === 0;
 
   // Keep a valid selection: default to the first NON-EMPTY group.
   const validKeys = groups.map((g) => g.key);
@@ -247,6 +255,15 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   useEffect(() => { setPage(1); }, [current]);
 
   const activeGroup = groups.find((g) => g.key === current);
+  useEffect(() => {
+    if (!lib.partial || !current || current === lib.system_key) return;
+    let alive = true; setLoading(true);
+    getLibrary({ system: current }).then((part) => {
+      if (alive) setLib({ ...part, partial: true, system_key: current, overview: lib.overview });
+    }).catch((e) => { if (alive) setError(e.message); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [current, lib.partial]);
   // Sort only the platform on screen, reusing one collator for name comparisons.
   const sortedGroup = useMemo(() => [...(activeGroup?.roms ?? [])].sort(sortCmp),
     [activeGroup?.roms, sortCmp]);
@@ -290,7 +307,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
       <div className="muted">
         <Library size={13} aria-hidden />{" "}
         <span className={`lib-summary ${loading ? "is-skel" : ""}`}>
-          {t("Stored")}: {lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all") || (current === "gba" && gbaFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
+          {t("Stored")}: {lib.overview?.total_roms ?? lib.roms.length} {t("ROM")}{experimental ? ` · ${lib.videos.length} ${t("VIDEO")} · ${lib.music?.length || 0} ${t("MUSIC")}` : ""}{(items.length > 0 || searching || missingOnly || nonKoOnly || unratedOnly || (current === "pico8" && compatFilter !== "all") || (current === "gba" && gbaFilter !== "all")) ? ` · ${t("{n} shown", { n: items.length })}` : ""}
         </span>
       </div>
 
@@ -348,7 +365,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
           <div className="lib-filters">
             <span className="search-scope" role="group" aria-label={t("Search scope")}>
               <button className={`scope-btn ${!searchAll ? "on" : ""}`} onClick={() => setSearchAll(false)}>{t("This")}</button>
-              <button className={`scope-btn ${searchAll ? "on" : ""}`} onClick={() => setSearchAll(true)}>{t("All")}</button>
+              <button className={`scope-btn ${searchAll ? "on" : ""}`} disabled={!!lib.partial} onClick={() => setSearchAll(true)}>{t("All")}</button>
             </span>
             <span className="search-scope" role="group" aria-label={t("Filter")}>
               <button className={`scope-btn ${missingOnly ? "on" : ""}`} onClick={() => setMissingOnly((m) => !m)}
@@ -397,20 +414,21 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
             // Count only games that can ship to SD; keep all games browsable.
             // Cover/Korean warnings still describe only what ships.
             const incl = g.roms.filter(goesOnCard);
-            const miss = incl.filter((r) => r.cover_status !== "ok").length;
+            const includedCount = lib.partial ? lib.overview.systems[g.key]?.sd || 0 : incl.length;
+            const miss = lib.partial ? lib.overview.systems[g.key]?.missing || 0 : incl.filter((r) => r.cover_status !== "ok").length;
             const koMiss = incl.filter(needsKorean).length;
             return (
             <button
               key={g.key}
-              className={`lib-chip ${g.key === current ? "on" : ""} ${g.roms.length ? "" : "empty"} ${dropped(g.key) ? "no-ko" : ""}`}
+              className={`lib-chip ${g.key === current ? "on" : ""} ${g.total ? "" : "empty"} ${dropped(g.key) ? "no-ko" : ""}`}
               style={{ "--sys": systemColor(g.key) }}
-              title={t("{total} in library · {included} on SD", { total: g.roms.length, included: incl.length })}
+              title={t("{total} in library · {included} on SD", { total: g.total, included: includedCount })}
               onClick={() => setActive(g.key)}
             >
               {/* One issue badge at most (avoid 3-up crowding): cover-missing has
                   priority; the 한글제목 badge only shows once covers are done. */}
               <span className="lib-chip-badges">
-                <span className="lib-chip-count" title={t("{n} included on SD", { n: incl.length })}>{incl.length}</span>
+                <span className="lib-chip-count" title={t("{n} included on SD", { n: includedCount })}>{includedCount}</span>
                 {always(g.key) && (
                   <span className="lib-chip-always"
                     title={t("Always on the card — the firmware's built-in apps need these files, whatever the conditions")}>!</span>
@@ -419,7 +437,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
                   ? <span className="lib-chip-miss" title={t("{n} missing covers", { n: miss })}>{miss}</span>
                   : koFeature && koMiss > 0 && <span className="lib-chip-komiss" title={t("{n} without Korean titles", { n: koMiss })}>{koMiss}</span>}
               </span>
-              {g.roms.length > 0 && (
+              {g.total > 0 && (
                 <span
                   className={`lib-chip-check ${selected.has(g.key) ? "on" : ""} ${dropped(g.key) ? "off" : ""}`}
                   role="checkbox" aria-checked={selected.has(g.key)} aria-disabled={dropped(g.key)}
@@ -439,7 +457,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
       )}
 
       {/* Selected system has no roms → upload straight into it right here. */}
-      {!loading && !searching && activeGroup && activeGroup.roms.length === 0 && (
+      {!loading && !searching && activeGroup && activeGroup.total === 0 && (
         <div className="lib-upload-area">
           <Dropzone
             multiple

@@ -66,3 +66,37 @@ def test_rom_download_retains_original_zip_transport(client, make_rom, session_i
     assert "Content-Encoding" not in response.headers
     with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
         assert any(archive.read(name) == b"original ROM bytes" * 1000 for name in archive.namelist())
+
+
+def test_library_start_has_all_counts_but_only_first_platform(client, make_rom, session_id):
+    make_rom("nes", "First.nes")
+    make_rom("nes", "Excluded.nes", sd_exclude=1)
+    make_rom("32x", "Other.32x")
+    make_rom("pico8", "Broken.p8", pico8_compat="broken")
+    start = client.get(f"/api/sessions/{session_id}/library/start").json()
+    assert start["partial"] is True
+    assert start["overview"]["total_roms"] == 4
+    assert start["overview"]["systems"]["nes"] == {"total":2,"sd":1,"missing":1}
+    assert start["overview"]["systems"]["pico8"]["sd"] == 0
+    assert {r["system_key"] for r in start["roms"]} == {start["system_key"]}
+    assert len(start["roms"]) < start["overview"]["total_roms"]
+    all_roms = client.get(f"/api/sessions/{session_id}/library?compact=true").json()["roms"]
+    assert len(all_roms) == 4
+    nes = client.get(f"/api/sessions/{session_id}/library?compact=true&system=nes").json()["roms"]
+    assert len(nes) == 2 and all(r["system_key"] == "nes" for r in nes)
+
+
+def test_library_start_skips_hidden_default_platform(client, make_rom, session_id):
+    make_rom("nes"); make_rom("32x", "Other.32x")
+    client.patch(f"/api/sessions/{session_id}/systems/nes/visibility", json={"hidden":True})
+    start = client.get(f"/api/sessions/{session_id}/library/start").json()
+    assert start["system_key"] == "32x"
+    assert start["overview"]["systems"]["nes"]["sd"] == 0
+    assert start["overview"]["systems"]["nes"]["total"] == 1
+
+
+def test_library_start_empty_and_invalid_platform(client, session_id):
+    start = client.get(f"/api/sessions/{session_id}/library/start").json()
+    assert start["roms"] == [] and start["overview"]["total_roms"] == 0
+    assert client.get(f"/api/sessions/{session_id}/library?system=unknown").status_code == 404
+    assert client.get("/api/sessions/missing/library/start").status_code == 404

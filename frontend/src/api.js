@@ -453,7 +453,12 @@ export async function getJob(jobId) {
 }
 
 let libraryPending = null;
-export function getLibrary({ fresh = false } = {}) {
+export function getLibrary({ fresh = false, system } = {}) {
+  if (system) return withSession(async (sid) => {
+    const res = await fetch(`/api/sessions/${sid}/library?compact=true&system=${encodeURIComponent(system)}`);
+    if (!res.ok) throw new Error("Failed to load library");
+    return res.json();
+  });
   // App and LibraryTab share a request while it is in flight. A later refresh
   // always fetches again, so uploads, edits and exclusions cannot stay stale.
   if (!libraryPending || fresh) {
@@ -972,3 +977,18 @@ export async function setSystemVisibility(key, hidden) {
   if (!res.ok) throw new Error(body.detail || "Failed to save settings");
   return body.hidden_systems;
 }
+
+let libraryStartPending = null;
+export function getLibraryStart() {
+  if (DEMO) return getLibrary();
+  if (!libraryStartPending) {
+    libraryStartPending = withSession(async (sid) => {
+      const res = await fetch(`/api/sessions/${sid}/library/start`);
+      if (!res.ok) throw new Error("Failed to load library");
+      return res.json();
+    }).finally(() => { libraryStartPending = null; });
+  }
+  return libraryStartPending;
+}
+export const afterLibraryPaint = () => new Promise((resolve) =>
+  requestAnimationFrame(() => requestAnimationFrame(resolve)));

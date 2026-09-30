@@ -8,7 +8,7 @@ import HelpTab from "./tabs/HelpTab.jsx";
 import SystemSettings from "./SystemSettings.jsx";
 import ActivityFeed from "./ActivityFeed.jsx";
 import { Upload, Clapperboard, Library, Download, Database, Info, Check, X, HardDrive, Languages, Loader2 } from "lucide-react";
-import { getLibrary, packageSize, formatBytes, EMPTY_SD_FILTER, sdFilterCount } from "./api.js";
+import { getLibrary, getLibraryStart, afterLibraryPaint, packageSize, formatBytes, EMPTY_SD_FILTER, sdFilterCount } from "./api.js";
 import SdFilterPanel from "./SdFilterPanel.jsx";
 import { useDownload } from "./download.jsx";
 import { useT, useI18n } from "./i18n.jsx";
@@ -211,6 +211,7 @@ export default function App() {
   const [selected, setSelected] = useState(() => new Set()); // checked systems for download
   const [selSize, setSelSize] = useState(null);
   const [hiddenSystems, setHiddenSystems] = useState([]);
+  const [overview, setOverview] = useState(null);
   const [roms, setRoms] = useState([]);           // the library, for counting what a filter would ship
   const [sdFilter, setSdFilter] = useState(EMPTY_SD_FILTER);   // SD ZIP 상세 조건
   const dl = useDownload();
@@ -221,15 +222,20 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    getLibrary({ fresh: reloadKey > 0 })
-      .then((l) => {
-        setCount(l.roms.length + l.videos.length + (l.music?.length || 0) + (l.clock_files?.length || 0));
-        setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
-        setRoms(l.roms);
-        setHiddenSystems(l.hidden_systems || []);
-      })
-      .catch(() => { setCount(0); setLibKeys([]); setRoms([]); })
-      .finally(() => setLoading(false));   // stays false after first settle (no skeleton flash on reloads)
+    let alive = true, shown = false;
+    const apply = (l) => {
+      if (!alive) return;
+      shown = true;
+      setOverview(l.partial ? l.overview : null);
+      setCount((l.overview?.total_roms ?? l.roms.length) + l.videos.length + (l.music?.length || 0) + (l.clock_files?.length || 0));
+      setLibKeys(l.partial ? Object.keys(l.overview.systems).sort() : [...new Set(l.roms.map((r) => r.system_key))].sort());
+      setRoms(l.roms); setHiddenSystems(l.hidden_systems || []); setLoading(false);
+    };
+    (async () => {
+      if (reloadKey === 0) { apply(await getLibraryStart()); await afterLibraryPaint(); }
+      if (alive) apply(await getLibrary({ fresh: reloadKey > 0 }));
+    })().catch(() => { if (alive && !shown) { setCount(0); setLibKeys([]); setLoading(false); } });
+    return () => { alive = false; };
   }, [reloadKey]);
 
   // Does this ROM survive the conditions? The server decides for real (SdFilter in
@@ -251,17 +257,19 @@ export default function App() {
   // Per-flag ROM counts for the panel — so a condition that would ship nothing reads
   // as zero before you pick it.
   const flagCounts = useMemo(() => {
+    if (overview) return overview.flags;
     const out = {};
     for (const r of roms) {
       const code = r.cover_flag || "none";
       out[code] = (out[code] || 0) + 1;
     }
     return out;
-  }, [roms]);
+  }, [roms, overview]);
 
   // Platforms that still have something to ship under the conditions.
   const keepKeys = useMemo(
-    () => new Set(roms.filter(passes).map((r) => r.system_key)), [roms, passes]);
+    () => overview ? new Set(Object.keys(overview.systems).filter((k) => overview.systems[k].sd > 0 && !hiddenSystems.includes(k)))
+      : new Set(roms.filter(passes).map((r) => r.system_key)), [roms, passes, overview, hiddenSystems]);
 
   // Full-library size. Cleared BEFORE the refetch: changing a condition changes the
   // answer, and leaving the old number up until the new one lands reads as "nothing
@@ -396,7 +404,7 @@ export default function App() {
             {/* loading, not just disabled: its two neighbours shimmer while the library
                 loads, and a plain button sitting between them reads as the odd one out. */}
             <SdFilterPanel filter={sdFilter} onChange={setSdFilter}
-              flagCounts={flagCounts} disabled={loading} loading={loading} />
+              flagCounts={flagCounts} disabled={loading || !!overview} loading={loading} />
             <button className={`btn tab-dl has-size ${loading ? "is-skel" : ""}`}
               disabled={loading || !hasSel || dl.busy}
               onClick={() => dl.downloadPackage(

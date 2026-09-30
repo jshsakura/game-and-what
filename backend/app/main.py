@@ -14,7 +14,7 @@ from .routers import clock, covers, data, downloads, events, extra, firmware, ga
 from .services.video import ffmpeg_available
 from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.14.9")
+app = FastAPI(title="gnw-retro-manager", version="1.14.10")
 
 # How many missing covers one boot goes back for (see _resume_covers). A page, not the
 # backlog: each is two or three provider round-trips, and the remainder is picked up by
@@ -47,7 +47,7 @@ class _TextGZipMiddleware(GZipMiddleware):
         path = scope.get("path", "")
         # Compress the large list and frontend text, while file/ZIP/media streams
         # retain their original bytes, range support and download throughput.
-        if (scope["type"] == "http" and (path.endswith("/library") or path == "/"
+        if (scope["type"] == "http" and (path.endswith(("/library", "/library/start")) or path == "/"
                 or (path.startswith("/assets/") and path.endswith((".js", ".css", ".svg"))))):
             await super().__call__(scope, receive, send)
         else:

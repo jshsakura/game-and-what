@@ -124,15 +124,21 @@ def require_session(conn, session_id: str) -> None:
 
 
 @router.get("/sessions/{session_id}/library")
-def get_library(session_id: str, compact: bool = False) -> dict:
+def get_library(session_id: str, compact: bool = False, system: str | None = None) -> dict:
     """All ROMs, videos, music and clock backgrounds stored in this session."""
+    if system is not None:
+        try:
+            get_system(system)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Unknown platform")
     with db.connect() as conn:
         require_session(conn, session_id)
         roms = [
             _enrich_rom(dict(r), session_id)
             for r in conn.execute(
-                "SELECT * FROM roms WHERE session_id = ? ORDER BY created_at DESC",
-                (session_id,),
+                "SELECT * FROM roms WHERE session_id = ? "
+                + ("AND system_key = ? " if system else "") + "ORDER BY created_at DESC",
+                (session_id, system) if system else (session_id,),
             ).fetchall()
         ]
         hidden_systems = [r[0] for r in conn.execute(
@@ -205,3 +211,33 @@ def set_system_visibility(session_id: str, system_key: str, body: SystemVisibili
             "SELECT system_key FROM hidden_systems WHERE session_id = ? ORDER BY system_key",
             (session_id,))]
     return {"hidden_systems": hidden}
+
+
+@router.get("/sessions/{session_id}/library/start")
+def get_library_start(session_id: str):
+    """Lightweight counts plus the first platform; the full index loads later."""
+    from ..systems import available_systems
+    with db.connect() as conn:
+        require_session(conn, session_id)
+        hidden = {r[0] for r in conn.execute(
+            "SELECT system_key FROM hidden_systems WHERE session_id=?", (session_id,))}
+        counts = {}
+        for row in conn.execute(
+            "SELECT system_key, count(*) AS total, "
+            "sum(CASE WHEN sd_exclude=0 AND coalesce(pico8_compat,'')!='broken' THEN 1 ELSE 0 END) AS sd, "
+            "sum(CASE WHEN sd_exclude=0 AND coalesce(pico8_compat,'')!='broken' AND cover_status!='ok' THEN 1 ELSE 0 END) AS missing "
+            "FROM roms WHERE session_id=? GROUP BY system_key", (session_id,)):
+            counts[row["system_key"]] = {"total": row["total"],
+                "sd": 0 if row["system_key"] in hidden else row["sd"], "missing": row["missing"]}
+        flags = {r[0] or "none": r[1] for r in conn.execute(
+            "SELECT coalesce(nullif(cover_flag,''),'none') AS flag, count(*) FROM roms WHERE session_id=? GROUP BY flag", (session_id,))}
+    first = next((s.key for s in sorted(available_systems(), key=lambda s:s.name)
+                  if s.key not in hidden and counts.get(s.key, {}).get("total")), None)
+    result = get_library(session_id, system=first or available_systems()[0].key)
+    if first is None:
+        result["roms"] = []
+    result["roms"] = [{k:v for k,v in r.items() if k != "igdb_meta" and v is not None}
+                      for r in result["roms"]]
+    result.update(partial=True, system_key=first, overview={"systems":counts,
+                  "total_roms":sum(r["total"] for r in counts.values()), "flags":flags})
+    return JSONResponse(result)
