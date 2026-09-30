@@ -126,8 +126,18 @@ def _sd_entries(session_id: str, include_video: bool, systems: "set[str] | None"
         return path, arcname
 
     root = storage.session_root(session_id)
-    for path in sorted(root.rglob("*")):
-        if path.is_file() and not _excluded(root, path, include_video, systems, homebrew_roms, excluded_roms):
+    paths = []
+    for base, dirs, files in os.walk(root):
+        base = Path(base)
+        # Test a sentinel child so underscore/hidden system/game folders are
+        # rejected BEFORE walking their contents. roms/ and covers/ themselves
+        # remain traversable when downloading a selected set of systems.
+        dirs[:] = [d for d in dirs if not _excluded(
+            root, base / d / "__contents__", include_video,
+            None if base == root else systems, homebrew_roms, excluded_roms)]
+        paths.extend(base / name for name in files)
+    for path in sorted(paths):
+        if not _excluded(root, path, include_video, systems, homebrew_roms, excluded_roms) and path.is_file():
             entry = once(path, str(path.relative_to(root)))
             if entry:
                 yield entry
@@ -195,8 +205,8 @@ def _write_sd_zip(zf: "zipfile.ZipFile", session_id: str, include_video: bool,
             on_progress(done, total, abs_path.name)
 
 
-def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
-                   homebrew_roms: "set[str] | None" = None, excluded_roms: "set[str] | None" = None) -> str:
+def sd_manifest_info(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
+                   homebrew_roms: "set[str] | None" = None, excluded_roms: "set[str] | None" = None) -> tuple[str, int]:
     """A cheap content key (no file reads — stat only) over exactly the files that
     would go in the zip + params + cache version. Changes iff the resulting zip
     would change → used as the cache key and HTTP ETag."""
@@ -206,19 +216,27 @@ def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[s
     h.update(f"|video={include_video}|sys={sorted(systems) if systems else None}"
              f"|hb={sorted(homebrew_roms) if homebrew_roms else None}"
              f"|ex={sorted(excluded_roms) if excluded_roms else None}|".encode())
+    total = 0
     for abs_path, arcname in _sd_entries(session_id, include_video, systems,
                                          homebrew_roms, excluded_roms):
         st = abs_path.stat()
+        total += st.st_size
         h.update(f"{arcname}|{st.st_size}|{st.st_mtime_ns}\n".encode())
-    return h.hexdigest()
+    return h.hexdigest(), total
+
+
+def sd_fingerprint(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
+                   homebrew_roms: "set[str] | None" = None, excluded_roms: "set[str] | None" = None) -> str:
+    return sd_manifest_info(session_id, include_video, systems, homebrew_roms, excluded_roms)[0]
 
 
 def cached_zip_path(session_id: str, include_video: bool = False, systems: "set[str] | None" = None,
                     homebrew_roms: "set[str] | None" = None,
-                    excluded_roms: "set[str] | None" = None) -> tuple[str, str, bool]:
+                    excluded_roms: "set[str] | None" = None,
+                    *, fingerprint: str | None = None) -> tuple[str, str, bool]:
     """(zip_path, etag, exists) for the current library/params, without building.
     Lets the caller answer 'is it ready?' before starting a build job."""
-    key = sd_fingerprint(session_id, include_video, systems, homebrew_roms, excluded_roms)
+    key = fingerprint or sd_fingerprint(session_id, include_video, systems, homebrew_roms, excluded_roms)
     cache_dir = config.DATA_DIR / "_cache"
     cached = cache_dir / f"sd-{key}.zip"
     exists = cached.exists()

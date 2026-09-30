@@ -142,7 +142,7 @@ export default function LibraryTab({ onChanged, selected, onToggleSel,
   // broken/exclude/favorite, rename…) so the chip counts update in place
   // instead of flashing the whole library back to skeletons.
   const reloadSilent = useCallback(() => {
-    getLibrary().then(setLib).catch(() => {});
+    getLibrary({ fresh: true }).then(setLib).catch(() => {});
   }, []);
 
   // Mount-only: `reloadKey` bumps from this tab's own edits (rename, cover

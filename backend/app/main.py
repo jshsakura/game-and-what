@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db
@@ -13,7 +14,7 @@ from .routers import clock, covers, data, downloads, events, extra, firmware, ga
 from .services.video import ffmpeg_available
 from .systems import available_systems
 
-app = FastAPI(title="gnw-retro-manager", version="1.14.7")
+app = FastAPI(title="gnw-retro-manager", version="1.14.8")
 
 # How many missing covers one boot goes back for (see _resume_covers). A page, not the
 # backlog: each is two or three provider round-trips, and the remainder is picked up by
@@ -40,6 +41,8 @@ async def _cross_origin_isolation(request, call_next):
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
     response.headers["Cross-Origin-Embedder-Policy"] = "credentialless"
     return response
+
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=3)
 
 # API routers — must be registered BEFORE the SPA catch-all below.
 # videos/clock/music are fork-firmware features (avi media player, clock bg.gif,

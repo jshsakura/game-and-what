@@ -221,7 +221,7 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    getLibrary()
+    getLibrary({ fresh: reloadKey > 0 })
       .then((l) => {
         setCount(l.roms.length + l.videos.length + (l.music?.length || 0) + (l.clock_files?.length || 0));
         setLibKeys([...new Set(l.roms.map((r) => r.system_key))].sort());
@@ -267,13 +267,14 @@ export default function App() {
   // answer, and leaving the old number up until the new one lands reads as "nothing
   // happened". null == recalculating.
   useEffect(() => {
+    if (loading) return undefined;
     let alive = true;
     setSdSize(null);
     packageSize(undefined, sdFilter)
       .then((b) => alive && setSdSize(b))
       .catch(() => alive && setSdSize(null));
     return () => { alive = false; };
-  }, [reloadKey, sdFilter]);
+  }, [reloadKey, sdFilter, loading]);
 
   // Download selection (system key == dirname). 전체 선택 + 다운로드 live together top-right.
   // A platform the conditions empty out isn't selectable: checking it would ship an

@@ -294,9 +294,11 @@ def package_size(session_id: str, video: bool = False, system: str | None = None
         homebrew = _homebrew_roms(conn, session_id)
         excluded = _excluded_roms(conn, session_id, sd_filter)
     systems = _parse_systems(system)
+    fingerprint, content_bytes = packaging.sd_manifest_info(
+        session_id, video, systems, homebrew, excluded)
     zip_path, _, exists = packaging.cached_zip_path(session_id, include_video=video,
                                                     systems=systems, homebrew_roms=homebrew,
-                                                    excluded_roms=excluded)
+                                                    excluded_roms=excluded, fingerprint=fingerprint)
     zip_bytes = None
     if exists:
         try:
@@ -304,8 +306,7 @@ def package_size(session_id: str, video: bool = False, system: str | None = None
         except OSError:
             zip_bytes = None
     return {
-        "bytes": packaging.sd_content_size(session_id, include_video=video, systems=systems,
-                                           homebrew_roms=homebrew, excluded_roms=excluded),
+        "bytes": content_bytes,
         "zip_bytes": zip_bytes,
     }
 

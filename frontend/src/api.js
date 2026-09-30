@@ -452,10 +452,19 @@ export async function getJob(jobId) {
   return res.json();
 }
 
-export async function getLibrary() {
-  const res = await withSession((sid) => fetch(`/api/sessions/${sid}/library`));
-  if (!res.ok) throw new Error("Failed to load library");
-  return res.json();
+let libraryPending = null;
+export function getLibrary({ fresh = false } = {}) {
+  // App and LibraryTab share a request while it is in flight. A later refresh
+  // always fetches again, so uploads, edits and exclusions cannot stay stale.
+  if (!libraryPending || fresh) {
+    const pending = (async () => {
+      const res = await withSession((sid) => fetch(`/api/sessions/${sid}/library?compact=true`));
+      if (!res.ok) throw new Error("Failed to load library");
+      return res.json();
+    })().finally(() => { if (libraryPending === pending) libraryPending = null; });
+    libraryPending = pending;
+  }
+  return libraryPending;
 }
 
 // Activity feed — recent library changes (uploads, renames, PICO-8 compat…),

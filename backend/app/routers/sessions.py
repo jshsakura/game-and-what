@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, StrictBool
 from ..systems import get_system
 
@@ -123,7 +124,7 @@ def require_session(conn, session_id: str) -> None:
 
 
 @router.get("/sessions/{session_id}/library")
-def get_library(session_id: str) -> dict:
+def get_library(session_id: str, compact: bool = False) -> dict:
     """All ROMs, videos, music and clock backgrounds stored in this session."""
     with db.connect() as conn:
         require_session(conn, session_id)
@@ -171,8 +172,15 @@ def get_library(session_id: str) -> dict:
                 (session_id,),
             ).fetchall()
         ]
-    return {"session_id": session_id, "roms": roms, "videos": videos, "music": music,
-            "clock_files": clock_files, "hidden_systems": hidden_systems}
+    result = {"session_id": session_id, "roms": roms, "videos": videos, "music": music,
+              "clock_files": clock_files, "hidden_systems": hidden_systems}
+    if compact:
+        # Rich facts are already fetched by the detail popup's igdb-meta endpoint.
+        # Keep list facts/flags/sizes, but avoid sending every game's full metadata.
+        result["roms"] = [{k: v for k, v in r.items() if k != "igdb_meta" and v is not None}
+                          for r in roms]
+        return JSONResponse(result)
+    return result
 
 
 class SystemVisibility(BaseModel):
