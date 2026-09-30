@@ -4,7 +4,7 @@ import {
   Check, ImageOff, XCircle, ImagePlus, Loader, Play,
   Download, MoreHorizontal, Trash2, X, Film, Music, ChevronDown, Pencil, Search, Hand, Crop, Upload, FolderPlus, Star,
   AlertTriangle, HelpCircle, Timer, Copy, Files, ArrowDownUp, HardDriveDownload, Gauge, Info, RefreshCw,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, FolderOpen,
 } from "lucide-react";
 import { EmulatorOverlay, canPlay, isExperimental } from "./emulator.jsx";
 import { useDownload } from "./download.jsx";
@@ -1312,6 +1312,11 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
   // the .bin app itself once it's opted into the SD (sd_include).
   let extraFiles = [];
   try { extraFiles = JSON.parse(rom.extra_files || "[]"); } catch { extraFiles = []; }
+  const cdGame = ["pcecd", "segacd"].includes(rom.system_key);
+  const fileSet = cdGame || extraFiles.length > 0;
+  const folderGame = cdGame && (rom.rom_path || "").split("/").length >= 4;
+  const discFiles = rom.rom_files || [{ name: rom.stored_name, size: rom.primary_size_bytes ?? rom.size_bytes }, ...extraFiles];
+  const discFolder = rom.rom_path ? `/${rom.rom_path.slice(0, rom.rom_path.lastIndexOf("/") + 1)}` : `/roms/${rom.system_key}/`;
   const dataFileCount = [rom.stored_name, ...extraFiles.map((f) => f.name)]
     .filter((n) => n && (!n.toLowerCase().endsWith(".bin") || rom.sd_include)).length;
   // GBA only. `idle_loop` says gpSP can skip this game's VBlank wait — the
@@ -1812,13 +1817,27 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                 </div>
               )}
 
+              {fileSet && (
+                <div className="rom-set-summary">
+                  <div className="rom-set-icon"><FolderOpen size={22} strokeWidth={1.7} /></div>
+                  <div className="rom-set-main">
+                    <div className="rom-set-title">{t(folderGame ? "Game folder" : "File set")}<span>{t("Files ({n})", { n: discFiles.length })}</span></div>
+                    <div className="rom-set-path" title={discFolder}>{discFolder}</div>
+                  </div>
+                  <button className="icon-btn rom-set-copy" onClick={() => copyField("folder", discFolder)} title={t("Copy")}>
+                    {copiedKey === "folder" ? <Check size={13} /> : <Copy size={13} />}
+                  </button>
+                  <div className="rom-set-size"><span>{t("Total size")}</span><strong>{rom.size_bytes == null ? "—" : formatBytes(rom.size_bytes)}</strong></div>
+                </div>
+              )}
+
               {/* Homebrew entries are fixed firmware launch templates — the .bin
                   name must stay exact, so no rename field (managed via file list). */}
               {rom.system_key !== "homebrew" && (
                 <>
-                  <label className="field-label">{t("Filename")}</label>
+                  <label className="field-label">{t(folderGame ? "Folder name" : "Filename")}</label>
                   <div className="rename-row">
-                    {rom.system_key && <span className="path-prefix">/roms/{rom.system_key}/</span>}
+                    {rom.system_key && !fileSet && <span className="path-prefix">/roms/{rom.system_key}/</span>}
                     <input
                       className="text-input"
                       value={name}
@@ -1837,10 +1856,10 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
 
               {/* File info — size, checksums, provenance in one table; each row copyable
                   (CRC32 matches No-Intro/한글패치 checksum lists; SHA-256 is our exact-dup id). */}
-              <div className="rom-info">
+              <div className={`rom-info ${fileSet ? "set-info" : ""}`}>
                 <table className="rom-info-table"><tbody>
-                  {rom.size_bytes != null && (
-                    <InfoRow k="size" label={t("Size")} value={formatBytes(rom.size_bytes)}
+                  {!fileSet && rom.size_bytes != null && (
+                    <InfoRow k="size" label={t(fileSet ? "Total size" : "Size")} value={formatBytes(rom.size_bytes)}
                       copyValue={String(rom.size_bytes)} copiedKey={copiedKey} onCopy={copyField} t={t} />
                   )}
                   {rom.crc32 && (
@@ -1848,7 +1867,7 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                       copiedKey={copiedKey} onCopy={copyField} t={t} />
                   )}
                   {rom.content_hash && (
-                    <InfoRow k="sha" label="SHA-256" value={rom.content_hash} mono trunc
+                    <InfoRow k="sha" label={fileSet ? t("Upload SHA-256") : "SHA-256"} value={rom.content_hash} mono trunc
                       copiedKey={copiedKey} onCopy={copyField} t={t} />
                   )}
                   {rom.original_name && rom.original_name !== romBase && (
@@ -1869,6 +1888,21 @@ export function RomCard({ rom, previewSrc, onChanged, dupes = [] }) {
                   </div>
                 )}
               </div>
+
+              {fileSet && (
+                <div className="file-list cd-file-list">
+                  <label className="field-label">{t("Files ({n})", { n: discFiles.length })}</label>
+                  <ul className="files">
+                    {discFiles.map((file, index) => (
+                      <li className={`file-row ${index === 0 ? "primary-file" : ""}`} key={file.name}>
+                        <span className="file-tag">{(file.name.split(".").pop() || "FILE").toUpperCase()}</span>
+                        <span className="file-name" title={file.name}>{file.name}{index === 0 && <small>{t("Launch file")}</small>}</span>
+                        <span className="file-size">{file.size == null ? "—" : formatBytes(file.size)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <IgdbFactsPanel igdbOn={igdbOn} meta={igdbMeta.meta} loading={igdbMeta.loading} refresh={igdbMeta.refresh} t={t} />
 

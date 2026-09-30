@@ -229,3 +229,29 @@ def test_existing_chd_failure_retains_source_and_row(client, session_id, make_ro
     assert (storage.session_root(session_id) / rom["rom_path"]).read_bytes() == b"original CHD"
     assert row(rom["id"])["rom_path"] == rom["rom_path"]
     assert not list(storage.roms_dir(session_id, "pcecd").glob(".incoming-*"))
+
+
+def test_cd_library_size_includes_actual_track_files(client, session_id):
+    result = client.post(f"/api/sessions/{session_id}/roms/cdfolder",
+        data={"system": "pcecd", "paths": '["Game/Game.cue", "Game/track.bin"]'},
+        files=[("files", ("Game.cue", b"cue")), ("files", ("track.bin", b"data" * 100))]).json()["results"][0]
+    entries = client.get(f"/api/sessions/{session_id}/library").json()["roms"]
+    entry = next(r for r in entries if r["id"] == result["id"])
+    assert entry["primary_size_bytes"] == 3
+    assert entry["size_bytes"] == 403
+    assert entry["rom_files"] == [{"name": "Game.cue", "size": 3}, {"name": "track.bin", "size": 400}]
+    # A missing sidecar must not turn into an apparently tiny, valid CD game.
+    (storage.session_root(session_id) / "roms/pcecd/Game/track.bin").unlink()
+    entry = next(r for r in client.get(f"/api/sessions/{session_id}/library").json()["roms"] if r["id"] == result["id"])
+    assert entry["size_bytes"] is None
+    assert entry["rom_files"][1]["size"] is None
+
+
+def test_non_cd_file_set_size_includes_sidecars(client, session_id, make_rom):
+    rom = make_rom(system_key="homebrew", name="Game.bin", content=b"launch",
+                   extra_files='[{"name":"assets.dat","size":999}]')
+    (storage.session_root(session_id) / "roms/homebrew/assets.dat").write_bytes(b"assets")
+    entry = next(r for r in client.get(f"/api/sessions/{session_id}/library").json()["roms"] if r["id"] == rom["id"])
+    assert entry["primary_size_bytes"] == 6
+    assert entry["size_bytes"] == 12  # actual disk sizes, not stale uploaded metadata
+    assert len(entry["rom_files"]) == 2

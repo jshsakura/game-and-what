@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import zlib
+import json
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
@@ -62,7 +64,7 @@ def _enrich_rom(r: dict, session_id: str) -> dict:
     - display_region: the region you actually PLAY in. A Japanese dump with a
       Korean patch reads as 'Korea' (play_lang ko), never 'Japan'.
     - cover_ver: cache-bust token for the cover URL (see _cover_ver).
-    - size_bytes: the ROM file's size, so the UI can count/preview what a size-capped
+    - size_bytes: the ROM file size (CUE + all tracks for CD games), so the UI can count/preview what a size-capped
       SD selection would actually contain without asking the server per keystroke."""
     if r.get("korean_name"):
         display = r["korean_name"]
@@ -77,6 +79,27 @@ def _enrich_rom(r: dict, session_id: str) -> dict:
         r["size_bytes"] = (storage.session_root(session_id) / r["rom_path"]).stat().st_size
     except OSError:
         r["size_bytes"] = None
+    if r.get("system_key") in {"segacd", "pcecd"} or r.get("extra_files"):
+        r["primary_size_bytes"] = r["size_bytes"]
+        primary = storage.session_root(session_id) / r["rom_path"]
+        files = [{"name": primary.name, "size": r["primary_size_bytes"]}]
+        try:
+            extra = json.loads(r.get("extra_files") or "[]")
+        except (ValueError, TypeError):
+            extra = []
+        seen = {primary.name}
+        for item in extra if isinstance(extra, list) else []:
+            name = item.get("name") if isinstance(item, dict) else None
+            if not name or name in seen or Path(name).name != name or "\\" in name:
+                continue
+            seen.add(name)
+            try:
+                size = (primary.parent / name).stat().st_size
+            except OSError:
+                size = None
+            files.append({"name": name, "size": size})
+        r["rom_files"] = files
+        r["size_bytes"] = sum(f["size"] for f in files) if all(f["size"] is not None for f in files) else None
     return r
 
 
