@@ -3,6 +3,9 @@
 // Missing keys fall back to the English key (which is the source language).
 export default {
   "IGDB info": "IGDB 정보",
+  "Game info": "게임 정보",
+  "Miyoo gamelist": "미요 게임목록",
+  "Rating": "평점",
   "IGDB rating": "평점",
   "Settings": "설정",
   "No screenshots": "스크린샷 없음",

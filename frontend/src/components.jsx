@@ -682,12 +682,13 @@ function useIgdbMeta(romId, igdbOn) {
 // column next to the cover so that column fills to roughly poster height.
 function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
   if (!igdbOn) return null;     // deploy-time key, user can't set it → hide entirely
+  const local = meta?.source === "miyoo-gamelist";
   const has = !!(meta && (meta.release_date || meta.summary
     || (meta.genres || []).length || (meta.developers || []).length || meta.rating != null));
   return (
     <div className="igdb-meta">
       <div className="igdb-meta-head">
-        <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {t("IGDB info")}</span>
+        <span className="field-label"><Info size={12} strokeWidth={2.5} aria-hidden /> {local ? t("Game info") : t("IGDB info")}{local && <> · {t("Miyoo gamelist")}</>}</span>
         <button type="button" className="btn ghost" disabled={loading} onClick={refresh}>
           {loading ? <Loader size={13} className="spin" /> : <RefreshCw size={13} strokeWidth={2.5} />}
           {t("Refresh")}
@@ -715,7 +716,7 @@ function IgdbFactsPanel({ igdbOn, meta, loading, refresh, t }) {
                 <td colSpan={2}><span className="rom-info-val">{meta.developers.join(", ")}</span></td></tr>
             )}
             {meta.rating != null && (
-              <tr className="rom-info-row"><th scope="row">{t("IGDB rating")}</th>
+              <tr className="rom-info-row"><th scope="row">{local ? t("Rating") : t("IGDB rating")}</th>
                 <td colSpan={2}><span className="rom-info-val">{meta.rating}/100{meta.rating_count ? ` (${meta.rating_count})` : ""}</span></td></tr>
             )}
           </tbody></table>
