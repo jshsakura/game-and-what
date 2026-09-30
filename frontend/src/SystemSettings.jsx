@@ -25,7 +25,7 @@ export default function SystemSettings({ hiddenSystems, onChanged }) {
     finally { setBusy(null); }
   };
   return <>
-    <button className="btn" onClick={() => setOpen(true)} title={t("Settings")} aria-label={t("Settings")}><Settings size={16} /></button>
+    <button type="button" className="icon-btn" onClick={() => setOpen(true)} title={t("Settings")} aria-label={t("Settings")} aria-haspopup="dialog" aria-expanded={open}><Settings size={15} aria-hidden="true" /></button>
     {open && <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
       <section className="modal" role="dialog" aria-modal="true" aria-label={t("Platform visibility")}>
         <div className="modal-head"><span>{t("Platform visibility")}</span><button ref={closeRef} className="icon-btn" onClick={() => setOpen(false)} aria-label={t("Close")}><X size={18} /></button></div>
