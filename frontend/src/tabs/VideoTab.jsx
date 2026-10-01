@@ -4,6 +4,7 @@ import { uploadVideo, getJob, getHealth } from "../api.js";
 import { Dropzone, ProgressBar } from "../components.jsx";
 import { convertToDeviceAvi, downloadBlob, aviName, preloadEncoder, isMultiThread, cancelEncode } from "../localencode.js";
 import { useT } from "../i18n.jsx";
+import { DEFAULT_VIDEO_PROFILE, VIDEO_PROFILES } from "../videoencode.js";
 
 // Screen-fit selector — shared by both sections (it's about how the source maps
 // onto the 320×240 screen, the same either way).
@@ -95,6 +96,7 @@ function JobStatus({ job, name, busyLabel, doneLabel, t }) {
 export default function VideoTab({ onChanged }) {
   const t = useT();
   const [mode, setMode] = useState("fit");      // fit | fill | stretch (shared)
+  const [profile, setProfile] = useState(DEFAULT_VIDEO_PROFILE);
   const [ffmpeg, setFfmpeg] = useState(true);
   // Browser-convert section (local → download, no upload). queue = many files
   // dropped at once, converted sequentially.
@@ -128,6 +130,7 @@ export default function VideoTab({ onChanged }) {
       set(i, { status: "converting", progress: 0.02 });
       try {
         const blob = await convertToDeviceAvi(list[i], mode, {
+          profile,
           onProgress: (p) => set(i, { progress: Math.max(0.02, p) }),
         });
         if (cancelledRef.current.has(i)) { set(i, { status: "cancelled" }); continue; }
@@ -166,7 +169,7 @@ export default function VideoTab({ onChanged }) {
     setSrvError(""); setSrvName(file.name);
     setSrvJob({ status: "encoding", progress: 0.05 });
     try {
-      const res = await uploadVideo(file, onProgress, { mode });
+      const res = await uploadVideo(file, onProgress, { mode, profile });
       poll(res.job_id);
     } catch (e) {
       setSrvError(e.message); setSrvJob(null);
@@ -192,10 +195,18 @@ export default function VideoTab({ onChanged }) {
   return (
     <div className="stack">
       <div className="muted">
-        <Clapperboard size={13} aria-hidden /> {t("For the device's /video player")} · <b>MJPEG · AVI · 320×240 · 20fps · mono MP3 (q17)</b>
+        <Clapperboard size={13} aria-hidden /> {t("For the device's /video player")} · <b>MJPEG · AVI · 320×240 · {VIDEO_PROFILES[profile].fps}fps · mono MP3</b>
       </div>
 
       <FitSelect mode={mode} setMode={setMode} t={t} />
+      <label className="row" style={{ gap: 9, alignItems: "center" }}>
+        <span className="muted">{t("Playback quality")}</span>
+        <select value={profile} onChange={(e) => setProfile(e.target.value)}>
+          <option value="balanced">{t("Balanced (20 fps)")}</option>
+          <option value="smooth">{t("Smooth (30 fps)")}</option>
+          <option value="light">{t("Light (15 fps, less playback load)")}</option>
+        </select>
+      </label>
 
       {/* ── TOP: convert in the browser, download the .avi (no upload) ── */}
       <section className="vtab-section" onMouseEnter={preloadEncoder}>

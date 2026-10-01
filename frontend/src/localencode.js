@@ -9,6 +9,7 @@
 // which doesn't support COEP credentialless. Both are self-hosted.
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { buildDeviceVideoArgs, DEFAULT_VIDEO_PROFILE } from "./videoencode.js";
 
 // SharedArrayBuffer (hence the MT core) only works on a cross-origin-isolated page.
 const MT = typeof globalThis !== "undefined" && globalThis.crossOriginIsolated === true;
@@ -18,19 +19,6 @@ const MT = typeof globalThis !== "undefined" && globalThis.crossOriginIsolated =
 // 11MB clip) — H.264 frame-decode in particular scales with this. Cap at 8 so we
 // don't oversubscribe the emscripten pthread pool; the single-thread core is 1.
 const THREADS = String(MT ? Math.min(navigator.hardwareConcurrency || 4, 8) : 1);
-
-// Screen-fit filters — kept byte-identical to the server's _VIDEO_FILTERS.
-const FILTERS = {
-  fit: "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20",
-  fill: "scale=320:240:force_original_aspect_ratio=increase,crop=320:240,fps=20",
-  stretch: "scale=320:240,fps=20",
-};
-
-// device-verified params (mirror video.py: VIDEO_QSCALE 17, mono MP3 96k/48000).
-// 48000 = the device's own rate, so its nearest-sample resampler passes the audio
-// through untouched — see the alarm section below for what 44100 cost.
-const VIDEO_ARGS = ["-c:v", "mjpeg", "-q:v", "17"];
-const AUDIO_ARGS = ["-c:a", "libmp3lame", "-ac", "1", "-b:a", "96k", "-ar", "48000"];
 
 let _ff = null;          // single shared instance (the 32MB core loads once)
 let _loading = null;
@@ -104,7 +92,7 @@ export function cancelEncode() {
  * Convert a video File to a device-playable MJPEG .avi entirely in the browser.
  * @returns {Promise<Blob>} the .avi blob (caller triggers the download).
  */
-export async function convertToDeviceAvi(file, mode = "fit", { onProgress, onLog } = {}) {
+export async function convertToDeviceAvi(file, mode = "fit", { onProgress, onLog, profile = DEFAULT_VIDEO_PROFILE } = {}) {
   if (!file) throw new Error("No file");
   const ff = await getFFmpeg();
   _onProgress = onProgress || null;
@@ -114,16 +102,10 @@ export async function convertToDeviceAvi(file, mode = "fit", { onProgress, onLog
   const outName = "output.avi";
   try {
     await ff.writeFile(inName, await fetchFile(file));
-    const code = await ff.exec([
-      "-hide_banner", "-y",
-      "-threads", THREADS,           // decode threads (H.264 → big win on the MT core)
-      "-i", inName,
-      ...VIDEO_ARGS,
-      "-vf", FILTERS[mode] || FILTERS.fit,
-      "-threads", THREADS,           // encode/output threads
-      ...AUDIO_ARGS,
-      outName,
-    ]);
+    const args = buildDeviceVideoArgs(inName, outName, mode, profile);
+    args.splice(2, 0, "-threads", THREADS);
+    args.splice(args.indexOf("-c:a"), 0, "-threads", THREADS);
+    const code = await ff.exec(args);
     if (code !== 0) throw new Error("ffmpeg exited with code " + code);
     const data = await ff.readFile(outName);
     if (!data || !data.length) throw new Error("Encode produced no output");

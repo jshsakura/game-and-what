@@ -300,10 +300,11 @@ export async function uploadRomset(systemKey, exts, files, onProgress) {
   return { ...res, covers, skippedAlt };
 }
 
-export async function uploadVideo(file, onProgress, { mode = "fit" } = {}) {
+export async function uploadVideo(file, onProgress, { mode = "fit", profile = "balanced" } = {}) {
   const form = new FormData();
   form.append("file", file);
   form.append("mode", mode);  // fit (letterbox) | fill (crop) | stretch (distort)
+  form.append("profile", profile);
   return xhrUpload(`/api/sessions/${SESSION_ID}/videos`, form, onProgress);
 }
 

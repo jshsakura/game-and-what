@@ -2,6 +2,10 @@
 // Keys must EXACTLY equal the in-code English literal (including punctuation/ellipsis/{placeholders}).
 // Missing keys fall back to the English key (which is the source language).
 export default {
+  "Playback quality": "재생 품질",
+  "Balanced (20 fps)": "기본 (20fps)",
+  "Smooth (30 fps)": "부드럽게 (30fps)",
+  "Light (15 fps, less playback load)": "가볍게 (15fps, 재생 부하 감소)",
   "Platform visibility": "기종별 보임·숨김",
   "Hidden platforms are excluded from the library and SD downloads.": "숨긴 기종은 라이브러리 화면과 SD 다운로드에서 제외됩니다.",
   "Show": "보임",
