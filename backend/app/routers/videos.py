@@ -16,11 +16,12 @@ router = APIRouter(prefix="/api", tags=["videos"])
 async def _run_encode(
     job_id: str, video_id: str, src: Path, dst: Path, session_id: str,
     mode: str = video.DEFAULT_FIT_MODE,
+    profile: str = video.DEFAULT_VIDEO_PROFILE,
 ) -> None:
     """Background: encode src -> dst, updating job + DB status."""
     jobs.update(job_id, status="running", progress=0.05, message="encoding")
     try:
-        await video.encode_to_mjpeg_avi(src, dst, mode=mode)
+        await video.encode_to_mjpeg_avi(src, dst, mode=mode, profile=profile)
         # web preview (browser-playable .mp4) + square thumbnail, built from the
         # source while it's still here. Non-fatal — the card just falls back to an
         # icon, and the serve endpoints can lazy-build from the .avi later.
@@ -57,10 +58,13 @@ async def upload_video(
     file: UploadFile = File(...),
     file_size: int = Form(0),  # optional client hint, unused for validation
     mode: str = Form(video.DEFAULT_FIT_MODE),  # fit | fill | stretch
+    profile: str = Form(video.DEFAULT_VIDEO_PROFILE),  # balanced | smooth | light
 ) -> dict:
     """Upload one video; returns a job id to poll for encode progress."""
     if mode not in video.FIT_MODES:
         mode = video.DEFAULT_FIT_MODE
+    if profile not in video.VIDEO_PROFILES:
+        raise HTTPException(status_code=422, detail="unknown video profile")
     if not video.ffmpeg_available():
         raise HTTPException(status_code=503, detail="ffmpeg not installed on server")
 
@@ -86,6 +90,7 @@ async def upload_video(
             (video_id, session_id, original, avi_name, job_id),
         )
     jobs.create(job_id, "video_encode")
-    asyncio.create_task(_run_encode(job_id, video_id, src_path, dst_path, session_id, mode=mode))
+    asyncio.create_task(_run_encode(job_id, video_id, src_path, dst_path, session_id,
+                                    mode=mode, profile=profile))
 
     return {"video_id": video_id, "job_id": job_id, "avi_name": avi_name, "status": "encoding"}

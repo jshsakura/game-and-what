@@ -1,27 +1,8 @@
-"""
-Video encoding for the device's /media MJPEG player.
+"""Device media encoders: baseline MJPEG AVI at 320x240 with mono MP3.
 
-Hard hardware fact: the chip has NO H.264/HEVC decoder, only a hardware JPEG
-decoder. So the ONLY playable video is MJPEG inside an .avi container. This
-is the EXACT command build_command() emits (default 'fit' mode shown):
-
-  ffmpeg -hide_banner -y -i input -c:v mjpeg \
-    -b:v 1600k -maxrate 1600k -bufsize 320k -qmin 17 -qmax 31 \
-    -vf scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20 \
-    -c:a libmp3lame -ac 1 -b:a 96k -ar 48000 output.avi
-
-Only the -vf filter changes with the screen-fit mode (see _VIDEO_FILTERS):
-  fit     scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:-1:-1:color=black,fps=20
-  fill    scale=320:240:force_original_aspect_ratio=increase,crop=320:240,fps=20
-  stretch scale=320:240,fps=20
-
-Audio = MP3 mono, NOT raw PCM: the SD card is the bottleneck. MP3 mono 96k is
-~12 KB/s and reuses the device's existing minimp3 decoder (shared with the
-music app) — no new audio path. The device downmixes/resamples to its 48kHz
-mono output internally, so source channels/rate don't matter. Video is
-320x240 MJPEG q17 @ 30fps (peak <100 KB/s, scene-complexity-flattened); the
-on-device player drops video frames when the SD can't keep up so audio stays
-locked in sync. Screen is 320x240.
+Video profiles trade motion smoothness against SD/decoder load. Balanced
+20fps is the default; smooth 30fps and light 15fps are explicit choices.
+Browser and server video encoding use matching rate/quality limits.
 """
 from __future__ import annotations
 
@@ -29,75 +10,20 @@ import asyncio
 import shutil
 from pathlib import Path
 
-# ── Encoder settings (what you can tune) ────────────────────────────────────
-# One line: video codec is LOCKED to MJPEG/.avi (the chip only has a HW JPEG
-# decoder — no H.264/HEVC); the only knobs are -q:v (quality↔size) and fps (SD
-# load), audio is mono MP3, resolution is fixed 320×240.
-#
-#   option            current   meaning
-#   ----------------- --------- ----------------------------------------------
-#   -q:v N            17        MJPEG quality 2(best)–31(worst); lower = sharper
-#                               + bigger files (more SD reads)
-#   fps=N  (in -vf)   30        frame rate. SD reads were the bottleneck and are
-#                               not any more (block reads + the 340 MHz boost)
-#   -c:a libmp3lame   mono MP3  audio; firmware expects MP3 (reuses minimp3)
-#   -ac 1
-#   resolution        320×240   the screen — fixed
-#
-# Tuning: sharper (SD has headroom) -q:v 10–12 / fps 24; smoother (SD-bound)
-# -q:v 20 / fps 16–18. Codec/container can't change — anything but baseline
-# MJPEG in .avi won't play on the device.
-
-# Device-verified encode parameters (bench-tested on hardware).
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
-VIDEO_QSCALE = 17         # Quality anchor (used as -qmin). MJPEG is intra-only, so
-                          # per-frame bytes track SCENE COMPLEXITY: a calm verse is
-                          # small but a busy chorus balloons — over the SD read budget,
-                          # so the player drops/judders mid-clip. Two layers flatten it:
-                          #   1. -qmin VIDEO_QSCALE pins easy/medium scenes to exactly
-                          #      the old constant-q17 output (measured byte-identical);
-                          #   2. VBV rate control (-maxrate/-bufsize below) raises q
-                          #      only on the heaviest scenes, cutting their read load
-                          #      ~26% (measured on a full-noise worst case) and giving
-                          #      a hard per-frame byte ceiling well under the device's
-                          #      64 KB frame-slot limit.
-                          # (An earlier note here said -b:v "does not help" — that was
-                          # plain -b:v without qmin/bufsize; the VBV form does bound
-                          # the peaks, verified per-frame with ffprobe.)
-VIDEO_BITRATE = "2400k"   # VBV target/ceiling: ~300 KB/s, raised with FRAME_RATE:
-                          # at 30fps the old 1600k would make rate control raise q on
-                          # ordinary scenes, buying smoothness by spending sharpness.
-                          # 2400k keeps per-frame quality and lets the extra frames
-                          # cost extra bytes — which is what the faster read path is
-                          # for. Was: ~200 KB/s. Sits above q17's typical
-                          # ~100 KB/s, so RC only intervenes in the top complexity band.
-VIDEO_VBV_BUF = "320k"    # ~40 KB VBV window -> worst frames bounded near it.
-FRAME_RATE = 30           # fps=30. Raised from 20 because the reason for 20 is gone:
-                          # 20 was chosen when per-read latency WAS the bottleneck — the
-                          # firmware read each 512-byte SD block ONE BYTE AT A TIME, which
-                          # capped reads near 243 KB/s whatever the SPI clock was. That loop
-                          # now does one block transfer per block (~8-10x; rd= went from
-                          # ~32 ms/frame to single digits), and the player now takes the
-                          # 340 MHz overclock, which speeds up the SPI loop itself. At 30fps
-                          # with the ceiling below the load is ~300 KB/s against a path that
-                          # does megabytes. Smoothness is the most visible improvement left,
-                          # because nothing else about a 320x240 screen can get better.
-                          # If a device disagrees: the player's debug HUD shows dec=/v=
-                          # (decoded vs seen — they should track) and rd= (blocking read ms
-                          # — should stay near zero, work showing in pf=). Falling back is
-                          # one line: set this to 20, VIDEO_BITRATE to 1600k, re-upload.
-                          # --- the note this replaces, kept for the reasoning: per-read latency
-                          # is the bottleneck, so fps↓ (read count) + q↑ (sectors/read)
-                          # both cut SD load directly. 20fps (down from 24) trims ~17%
-                          # of the read count for noticeably smoother playback on slow
-                          # SD cards, at a barely-perceptible motion cost. Target ~110 KB/s.
-AUDIO_BITRATE = "96k"     # MP3 mono — minimal SD load, reuses minimp3 on device
-AUDIO_RATE = 48000        # the device's own rate. Its resampler steps by
-                          # (src_hz << 16) / 48000 and reads the NEAREST sample,
-                          # so 48000 is the one rate that passes through untouched
-                          # (step == 65536). 44100 gave step 60211 and folded an
-                          # image of the source back into the audible band.
+VIDEO_PROFILES = {
+    "balanced": {"fps": 20, "bitrate": "1600k", "qmin": 17},
+    "smooth": {"fps": 30, "bitrate": "2400k", "qmin": 17},
+    "light": {"fps": 15, "bitrate": "1000k", "qmin": 20},
+}
+DEFAULT_VIDEO_PROFILE = "balanced"
+FRAME_RATE = VIDEO_PROFILES[DEFAULT_VIDEO_PROFILE]["fps"]
+VIDEO_BITRATE = VIDEO_PROFILES[DEFAULT_VIDEO_PROFILE]["bitrate"]
+VIDEO_QSCALE = VIDEO_PROFILES[DEFAULT_VIDEO_PROFILE]["qmin"]
+VIDEO_VBV_BUF = "320k"
+AUDIO_BITRATE = "96k"
+AUDIO_RATE = 48000
 OUTPUT_SUFFIX = ".avi"
 
 # Three ways to map an arbitrary source onto the exact 320x240 screen:
@@ -136,23 +62,29 @@ def ffmpeg_available() -> bool:
     return shutil.which("ffmpeg") is not None
 
 
-def build_command(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE) -> list[str]:
+def build_command(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE,
+                  profile: str = DEFAULT_VIDEO_PROFILE) -> list[str]:
     """The exact MJPEG/.avi command, as an argv list (no shell). `mode` is one of
     FIT_MODES — 'fit' (letterbox), 'fill' (crop to cover), 'stretch' (distort).
     Unknown values fall back to the default fit."""
+    settings = VIDEO_PROFILES.get(profile, VIDEO_PROFILES[DEFAULT_VIDEO_PROFILE])
+    vf = _VIDEO_FILTERS.get(mode, _VIDEO_FILTERS[DEFAULT_FIT_MODE])
+    vf = vf.rsplit(",fps=", 1)[0] + f",fps={settings['fps']}"
     return [
         "ffmpeg", "-hide_banner", "-y",
         "-i", str(input_path),
         "-c:v", "mjpeg",
-        "-b:v", VIDEO_BITRATE, "-maxrate", VIDEO_BITRATE, "-bufsize", VIDEO_VBV_BUF,
-        "-qmin", str(VIDEO_QSCALE), "-qmax", "31",
-        "-vf", _VIDEO_FILTERS.get(mode, _VIDEO_FILTERS[DEFAULT_FIT_MODE]),
+        "-pix_fmt", "yuvj420p",  # fits the device's fixed YCbCr decode workspace
+        "-b:v", settings["bitrate"], "-maxrate", settings["bitrate"], "-bufsize", VIDEO_VBV_BUF,
+        "-qmin", str(settings["qmin"]), "-qmax", "31",
+        "-vf", vf,
         "-c:a", "libmp3lame", "-ac", "1", "-b:a", AUDIO_BITRATE, "-ar", str(AUDIO_RATE),
         str(output_path),
     ]
 
 
-async def encode_to_mjpeg_avi(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE) -> Path:
+async def encode_to_mjpeg_avi(input_path: Path, output_path: Path, mode: str = DEFAULT_FIT_MODE,
+                              profile: str = DEFAULT_VIDEO_PROFILE) -> Path:
     """
     Encode `input_path` to a device-playable MJPEG .avi at `output_path`.
 
@@ -168,7 +100,7 @@ async def encode_to_mjpeg_avi(input_path: Path, output_path: Path, mode: str = D
         raise VideoEncodeError(f"Input not found: {input_path}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = build_command(input_path, output_path, mode=mode)
+    cmd = build_command(input_path, output_path, mode=mode, profile=profile)
 
     proc = await asyncio.create_subprocess_exec(
         *cmd,
